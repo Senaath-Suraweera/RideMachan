@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- ===================
+             Meta & Stylesheets
+    =================== -->
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Bookings - Ride Booker</title>
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+    />
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
+    />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet"
+    />
+    <link rel="stylesheet" href="booking.css" />
+</head>
+<body>
+    <div class="container">
+        <!-- ===================
+                 Sidebar Navigation
+        =================== -->
+        <div class="sidebar">
+            <div class="logo">
+                    <img src="logo.png" alt="Logo" class="logo">
+                </div>
+            <div class="nav-menu">
+                    <!-- Home Section -->
+
+                    <div class="nav-item">
+                        <i class="fas fa-car"></i>
+                        <a href="home.html"><span>Home</span></a>
+                        
+                    </div>
+                    
+                    <div class="nav-item">
+                        <i class="fas fa-car"></i>
+                        <a href="search.html"><span>Search</span></a>
+                    </div>
+                
+                    <div class="nav-item active">
+                        <i class="fas fa-box"></i>
+                        <a href="booking.html"><span>Bookings</span></a>
+                    </div>
+
+                    <div class="nav-item">
+                        <i class="fas fa-cog"></i>
+                        <a href="settings.html"><span>Settings</span></a>
+                    </div>
+                    <div class="nav-item">
+                        <i class="fas fa-bell"></i>
+                        <a href="notifications.html"><span>Notifications</span></a>
+                    </div>
+                    <div class="logout">
+                        <i class="fas fa-sign-out"></i>
+                        <span>Logout</span>
+                    </div>
+                </div>
+        </div>
+
+        <!-- ===================
+                 Header Section
+        =================== -->
+        <div class="header">
+            <div class="hi">
+                <h1>My Bookings</h1>
+                <p class="subtitle">Manage your vehicle reservations</p>
+            </div>
+            <div class="header-actions">
+                <button class="btn btn-primary">
+                    <i class="fas fa-plus"></i>
+                    New Booking
+                </button>
+                <div class="notification">
+                    <a href="#"><i class="fas fa-bell"></i></a>
+                    <div class="badge">3</div>
+                </div>
+                <div class="notification">
+                    <a href="#"><i class="fas fa-envelope"></i></a>
+                    <div class="badge">5</div>
+                </div>
+                <div class="user-profile">
+                    <div class="profile-img">K</div>
+                    <div class="user-info">
+                        <div class="user-name">Kamal</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===================
+                 Main Content Section
+        =================== -->
+        <div class="main-content">
+            <!-- Booking Categories -->
+            <div class="booking-categories">
+                <div class="category-tabs">
+                    <button class="tab-btn active" data-tab="vehicle-bookings">
+                        <i class="fas fa-car"></i>
+                        Vehicle Bookings
+                    </button>
+                    <button class="tab-btn" data-tab="driver-only-bookings">
+                        <i class="fas fa-user-tie"></i>
+                        Driver Only Bookings
+                    </button>
+                </div>
+            </div>
+
+            <!-- Vehicle Bookings Section -->
+            <div class="tab-content active" id="vehicle-bookings">
+                <!-- Booking Type Filter -->
+                <div class="booking-filters">
+                    <div class="filter-tabs">
+                        <button class="filter-btn active" data-filter="all" data-category="vehicle">
+                            <i class="fas fa-list"></i>
+                            All
+                        </button>
+                        <button class="filter-btn" data-filter="active" data-category="vehicle">
+                            <i class="fas fa-play"></i>
+                            Active
+                        </button>
+                        <button class="filter-btn" data-filter="upcoming" data-category="vehicle">
+                            <i class="fas fa-clock"></i>
+                            Upcoming
+                        </button>
+                        <button class="filter-btn" data-filter="past" data-category="vehicle">
+                            <i class="fas fa-history"></i>
+                            Past
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Booking Stats -->
+                <div class="booking-stats">
+                    <div class="stat-card">
+                        <div class="stat-number">1</div>
+                        <div class="stat-label">Active Vehicle Rides</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">3</div>
+                        <div class="stat-label">Upcoming Vehicle Bookings</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">7</div>
+                        <div class="stat-label">Completed Vehicle Rides</div>
+                    </div>
+                </div>
+
+                <!-- Active Vehicle Booking -->
+                <div class="booking-section vehicle-active">
+                    <h3 class="section-title">
+                        <i class="fas fa-play-circle text-success"></i>
+                        Active Vehicle Booking
+                    </h3>
+                    <div class="booking-card active-booking">
+                        <div class="booking-header">
+                            <div class="vehicle-info">
+                                <div class="vehicle-icon">
+                                    <i class="fas fa-car"></i>
+                                </div>
+                                <div class="vehicle-details">
+                                    <h4>Toyota Prius</h4>
+                                    <span class="vehicle-status active">Active</span>
+                                </div>
+                            </div>
+                            <div class="booking-status">
+                                <span class="status-badge paid">Paid</span>
+                            </div>
+                        </div>
+                        <div class="booking-content">
+                            <div class="booking-info">
+                                <div class="info-row">
+                                    <span class="label">Date:</span>
+                                    <span class="value">8/13/2024</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="label">Time:</span>
+                                    <span class="value">09:00 - 18:00</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="label">Pickup:</span>
+                                    <span class="value">Colombo Fort Railway Station</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="label">Range:</span>
+                                    <span class="value">Kandy City Center</span>
+                                </div>
+                            </div>
+                            <div class="driver-info">
+                                <div class="driver-avatar">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                <div class="driver-details">
+                                    <span class="driver-name">Driver: Lasith Perera</span>
+                                    <div class="driver-rating">
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        4.8
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="amount-info">
+                                <span class="amount">LKR 15,000</span>
+                            </div>
+                        </div>
+                        <div class="booking-actions">
+                            <button class="btn btn-outline btn-sm">
+                                <i class="fas fa-receipt"></i>
+                                View Receipt
+                            </button>
+                            <button class="btn btn-primary btn-sm">
+                                <i class="fas fa-message"></i>
+                                Message
+                            </button>
+                            <button class="btn btn-success btn-sm">
+                                <i class="fas fa-phone"></i>
+                                Call
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Upcoming Vehicle Bookings -->
+                <div class="booking-section vehicle-upcoming">
+                    <h3 class="section-title">
+                        <i class="fas fa-clock text-warning"></i>
+                        Upcoming Vehicle Bookings
+                    </h3>
+                    
+                    <!-- Toyota Prius Booking -->
+                    <div class="booking-card">
+                        <div class="booking-header">
+                            <div class="vehicle-info">
+                                <div class="vehicle-icon">
+                                    <i class="fas fa-car"></i>
+                                </div>
+                                <div class="vehicle-details">
+                                    <h4>Toyota Prius</h4>
+                                    <span class="booking-id">Booking ID: CC-2024-009</span>
+                                </div>
+                            </div>
+                            <div class="booking-status">
+                                <span class="status-badge paid">Paid</span>
+                                <span class="booking-type">Morning</span>
+                            </div>
+                        </div>
+                        <div class="booking-content">
+                            <div class="booking-info">
+                                <div class="info-row">
+                                    <span class="label">8/16/2024 - 8/16/2024</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="label">06:00 - 18:00</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="label">Colombo Fort Railway Station</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="label">To: Bandaranaike International Airport</span>
+                                </div>
+                            </div>
+                            <div class="driver-info">
+                                <span class="driver-name">Ruwan Silva (4.7⭐)</span>
+                                <div class="contact-info">
+                                    <span class="phone">📞 Call</span>
+                                    <span class="message">💬 Message</span>
+                                </div>
+                                <span class="amount">LKR 12,000</span>
+                                <span class="vehicle-number">SMI-**** 4537</span>
+                            </div>
+                        </div>
+                        <div class="booking-actions">
+                            <button class="btn btn-outline btn-sm"><a href="payment_status.html"> Details</button></a>
+                            <button class="btn btn-danger btn-sm">Cancel Booking</button>
+                        </div>
+                    </div>
+
+                    <!-- Toyota Aqua Booking -->
+                    <div class="booking-card">
+                        <div class="booking-header">
+                            <div class="vehicle-info">
+                                <div class="vehicle-icon">
+                                    <i class="fas fa-car"></i>
+                                </div>
+                                <div class="vehicle-details">
+                                    <h4>Toyota Aqua</h4>
+                                    <span class="booking-id">Booking ID: BB-2024-010</span>
+                                </div>
+                            </div>
+                            <div class="booking-status">
+                                <span class="status-badge payment-pending">Payment Pending</span>
+                                <span class="booking-type">Morning</span>
+                            </div>
+                        </div>
+                        <div class="booking-content">
+                            <div class="booking-info">
+                                <div class="info-row">
+                                    <span class="label">8/18/2024 - 8/18/2024</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="label">06:00 - 20:00</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="label">Galle Face Green</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="label">To: Sigiriya Rock Fortress</span>
+                                </div>
+                            </div>
+                            <div class="driver-info">
+                                <span class="driver-name">Chaminda Fernando (4.6⭐)</span>
+                                <div class="contact-info">
+                                    <span class="phone">📞 Call</span>
+                                    <span class="message">💬 Message</span>
+                                </div>
+                                <span class="amount">LKR 25,000</span>
+                            </div>
+                        </div>
+                        <div class="booking-actions">
+                            <button class="btn btn-primary btn-sm"><a href="payment.html">Pay Now</button></a>
+                            <button class="btn btn-outline btn-sm">Cancel Booking</button>
+                        </div>
+                    </div>
+
+                    <!-- Suzuki Alto Booking -->
+                    <div class="booking-card">
+                        <div class="booking-header">
+                            <div class="vehicle-info">
+                                <div class="vehicle-icon">
+                                    <i class="fas fa-car"></i>
+                                </div>
+                                <div class="vehicle-details">
+                                    <h4>Suzuki Alto</h4>
+                                    <span class="booking-id">Budget Car Rental</span>
+                                </div>
+                            </div>
+                            <div class="booking-status">
+                                <span class="status-badge payment-pending">Payment Pending</span>
+                                <span class="booking-type">Morning</span>
+                            </div>
+                        </div>
+                        <div class="booking-content">
+                            <div class="booking-info">
+                                <div class="info-row">
+                                    <span class="label">8/20/2024 - 8/20/2024</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="label">06:00 - 17:00</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="label">Kandy City Centre</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="label">To: Temple of the Tooth</span>
+                                </div>
+                            </div>
+                            <div class="driver-info">
+                                <span class="driver-name">Self Drive Rental</span>
+                                <span class="amount">LKR 8,500</span>
+                            </div>
+                        </div>
+                        <div class="booking-actions">
+                            <button class="btn btn-primary btn-sm">Pay Now</button>
+                            <button class="btn btn-outline btn-sm">Cancel Booking</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Past Vehicle Bookings -->
+                <div class="booking-section vehicle-past">
+                    <h3 class="section-title">
+                        <i class="fas fa-history text-info"></i>
+                        Past Vehicle Bookings
+                    </h3>
+                    
+                    <!-- Completed Bookings -->
+                    <div class="booking-card completed">
+                        <div class="booking-header">
+                            <div class="vehicle-info">
+                                <div class="vehicle-icon">
+                                    <i class="fas fa-car"></i>
+                                </div>
+                                <div class="vehicle-details">
+                                    <h4>Toyota Prius</h4>
+                                    <span class="booking-id">Booking ID: LL-2024-004</span>
+                                </div>
+                            </div>
+                            <div class="booking-status">
+                                <span class="status-badge completed">Completed</span>
+                            </div>
+                        </div>
+                        <div class="booking-content">
+                            <div class="booking-info">
+                                <div class="info-row">
+                                    <span class="label">8/10/2024 - 8/10/2024</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="label">09:00 - 18:00</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="label">Colombo Airport</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="label">To: Kandy Queens Hotel</span>
+                                </div>
+                            </div>
+                            <div class="driver-info">
+                                <span class="driver-name">Lasith Perera (4.8⭐)</span>
+                                <span class="amount">LKR 18,000</span>
+                                <span class="payment-ref">Payment ID: 5847456754268</span>
+                            </div>
+                        </div>
+                        <div class="booking-actions">
+                            <button class="btn btn-outline btn-sm">Download Invoice</button>
+                            <button class="btn btn-primary btn-sm">Rate Service</button>
+                            <button class="btn btn-success btn-sm">Book Again</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Driver Only Bookings Section -->
+            <div class="tab-content" id="driver-only-bookings">
+                <!-- Driver Booking Filters -->
+                <div class="booking-filters">
+                    <div class="filter-tabs">
+                        <button class="filter-btn active" data-filter="all" data-category="driver">
+                            <i class="fas fa-list"></i>
+                            All
+                        </button>
+                        <button class="filter-btn" data-filter="active" data-category="driver">
+                            <i class="fas fa-play"></i>
+                            Active
+                        </button>
+                        <button class="filter-btn" data-filter="upcoming" data-category="driver">
+                            <i class="fas fa-clock"></i>
+                            Upcoming
+                        </button>
+                        <button class="filter-btn" data-filter="past" data-category="driver">
+                            <i class="fas fa-history"></i>
+                            Past
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Driver Booking Stats -->
+                <div class="booking-stats">
+                    <div class="stat-card">
+                        <div class="stat-number">2</div>
+                        <div class="stat-label">Active Driver Services</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">1</div>
+                        <div class="stat-label">Upcoming Driver Bookings</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">5</div>
+                        <div class="stat-label">Completed Driver Services</div>
+                    </div>
+                </div>
+
+                <!-- Active Driver Bookings -->
+                <div class="booking-section driver-active">
+                    <h3 class="section-title">
+                        <i class="fas fa-play-circle text-success"></i>
+                        Active Driver Services
+                    </h3>
+
+                    <!-- Driver Booking Card 1 -->
+                    <div class="driver-booking-card active-service">
+                        <div class="driver-header">
+                            <div class="driver-info">
+                                <div class="driver-avatar-large">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                <div class="driver-main-info">
+                                    <h4>Lasith Perera</h4>
+                                    <span class="driver-company">Grand Elite Drivers</span>
+                                    <span class="booking-id">Booking ID: GED-2024-007</span>
+                                </div>
+                            </div>
+                            <div class="status-section">
+                                <span class="status-badge active-progress">Active - In Progress</span>
+                                <span class="service-type">Pool</span>
+                            </div>
+                        </div>
+                        
+                        <div class="service-details">
+                            <div class="service-info">
+                                <div class="info-row">
+                                    <span class="label">📅 8/13/2024</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="label">🕘 09:00 - 18:00 (9 hours)</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="label">📍 From: Colombo Fort Railway Station</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="label">📍 To: Bandaranaike International Airport</span>
+                                </div>
+                                <div class="progress-indicator">
+                                    <span class="progress-text">🟢 Live Trip in Progress</span>
+                                    <span class="trip-status">Driver is currently en route with customer arrival at 17:45</span>
+                                </div>
+                            </div>
+                            
+                            <div class="customer-payment-info">
+                                <div class="customer-info">
+                                    <span class="customer-label">Customer: Priya Fernando</span>
+                                </div>
+                                <div class="payment-info">
+                                    <span class="amount">LKR 15,000</span>
+                                    <span class="eta">ETA: 17:45</span>
+                                </div>
+                                <div class="rating-info">
+                                    Rating: 4.9/5
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="service-actions">
+                            <button class="btn btn-outline btn-sm">
+                                <i class="fas fa-route"></i>
+                                Track Driver
+                            </button>
+                            <button class="btn btn-primary btn-sm">
+                                <i class="fas fa-phone"></i>
+                                Call Driver
+                            </button>
+                            <button class="btn btn-warning btn-sm">
+                                <i class="fas fa-message"></i>
+                                Message Driver
+                            </button>
+                            <button class="btn btn-success btn-sm">
+                                <i class="fas fa-user"></i>
+                                Call Customer
+                            </button>
+                            <button class="btn btn-danger btn-sm">Emergency Stop</button>
+                        </div>
+                    </div>
+
+                    <!-- Driver Booking Card 2 -->
+                    <div class="driver-booking-card active-service">
+                        <div class="driver-header">
+                            <div class="driver-info">
+                                <div class="driver-avatar-large">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                <div class="driver-main-info">
+                                    <h4>Ruwan Silva</h4>
+                                    <span class="driver-company">Professional Drivers LK</span>
+                                    <span class="booking-id">Booking ID: PDL-2024-009</span>
+                                </div>
+                            </div>
+                            <div class="status-section">
+                                <span class="status-badge active-progress">Active - In Progress</span>
+                                <span class="service-type">Pool</span>
+                            </div>
+                        </div>
+                        
+                        <div class="service-details">
+                            <div class="service-info">
+                                <div class="info-row">
+                                    <span class="label">📅 8/13/2024</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="label">🕐 14:00 - 22:00 (8 hours)</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="label">📍 From: Galle Face Green</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="label">📍 To: Kandy City Centre</span>
+                                </div>
+                                <div class="progress-indicator">
+                                    <span class="progress-text">🟢 Live Trip in Progress</span>
+                                    <span class="trip-status">Driver is currently en route and with customer around 21:30</span>
+                                </div>
+                            </div>
+                            
+                            <div class="customer-payment-info">
+                                <div class="customer-info">
+                                    <span class="customer-label">Customer: Dulki Smith</span>
+                                </div>
+                                <div class="payment-info">
+                                    <span class="amount">LKR 19,000</span>
+                                    <span class="eta">ETA: 21:30</span>
+                                </div>
+                                <div class="rating-info">
+                                    Rating: 4.7/5
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="service-actions">
+                            <button class="btn btn-outline btn-sm">
+                                <i class="fas fa-route"></i>
+                                Track Driver
+                            </button>
+                            <button class="btn btn-primary btn-sm">
+                                <i class="fas fa-phone"></i>
+                                Call Driver
+                            </button>
+                            <button class="btn btn-warning btn-sm">
+                                <i class="fas fa-message"></i>
+                                Message Driver
+                            </button>
+                            <button class="btn btn-success btn-sm">
+                                <i class="fas fa-user"></i>
+                                Call Customer
+                            </button>
+                            <button class="btn btn-danger btn-sm">Emergency Stop</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Upcoming Driver Bookings -->
+                <div class="booking-section driver-upcoming">
+                    <h3 class="section-title">
+                        <i class="fas fa-clock text-warning"></i>
+                        Upcoming Driver Services
+                    </h3>
+
+                    <div class="driver-booking-card">
+                        <div class="driver-header">
+                            <div class="driver-info">
+                                <div class="driver-avatar-large">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                <div class="driver-main-info">
+                                    <h4>Chaminda Fernando</h4>
+                                    <span class="driver-company">City Drivers Network</span>
+                                    <span class="booking-id">Booking ID: CDN-2024-015</span>
+                                </div>
+                            </div>
+                            <div class="status-section">
+                                <span class="status-badge payment-pending">Payment Pending</span>
+                                <span class="service-type">Premium</span>
+                            </div>
+                        </div>
+                        
+                        <div class="service-details">
+                            <div class="service-info">
+                                <div class="info-row">
+                                    <span class="label">📅 8/20/2024</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="label">🕘 08:00 - 20:00 (12 hours)</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="label">📍 From: Negombo Beach Resort</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="label">📍 To: Ella Rock Viewpoint</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="label">📋 Service: Full day sightseeing tour</span>
+                                </div>
+                            </div>
+                            
+                            <div class="customer-payment-info">
+                                <div class="customer-info">
+                                    <span class="customer-label">Customer: Sarah Johnson</span>
+                                </div>
+                                <div class="payment-info">
+                                    <span class="amount">LKR 28,000</span>
+                                    <span class="eta">Starts: 08:00</span>
+                                </div>
+                                <div class="rating-info">
+                                    Driver Rating: 4.6/5
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="service-actions">
+                            <button class="btn btn-primary btn-sm">
+                                <i class="fas fa-credit-card"></i>
+                                Pay Now
+                            </button>
+                            <button class="btn btn-outline btn-sm">
+                                <i class="fas fa-eye"></i>
+                                View Details
+                            </button>
+                            <button class="btn btn-danger btn-sm">
+                                <i class="fas fa-times"></i>
+                                Cancel Booking
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Past Driver Bookings -->
+                <div class="booking-section driver-past">
+                    <h3 class="section-title">
+                        <i class="fas fa-history text-info"></i>
+                        Past Driver Services
+                    </h3>
+
+                    <!-- Completed Driver Service 1 -->
+                    <div class="driver-booking-card completed">
+                        <div class="driver-header">
+                            <div class="driver-info">
+                                <div class="driver-avatar-large">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                <div class="driver-main-info">
+                                    <h4>Nimal Rathnayake</h4>
+                                    <span class="driver-company">Elite Travel Services</span>
+                                    <span class="booking-id">Booking ID: ETS-2024-003</span>
+                                </div>
+                            </div>
+                            <div class="status-section">
+                                <span class="status-badge completed">Completed</span>
+                                <span class="service-type">Premium</span>
+                            </div>
+                        </div>
+                        
+                        <div class="service-details">
+                            <div class="service-info">
+                                <div class="info-row">
+                                    <span class="label">📅 8/8/2024</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="label">🕘 06:00 - 22:00 (16 hours)</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="label">📍 From: Colombo Hilton Hotel</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="label">📍 To: Sigiriya Ancient Rock</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="label">📋 Service: Cultural heritage tour</span>
+                                </div>
+                            </div>
+                            
+                            <div class="customer-payment-info">
+                                <div class="customer-info">
+                                    <span class="customer-label">Customer: Michael Thompson</span>
+                                </div>
+                                <div class="payment-info">
+                                    <span class="amount">LKR 35,000</span>
+                                    <span class="payment-ref">Payment ID: 9876543210123</span>
+                                </div>
+                                <div class="rating-info">
+                                    Service Rating: 5.0/5 ⭐
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="service-actions">
+                            <button class="btn btn-outline btn-sm">
+                                <i class="fas fa-download"></i>
+                                Download Invoice
+                            </button>
+                            <button class="btn btn-primary btn-sm">
+                                <i class="fas fa-star"></i>
+                                Rate Service
+                            </button>
+                            <button class="btn btn-success btn-sm">
+                                <i class="fas fa-redo"></i>
+                                Book Again
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Completed Driver Service 2 -->
+                    <div class="driver-booking-card completed">
+                        <div class="driver-header">
+                            <div class="driver-info">
+                                <div class="driver-avatar-large">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                <div class="driver-main-info">
+                                    <h4>Sunil Wickramasinghe</h4>
+                                    <span class="driver-company">Mountain View Drivers</span>
+                                    <span class="booking-id">Booking ID: MVD-2024-001</span>
+                                </div>
+                            </div>
+                            <div class="status-section">
+                                <span class="status-badge completed">Completed</span>
+                                <span class="service-type">Standard</span>
+                            </div>
+                        </div>
+                        
+                        <div class="service-details">
+                            <div class="service-info">
+                                <div class="info-row">
+                                    <span class="label">📅 8/5/2024</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="label">🕘 09:00 - 17:00 (8 hours)</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="label">📍 From: Kandy Railway Station</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="label">📍 To: Nuwara Eliya Tea Gardens</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="label">📋 Service: Hill country tour</span>
+                                </div>
+                            </div>
+                            
+                            <div class="customer-payment-info">
+                                <div class="customer-info">
+                                    <span class="customer-label">Customer: Emma Wilson</span>
+                                </div>
+                                <div class="payment-info">
+                                    <span class="amount">LKR 18,500</span>
+                                    <span class="payment-ref">Payment ID: 5647382910456</span>
+                                </div>
+                                <div class="rating-info">
+                                    Service Rating: 4.8/5 ⭐
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="service-actions">
+                            <button class="btn btn-outline btn-sm">
+                                <i class="fas fa-download"></i>
+                                Download Invoice
+                            </button>
+                            <button class="btn btn-primary btn-sm">
+                                <i class="fas fa-star"></i>
+                                Rate Service
+                            </button>
+                            <button class="btn btn-success btn-sm">
+                                <i class="fas fa-redo"></i>
+                                Book Again
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Tab switching functionality
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const tab = btn.dataset.tab;
+                
+                // Remove active class from all tabs and content
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                
+                // Add active class to clicked tab and corresponding content
+                btn.classList.add('active');
+                document.getElementById(tab).classList.add('active');
+            });
+        });
+
+        // Filter functionality
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const category = btn.dataset.category;
+                
+                // Remove active class from filter buttons in the same category
+                document.querySelectorAll(`.filter-btn[data-category="${category}"]`).forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                
+                const filter = btn.dataset.filter;
+                const currentTab = document.querySelector('.tab-content.active').id;
+                
+                // Show/hide sections based on filter
+                if (currentTab === 'vehicle-bookings') {
+                    handleVehicleFilter(filter);
+                } else if (currentTab === 'driver-only-bookings') {
+                    handleDriverFilter(filter);
+                }
+            });
+        });
+
+        function handleVehicleFilter(filter) {
+            const sections = {
+                'vehicle-active': document.querySelector('.vehicle-active'),
+                'vehicle-upcoming': document.querySelector('.vehicle-upcoming'),
+                'vehicle-past': document.querySelector('.vehicle-past')
+            };
+
+            // Hide all sections first
+            Object.values(sections).forEach(section => {
+                if (section) section.style.display = 'none';
+            });
+
+            // Show sections based on filter
+            switch(filter) {
+                case 'all':
+                    Object.values(sections).forEach(section => {
+                        if (section) section.style.display = 'block';
+                    });
+                    break;
+                case 'active':
+                    if (sections['vehicle-active']) sections['vehicle-active'].style.display = 'block';
+                    break;
+                case 'upcoming':
+                    if (sections['vehicle-upcoming']) sections['vehicle-upcoming'].style.display = 'block';
+                    break;
+                case 'past':
+                    if (sections['vehicle-past']) sections['vehicle-past'].style.display = 'block';
+                    break;
+            }
+        }
+
+        function handleDriverFilter(filter) {
+            const sections = {
+                'driver-active': document.querySelector('.driver-active'),
+                'driver-upcoming': document.querySelector('.driver-upcoming'),
+                'driver-past': document.querySelector('.driver-past')
+            };
+
+            // Hide all sections first
+            Object.values(sections).forEach(section => {
+                if (section) section.style.display = 'none';
+            });
+
+            // Show sections based on filter
+            switch(filter) {
+                case 'all':
+                    Object.values(sections).forEach(section => {
+                        if (section) section.style.display = 'block';
+                    });
+                    break;
+                case 'active':
+                    if (sections['driver-active']) sections['driver-active'].style.display = 'block';
+                    break;
+                case 'upcoming':
+                    if (sections['driver-upcoming']) sections['driver-upcoming'].style.display = 'block';
+                    break;
+                case 'past':
+                    if (sections['driver-past']) sections['driver-past'].style.display = 'block';
+                    break;
+            }
+        }
+
+        // Initialize default view
+        document.addEventListener('DOMContentLoaded', function() {
+            // Show all sections by default
+            handleVehicleFilter('all');
+            handleDriverFilter('all');
+        });
+    </script>
+</body>
+</html>

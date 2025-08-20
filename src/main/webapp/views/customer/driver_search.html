@@ -1,0 +1,1258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Find Professional Drivers - Ride Machan</title>
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+    />
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
+    />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet"
+    />
+    <style>
+        /* =========================
+          CSS Variables
+          ========================= */
+        :root {
+          /* Color Palette */
+          --primary: #3a0ca3;
+          --primary-light: #4361ee;
+          --secondary: #7209b7;
+          --success: #4cc9f0;
+          --danger: #f72585;
+          --warning: #f8961e;
+          --info: #4895ef;
+          --dark: #1a1a2e;
+          --light: #f8f9fa;
+          --border: #e9ecef;
+          --text: #2d3748;
+          --text-light: #718096;
+
+          /* Shadows */
+          --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
+           0 4px 6px -2px rgba(0, 0, 0, 0.05);
+          --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+          --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
+           0 10px 10px -5px rgba(0, 0, 0, 0.04);
+
+          /* Border Radius */
+          --radius: 10px;
+          --radius-sm: 6px;
+
+          /* Layout */
+          --sidebar-width: 260px;
+          --header-height: 70px;
+
+          /* Transition */
+          --transition: all 0.3s ease;
+        }
+
+        /* =========================
+          Global Styles
+          ========================= */
+        * {
+          margin: 0;
+          padding: 0;
+          box-sizing: border-box;
+          font-family: "Poppins", sans-serif;
+        }
+
+        body {
+          background-color: #f5f7fb;
+          color: var(--text);
+          overflow-x: hidden;
+        }
+
+        /* =========================
+          Custom Scrollbar
+          ========================= */
+        ::-webkit-scrollbar {
+          width: 6px;
+          height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+          background: #f1f1f1;
+        }
+
+        ::-webkit-scrollbar-thumb {
+          background: var(--primary-light);
+          border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+          background: var(--primary);
+        }
+
+        /* =========================
+          Layout Container
+          ========================= */
+        .container {
+          display: grid;
+          grid-template-columns: var(--sidebar-width) 1fr;
+          grid-template-rows: var(--header-height) 1fr;
+          min-height: 100vh;
+        }
+
+        /* =========================
+          Sidebar
+          ========================= */
+        .sidebar {
+          grid-row: 1 / 3;
+          background-color: rgba(14, 21, 43, 0.94);  
+          color: white;
+          overflow-y: auto;
+          transition: var(--transition);
+          box-shadow: var(--shadow);
+          z-index: 1000;
+          position: fixed;
+          height:100%;
+          width: var(--sidebar-width);
+        }
+
+        .sidebar::before {
+          content: "";
+          position: absolute;
+          top: 0;
+          right: 0;
+          height: 100%;
+          width: 1px;
+          background: linear-gradient(to bottom, rgba(255, 255, 255, 0.1), transparent);
+        }
+
+        /* Sidebar Logo */
+        .logo {
+          width:100px;
+            height: 150px;
+            margin-left :2.5rem;
+        }
+
+        .logo img {
+          width: 100%;
+          height: auto;
+          display: block;
+          margin: 0 auto;
+        }
+
+        /* Sidebar Navigation */
+        .nav-menu {
+          padding: 10px 0;
+        }
+
+        .menu-heading {
+          padding: 16px 25px 8px;
+          font-size: 11px;
+          text-transform: uppercase;
+          letter-spacing: 1.2px;
+          color: rgba(255, 255, 255, 0.5);
+          font-weight: 500;
+        }
+
+        .nav-item {
+          padding: 12px 25px;
+          display: flex;
+          align-items: center;
+          cursor: pointer;
+          transition: var(--transition);
+          border-left: 4px solid transparent;
+          margin: 4px 0;
+          border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+          position: relative;
+          overflow: hidden;
+        }
+
+        .nav-item::after {
+          content: "";
+          position: absolute;
+          bottom: 0;
+          left: 0;
+          width: 0;
+          height: 1px;
+          background: linear-gradient(
+           90deg,
+           transparent,
+           rgba(255, 255, 255, 0.2),
+           transparent
+          );
+          transition: var(--transition);
+        }
+
+        .nav-item:hover::after {
+          width: 100%;
+        }
+
+        .nav-item:hover,
+        .nav-item.active {
+          background-color: rgba(255, 255, 255, 0.07);
+          border-left:5px solid rgba(255, 255, 255, 0.241);
+        }
+
+        .nav-item.active {
+          background: linear-gradient(90deg, rgba(67, 97, 238, 0.2), transparent);
+          font-weight: 500;
+        }
+
+        .nav-item i {
+          width: 24px;
+          margin-right: 12px;
+          font-size: 18px;
+          text-align: center;
+          transition: var(--transition);
+        }
+
+        .nav-item:hover i {
+          transform: translateY(-2px);
+        }
+
+        /* logout Sidebar Navigation */
+        .logout {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            padding-right: 10px;
+            margin-left: 20px;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            transition: var(--transition);
+            border-left: 4px solid transparent;
+            border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+            overflow: hidden;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        /* Bottom sliding line effect (same as nav items) */
+        .logout::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 1px;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(255, 255, 255, 0.2),
+                transparent
+            );
+            transition: var(--transition);
+        }
+
+        .logout:hover::after {
+            width: 100%;
+        }
+
+        /* Hover effects (same as nav items) */
+        .logout:hover {
+            background-color: rgba(244, 34, 34, 0.07);
+            border-left: 5px solid rgba(231, 50, 50, 0.241);
+            color: white;
+        }
+
+        /* Icon hover effect (same as nav items) */
+        .logout i {
+            width: 24px;
+            margin-right: 12px;
+            font-size: 18px;
+            text-align: center;
+            transition: var(--transition);
+        }
+
+        .logout:hover i {
+            transform: translateY(-2px);
+        }
+
+        /* =========================
+          Header
+          ========================= */
+        .header {
+          grid-column: 2;
+          background-color: white;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 0 30px;
+          box-shadow: var(--shadow-sm);
+          z-index: 100;
+          position: sticky;
+          top: 0;
+        }
+
+        .header h1{
+            color: rgba(14, 21, 43, 0.94);
+            line-height: 70px;
+        }
+
+        .header-actions {
+          display: flex;
+          align-items: center;
+        }
+
+        /* Notification Icon */
+        .notification {
+          position: relative;
+          margin: 0 15px;
+          cursor: pointer;
+          width: 40px;
+          height: 40px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          border-radius: 50%;
+          transition: var(--transition);
+        }
+
+        .notification:hover {
+          background-color: rgba(67, 97, 238, 0.1);
+        }
+
+        .notification i {
+          font-size: 18px;
+          color: var(--text-light);
+          transition: var(--transition);
+        }
+
+        .notification:hover i {
+          color: var(--primary);
+          transform: translateY(-2px);
+        }
+
+        .notification .badge {
+          position: absolute;
+          top: 3px;
+          right: 3px;
+          background-color: var(--danger);
+          color: white;
+          border-radius: 50%;
+          width: 18px;
+          height: 18px;
+          font-size: 10px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          box-shadow: 0 3px 6px rgba(247, 37, 133, 0.2);
+          border: 2px solid white;
+          font-weight: 600;
+        }
+
+        /* User Profile */
+        .user-profile {
+          display: flex;
+          align-items: center;
+          cursor: pointer;
+          padding: 6px 10px;
+          border-radius: var(--radius);
+          transition: var(--transition);
+          margin-left: 10px;
+        }
+
+        .user-profile:hover {
+          background-color: rgba(67, 97, 238, 0.05);
+        }
+
+        .profile-img {
+          width: 42px;
+          height: 42px;
+          border-radius: 50%;
+          background: linear-gradient(135deg, var(--secondary), var(--primary));
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: white;
+          font-weight: 600;
+          margin-right: 12px;
+          box-shadow: 0 3px 8px rgba(67, 97, 238, 0.2);
+          font-size: 16px;
+        }
+
+        .user-info {
+          display: flex;
+          flex-direction: column;
+        }
+
+        .user-name {
+          font-weight: 600;
+          font-size: 14px;
+        }
+
+        .user-role {
+          font-size: 12px;
+          color: var(--text-light);
+        }
+
+        /* =========================
+          Main Content
+          ========================= */
+        .main-content {
+          grid-column: 2;
+          padding: 30px;
+          overflow-y: auto;
+          background-color: #f5f7fb;
+        }
+
+        /* Search Section */
+        .search-section {
+          background: white;
+          padding: 30px;
+          border-radius: var(--radius);
+          box-shadow: var(--shadow);
+          margin-bottom: 30px;
+        }
+
+        .page-title {
+          font-size: 28px;
+          font-weight: 700;
+          color: var(--dark);
+          margin-bottom: 8px;
+        }
+
+        .page-subtitle {
+          color: var(--text-light);
+          margin-bottom: 30px;
+          font-size: 16px;
+        }
+
+        .search-form {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+          gap: 20px;
+          margin-bottom: 25px;
+        }
+
+        .form-group {
+          display: flex;
+          flex-direction: column;
+        }
+
+        .form-group label {
+          font-weight: 500;
+          margin-bottom: 8px;
+          color: var(--text);
+          font-size: 14px;
+        }
+
+        .form-group input,
+        .form-group select {
+          padding: 12px 16px;
+          border: 2px solid var(--border);
+          border-radius: var(--radius-sm);
+          font-size: 14px;
+          transition: var(--transition);
+          background-color: white;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+          outline: none;
+          border-color: var(--primary-light);
+          box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+        }
+
+        .search-btn {
+          background: linear-gradient(135deg, var(--primary), var(--primary-light));
+          color: white;
+          padding: 12px 30px;
+          border: none;
+          border-radius: var(--radius-sm);
+          font-weight: 600;
+          cursor: pointer;
+          transition: var(--transition);
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          margin-top: auto;
+        }
+
+        .search-btn:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 6px 15px rgba(58, 12, 163, 0.3);
+        }
+
+        /* Filters Section */
+        .filters-section {
+          background: white;
+          padding: 25px 30px;
+          border-radius: var(--radius);
+          box-shadow: var(--shadow);
+          margin-bottom: 30px;
+        }
+
+        .filters-title {
+          font-size: 18px;
+          font-weight: 600;
+          margin-bottom: 20px;
+          color: var(--dark);
+        }
+
+        .filters-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+          gap: 20px;
+          margin-bottom: 20px;
+        }
+
+        .filter-checkbox {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        }
+
+        .filter-checkbox input[type="checkbox"] {
+          width: 18px;
+          height: 18px;
+          accent-color: var(--primary);
+        }
+
+        .apply-filters-btn {
+          background-color: var(--info);
+          color: white;
+          padding: 8px 20px;
+          border: none;
+          border-radius: var(--radius-sm);
+          cursor: pointer;
+          font-weight: 500;
+          transition: var(--transition);
+        }
+
+        .apply-filters-btn:hover {
+          background-color: var(--primary);
+          transform: translateY(-1px);
+        }
+
+        /* Results Section */
+        .results-section {
+          background: white;
+          border-radius: var(--radius);
+          box-shadow: var(--shadow);
+          overflow: hidden;
+        }
+
+        .results-header {
+          padding: 25px 30px;
+          border-bottom: 1px solid var(--border);
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+        }
+
+        .results-title {
+          font-size: 20px;
+          font-weight: 600;
+          color: var(--dark);
+        }
+
+        .sort-dropdown {
+          padding: 8px 16px;
+          border: 2px solid var(--border);
+          border-radius: var(--radius-sm);
+          background-color: white;
+          cursor: pointer;
+        }
+
+        /* Driver Cards */
+        .drivers-list {
+          padding: 20px 30px;
+        }
+
+        .driver-card {
+          display: flex;
+          align-items: center;
+          padding: 25px;
+          border: 1px solid var(--border);
+          border-radius: var(--radius);
+          margin-bottom: 20px;
+          transition: var(--transition);
+          background: white;
+        }
+
+        .driver-card:hover {
+          transform: translateY(-3px);
+          box-shadow: var(--shadow-lg);
+          border-color: var(--primary-light);
+        }
+
+        .driver-avatar {
+          width: 80px;
+          height: 80px;
+          border-radius: 50%;
+          background: linear-gradient(135deg, var(--info), var(--primary-light));
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: white;
+          font-size: 28px;
+          font-weight: 700;
+          margin-right: 25px;
+          box-shadow: 0 4px 12px rgba(67, 97, 238, 0.2);
+        }
+
+        .driver-info {
+          flex: 1;
+        }
+
+        .driver-name {
+          font-size: 20px;
+          font-weight: 600;
+          color: var(--dark);
+          margin-bottom: 5px;
+          display: flex;
+          align-items: center;
+          gap: 10px;
+        }
+
+        .verified-badge {
+          background-color: var(--success);
+          color: white;
+          padding: 2px 8px;
+          border-radius: 12px;
+          font-size: 10px;
+          font-weight: 600;
+          text-transform: uppercase;
+          display: flex;
+          align-items: center;
+          gap: 4px;
+        }
+
+        .driver-details {
+          display: flex;
+          gap: 15px;
+          margin-bottom: 10px;
+          color: var(--text-light);
+          font-size: 14px;
+        }
+
+        .driver-price {
+          font-size: 18px;
+          font-weight: 700;
+          color: var(--primary);
+          margin-bottom: 8px;
+        }
+
+        .driver-rating {
+          display: flex;
+          align-items: center;
+          gap: 5px;
+          margin-bottom: 12px;
+        }
+
+        .stars {
+          color: #fbbf24;
+          font-size: 16px;
+        }
+
+        .rating-text {
+          color: var(--text-light);
+          font-size: 14px;
+        }
+
+        .driver-languages {
+          display: flex;
+          gap: 8px;
+          margin-bottom: 12px;
+        }
+
+        .language-tag {
+          background-color: var(--light);
+          color: var(--text);
+          padding: 4px 10px;
+          border-radius: 15px;
+          font-size: 12px;
+          font-weight: 500;
+        }
+
+        .driver-specialties {
+          display: flex;
+          gap: 8px;
+          flex-wrap: wrap;
+        }
+
+        .specialty-tag {
+          background-color: rgba(67, 97, 238, 0.1);
+          color: var(--primary);
+          padding: 4px 10px;
+          border-radius: 15px;
+          font-size: 12px;
+          font-weight: 500;
+        }
+
+        .driver-actions {
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+          align-items: flex-end;
+        }
+
+        .btn {
+          padding: 10px 20px;
+          border-radius: var(--radius-sm);
+          font-weight: 500;
+          cursor: pointer;
+          transition: var(--transition);
+          border: none;
+          text-decoration: none;
+          text-align: center;
+          font-size: 14px;
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+        }
+
+        .btn-primary {
+          background: linear-gradient(135deg, var(--primary), var(--primary-light));
+          color: white;
+        }
+
+        .btn-primary:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 6px 15px rgba(58, 12, 163, 0.3);
+        }
+
+        .btn-outline {
+          background: transparent;
+          color: var(--primary);
+          border: 2px solid var(--primary-light);
+        }
+
+        .btn-outline:hover {
+          background: var(--primary);
+          color: white;
+          transform: translateY(-2px);
+        }
+
+        /* =========================
+          Responsive Media Queries
+          ========================= */
+        @media (max-width: 992px) {
+          .container {
+           grid-template-columns: 0 1fr;
+          }
+
+          .sidebar {
+           transform: translateX(-100%);
+           position: fixed;
+           height: 100vh;
+           z-index: 1001;
+          }
+
+          .sidebar.active {
+           transform: translateX(0);
+           box-shadow: var(--shadow-lg);
+          }
+
+          .header {
+           padding: 0 20px;
+          }
+
+          .main-content {
+           padding: 20px;
+          }
+        }
+
+        @media (max-width: 768px) {
+          .search-form {
+           grid-template-columns: 1fr;
+          }
+
+          .filters-grid {
+           grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+          }
+
+          .driver-card {
+           flex-direction: column;
+           text-align: center;
+          }
+
+          .driver-avatar {
+           margin-right: 0;
+           margin-bottom: 15px;
+          }
+
+          .driver-actions {
+           flex-direction: row;
+           justify-content: center;
+           align-items: center;
+           margin-top: 15px;
+          }
+
+          .page-title {
+           font-size: 24px;
+          }
+
+          .user-info {
+           display: none;
+          }
+
+          .profile-img {
+           margin-right: 0;
+          }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- ===================
+             Sidebar Navigation
+        =================== -->
+        <div class="sidebar">
+            <div class="logo">
+                    <img src="logo.png" alt="Logo" class="logo">
+                </div>
+            <div class="nav-menu">
+                <div class="nav-item">
+                    <i class="fas fa-house"></i>
+                    <span>Home</span>
+                </div>
+                <div class="nav-item active">
+                    <i class="fas fa-search"></i>
+                    <span>Search</span>
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-calendar-check"></i>
+                    <span>Bookings</span>
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-cog"></i>
+                    <span>Settings</span>
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-bell"></i>
+                    <span>Notifications</span>
+                </div>
+                <div class="logout">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===================
+             Header Section
+        =================== -->
+        <div class="header">
+            <div class="hi">
+                <h1>Find Professional Drivers</h1>
+            </div>
+            <div class="header-actions">
+                <!-- Notifications -->
+                <div class="notification">
+                    <i class="fas fa-bell"></i>
+                    <div class="badge">3</div>
+                </div>
+                <div class="notification">
+                    <i class="fas fa-envelope"></i>
+                    <div class="badge">5</div>
+                </div>
+                <!-- User Profile -->
+                <div class="user-profile">
+                    <div class="profile-img">K</div>
+                    <div class="user-info">
+                        <div class="user-name">Kamal</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===================
+             Main Content
+        =================== -->
+        <div class="main-content">
+            <!-- Search Section -->
+            <div class="search-section">
+                <h2 class="page-title">Find Professional Drivers</h2>
+                <p class="page-subtitle">Book experienced drivers for your journey across Sri Lanka</p>
+                
+                <div class="search-form">
+                    <div class="form-group">
+                        <label for="pickup">Pick-up Location</label>
+                        <input type="text" id="pickup" placeholder="Enter pickup location">
+                    </div>
+                    <div class="form-group">
+                        <label for="dropoff">Drop-off Location</label>
+                        <input type="text" id="dropoff" placeholder="Enter destination">
+                    </div>
+                    <div class="form-group">
+                        <label for="date">Date & Time</label>
+                        <input type="datetime-local" id="date">
+                    </div>
+                    <div class="form-group">
+                        <label for="duration">Trip Duration</label>
+                        <select id="duration">
+                            <option value="">Select duration</option>
+                            <option value="1-3">1-3 hours</option>
+                            <option value="4-6">4-6 hours</option>
+                            <option value="7-12">7-12 hours</option>
+                            <option value="1day">1 day</option>
+                            <option value="2days">2+ days</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <button class="search-btn">
+                            <i class="fas fa-search"></i>
+                            Search Drivers
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filters Section -->
+            <div class="filters-section">
+                <h3 class="filters-title">Filters</h3>
+                <div class="filters-grid">
+                    <div class="form-group">
+                        <label for="price-range">Price Range (per hour)</label>
+                        <select id="price-range">
+                            <option value="">Select</option>
+                            <option value="1000-2000">LKR 1,000 - 2,000</option>
+                            <option value="2000-3000">LKR 2,000 - 3,000</option>
+                            <option value="3000+">LKR 3,000+</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="experience">Experience</label>
+                        <select id="experience">
+                            <option value="">Select</option>
+                            <option value="1-3">1-3 years</option>
+                            <option value="4-6">4-6 years</option>
+                            <option value="7+">7+ years</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="languages">Languages</label>
+                        <select id="languages">
+                            <option value="">Select</option>
+                            <option value="sinhala">Sinhala</option>
+                            <option value="english">English</option>
+                            <option value="tamil">Tamil</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="rating">Minimum Rating</label>
+                        <select id="rating">
+                            <option value="">Select</option>
+                            <option value="3">3+ stars</option>
+                            <option value="4">4+ stars</option>
+                            <option value="4.5">4.5+ stars</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <div class="filter-checkbox">
+                            <input type="checkbox" id="verified">
+                            <label for="verified">Verified Only</label>
+                        </div>
+                    </div>
+                </div>
+                <button class="apply-filters-btn">Apply Filters</button>
+            </div>
+
+            <!-- Results Section -->
+            <div class="results-section">
+                <div class="results-header">
+                    <h3 class="results-title">Available Drivers (4)</h3>
+                    <select class="sort-dropdown">
+                        <option value="rating">Highest Rating</option>
+                        <option value="price-low">Price: Low to High</option>
+                        <option value="price-high">Price: High to Low</option>
+                        <option value="experience">Most Experienced</option>
+                    </select>
+                </div>
+
+                <div class="drivers-list">
+                    <!-- Driver 1 -->
+                    <div class="driver-card">
+                        <div class="driver-avatar">L</div>
+                        <div class="driver-info">
+                            <div class="driver-name">
+                                Lasith Perera
+                                <span class="verified-badge">
+                                    <i class="fas fa-check-circle"></i>
+                                    Verified
+                                </span>
+                            </div>
+                            <div class="driver-details">
+                                <span><i class="fas fa-map-marker-alt"></i> Colombo, Sri Lanka</span>
+                                <span><i class="fas fa-calendar"></i> 8 years experience</span>
+                            </div>
+                            <div class="driver-price">LKR 2,500/hour</div>
+                            <div class="driver-rating">
+                                <div class="stars">
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                </div>
+                                <span class="rating-text">4.9 (156 reviews)</span>
+                            </div>
+                            <div class="driver-languages">
+                                <span class="language-tag">Sinhala</span>
+                                <span class="language-tag">English</span>
+                                <span class="language-tag">Tamil</span>
+                            </div>
+                            <div class="driver-specialties">
+                                <span class="specialty-tag">Airport transfers</span>
+                                <span class="specialty-tag">Long distance</span>
+                                <span class="specialty-tag">City tours</span>
+                            </div>
+                        </div>
+                        <div class="driver-actions">
+                            <button class="btn btn-primary">
+                                <i class="fas fa-calendar-plus"></i>
+                                Book Now
+                            </button>
+                            <button class="btn btn-outline">
+                                <i class="fas fa-comment"></i>
+                                Message
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Driver 2 -->
+                    <div class="driver-card">
+                        <div class="driver-avatar">R</div>
+                        <div class="driver-info">
+                            <div class="driver-name">
+                                Ruwan Silva
+                                <span class="verified-badge">
+                                    <i class="fas fa-check-circle"></i>
+                                    Verified
+                                </span>
+                            </div>
+                            <div class="driver-details">
+                                <span><i class="fas fa-map-marker-alt"></i> Kandy, Sri Lanka</span>
+                                <span><i class="fas fa-calendar"></i> 5 years experience</span>
+                            </div>
+                            <div class="driver-price">LKR 2,000/hour</div>
+                            <div class="driver-rating">
+                                <div class="stars">
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                </div>
+                                <span class="rating-text">4.7 (89 reviews)</span>
+                            </div>
+                            <div class="driver-languages">
+                                <span class="language-tag">Sinhala</span>
+                                <span class="language-tag">English</span>
+                            </div>
+                            <div class="driver-specialties">
+                                <span class="specialty-tag">Business trips</span>
+                                <span class="specialty-tag">Event transportation</span>
+                            </div>
+                        </div>
+                        <div class="driver-actions">
+                            <button class="btn btn-primary">
+                                <i class="fas fa-calendar-plus"></i>
+                                Book Now
+                            </button>
+                            <button class="btn btn-outline">
+                                <i class="fas fa-comment"></i>
+                                Message
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Driver 3 -->
+                    <div class="driver-card">
+                        <div class="driver-avatar">N</div>
+                        <div class="driver-info">
+                            <div class="driver-name">
+                                Nimal Fernando
+                                <span class="verified-badge">
+                                    <i class="fas fa-check-circle"></i>
+                                    Verified
+                                </span>
+                            </div>
+                            <div class="driver-details">
+                                <span><i class="fas fa-map-marker-alt"></i> Galle, Sri Lanka</span>
+                                <span><i class="fas fa-calendar"></i> 12 years experience</span>
+                            </div>
+                            <div class="driver-price">LKR 3,200/hour</div>
+                            <div class="driver-rating">
+                                <div class="stars">
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                </div>
+                                <span class="rating-text">4.8 (203 reviews)</span>
+                            </div>
+                            <div class="driver-languages">
+                                <span class="language-tag">Sinhala</span>
+                                <span class="language-tag">English</span>
+                            </div>
+                            <div class="driver-specialties">
+                                <span class="specialty-tag">Tourist guide</span>
+                                <span class="specialty-tag">Cultural tours</span>
+                                <span class="specialty-tag">Photography tours</span>
+                            </div>
+                        </div>
+                        <div class="driver-actions">
+                            <button class="btn btn-primary">
+                                <i class="fas fa-calendar-plus"></i>
+                                Book Now
+                            </button>
+                            <button class="btn btn-outline">
+                                <i class="fas fa-comment"></i>
+                                Message
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Driver 4 -->
+                    <div class="driver-card">
+                        <div class="driver-avatar">A</div>
+                        <div class="driver-info">
+                            <div class="driver-name">
+                                Asanka Jayawardena
+                                <span class="verified-badge">
+                                    <i class="fas fa-check-circle"></i>
+                                    Verified
+                                </span>
+                            </div>
+                            <div class="driver-details">
+                                <span><i class="fas fa-map-marker-alt"></i> Negombo, Sri Lanka</span>
+                                <span><i class="fas fa-calendar"></i> 6 years experience</span>
+                            </div>
+                            <div class="driver-price">LKR 2,300/hour</div>
+                            <div class="driver-rating">
+                                <div class="stars">
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                </div>
+                                <span class="rating-text">4.6 (124 reviews)</span>
+                            </div>
+                            <div class="driver-languages">
+                                <span class="language-tag">Sinhala</span>
+                                <span class="language-tag">English</span>
+                            </div>
+                            <div class="driver-specialties">
+                                <span class="specialty-tag">Airport pickup</span>
+                                <span class="specialty-tag">Hotel transfers</span>
+                                <span class="specialty-tag">Beach tours</span>
+                            </div>
+                        </div>
+                        <div class="driver-actions">
+                            <button class="btn btn-primary">
+                                <i class="fas fa-calendar-plus"></i>
+                                Book Now
+                            </button>
+                            <button class="btn btn-outline">
+                                <i class="fas fa-comment"></i>
+                                Message
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Simple interactivity
+        document.addEventListener('DOMContentLoaded', function() {
+            // Search functionality
+            const searchBtn = document.querySelector('.search-btn');
+            searchBtn.addEventListener('click', function() {
+                const pickup = document.getElementById('pickup').value;
+                const dropoff = document.getElementById('dropoff').value;
+                
+                if (pickup && dropoff) {
+                    // Simulate search
+                    searchBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Searching...';
+                    setTimeout(() => {
+                        searchBtn.innerHTML = '<i class="fas fa-search"></i> Search Drivers';
+                        // You can add actual search logic here
+                    }, 2000);
+                } else {
+                    alert('Please enter both pickup and drop-off locations');
+                }
+            });
+
+            // Apply filters functionality
+            const applyFiltersBtn = document.querySelector('.apply-filters-btn');
+            applyFiltersBtn.addEventListener('click', function() {
+                applyFiltersBtn.innerHTML = 'Applying...';
+                setTimeout(() => {
+                    applyFiltersBtn.innerHTML = 'Apply Filters';
+                    // Add filter logic here
+                }, 1000);
+            });
+
+            // Book Now buttons
+            const bookButtons = document.querySelectorAll('.btn-primary');
+            bookButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const driverName = this.closest('.driver-card').querySelector('.driver-name').textContent.trim();
+                    alert(`Booking request sent to ${driverName}! You will receive a confirmation shortly.`);
+                });
+            });
+
+            // Message buttons
+            const messageButtons = document.querySelectorAll('.btn-outline');
+            messageButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const driverName = this.closest('.driver-card').querySelector('.driver-name').textContent.trim();
+                    alert(`Opening chat with ${driverName}...`);
+                });
+            });
+
+            // Navigation items
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    navItems.forEach(nav => nav.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+
+            // Mobile sidebar toggle (you can add a hamburger menu button)
+            const sidebar = document.querySelector('.sidebar');
+            
+            // Add mobile menu toggle button for smaller screens
+            if (window.innerWidth <= 992) {
+                const mobileMenuBtn = document.createElement('button');
+                mobileMenuBtn.innerHTML = '<i class="fas fa-bars"></i>';
+                mobileMenuBtn.className = 'mobile-menu-btn';
+                mobileMenuBtn.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    left: 20px;
+                    z-index: 1002;
+                    background: var(--primary);
+                    color: white;
+                    border: none;
+                    padding: 10px;
+                    border-radius: 5px;
+                    cursor: pointer;
+                `;
+                
+                document.body.appendChild(mobileMenuBtn);
+                
+                mobileMenuBtn.addEventListener('click', function() {
+                    sidebar.classList.toggle('active');
+                });
+
+                // Close sidebar when clicking outside
+                document.addEventListener('click', function(e) {
+                    if (!sidebar.contains(e.target) && !mobileMenuBtn.contains(e.target)) {
+                        sidebar.classList.remove('active');
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>
