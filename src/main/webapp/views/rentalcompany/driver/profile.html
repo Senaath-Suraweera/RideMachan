@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Driver Profile - Ride Machan</title>
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+    />
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
+    />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet"
+    />
+    <!-- External CSS File -->
+    <link rel="stylesheet" href="profile.css" />
+</head>
+<body>
+    <div class="container">
+        <!-- Mobile Toggle Button -->
+        <button class="mobile-toggle" onclick="toggleSidebar()">
+            <i class="fas fa-bars"></i>
+        </button>
+
+        <!-- Sidebar Navigation -->
+        <div class="sidebar" id="sidebar">
+            <div class="logo">
+                <img src="logo.png" alt="Logo" class="logo">
+            </div>
+            <div class="nav-menu">
+                <div class="nav-item">
+                    <i class="fas fa-house"></i>
+                    <a href="dashboard.html"><span> Home</span></a>
+                </div>
+                <div class="nav-item active">
+                    <i class="fas fa-user"></i>
+                    <a href="profile.html"><span>Profile</span></a>
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-calendar-alt"></i>
+                    <a href="drivercalview.html"><span>Calander</span></a>
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-car"></i>
+                    <a href="vehicleview.html"><span>Vehicles</span></a>
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-users"></i>
+                    <a href="customerview.html"><span>Customer</span></a>
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-book"></i>
+                    <a href="issuerepirting.html"><span>Reports</span></a>
+                </div>
+                <div class="logout">
+                    <i class="fas fa-sign-out"></i>
+                    <span>Logout</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Header Section -->
+        <div class="header">
+            <div class="hi">
+                <h1>Driver Profile</h1>
+            </div>
+            <div class="header-actions">
+                <!-- Notifications -->
+                <div class="notification">
+                    <a href="#"><i class="fas fa-bell"></i></a>
+                    <div class="badge">3</div>
+                </div>
+                <div class="notification">
+                    <a href="#"><i class="fas fa-envelope"></i></a>
+                    <div class="badge">5</div>
+                </div>
+                <!-- User Profile -->
+                <div class="user-profile">
+                    <div class="profile-img">S</div>
+                    <div class="user-info">
+                        <div class="user-name">Sivajan</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Driver Profile Header -->
+            <div class="profile-header">
+                <div class="profile-title">Driver Profile</div>
+                <div class="profile-info">
+                    <div class="profile-avatar">S</div>
+                    <div class="profile-details">
+                        <h3>Sivajan</h3>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Personal Information -->
+            <div class="personal-info">
+                <div class="section-title">Personal Information</div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label">Fullname</label>
+                        <input type="text" class="form-input" value="Sivajan Kumar" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-input" value="sivajan.kumar@email.com" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Home Address</label>
+                        <input type="text" class="form-input" value="123 Main Street, Colombo 07, Sri Lanka" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Driver ID</label>
+                        <input type="text" class="form-input" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">License No.</label>
+                        <input type="text" class="form-input" value="DL123456789" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Phone Number</label>
+                        <input type="text" class="form-input" value="+94 77 123 4567" readonly>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Company/Employment Information -->
+            <div class="company-info">
+                <div class="section-title">Company/Employment Information</div>
+                <div class="company-grid">
+                    <div class="info-card">
+                        <div class="info-label">Rental Company</div>
+                        <div class="company-badge">ABC Car Rent</div>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-card-header">
+                            <i class="fas fa-calendar-alt info-icon"></i>
+                            <span class="info-label">Joined On</span>
+                        </div>
+                        <div class="info-value">15-06-2020</div>
+                        <div class="info-extra">3 year Experience</div>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-card-header">
+                            <i class="fas fa-map-marker-alt info-icon"></i>
+                            <span class="info-label">Assigned Area</span>
+                        </div>
+                        <div class="area-badge">Colombo</div>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-card-header">
+                            <i class="fas fa-clock info-icon"></i>
+                            <span class="info-label">Shift Time</span>
+                        </div>
+                        <div class="info-value">8:00-20:00</div>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-card-header">
+                            <i class="fas fa-user-tie info-icon"></i>
+                            <span class="info-label">Reporting Manager</span>
+                        </div>
+                        <div class="info-value">John Silva</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="quick-actions">
+                <div class="section-title">Quick Actions</div>
+                <div class="actions-grid">
+                    <a href="#" class="action-button">
+                        <i class="fas fa-calendar info-icon"></i>
+                        <span>My Calendar</span>
+                    </a>
+                    <a href="#" class="action-button">
+                        <i class="fas fa-bookmark info-icon"></i>
+                        <span>My Bookings</span>
+                    </a>
+                    <a href="#" class="action-button">
+                        <i class="fas fa-exclamation-triangle info-icon"></i>
+                        <span>Issue Reports</span>
+                    </a>
+                    <a href="#" class="action-button">
+                        <i class="fas fa-edit info-icon"></i>
+                        <span>Edit Profile</span>
+                    </a>
+                    <a href="#" class="action-button">
+                        <i class="fas fa-credit-card info-icon"></i>
+                        <span>Payments</span>
+                    </a>
+                    <a href="#" class="action-button">
+                        <i class="fas fa-key info-icon"></i>
+                        <span>Change Password</span>
+                    </a>
+                    <a href="#" class="action-button logout-button">
+                        <i class="fas fa-sign-out-alt info-icon"></i>
+                        <span>Logout</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleSidebar() {
+            document.getElementById("sidebar").classList.toggle("active");
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ride Machan - Driver Vehicle View</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Inter:400,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="vehicleview.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar Navigation -->
+        <div class="sidebar" id="sidebar">
+            <div class="logo">
+                <img src="logo.png" alt="Logo" class="logo">
+            </div>
+            
+            <div class="nav-menu">
+                <div class="nav-item">
+                    <i class="fas fa-house"></i>
+                    <a href="dashboard.html"><span> Home</span></a>
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-user"></i>
+                    <a href="profile.html"><span>Profile</span></a>
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-calendar-alt"></i>
+                    <a href="drivercalview"><span>Calander</span></a>
+                </div>
+                <div class="nav-item active">
+                    <i class="fas fa-car"></i>
+                    <a href="vehicleview.html"><span>Vehicles</span></a>
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-users"></i>
+                    <a href="customerview.html"><span>Customer</span></a>
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-book"></i>
+                    <a href="issuerepirting.html"><span>Reports</span></a>
+                </div>
+                <div class="logout">
+                    <i class="fas fa-sign-out"></i>
+                    <span>Logout</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Header Section -->
+        <div class="header">
+            <button class="mobile-menu-toggle" onclick="toggleSidebar()">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="hi">
+                <h1>Driver Vehicle View</h1>
+            </div>
+            <div class="header-actions">
+                <!-- Notifications -->
+                <div class="notification">
+                    <a href="#"><i class="fas fa-bell"></i></a>
+                    <div class="badge">3</div>
+                </div>
+                <div class="notification">
+                    <a href="#"><i class="fas fa-envelope"></i></a>
+                    <div class="badge">5</div>
+                </div>
+                <!-- User Profile -->
+                <div class="user-profile">
+                    <div class="profile-img">K</div>
+                    <div class="user-info">
+                        <div class="user-name">Kamal</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            
+            <div class="content-grid">
+                <!-- Vehicle Information Card -->
+                <div class="vehicle-info-card">
+                    <div class="card-header">
+                        <i class="fas fa-car"></i>
+                        <div class="card-title">Vehicle Information</div>
+                    </div>
+                    
+                    <div class="vehicle-info-grid">
+                        <div class="vehicle-details">
+                            <div class="info-item">
+                                <i class="fas fa-car-side"></i>
+                                <div class="info-content">
+                                    <div class="info-label">Model:</div>
+                                    <div class="info-value">Toyota Camry</div>
+                                </div>
+                            </div>
+                            
+                            <div class="info-item">
+                                <i class="fas fa-hashtag"></i>
+                                <div class="info-content">
+                                    <div class="info-label">Plate number:</div>
+                                    <div class="info-value">ND - 4357</div>
+                                </div>
+                            </div>
+                            
+                            <div class="info-item">
+                                <i class="fas fa-gas-pump"></i>
+                                <div class="info-content">
+                                    <div class="info-label">Fuel Type:</div>
+                                    <div class="info-value">Petrol</div>
+                                </div>
+                            </div>
+                            
+                            <div class="info-item">
+                                <i class="fas fa-tachometer-alt"></i>
+                                <div class="info-content">
+                                    <div class="info-label">Mileage:</div>
+                                    <div class="info-value">57,000km</div>
+                                </div>
+                            </div>
+                            
+                            <div class="info-item">
+                                <i class="fas fa-info-circle"></i>
+                                <div class="info-content">
+                                    <div class="info-label">Status:</div>
+                                    <div class="status-badge">Assigned</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="vehicle-image">
+                            <i class="fas fa-vehicle"></i>
+                            <div class="vehicle-image-text">Vehicle Image</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Service Information and Past Issues -->
+                <div class="service-issues-grid">
+                    <!-- Service Information -->
+                    <div class="service-card">
+                        <div class="card-header">
+                            <i class="fas fa-tools"></i>
+                            <div class="card-title">Service Information</div>
+                        </div>
+                        
+                        <div class="service-item">
+                            <i class="fas fa-calendar"></i>
+                            <div class="service-content">
+                                <div class="service-label">Last Service:</div>
+                                <div class="service-value">2025-06-20</div>
+                            </div>
+                        </div>
+                        
+                        <div class="service-item">
+                            <i class="fas fa-calendar-alt"></i>
+                            <div class="service-content">
+                                <div class="service-label">Next Service:</div>
+                                <div class="service-value">2025-08-20</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Past Issues -->
+                    <div class="issues-card">
+                        <div class="card-header">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <div class="card-title">Past Issues</div>
+                        </div>
+                        
+                        <div class="service-item">
+                            <i class="fas fa-wrench"></i>
+                            <div class="service-content">
+                                <div class="service-label">Last Service:</div>
+                                <div class="service-value">2025-06-20</div>
+                            </div>
+                        </div>
+                        
+                        <div class="service-item">
+                            <i class="fas fa-wrench"></i>
+                            <div class="service-content">
+                                <div class="service-label">Next Service:</div>
+                                <div class="service-value">2025-08-20</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Notes from Customer -->
+                <div class="notes-card">
+                    <div class="card-header">
+                        <i class="fas fa-sticky-note"></i>
+                        <div class="card-title">Notes from Customer</div>
+                    </div>
+                    
+                    <div class="note-item">
+                        <i class="fas fa-video"></i>
+                        <div class="note-text">Car has dash cam</div>
+                    </div>
+                    
+                    <div class="note-item">
+                        <i class="fas fa-gas-pump"></i>
+                        <div class="note-text">Fuel is full</div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('active');
+        }
+
+        // Close sidebar when clicking outside on mobile
+        document.addEventListener('click', function(event) {
+            const sidebar = document.getElementById('sidebar');
+            const toggle = document.querySelector('.mobile-menu-toggle');
+            
+            if (window.innerWidth <= 992) {
+                if (!sidebar.contains(event.target) && !toggle.contains(event.target)) {
+                    sidebar.classList.remove('active');
+                }
+            }
+        });
+
+        // Handle window resize
+        window.addEventListener('resize', function() {
+            const sidebar = document.getElementById('sidebar');
+            if (window.innerWidth > 992) {
+                sidebar.classList.remove('active');
+            }
+        });
+    </script>
+</body>
+</html>

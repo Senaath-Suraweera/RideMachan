@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- ===================
+             Meta & Stylesheets
+    =================== -->
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Customer View</title>
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+    />
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
+    />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet"
+    />
+    <link rel="stylesheet" href="customerview.css" />
+</head>
+<body>
+    <div class="container">
+        <!-- ===================
+                 Sidebar Navigation
+        =================== -->
+        <div class="sidebar" id="sidebar">
+            <div class="logo">
+                <img src="logo.png" alt="Logo" class="logo">
+            </div>
+            <div class="nav-menu">
+                <div class="nav-item" data-page="dashboard">
+                    <i class="fas fa-house"></i>
+                    <a href="dashboard.html"><span> Home</span></a>
+                </div>
+                <div class="nav-item" data-page="profile">
+                    <i class="fas fa-user"></i>
+                    <a href="profile.html"><span>Profile</span></a>
+                </div>
+                <div class="nav-item" data-page="calendar">
+                    <i class="fas fa-calendar-alt"></i>
+                    <a href="drivercalview.html"><span>Calendar</span></a>
+                </div>
+                <div class="nav-item" data-page="vehicles">
+                    <i class="fas fa-car"></i>
+                    <a href="vehicleview.html"><span>Vehicles</span></a>
+                </div>
+                <div class="nav-item active" data-page="customer">
+                    <i class="fas fa-users"></i>
+                    <a href="customerview.html"><span>Customer</span></a>
+                </div>
+                <div class="nav-item" data-page="reports">
+                    <i class="fas fa-book"></i>
+                    <a href="issuereporting.html"><span>Reports</span></a>
+                </div>
+                <div class="logout" id="logoutBtn">
+                    <i class="fas fa-sign-out"></i>
+                    <a href="#"><span>Logout</span></a>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===================
+                 Header Section
+        =================== -->
+        <div class="header">
+            <div class="header-left">
+                <button class="sidebar-toggle" id="sidebarToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h1>Customer View</h1>
+            </div>
+            <div class="header-actions">
+                <!-- Notifications -->
+                <div class="notification" id="bellNotification" title="Notifications">
+                    <i class="fas fa-bell"></i>
+                    <div class="badge" id="bellBadge">3</div>
+                </div>
+                <div class="notification" id="messageNotification" title="Messages">
+                    <i class="fas fa-envelope"></i>
+                    <div class="badge" id="messageBadge">5</div>
+                </div>
+                <!-- User Profile -->
+                <div class="user-profile" id="userProfile">
+                    <div class="profile-img">K</div>
+                    <div class="user-info">
+                        <div class="user-name">Kamal</div>
+                        <div class="user-role">Driver</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===================
+                 Main Content
+        =================== -->
+        <div class="main-content">
+            <!-- Success Message -->
+            <div class="success-message" id="successMessage">
+                <i class="fas fa-check-circle"></i>
+                <span>Action completed successfully!</span>
+            </div>
+
+            <!-- Loading Spinner -->
+            <div class="loading" id="loadingSpinner">
+                <div class="spinner"></div>
+            </div>
+
+            <div class="customer-view-card" id="customerCard">
+                <!-- Customer Information Section -->
+                <div class="info-section" style="animation-delay: 0.1s">
+                    <div class="section-header" data-section="customer-info">
+                        <i class="fas fa-user-circle"></i>
+                        <h3>Customer Information</h3>
+                    </div>
+                    <div class="info-grid">
+                        <div class="info-item" data-field="name">
+                            <label>Name</label>
+                            <span id="customerName">Sivajani</span>
+                        </div>
+                        <div class="info-item" data-field="phone">
+                            <label>Phone</label>
+                            <span id="customerPhone">+94 77-XXXXXXX</span>
+                        </div>
+                        <div class="info-item" data-field="email">
+                            <label>Email</label>
+                            <span id="customerEmail">siva@gmail.com</span>
+                        </div>
+                        <div class="info-item" data-field="rating">
+                            <label>Customer Rating</label>
+                            <span id="customerRating">
+                                <i class="fas fa-star" style="color: #f8961e;"></i>
+                                <i class="fas fa-star" style="color: #f8961e;"></i>
+                                <i class="fas fa-star" style="color: #f8961e;"></i>
+                                <i class="fas fa-star" style="color: #f8961e;"></i>
+                                <i class="fas fa-star" style="color: #e9ecef;"></i>
+                                4.0
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Booking Information Section -->
+                <div class="info-section" style="animation-delay: 0.2s">
+                    <div class="section-header" data-section="booking-info">
+                        <i class="fas fa-calendar-check"></i>
+                        <h3>Booking Information</h3>
+                    </div>
+                    <div class="booking-details">
+                        <div class="booking-row">
+                            <div class="booking-item">
+                                <label>Pickup Date</label>
+                                <span id="pickupDate">2024-09-19</span>
+                            </div>
+                            <div class="booking-item location-item pickup">
+                                <label>Pickup Location</label>
+                                <span>
+                                    <i class="fas fa-map-marker-alt pickup-icon"></i> 
+                                    <span id="pickupLocation">Colombo Fort Railway Station</span>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="booking-row">
+                            <div class="booking-item">
+                                <label>Pickup Time</label>
+                                <span id="pickupTime">10:30 AM</span>
+                            </div>
+                            <div class="booking-item location-item dropoff">
+                                <label>Dropoff Location</label>
+                                <span>
+                                    <i class="fas fa-map-marker-alt dropoff-icon"></i> 
+                                    <span id="dropoffLocation">Bandaranaike International Airport</span>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="booking-row">
+                            <div class="booking-item">
+                                <label>Booking Type</label>
+                                <span id="bookingType">Standard Ride</span>
+                            </div>
+                            <div class="booking-item">
+                                <label>Estimated Duration</label>
+                                <span id="estimatedDuration">
+                                    <i class="fas fa-clock" style="color: var(--info);"></i>
+                                    45 minutes
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Special Instructions Section -->
+                <div class="info-section" style="animation-delay: 0.3s">
+                    <div class="section-header" data-section="instructions">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <h3>Special Instructions</h3>
+                    </div>
+                    <div class="instructions-list">
+                        <div class="instruction-item" data-instruction="luggage">
+                            <i class="fas fa-suitcase"></i>
+                            <span>Carry large luggage</span>
+                        </div>
+                        <div class="instruction-item" data-instruction="driving">
+                            <i class="fas fa-car"></i>
+                            <span>Customer prefers slow driving</span>
+                        </div>
+                        <div class="instruction-item" data-instruction="contact">
+                            <i class="fas fa-phone"></i>
+                            <span>Call upon arrival</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Past Bookings Summary Section -->
+                <div class="info-section" style="animation-delay: 0.4s">
+                    <div class="section-header" data-section="past-bookings">
+                        <i class="fas fa-history"></i>
+                        <h3>Past Bookings Summary</h3>
+                    </div>
+                    <div class="past-bookings" id="pastBookingsCard">
+                        <div class="booking-count">
+                            <span class="count" id="totalRides">3</span>
+                            <span class="label">Previous Rides</span>
+                        </div>
+                        <div class="booking-stats">
+                            <div class="stat-item">
+                                <span class="stat-label">Avg Rating</span>
+                                <span class="stat-value">4.2</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Total Distance</span>
+                                <span class="stat-value">156 km</span>
+                            </div>
+                        </div>
+                        <div class="last-ride">
+                            <span class="last-ride-label">Last Ride</span>
+                            <span class="last-ride-date" id="lastRideDate">2024-07-20</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="action-buttons">
+                    <button class="btn btn-outline" id="backBtn">
+                        <i class="fas fa-arrow-left"></i>
+                        Back to Calendar
+                    </button>
+                    <button class="btn btn-outline" id="refreshBtn">
+                        <i class="fas fa-sync-alt"></i>
+                        Refresh
+                    </button>
+                    <button class="btn btn-outline" id="callBtn">
+                        <i class="fas fa-phone"></i>
+                        Call Customer
+                    </button>
+                    <button class="btn btn-primary" id="messageBtn">
+                        <i class="fas fa-comment"></i>
+                        Message
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Message Modal -->
+    <div id="messageModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Send Message to Customer</h3>
+                <span class="close" id="closeModal">&times;</span>
+            </div>
+            <div class="modal-body">
+                <textarea id="messageText" placeholder="Type your message here..."></textarea>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" id="cancelMessage">Cancel</button>
+                <button class="btn btn-primary" id="sendMessage">Send Message</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const sidebar = document.getElementById('sidebar');
+        const sidebarToggle = document.getElementById('sidebarToggle');
+        const navItems = document.querySelectorAll('.nav-item');
+        const sectionHeaders = document.querySelectorAll('.section-header');
+        const customerCard = document.getElementById('customerCard');
+        const loadingSpinner = document.getElementById('loadingSpinner');
+        const successMessage = document.getElementById('successMessage');
+        
+        // Button elements
+        const refreshBtn = document.getElementById('refreshBtn');
+        const backBtn = document.getElementById('backBtn');
+        const callBtn = document.getElementById('callBtn');
+        const messageBtn = document.getElementById('messageBtn');
+        const logoutBtn = document.getElementById('logoutBtn');
+        
+        // Notification elements
+        const bellNotification = document.getElementById('bellNotification');
+        const messageNotification = document.getElementById('messageNotification');
+        const bellBadge = document.getElementById('bellBadge');
+        const messageBadge = document.getElementById('messageBadge');
+        
+        // Modal elements
+        const messageModal = document.getElementById('messageModal');
+        const closeModal = document.getElementById('closeModal');
+        const cancelMessage = document.getElementById('cancelMessage');
+        const sendMessage = document.getElementById('sendMessage');
+        const messageText = document.getElementById('messageText');
+        
+        // User profile
+        const userProfile = document.getElementById('userProfile');
+
+        // Utility Functions
+        function showLoading() {
+            loadingSpinner.style.display = 'flex';
+            customerCard.style.opacity = '0.5';
+        }
+
+        function hideLoading() {
+            loadingSpinner.style.display = 'none';
+            customerCard.style.opacity = '1';
+        }
+
+        function showSuccessMessage(message) {
+            const messageSpan = successMessage.querySelector('span');
+            messageSpan.textContent = message;
+            successMessage.classList.add('show');
+            setTimeout(() => {
+                successMessage.classList.remove('show');
+            }, 3000);
+        }
+
+        function animateElement(element, animationClass = 'pulse') {
+            element.classList.add('animate__animated', `animate__${animationClass}`);
+            element.addEventListener('animationend', () => {
+                element.classList.remove('animate__animated', `animate__${animationClass}`);
+            }, { once: true });
+        }
+
+        // Sidebar functionality
+        sidebarToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('active');
+        });
+
+        // Close sidebar when clicking outside (mobile)
+        document.addEventListener('click', (e) => {
+            if (window.innerWidth <= 992 && 
+                !sidebar.contains(e.target) && 
+                !sidebarToggle.contains(e.target) && 
+                sidebar.classList.contains('active')) {
+                sidebar.classList.remove('active');
+            }
+        });
+
+        // Navigation items hover effects
+        navItems.forEach(item => {
+            item.addEventListener('mouseenter', () => {
+                animateElement(item.querySelector('i'), 'bounceIn');
+            });
+        });
+
+        // Section header interactions
+        sectionHeaders.forEach(header => {
+            header.addEventListener('click', () => {
+                animateElement(header.querySelector('i'), 'rotateIn');
+            });
+        });
+
+        // Button event listeners
+        refreshBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            showLoading();
+            animateElement(refreshBtn.querySelector('i'), 'rotateIn');
+            
+            // Simulate refresh delay
+            setTimeout(() => {
+                hideLoading();
+                showSuccessMessage('Customer data refreshed successfully!');
+                
+                // Update last ride date to show refresh worked
+                const lastRideDateElement = document.getElementById('lastRideDate');
+                const today = new Date().toISOString().split('T')[0];
+                lastRideDateElement.textContent = today;
+            }, 1500);
+        });
+
+        backBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            animateElement(backBtn.querySelector('i'), 'slideInLeft');
+            showSuccessMessage('Navigating back to calendar...');
+            
+            // Simulate navigation delay
+            setTimeout(() => {
+                window.location.href = 'drivercalview.html';
+            }, 1000);
+        });
+
+        callBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            animateElement(callBtn.querySelector('i'), 'swing');
+            
+            // Simulate call initiation
+            const phone = document.getElementById('customerPhone').textContent;
+            showSuccessMessage(`Initiating call to ${phone}...`);
+            
+            // In a real app, this would initiate a phone call
+            setTimeout(() => {
+                alert(`Calling ${phone}...`);
+            }, 1000);
+        });
+
+        messageBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            messageModal.style.display = 'block';
+            animateElement(messageModal.querySelector('.modal-content'), 'zoomIn');
+            messageText.focus();
+        });
+
+        // Modal functionality
+        closeModal.addEventListener('click', () => {
+            messageModal.style.display = 'none';
+        });
+
+        cancelMessage.addEventListener('click', () => {
+            messageModal.style.display = 'none';
+            messageText.value = '';
+        });
+
+        sendMessage.addEventListener('click', () => {
+            const message = messageText.value.trim();
+            if (message) {
+                messageModal.style.display = 'none';
+                showSuccessMessage('Message sent successfully!');
+                messageText.value = '';
+                
+                // Update message notification badge
+                const currentCount = parseInt(messageBadge.textContent);
+                messageBadge.textContent = currentCount + 1;
+                animateElement(messageNotification, 'pulse');
+            } else {
+                alert('Please enter a message before sending.');
+            }
+        });
+
+        // Close modal when clicking outside
+        window.addEventListener('click', (e) => {
+            if (e.target === messageModal) {
+                messageModal.style.display = 'none';
+                messageText.value = '';
+            }
+        });
+
+        // Notification interactions
+        bellNotification.addEventListener('click', (e) => {
+            e.preventDefault();
+            animateElement(bellNotification, 'swing');
+            const count = parseInt(bellBadge.textContent);
+            if (count > 0) {
+                bellBadge.textContent = Math.max(0, count - 1);
+                showSuccessMessage('Notification marked as read!');
+            }
+        });
+
+        messageNotification.addEventListener('click', (e) => {
+            e.preventDefault();
+            animateElement(messageNotification, 'swing');
+            const count = parseInt(messageBadge.textContent);
+            if (count > 0) {
+                messageBadge.textContent = Math.max(0, count - 1);
+                showSuccessMessage('Message marked as read!');
+            }
+        });
+
+        // User profile interaction
+        userProfile.addEventListener('click', () => {
+            animateElement(userProfile.querySelector('.profile-img'), 'bounceIn');
+            showSuccessMessage('Profile menu would open here');
+        });
+
+        // Logout functionality
+        logoutBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (confirm('Are you sure you want to logout?')) {
+                showLoading();
+                showSuccessMessage('Logging out...');
+                setTimeout(() => {
+                    window.location.href = 'login.html';
+                }, 2000);
+            }
+        });
+
+        // Interactive elements
+        const infoItems = document.querySelectorAll('.info-item');
+        const instructionItems = document.querySelectorAll('.instruction-item');
+        const pastBookingsCard = document.getElementById('pastBookingsCard');
+        const totalRides = document.getElementById('totalRides');
+
+        // Info item interactions
+        infoItems.forEach(item => {
+            item.addEventListener('click', () => {
+                animateElement(item, 'pulse');
+                const field = item.getAttribute('data-field');
+                showSuccessMessage(`${field} details copied to clipboard`);
+            });
+        });
+
+        // Instruction item interactions
+        instructionItems.forEach(item => {
+            item.addEventListener('click', () => {
+                animateElement(item, 'bounceIn');
+                const instruction = item.getAttribute('data-instruction');
+                showSuccessMessage(`Instruction noted: ${instruction}`);
+            });
+        });
+
+        // Past bookings interaction
+        pastBookingsCard.addEventListener('click', () => {
+            animateElement(pastBookingsCard, 'pulse');
+            showSuccessMessage('Opening detailed booking history...');
+        });
+
+        totalRides.addEventListener('click', () => {
+            animateElement(totalRides, 'bounceIn');
+            // Simulate loading more details
+            const currentCount = parseInt(totalRides.textContent);
+            totalRides.textContent = currentCount + Math.floor(Math.random() * 3) + 1;
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey || e.metaKey) {
+                switch(e.key) {
+                    case 'r':
+                        e.preventDefault();
+                        refreshBtn.click();
+                        break;
+                    case 'm':
+                        e.preventDefault();
+                        messageBtn.click();
+                        break;
+                    case 'b':
+                        e.preventDefault();
+                        backBtn.click();
+                        break;
+                }
+            }
+            
+            // Escape key to close modal
+            if (e.key === 'Escape' && messageModal.style.display === 'block') {
+                messageModal.style.display = 'none';
+                messageText.value = '';
+            }
+        });
+
+        // Auto-save draft messages
+        messageText.addEventListener('input', () => {
+            const draft = messageText.value;
+            localStorage.setItem('messageDraft', draft);
+        });
+
+        // Restore draft on page load
+        window.addEventListener('load', () => {
+            const draft = localStorage.getItem('messageDraft');
+            if (draft) {
+                messageText.value = draft;
+            }
+            
+            // Clear draft when message is sent
+            sendMessage.addEventListener('click', () => {
+                localStorage.removeItem('messageDraft');
+            });
+        });
+
+        // Real-time updates simulation
+        setInterval(() => {
+            const notifications = [bellBadge, messageBadge];
+            const randomNotification = notifications[Math.floor(Math.random() * notifications.length)];
+            const currentCount = parseInt(randomNotification.textContent);
+            
+            if (Math.random() < 0.1) { // 10% chance every 30 seconds
+                randomNotification.textContent = currentCount + 1;
+                animateElement(randomNotification.parentElement, 'pulse');
+            }
+        }, 30000);
+
+        // Smooth scroll to sections
+        navItems.forEach(item => {
+            item.addEventListener('click', (e) => {
+                const targetSection = item.getAttribute('data-page');
+                if (targetSection) {
+                    animateElement(item, 'pulse');
+                }
+            });
+        });
+
+        // Initialize tooltips for better UX
+        const tooltipElements = document.querySelectorAll('[title]');
+        tooltipElements.forEach(element => {
+            element.addEventListener('mouseenter', () => {
+                const tooltip = document.createElement('div');
+                tooltip.className = 'tooltip';
+                tooltip.textContent = element.getAttribute('title');
+                document.body.appendChild(tooltip);
+                
+                const rect = element.getBoundingClientRect();
+                tooltip.style.position = 'absolute';
+                tooltip.style.left = rect.left + (rect.width / 2) - (tooltip.offsetWidth / 2) + 'px';
+                tooltip.style.top = rect.top - tooltip.offsetHeight - 10 + 'px';
+                tooltip.style.background = 'rgba(0, 0, 0, 0.8)';
+                tooltip.style.color = 'white';
+                tooltip.style.padding = '5px 10px';
+                tooltip.style.borderRadius = '4px';
+                tooltip.style.fontSize = '12px';
+                tooltip.style.zIndex = '9999';
+                
+                element.addEventListener('mouseleave', () => {
+                    tooltip.remove();
+                }, { once: true });
+            });
+        });
+
+        console.log('Customer View JavaScript loaded successfully!');
+    </script>
+</body>
+</html>

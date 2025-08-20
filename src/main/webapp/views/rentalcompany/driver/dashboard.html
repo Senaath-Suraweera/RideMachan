@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- ===================
+             Meta & Stylesheets
+    =================== -->
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Driver Dashboard</title>
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+    />
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
+    />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet"
+    />
+    <link rel="stylesheet" href="dashboard.css" />
+</head>
+<body>
+    <div class="container">
+        <!-- ===================
+                 Sidebar Navigation
+        =================== -->
+        <div class="sidebar" id="sidebar">
+            <div class="logo">
+                <img src="logo.png" alt="Logo" class="logo">
+            </div> 
+            <div class="nav-menu">
+                <div class="nav-item active">
+                    <i class="fas fa-house"></i>
+                    <a href="dashboard.html"><span> Home</span></a>
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-user"></i>
+                    <a href="profile.html"><span>Profile</span></a>
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-calendar-alt"></i>
+                    <a href="drivercalview.html"><span>Calendar</span></a>
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-car"></i>
+                    <a href="vehicleview.html"><span>Vehicles</span></a>
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-users"></i>
+                    <a href="customerview.html"><span>Customer</span></a>
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-book"></i>
+                    <a href="issuereporting.html"><span>Reports</span></a>
+                </div>
+                <div class="logout">
+                    <i class="fas fa-sign-out"></i>
+                    <span>Logout</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- ===================
+                 Header Section
+        =================== -->
+        <div class="header">
+            <div class="header-left">
+                <button class="mobile-menu-toggle" onclick="toggleSidebar()">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h1>Hi "John Smith"</h1>
+            </div>
+            <div class="header-actions">
+                <span class="driver-photo-label">driver photo</span>
+                <!-- User Profile -->
+                <div class="user-profile">
+                    <div class="profile-img">J</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===================
+                 Main Content
+        =================== -->
+        <div class="main-content">
+            <!-- Stats Cards -->
+            <div class="stats-section">
+                <!-- Monthly Income Graph -->
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <h3>Monthly Income Graph</h3>
+                    </div>
+                    <div class="stat-value">$2,450</div>
+                    <div class="chart-container">
+                        <div class="bar-chart">
+                            <div class="bar" style="height: 40%"></div>
+                            <div class="bar" style="height: 60%"></div>
+                            <div class="bar" style="height: 80%"></div>
+                            <div class="bar" style="height: 100%"></div>
+                            <div class="bar" style="height: 90%"></div>
+                            <div class="bar" style="height: 70%"></div>
+                            <div class="bar" style="height: 85%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Weekly Bookings Number Graph -->
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <h3>Weekly Bookings Number Graph</h3>
+                    </div>
+                    <div class="stat-value">28</div>
+                    <div class="chart-container">
+                        <div class="bar-chart">
+                            <div class="bar" style="height: 50%"></div>
+                            <div class="bar" style="height: 70%"></div>
+                            <div class="bar" style="height: 90%"></div>
+                            <div class="bar" style="height: 80%"></div>
+                            <div class="bar" style="height: 100%"></div>
+                            <div class="bar" style="height: 75%"></div>
+                            <div class="bar" style="height: 60%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Daily Driving Hours Graph -->
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <h3>Daily Driving Hours Graph</h3>
+                    </div>
+                    <div class="stat-value">8.5h</div>
+                    <div class="chart-container">
+                        <div class="line-chart">
+                            <svg viewBox="0 0 200 60" class="line-svg">
+                                <polyline
+                                    fill="none"
+                                    stroke="#4285f4"
+                                    stroke-width="3"
+                                    points="10,40 30,35 50,25 70,30 90,20 110,15 130,25 150,20 170,10 190,15"
+                                />
+                                <circle cx="10" cy="40" r="3" fill="#4285f4"/>
+                                <circle cx="30" cy="35" r="3" fill="#4285f4"/>
+                                <circle cx="50" cy="25" r="3" fill="#4285f4"/>
+                                <circle cx="70" cy="30" r="3" fill="#4285f4"/>
+                                <circle cx="90" cy="20" r="3" fill="#4285f4"/>
+                                <circle cx="110" cy="15" r="3" fill="#4285f4"/>
+                                <circle cx="130" cy="25" r="3" fill="#4285f4"/>
+                                <circle cx="150" cy="20" r="3" fill="#4285f4"/>
+                                <circle cx="170" cy="10" r="3" fill="#4285f4"/>
+                                <circle cx="190" cy="15" r="3" fill="#4285f4"/>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pie Chart and Action Buttons Section -->
+            <div class="bottom-section">
+                <!-- Pie Chart Section -->
+                <div class="pie-chart-section">
+                    <h3>Pie chart for completed, pending, cancelled, completed bookings</h3>
+                    <div class="pie-chart-container">
+                        <div class="pie-chart">
+                            <div class="pie-slice" style="--percentage: 65; --color: #4285f4;">
+                                <span class="percentage">65%</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="pie-stats">
+                        <div class="pie-stat-item">
+                            <span class="stat-label">Completed</span>
+                            <span class="stat-number">18</span>
+                        </div>
+                        <div class="pie-stat-item">
+                            <span class="stat-label">Pending</span>
+                            <span class="stat-number">6</span>
+                        </div>
+                        <div class="pie-stat-item">
+                            <span class="stat-label">Cancelled</span>
+                            <span class="stat-number">4</span>
+                        </div>
+                        <div class="pie-stat-item">
+                            <span class="stat-label">Total</span>
+                            <span class="stat-number">28</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons Section -->
+                <div class="action-buttons-section">
+                    <button class="action-btn message-btn">
+                        <i class="fas fa-comment"></i>
+                        Message Company
+                    </button>
+                    <button class="action-btn contact-btn">
+                        <i class="fas fa-phone"></i>
+                        Contact Admin
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('active');
+        }
+
+        // Close sidebar when clicking outside on mobile
+        document.addEventListener('click', function(event) {
+            const sidebar = document.getElementById('sidebar');
+            const toggle = document.querySelector('.mobile-menu-toggle');
+            
+            if (window.innerWidth <= 992) {
+                if (!sidebar.contains(event.target) && !toggle.contains(event.target)) {
+                    sidebar.classList.remove('active');
+                }
+            }
+        });
+
+        // Handle window resize
+        window.addEventListener('resize', function() {
+            const sidebar = document.getElementById('sidebar');
+            if (window.innerWidth > 992) {
+                sidebar.classList.remove('active');
+            }
+        });
+
+        // Add smooth scrolling for navigation links
+        document.querySelectorAll('.nav-item a').forEach(link => {
+            link.addEventListener('click', function(e) {
+                // Close mobile menu when link is clicked
+                if (window.innerWidth <= 992) {
+                    document.getElementById('sidebar').classList.remove('active');
+                }
+            });
+        });
+
+        // Add click handlers for action buttons
+        document.querySelector('.message-btn').addEventListener('click', function() {
+            alert('Message Company feature coming soon!');
+        });
+
+        document.querySelector('.contact-btn').addEventListener('click', function() {
+            alert('Contact Admin feature coming soon!');
+        });
+
+        // Add logout functionality
+        document.querySelector('.logout').addEventListener('click', function() {
+            if (confirm('Are you sure you want to logout?')) {
+                alert('Logging out...');
+                // Add actual logout logic here
+            }
+        });
+    </script>
+</body>
+</html>
