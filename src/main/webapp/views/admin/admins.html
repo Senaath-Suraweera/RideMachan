@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admins - Ride Machan</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/sidebar.css">
+    <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+    <div class="container">
+        <main class="main-content">
+            <header class="page-header">
+                <div class="header-content">
+                    <h1 class="page-title">Admins</h1>
+                    <div class="header-actions">
+                        <button class="btn btn-primary" onclick="openRegisterAdminModal()">
+                            + Register Admin
+                        </button>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Search and Filter Section -->
+            <div class="search-filter-section">
+                <div class="filter-row">
+                    <div class="form-group">
+                        <input type="text" class="form-control" placeholder="Enter admin name" id="adminNameFilter">
+                    </div>
+                    <div class="form-group">
+                        <input type="text" class="form-control" placeholder="Enter admin ID" id="adminIdFilter">
+                    </div>
+                    <div class="form-group">
+                        <select class="form-select" id="sortOrder">
+                            <option value="ascending">Ascending</option>
+                            <option value="descending">Descending</option>
+                            <option value="recent">Recently Added</option>
+                            <option value="status">By Status</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <button class="btn btn-primary search-btn" onclick="searchAdmins()">
+                             Search
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Admins List -->
+            <div class="admins-section">
+                <div class="admins-list" id="adminsList">
+                    <!-- Admin 1 -->
+                    <div class="admin-card" data-admin-id="1">
+                        <div class="admin-info">
+                            <div class="admin-id">#1</div>
+                            <div class="admin-details">
+                                <h3 class="admin-name">Admin Account Name</h3>
+                                <p class="admin-permission">Permission Level</p>
+                            </div>
+                        <div class="admin-status">
+                            <span class="status-badge status-inactive">
+                                <span class="status-indicator"></span>
+                                Inactive
+                            </span>
+                        </div>
+                        <div class="admin-actions">
+                            <button class="btn btn-secondary btn-sm" onclick="editAdmin(3)">Edit</button>
+                            <button class="btn btn-danger btn-sm" onclick="deleteAdmin(3)">Delete</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Register Admin Modal -->
+    <div class="modal" id="registerAdminModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Register New Admin</h3>
+                <button class="modal-close" onclick="closeRegisterAdminModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="registerAdminForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Full Name *</label>
+                            <input type="text" class="form-control" name="fullName" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Email Address *</label>
+                            <input type="email" class="form-control" name="email" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Phone Number *</label>
+                            <input type="tel" class="form-control" name="phone" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Employee ID</label>
+                            <input type="text" class="form-control" name="employeeId">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Permission Level *</label>
+                        <select class="form-select" name="permissionLevel" required>
+                            <option value="">Select Permission Level</option>
+                            <option value="super-admin">Super Admin</option>
+                            <option value="admin">Admin</option>
+                            <option value="moderator">Moderator</option>
+                            <option value="support">Support</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Department</label>
+                        <select class="form-select" name="department">
+                            <option value="">Select Department</option>
+                            <option value="operations">Operations</option>
+                            <option value="customer-service">Customer Service</option>
+                            <option value="finance">Finance</option>
+                            <option value="marketing">Marketing</option>
+                            <option value="technical">Technical</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Initial Password *</label>
+                        <input type="password" class="form-control" name="password" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Confirm Password *</label>
+                        <input type="password" class="form-control" name="confirmPassword" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeRegisterAdminModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="registerAdmin()">Register Admin</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Admin Modal -->
+    <div class="modal" id="editAdminModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Edit Admin</h3>
+                <button class="modal-close" onclick="closeEditAdminModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="editAdminForm">
+                    <input type="hidden" name="adminId" id="editAdminId">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Full Name *</label>
+                            <input type="text" class="form-control" name="fullName" id="editFullName" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Email Address *</label>
+                            <input type="email" class="form-control" name="email" id="editEmail" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Phone Number *</label>
+                            <input type="tel" class="form-control" name="phone" id="editPhone" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Employee ID</label>
+                            <input type="text" class="form-control" name="employeeId" id="editEmployeeId">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Permission Level *</label>
+                        <select class="form-select" name="permissionLevel" id="editPermissionLevel" required>
+                            <option value="super-admin">Super Admin</option>
+                            <option value="admin">Admin</option>
+                            <option value="moderator">Moderator</option>
+                            <option value="support">Support</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Department</label>
+                        <select class="form-select" name="department" id="editDepartment">
+                            <option value="operations">Operations</option>
+                            <option value="customer-service">Customer Service</option>
+                            <option value="finance">Finance</option>
+                            <option value="marketing">Marketing</option>
+                            <option value="technical">Technical</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Status</label>
+                        <select class="form-select" name="status" id="editStatus">
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                            <option value="suspended">Suspended</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeEditAdminModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="updateAdmin()">Update Admin</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/sidebar.js"></script>
+    <script src="js/admin.js"></script>
+</body>

@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Dashboard - Ride Machan</title>
+    <link rel="stylesheet" href="css/styles.css" />
+    <link rel="stylesheet" href="css/sidebar.css" />
+    <link rel="stylesheet" href="css/dashboard.css" />
+  </head>
+  <body>
+    <div class="container">
+      <main class="main-content">
+        <header class="page-header">
+          <div class="header-content">
+            <h1 class="page-title">Admin Dashboard</h1>
+            <div class="header-actions">
+              <div class="notification-icon">🔔</div>
+              <div class="user-profile">
+                <span class="user-avatar">👤</span>
+                <span class="user-name">Admin User</span>
+              </div>
+            </div>
+          </div>
+        </header>
+
+        <!-- Stats Overview -->
+        <section class="stats-section">
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-header">
+                <h3 class="stat-title">Total Income</h3>
+              </div>
+              <div class="stat-value">Rs 15,000,000</div>
+              <div class="stat-change positive">+20.1 from Last month</div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-header">
+                <h3 class="stat-title">New Rental requests</h3>
+              </div>
+              <div class="stat-value">120</div>
+              <div class="stat-change positive">+12 from yesterday</div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-header">
+                <h3 class="stat-title">Support Tickets</h3>
+              </div>
+              <div class="stat-value">23</div>
+              <div class="stat-change negative">-5 from last week</div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-header">
+                <h3 class="stat-title">Reports</h3>
+              </div>
+              <div class="stat-value">42</div>
+              <div class="stat-label">Available Reports</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Main Dashboard Content -->
+        <div class="dashboard-grid">
+          <!-- Monthly Income Chart -->
+          <div class="dashboard-card chart-card">
+            <div class="card-header">
+              <h3 class="card-title">Monthly Income</h3>
+              <p class="card-subtitle">Revenue trend over time</p>
+            </div>
+            <div class="chart-container">
+              <canvas id="monthlyIncomeChart"></canvas>
+            </div>
+          </div>
+
+          <!-- Top Customers -->
+          <div class="dashboard-card top-customers">
+            <div class="card-header">
+              <h3 class="card-title">Top Customers</h3>
+            </div>
+            <div class="top-list">
+              <div class="top-item">
+                <div class="avatar"></div>
+                <div class="item-info">
+                  <div class="item-name">Name</div>
+                  <div class="item-detail">Rides</div>
+                </div>
+                <div class="item-rating">
+                  <span class="star">⭐</span>
+                  <span>4.8</span>
+                </div>
+              </div>
+              <div class="top-item">
+                <div class="avatar"></div>
+                <div class="item-info">
+                  <div class="item-name">Name</div>
+                  <div class="item-detail">Rides</div>
+                </div>
+                <div class="item-rating">
+                  <span class="star">⭐</span>
+                  <span>4.7</span>
+                </div>
+              </div>
+              <div class="top-item">
+                <div class="avatar"></div>
+                <div class="item-info">
+                  <div class="item-name">Name</div>
+                  <div class="item-detail">Rides</div>
+                </div>
+                <div class="item-rating">
+                  <span class="star">⭐</span>
+                  <span>4.7</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Top Renters -->
+          <div class="dashboard-card top-renters">
+            <div class="card-header">
+              <h3 class="card-title">Top Renters</h3>
+            </div>
+            <div class="top-list">
+              <div class="top-item">
+                <div class="avatar"></div>
+                <div class="item-info">
+                  <div class="item-name">Name</div>
+                  <div class="item-detail">Rides</div>
+                </div>
+                <div class="item-rating">
+                  <span class="star">⭐</span>
+                  <span>4.9</span>
+                </div>
+              </div>
+              <div class="top-item">
+                <div class="avatar"></div>
+                <div class="item-info">
+                  <div class="item-name">Name</div>
+                  <div class="item-detail">Rides</div>
+                </div>
+                <div class="item-rating">
+                  <span class="star">⭐</span>
+                  <span>4.8</span>
+                </div>
+              </div>
+              <div class="top-item">
+                <div class="avatar"></div>
+                <div class="item-info">
+                  <div class="item-name">Name</div>
+                  <div class="item-detail">Rides</div>
+                </div>
+                <div class="item-rating">
+                  <span class="star">⭐</span>
+                  <span>4.7</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sri Lanka Map -->
+        <div class="map-section">
+          <div class="map-card">
+            <div class="card-header">
+              <h3 class="card-title">Map of Sri Lanka</h3>
+            </div>
+            <div class="map-container">
+              <div class="map-placeholder">
+                <div class="map-icon">📍</div>
+                <p>Map will be loaded here</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <script src="js/sidebar.js"></script>
+    <script src="js/dashboard.js"></script>
+  </body>
+</html>

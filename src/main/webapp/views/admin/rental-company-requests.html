@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Pending Rental Company Requests - Ride Machan</title>
+
+    <link rel="stylesheet" href="css/styles.css" />
+    <link rel="stylesheet" href="css/sidebar.css" />
+
+    <link rel="stylesheet" href="css/rental-company-requests.css" />
+  </head>
+  <body>
+    <div class="container">
+      <main class="main-content">
+        <section class="requests-card">
+          <div class="card-header">
+            <div class="titles">
+              <h1 class="page-title">Pending Rental Company Requests</h1>
+              <p class="page-subtitle">
+                Review and manage company registration requests
+              </p>
+            </div>
+
+            <div class="card-controls">
+              <div
+                class="chip-group"
+                id="alphaSort"
+                role="group"
+                aria-label="Alphabetical sort"
+              >
+                <button
+                  class="chip active"
+                  data-sort="az"
+                  type="button"
+                  title="Sort A → Z"
+                >
+                  A–Z
+                </button>
+                <button
+                  class="chip"
+                  data-sort="za"
+                  type="button"
+                  title="Sort Z → A"
+                >
+                  Z–A
+                </button>
+              </div>
+
+              <div
+                class="chip-group"
+                id="dateSort"
+                role="group"
+                aria-label="Date sort"
+              >
+                <button
+                  class="chip active"
+                  data-sort="new"
+                  type="button"
+                  title="Newest first"
+                >
+                  Date
+                </button>
+                <button
+                  class="chip"
+                  data-sort="old"
+                  type="button"
+                  title="Oldest first"
+                >
+                  Oldest
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="table-wrapper">
+            <table
+              class="requests-table"
+              id="requestsTable"
+              aria-label="Pending rental company requests"
+            >
+              <thead>
+                <tr>
+                  <th style="width: 72px">#</th>
+                  <th>Company Name</th>
+                  <th>Email</th>
+                  <th>Phone</th>
+                  <th style="width: 160px">Submitted Date</th>
+                  <th style="width: 160px">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="requestsTbody"></tbody>
+            </table>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script src="js/sidebar.js"></script>
+    <script src="js/rental-company-requests.js" defer></script>
+  </body>
+</html>

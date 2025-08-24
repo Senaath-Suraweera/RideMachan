@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Vehicles - RideMachan</title>
+    <link rel="stylesheet" href="../css/styles.css" />
+    <link rel="stylesheet" href="../css/sidebar.css" />
+    <link rel="stylesheet" href="../css/my-vehicles.css" />
+  </head>
+  <body>
+    <div class="container">
+      <div class="main-content">
+        <div class="page-header">
+          <h1>My Vehicles</h1>
+          <button class="btn btn-primary" onclick="openAddVehicleModal()">
+            + Register a vehicle
+          </button>
+        </div>
+        <p class="page-subtitle">
+          Manage your vehicle fleet and track bookings
+        </p>
+
+        <!-- Filter Section -->
+        <div class="search-filter-section">
+          <div class="filter-row">
+            <div class="form-group">
+              <label class="form-label">Vehicle type</label>
+              <select class="form-select" id="vehicleTypeFilter">
+                <option>All Types</option>
+                <option>Sedan</option>
+                <option>SUV</option>
+                <option>Hatchback</option>
+                <option>Budget Cars</option>
+                <option>Luxury Rides</option>
+                <option>Eco Rentals</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Location</label>
+              <select class="form-select" id="locationFilter">
+                <option>All Locations</option>
+                <option>Colombo</option>
+                <option>Kandy</option>
+                <option>Galle</option>
+                <option>Negombo</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">From</label>
+              <input type="date" class="form-control" id="fromDate" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">To</label>
+              <input type="date" class="form-control" id="toDate" />
+            </div>
+          </div>
+          <div class="filter-options">
+            <label class="checkbox-label">
+              <input
+                type="radio"
+                name="vehicleStatus"
+                value="registered"
+                checked
+              />
+              Registered to company
+            </label>
+            <label class="checkbox-label">
+              <input type="radio" name="vehicleStatus" value="booked" />
+              Booked
+            </label>
+          </div>
+          <div class="search-sort-row">
+            <div class="search-box">
+              <input
+                type="text"
+                placeholder="Search vehicles..."
+                class="form-control"
+                id="searchInput"
+              />
+            </div>
+            <select class="form-select" id="sortSelect">
+              <option>Name (A-Z)</option>
+              <option>Name (Z-A)</option>
+              <option>Price (Low to High)</option>
+              <option>Price (High to Low)</option>
+              <option>Rating (High to Low)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Vehicles Grid -->
+        <div class="vehicles-grid" id="vehiclesGrid">
+          <!-- Vehicle Card 1 -->
+          <div class="vehicle-card" data-type="luxury" data-location="colombo">
+            <div class="vehicle-image">
+              <div class="no-image">No image available</div>
+              <div class="vehicle-status available">Available</div>
+            </div>
+            <div class="vehicle-info">
+              <h3 class="vehicle-name">BMW X3</h3>
+              <div class="vehicle-price">₹8500/day</div>
+              <div class="vehicle-category">🏢 Luxury Rides</div>
+              <div class="vehicle-location">📍 Colombo</div>
+              <div class="vehicle-features">
+                <span class="feature">AC</span>
+                <span class="feature">Automatic</span>
+                <span class="feature">Leather Seats</span>
+                <span class="feature">Sunroof</span>
+                <span class="feature">Premium Sound</span>
+              </div>
+              <div class="vehicle-rating">
+                <div class="rating">
+                  <span class="star">★</span>
+                  <span class="star">★</span>
+                  <span class="star">★</span>
+                  <span class="star">★</span>
+                  <span class="star">★</span>
+                  <span class="rating-text">42 reviews</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Vehicle Card 2 -->
+          <div class="vehicle-card" data-type="eco" data-location="colombo">
+            <div class="vehicle-image">
+              <div class="no-image">No image available</div>
+              <div class="vehicle-status available">Available</div>
+            </div>
+            <div class="vehicle-info">
+              <h3 class="vehicle-name">Nissan Leaf</h3>
+              <div class="vehicle-price">₹6500/day</div>
+              <div class="vehicle-category">🌱 Eco Rentals</div>
+              <div class="vehicle-location">📍 Colombo</div>
+              <div class="vehicle-features">
+                <span class="feature">Electric</span>
+                <span class="feature">Silent</span>
+                <span class="feature">GPS</span>
+                <span class="feature">AC</span>
+                <span class="feature">Eco-friendly</span>
+              </div>
+              <div class="vehicle-rating">
+                <div class="rating">
+                  <span class="star">★</span>
+                  <span class="star">★</span>
+                  <span class="star">★</span>
+                  <span class="star">★</span>
+                  <span class="star empty">★</span>
+                  <span class="rating-text">15 reviews</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Vehicle Card 3 -->
+          <div class="vehicle-card" data-type="budget" data-location="galle">
+            <div class="vehicle-image">
+              <div class="no-image">No image available</div>
+              <div class="vehicle-status available">Available</div>
+            </div>
+            <div class="vehicle-info">
+              <h3 class="vehicle-name">Suzuki Alto</h3>
+              <div class="vehicle-price">₹2800/day</div>
+              <div class="vehicle-category">💰 Budget Cars</div>
+              <div class="vehicle-location">📍 Galle</div>
+              <div class="vehicle-features">
+                <span class="feature">AC</span>
+                <span class="feature">Manual</span>
+                <span class="feature">Fuel Efficient</span>
+              </div>
+              <div class="vehicle-rating">
+                <div class="rating">
+                  <span class="star">★</span>
+                  <span class="star">★</span>
+                  <span class="star">★</span>
+                  <span class="star empty">★</span>
+                  <span class="star empty">★</span>
+                  <span class="rating-text">12 reviews</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Vehicle Card 4 -->
+          <div class="vehicle-card" data-type="sedan" data-location="colombo">
+            <div class="vehicle-image">
+              <div class="no-image">No image available</div>
+              <div class="vehicle-status booked">Booked</div>
+            </div>
+            <div class="vehicle-info">
+              <h3 class="vehicle-name">Toyota Corolla</h3>
+              <div class="vehicle-price">₹3500/day</div>
+              <div class="vehicle-category">🚗 City Car Rentals</div>
+              <div class="vehicle-location">📍 Colombo</div>
+              <div class="vehicle-features">
+                <span class="feature">AC</span>
+                <span class="feature">Automatic</span>
+                <span class="feature">GPS</span>
+                <span class="feature">Bluetooth</span>
+              </div>
+              <div class="vehicle-rating">
+                <div class="rating">
+                  <span class="star">★</span>
+                  <span class="star">★</span>
+                  <span class="star">★</span>
+                  <span class="star">★</span>
+                  <span class="star empty">★</span>
+                  <span class="rating-text">25 reviews</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Load More Button -->
+        <div class="load-more-section">
+          <button class="btn btn-secondary" onclick="loadMoreVehicles()">
+            Load More Vehicles
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Add Vehicle Modal -->
+    <div class="modal-overlay" id="addVehicleModal">
+      <div class="modal">
+        <div class="modal-header">
+          <h2>Register New Vehicle</h2>
+          <button class="modal-close" onclick="closeAddVehicleModal()">
+            ×
+          </button>
+        </div>
+        <div class="modal-body">
+          <form id="addVehicleForm">
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Vehicle Type</label>
+                <select class="form-select" required>
+                  <option value="">Select vehicle type</option>
+                  <option>Sedan</option>
+                  <option>SUV</option>
+                  <option>Hatchback</option>
+                  <option>Luxury</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Brand</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  placeholder="Enter brand"
+                  required
+                />
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Model</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  placeholder="Enter model"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Year</label>
+                <input
+                  type="number"
+                  class="form-control"
+                  placeholder="Enter year"
+                  min="2000"
+                  max="2025"
+                  required
+                />
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">License Plate</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  placeholder="Enter license plate"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Daily Rate (Rs)</label>
+                <input
+                  type="number"
+                  class="form-control"
+                  placeholder="Enter daily rate"
+                  required
+                />
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Location</label>
+              <select class="form-select" required>
+                <option value="">Select location</option>
+                <option>Colombo</option>
+                <option>Kandy</option>
+                <option>Galle</option>
+                <option>Negombo</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Features</label>
+              <div class="features-grid">
+                <label class="checkbox-label">
+                  <input type="checkbox" /> AC
+                </label>
+                <label class="checkbox-label">
+                  <input type="checkbox" /> Automatic
+                </label>
+                <label class="checkbox-label">
+                  <input type="checkbox" /> GPS
+                </label>
+                <label class="checkbox-label">
+                  <input type="checkbox" /> Bluetooth
+                </label>
+                <label class="checkbox-label">
+                  <input type="checkbox" /> Leather Seats
+                </label>
+                <label class="checkbox-label">
+                  <input type="checkbox" /> Sunroof
+                </label>
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            onclick="closeAddVehicleModal()"
+          >
+            Cancel
+          </button>
+          <button type="submit" form="addVehicleForm" class="btn btn-primary">
+            Register Vehicle
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script src="../js/sidebar.js"></script>
+    <script src="../js/my-vehicles.js"></script>
+  </body>
+</html>

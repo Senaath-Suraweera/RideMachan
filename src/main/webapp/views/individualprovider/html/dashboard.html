@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard - RideMachan</title>
+    <link rel="stylesheet" href="../css/styles.css" />
+    <link rel="stylesheet" href="../css/sidebar.css" />
+    <link rel="stylesheet" href="../css/dashboard.css" />
+  </head>
+  <body>
+    <div class="container">
+      <div class="main-content">
+        <div class="page-header">
+          <h1>Dashboard</h1>
+          <span class="last-updated">Last updated: 8/3/2025</span>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-value">Rs 342,500</div>
+            <div class="stat-label">Total Income</div>
+            <div class="stat-change positive">+ 12.5%</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value">94.2%</div>
+            <div class="stat-label">Acceptance Rate</div>
+            <div class="stat-change positive">+ 2.1%</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value">156</div>
+            <div class="stat-label">Total Bookings</div>
+            <div class="stat-change positive">+ 8.3%</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value">Rs 28,400</div>
+            <div class="stat-label">Payout Status</div>
+            <div class="stat-change pending">Pending</div>
+          </div>
+        </div>
+
+        <!-- Chart Section -->
+        <div class="chart-section">
+          <div class="chart-card">
+            <div class="card-header">
+              <h2>Monthly Income Graph</h2>
+              <p>Your earnings over the past 12 months</p>
+            </div>
+            <div class="chart-container">
+              <canvas id="incomeChart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- Map and Sessions -->
+        <div class="dashboard-grid">
+          <div class="map-section">
+            <div class="card">
+              <div class="card-header">
+                <h2>Map of Sri Lanka</h2>
+                <p>Displaying the rental sessions by district</p>
+              </div>
+              <div class="map-container">
+                <div class="interactive-map">
+                  <div class="map-icon">🗺️</div>
+                  <h3>Interactive Map View</h3>
+                  <p>Sri Lanka rental sessions by location</p>
+                  <button class="btn btn-primary">Load Map View</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="sessions-section">
+            <div class="card">
+              <div class="card-header">
+                <h2>Active Sessions by District</h2>
+              </div>
+              <div class="sessions-list">
+                <div class="session-item">
+                  <span class="district-dot colombo"></span>
+                  <span class="district-name">Colombo</span>
+                  <span class="session-count">45 sessions</span>
+                </div>
+                <div class="session-item">
+                  <span class="district-dot kandy"></span>
+                  <span class="district-name">Kandy</span>
+                  <span class="session-count">23 sessions</span>
+                </div>
+                <div class="session-item">
+                  <span class="district-dot galle"></span>
+                  <span class="district-name">Galle</span>
+                  <span class="session-count">18 sessions</span>
+                </div>
+                <div class="session-item">
+                  <span class="district-dot negombo"></span>
+                  <span class="district-name">Negombo</span>
+                  <span class="session-count">15 sessions</span>
+                </div>
+                <div class="session-item">
+                  <span class="district-dot jaffna"></span>
+                  <span class="district-name">Jaffna</span>
+                  <span class="session-count">8 sessions</span>
+                </div>
+              </div>
+              <div class="total-sessions">
+                <strong>Total Sessions: 109</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Vehicle Status Section -->
+        <div class="vehicle-status-grid">
+          <div class="maintenance-section">
+            <div class="card">
+              <div class="card-header">
+                <h2>Vehicles Under Maintenance</h2>
+                <span class="maintenance-icon">🔧</span>
+              </div>
+              <div class="vehicle-list">
+                <div class="vehicle-item">
+                  <div class="vehicle-info">
+                    <span class="vehicle-icon">🚗</span>
+                    <div>
+                      <div class="vehicle-name">Toyota Corolla</div>
+                      <div class="vehicle-id">ABC-1234</div>
+                    </div>
+                  </div>
+                  <span class="status-badge status-maintenance"
+                    >Oil Change</span
+                  >
+                  <span class="eta">ETA: 2 hours</span>
+                </div>
+                <div class="vehicle-item">
+                  <div class="vehicle-info">
+                    <span class="vehicle-icon">🚗</span>
+                    <div>
+                      <div class="vehicle-name">Honda Civic</div>
+                      <div class="vehicle-id">XYZ-5678</div>
+                    </div>
+                  </div>
+                  <span class="status-badge status-maintenance"
+                    >Brake Service</span
+                  >
+                  <span class="eta">ETA: 4 hours</span>
+                </div>
+                <div class="vehicle-item">
+                  <div class="vehicle-info">
+                    <span class="vehicle-icon">🚗</span>
+                    <div>
+                      <div class="vehicle-name">Nissan Sentra</div>
+                      <div class="vehicle-id">DEF-9012</div>
+                    </div>
+                  </div>
+                  <span class="status-badge status-maintenance"
+                    >Tire Change</span
+                  >
+                  <span class="eta">ETA: 1 hour</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="available-section">
+            <div class="card">
+              <div class="card-header">
+                <h2>Available Vehicles</h2>
+                <span class="available-icon">✅</span>
+              </div>
+              <div class="vehicle-list">
+                <div class="vehicle-item">
+                  <div class="vehicle-info">
+                    <span class="vehicle-icon">🚗</span>
+                    <div>
+                      <div class="vehicle-name">Toyota Camry</div>
+                      <div class="vehicle-id">GHI-3456 • Colombo</div>
+                    </div>
+                  </div>
+                  <span class="status-badge status-active">Available</span>
+                  <span class="price">Rs 5,000/day</span>
+                </div>
+                <div class="vehicle-item">
+                  <div class="vehicle-info">
+                    <span class="vehicle-icon">🚗</span>
+                    <div>
+                      <div class="vehicle-name">Mazda 3</div>
+                      <div class="vehicle-id">JKL-7890 • Kandy</div>
+                    </div>
+                  </div>
+                  <span class="status-badge status-active">Available</span>
+                  <span class="price">Rs 4,500/day</span>
+                </div>
+                <div class="vehicle-item">
+                  <div class="vehicle-info">
+                    <span class="vehicle-icon">🚗</span>
+                    <div>
+                      <div class="vehicle-name">Honda Accord</div>
+                      <div class="vehicle-id">MNO-1234 • Galle</div>
+                    </div>
+                  </div>
+                  <span class="status-badge status-active">Available</span>
+                  <span class="price">Rs 6,000/day</span>
+                </div>
+                <div class="vehicle-item">
+                  <div class="vehicle-info">
+                    <span class="vehicle-icon">🚗</span>
+                    <div>
+                      <div class="vehicle-name">Nissan Altima</div>
+                      <div class="vehicle-id">PQR-5678 • Negombo</div>
+                    </div>
+                  </div>
+                  <span class="status-badge status-active">Available</span>
+                  <span class="price">Rs 4,800/day</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="../js/sidebar.js"></script>
+    <script src="../js/dashboard.js"></script>
+  </body>
+</html>

@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Messages - RideMachan</title>
+    <link rel="stylesheet" href="../css/styles.css" />
+    <link rel="stylesheet" href="../css/sidebar.css" />
+    <link rel="stylesheet" href="../css/messages.css" />
+  </head>
+  <body>
+    <div class="container">
+      <div class="main-content">
+        <div class="page-header">
+          <h1>Messages</h1>
+          <button class="btn btn-primary" onclick="startNewConversation()">
+            New Message
+          </button>
+        </div>
+
+        <div class="messages-layout">
+          <!-- Conversations List -->
+          <div class="conversations-panel">
+            <div class="conversations-header">
+              <div class="search-box">
+                <input
+                  type="text"
+                  placeholder="Search conversations..."
+                  class="form-control"
+                  id="conversationSearch"
+                />
+                <span class="search-icon"></span>
+              </div>
+              <div class="filter-tabs">
+                <button
+                  class="filter-tab active"
+                  data-filter="all"
+                  onclick="filterConversations('all')"
+                >
+                  All
+                </button>
+                <button
+                  class="filter-tab"
+                  data-filter="unread"
+                  onclick="filterConversations('unread')"
+                >
+                  Unread
+                </button>
+                <button
+                  class="filter-tab"
+                  data-filter="important"
+                  onclick="filterConversations('important')"
+                >
+                  Important
+                </button>
+              </div>
+            </div>
+
+            <div class="conversations-list" id="conversationsList">
+              <!-- Conversation Item 1 -->
+              <div
+                class="conversation-item active unread important"
+                data-conversation="1"
+              >
+                <div class="conversation-avatar">
+                  <div class="avatar-circle">RC</div>
+                  <div class="status-indicator online"></div>
+                </div>
+                <div class="conversation-content">
+                  <div class="conversation-header">
+                    <h4 class="conversation-name">RentaCar Solutions</h4>
+                    <span class="conversation-time">2 min ago</span>
+                  </div>
+                  <p class="conversation-preview">
+                    We'd like to discuss partnership opportunities for your
+                    Toyota Camry...
+                  </p>
+                  <div class="conversation-meta">
+                    <span class="unread-badge">3</span>
+                    <span class="important-flag">!</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Conversation Item 2 -->
+              <div class="conversation-item unread" data-conversation="2">
+                <div class="conversation-avatar">
+                  <div class="avatar-circle">JS</div>
+                  <div class="status-indicator offline"></div>
+                </div>
+                <div class="conversation-content">
+                  <div class="conversation-header">
+                    <h4 class="conversation-name">John Smith (Customer)</h4>
+                    <span class="conversation-time">1 hour ago</span>
+                  </div>
+                  <p class="conversation-preview">
+                    Thank you for the excellent service! The car was perfect for
+                    our trip...
+                  </p>
+                  <div class="conversation-meta">
+                    <span class="unread-badge">1</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Conversation Item 3 -->
+              <div class="conversation-item" data-conversation="3">
+                <div class="conversation-avatar">
+                  <div class="avatar-circle">RM</div>
+                  <div class="status-indicator away"></div>
+                </div>
+                <div class="conversation-content">
+                  <div class="conversation-header">
+                    <h4 class="conversation-name">RideMachan Support</h4>
+                    <span class="conversation-time">Yesterday</span>
+                  </div>
+                  <p class="conversation-preview">
+                    Your account verification has been completed successfully...
+                  </p>
+                  <div class="conversation-meta">
+                    <span class="message-type">✓ System</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Conversation Item 4 -->
+              <div class="conversation-item" data-conversation="4">
+                <div class="conversation-avatar">
+                  <div class="avatar-circle">EC</div>
+                  <div class="status-indicator online"></div>
+                </div>
+                <div class="conversation-content">
+                  <div class="conversation-header">
+                    <h4 class="conversation-name">Elite Car Rentals</h4>
+                    <span class="conversation-time">2 days ago</span>
+                  </div>
+                  <p class="conversation-preview">
+                    Your application has been approved. Welcome to our network!
+                  </p>
+                  <div class="conversation-meta">
+                    <span class="message-type">✓ Business</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Conversation Item 5 -->
+              <div class="conversation-item" data-conversation="5">
+                <div class="conversation-avatar">
+                  <div class="avatar-circle">SW</div>
+                  <div class="status-indicator offline"></div>
+                </div>
+                <div class="conversation-content">
+                  <div class="conversation-header">
+                    <h4 class="conversation-name">Sarah Wilson (Customer)</h4>
+                    <span class="conversation-time">3 days ago</span>
+                  </div>
+                  <p class="conversation-preview">
+                    Is the Honda Civic available for next weekend?
+                  </p>
+                  <div class="conversation-meta">
+                    <span class="message-type">Customer</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Chat Area -->
+          <div class="chat-panel">
+            <div class="chat-header">
+              <div class="chat-contact-info">
+                <div class="contact-avatar">
+                  <div class="avatar-circle">RC</div>
+                  <div class="status-indicator online"></div>
+                </div>
+                <div class="contact-details">
+                  <h3 class="contact-name">RentaCar Solutions</h3>
+                  <p class="contact-status">Online • Rental Company</p>
+                </div>
+              </div>
+              <div class="chat-actions">
+                <button
+                  class="btn btn-secondary btn-sm"
+                  onclick="toggleChatInfo()"
+                >
+                  Info
+                </button>
+                <button
+                  class="btn btn-secondary btn-sm"
+                  onclick="toggleImportant()"
+                >
+                  Important
+                </button>
+              </div>
+            </div>
+
+            <div class="chat-messages" id="chatMessages">
+              <!-- Incoming Message -->
+              <div class="message incoming">
+                <div class="message-avatar">
+                  <div class="avatar-circle">RC</div>
+                </div>
+                <div class="message-content">
+                  <div class="message-bubble">
+                    <p>
+                      Hello! We're interested in partnering with you for your
+                      Toyota Camry. We offer competitive rates and excellent
+                      customer support.
+                    </p>
+                  </div>
+                  <div class="message-time">Today 2:15 PM</div>
+                </div>
+              </div>
+
+              <!-- Outgoing Message -->
+              <div class="message outgoing">
+                <div class="message-content">
+                  <div class="message-bubble">
+                    <p>
+                      Hi! Thank you for reaching out. I'd be interested to learn
+                      more about your partnership program. What are the
+                      commission rates?
+                    </p>
+                  </div>
+                  <div class="message-time">Today 2:18 PM</div>
+                </div>
+              </div>
+
+              <!-- Incoming Message -->
+              <div class="message incoming">
+                <div class="message-avatar">
+                  <div class="avatar-circle">RC</div>
+                </div>
+                <div class="message-content">
+                  <div class="message-bubble">
+                    <p>
+                      Great! We offer 85% commission to vehicle owners, with
+                      instant payouts and comprehensive insurance coverage.
+                      Would you like to schedule a call to discuss details?
+                    </p>
+                  </div>
+                  <div class="message-time">Today 2:20 PM</div>
+                </div>
+              </div>
+
+              <!-- System Message -->
+              <div class="message system">
+                <div class="message-content">
+                  <div class="message-bubble">
+                    <p>
+                      📋 RentaCar Solutions has sent you a partnership agreement
+                      document.
+                    </p>
+                    <div class="attachment">
+                      <div class="attachment-icon">📄</div>
+                      <div class="attachment-info">
+                        <div class="attachment-name">
+                          Partnership_Agreement_2024.pdf
+                        </div>
+                        <div class="attachment-size">2.3 MB</div>
+                      </div>
+                      <button class="btn btn-sm btn-primary">Download</button>
+                    </div>
+                  </div>
+                  <div class="message-time">Today 2:22 PM</div>
+                </div>
+              </div>
+
+              <!-- Typing Indicator -->
+              <div
+                class="message incoming typing"
+                id="typingIndicator"
+                style="display: none"
+              >
+                <div class="message-avatar">
+                  <div class="avatar-circle">RC</div>
+                </div>
+                <div class="message-content">
+                  <div class="message-bubble">
+                    <div class="typing-dots">
+                      <span></span>
+                      <span></span>
+                      <span></span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="chat-input">
+              <div class="input-actions">
+                <button class="action-btn" onclick="attachFile()">📎</button>
+                <button class="action-btn" onclick="addEmoji()">😊</button>
+              </div>
+              <textarea
+                id="messageInput"
+                class="message-textarea"
+                placeholder="Type your message..."
+                rows="1"
+                onkeydown="handleKeyPress(event)"
+              ></textarea>
+              <button class="send-btn" onclick="sendMessage()" id="sendButton">
+                <span class="send-icon">→</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Chat Info Panel -->
+          <div class="chat-info-panel" id="chatInfoPanel">
+            <div class="info-header">
+              <h3>Contact Information</h3>
+              <button class="close-info" onclick="toggleChatInfo()">×</button>
+            </div>
+            <div class="info-content">
+              <div class="contact-profile">
+                <div class="profile-avatar">
+                  <div class="avatar-circle large">RC</div>
+                </div>
+                <h4>RentaCar Solutions</h4>
+                <p>Rental Company</p>
+              </div>
+              <div class="contact-details-section">
+                <div class="detail-item">
+                  <strong>Email:</strong>
+                  <span>contact@rentacarsolutions.com</span>
+                </div>
+                <div class="detail-item">
+                  <strong>Phone:</strong>
+                  <span>+94 11 234 5678</span>
+                </div>
+                <div class="detail-item">
+                  <strong>Location:</strong>
+                  <span>Colombo, Sri Lanka</span>
+                </div>
+                <div class="detail-item">
+                  <strong>Business License:</strong>
+                  <span>BL-2024001234</span>
+                </div>
+              </div>
+              <div class="shared-files">
+                <h4>Shared Files</h4>
+                <div class="file-list">
+                  <div class="file-item">
+                    <div class="file-icon">📄</div>
+                    <div class="file-info">
+                      <div class="file-name">
+                        Partnership_Agreement_2024.pdf
+                      </div>
+                      <div class="file-date">Today</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- New Message Modal -->
+    <div class="modal-overlay" id="newMessageModal">
+      <div class="modal">
+        <div class="modal-header">
+          <h2>New Message</h2>
+          <button class="modal-close" onclick="closeNewMessageModal()">
+            ×
+          </button>
+        </div>
+        <div class="modal-body">
+          <form id="newMessageForm">
+            <div class="form-group">
+              <label class="form-label">To</label>
+              <input
+                type="text"
+                class="form-control"
+                placeholder="Search for contacts..."
+                id="recipientInput"
+              />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Subject</label>
+              <input
+                type="text"
+                class="form-control"
+                placeholder="Enter subject"
+                id="subjectInput"
+              />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Message</label>
+              <textarea
+                class="form-control"
+                rows="6"
+                placeholder="Type your message..."
+                id="messageBodyInput"
+              ></textarea>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            onclick="closeNewMessageModal()"
+          >
+            Cancel
+          </button>
+          <button type="submit" form="newMessageForm" class="btn btn-primary">
+            Send Message
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script src="../js/sidebar.js"></script>
+    <script src="../js/messages.js"></script>
+  </body>
+</html>

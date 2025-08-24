@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Support Tickets - Ride Machan</title>
+
+    <!-- global -->
+    <link rel="stylesheet" href="css/styles.css" />
+    <link rel="stylesheet" href="css/sidebar.css" />
+    <link rel="stylesheet" href="css/report-view.css" />
+
+    <!-- page -->
+    <link rel="stylesheet" href="css/support-ticket-view.css" />
+  </head>
+  <body>
+    <div class="container">
+      <main class="main-content">
+        <header class="page-header">
+          <div class="header-content">
+            <h1 class="page-title">Support Tickets</h1>
+            <div class="header-actions">
+              <button
+                class="btn btn-secondary"
+                id="roleToggleBtn"
+                onclick="toggleRole()"
+              >
+                Role: All
+              </button>
+            </div>
+          </div>
+          <p class="page-subtitle">Monitor and manage all platform tickets</p>
+        </header>
+
+        <div class="reports-overview">
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-icon">🎫</div>
+              <div class="stat-content">
+                <div class="stat-value" id="stat-total">0</div>
+                <div class="stat-label">Total Tickets</div>
+                <div class="stat-change positive" id="stat-total-change">—</div>
+              </div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-icon">⏳</div>
+              <div class="stat-content">
+                <div class="stat-value" id="stat-ongoing">0</div>
+                <div class="stat-label">In Progress</div>
+                <div class="stat-change negative" id="stat-ongoing-change">
+                  —
+                </div>
+              </div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-icon">✅</div>
+              <div class="stat-content">
+                <div class="stat-value" id="stat-resolved">0</div>
+                <div class="stat-label">Resolved</div>
+                <div class="stat-change positive" id="stat-resolved-change">
+                  —
+                </div>
+              </div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-icon">⚡</div>
+              <div class="stat-content">
+                <div class="stat-value" id="stat-high">0</div>
+                <div class="stat-label">High Priority</div>
+                <div class="stat-change positive" id="stat-high-change">—</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Same shell as Reports -->
+        <section class="reports-section tickets-section">
+          <div class="section-header">
+            <h3 class="section-title">All Tickets</h3>
+            <div class="filter-controls">
+              <select class="form-select" id="statusFilter">
+                <option value="">All Status</option>
+                <option value="pending">Pending</option>
+                <option value="ongoing">In Progress</option>
+                <option value="resolved">Resolved</option>
+              </select>
+              <select class="form-select" id="roleFilter">
+                <option value="">All Roles</option>
+                <option value="customer">Customer</option>
+                <option value="driver">Driver</option>
+                <option value="company">Company</option>
+              </select>
+              <select class="form-select" id="priorityFilter">
+                <option value="">All Priorities</option>
+                <option value="low">Low</option>
+                <option value="medium">Medium</option>
+                <option value="high">High</option>
+              </select>
+              <button class="btn btn-primary" onclick="applyTicketFilters()">
+                Apply
+              </button>
+            </div>
+          </div>
+
+          <div class="table-responsive">
+            <table class="table reports-table tickets-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Subject Topic</th>
+                  <th>Status</th>
+                  <th>Role</th>
+                  <th>Priority</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- rows injected by JS -->
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <!-- (Filter modal kept; reused by JS)
+    <div class="modal" id="filterModal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>Filter Tickets</h3>
+          <button class="modal-close" onclick="closeFilterModal()">
+            &times;
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="filter-options">
+            <div class="form-group">
+              <label class="form-label">Status</label>
+              <select class="form-select" id="statusFilter">
+                <option value="">All Status</option>
+                <option value="pending">Pending</option>
+                <option value="ongoing">In Progress</option>
+                <option value="resolved">Resolved</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Role</label>
+              <select class="form-select" id="roleFilter">
+                <option value="">All Roles</option>
+                <option value="customer">Customer</option>
+                <option value="driver">Driver</option>
+                <option value="company">Company</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Priority</label>
+              <select class="form-select" id="priorityFilter">
+                <option value="">All Priorities</option>
+                <option value="low">Low</option>
+                <option value="medium">Medium</option>
+                <option value="high">High</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" onclick="clearTicketFilters()">
+            Clear
+          </button>
+          <button class="btn btn-primary" onclick="applyTicketFilters()">
+            Apply
+          </button>
+        </div>
+      </div>
+    </div> -->
+
+    <script src="js/sidebar.js"></script>
+    <script src="js/support-ticket-view.js"></script>
+  </body>
+</html>

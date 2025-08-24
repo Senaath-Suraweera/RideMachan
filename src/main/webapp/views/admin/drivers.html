@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Drivers - Ride Machan</title>
+
+    <!-- Reuse your global styles + sidebar CSS, just like Customers -->
+    <link rel="stylesheet" href="css/styles.css" />
+    <link rel="stylesheet" href="css/sidebar.css" />
+    <link rel="stylesheet" href="css/drivers.css" />
+  </head>
+  <body>
+    <div class="container">
+      <main class="main-content">
+        <header class="page-header">
+          <div class="header-content">
+            <h1 class="page-title">Drivers</h1>
+            <div class="header-actions">
+              <!-- Redirect to a page instead of opening a modal -->
+              <a class="btn btn-primary" href="driver-reg.html"
+                >+ Register Driver</a
+              >
+            </div>
+          </div>
+          <p class="page-subtitle">Drivers</p>
+        </header>
+
+        <!-- Search and Filter Section (mirrors Customers) -->
+        <section class="search-filter-section">
+          <h3 class="section-title">Search & Filter Drivers</h3>
+
+          <div class="filter-row">
+            <div class="form-group">
+              <label class="form-label">Driver Name</label>
+              <input
+                id="driverNameFilter"
+                class="form-control"
+                type="text"
+                placeholder="Enter name"
+              />
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">License Number</label>
+              <input
+                id="licenseFilter"
+                class="form-control"
+                type="text"
+                placeholder="Enter license no."
+              />
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Sort Order</label>
+              <select id="sortOrder" class="form-select">
+                <option value="ascending">Ascending</option>
+                <option value="descending">Descending</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Minimum Rating</label>
+              <div
+                class="rating-stars"
+                id="ratingFilter"
+                aria-label="Minimum rating"
+              >
+                <span class="star" data-value="1">⭐</span>
+                <span class="star" data-value="2">⭐</span>
+                <span class="star" data-value="3">⭐</span>
+                <span class="star" data-value="4">⭐</span>
+                <span class="star" data-value="5">⭐</span>
+              </div>
+              <small class="rating-text"
+                >Click a star to set the minimum rating</small
+              >
+            </div>
+          </div>
+
+          <div class="search-actions">
+            <button class="btn btn-primary" onclick="searchDrivers()">
+              Search
+            </button>
+            <button class="btn btn-secondary" onclick="clearFilters()">
+              Clear Filters
+            </button>
+          </div>
+        </section>
+
+        <!-- Drivers List -->
+        <section class="drivers-section">
+          <div class="section-header">
+            <h3 class="section-title">Driver List (0)</h3>
+          </div>
+          <div class="drivers-grid" id="driversGrid"></div>
+        </section>
+      </main>
+    </div>
+
+    <script src="js/sidebar.js"></script>
+    <script src="js/drivers.js"></script>
+  </body>
+</html>

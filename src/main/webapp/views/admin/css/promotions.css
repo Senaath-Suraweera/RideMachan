@@ -1,0 +1,319 @@
+/* ---- Card + layout scaffolding ---- */
+.filters-section,
+.promotions-section {
+  background: #fff;
+  border: 1px solid #e6e8ec;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(17, 24, 39, 0.04);
+  padding: 16px;
+}
+
+/* ---- Filters ---- */
+.filter-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(280px, 1fr));
+  gap: 16px 24px;
+}
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.filter-label {
+  font-weight: 600;
+  color: #374151;
+  font-size: 14px;
+}
+
+.form-control,
+.form-select {
+  width: 100%;
+  height: 40px;
+  padding: 8px 12px;
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
+  outline: none;
+  background: #fff;
+  color: #111827;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.form-control:focus,
+.form-select:focus {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+}
+
+.filter-options {
+  margin-top: 10px;
+}
+
+/* Custom checkbox (used for "with driver") */
+.checkbox-container {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  user-select: none;
+  font-size: 14px;
+  color: #374151;
+}
+.checkbox-container input {
+  display: none;
+}
+.checkmark {
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  border: 1px solid #cfd6e4;
+  background: #fff;
+  display: inline-block;
+  position: relative;
+  transition: all 0.15s ease;
+}
+.checkbox-container input:checked + .checkmark {
+  background: #4f46e5;
+  border-color: #4f46e5;
+}
+.checkbox-container input:checked + .checkmark::after {
+  content: "";
+  position: absolute;
+  left: 5px;
+  top: 1px;
+  width: 5px;
+  height: 10px;
+  border: solid #fff;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.search-actions {
+  display: flex;
+  justify-content: flex-start;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+/* ---- Buttons ---- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  font-weight: 600;
+  cursor: pointer;
+  user-select: none;
+}
+.btn-sm {
+  padding: 8px 12px;
+  font-size: 14px;
+}
+.btn-primary {
+  background: #14a3b8;
+  color: #fff;
+}
+.btn-primary:hover {
+  background: #0f8da0;
+}
+.btn-secondary {
+  background: #111827;
+  color: #fff;
+}
+.btn-secondary:hover {
+  background: #0b1220;
+}
+
+/* ---- Promotions Grid & Card ---- */
+.promotions-grid {
+  display: grid;
+  gap: 16px;
+}
+.promotion-card {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: 16px;
+  border: 1px solid #e6e8ec;
+  border-radius: 10px;
+  padding: 0;
+  background: #fff;
+  overflow: hidden;
+  transition: box-shadow 0.15s ease, transform 0.05s ease,
+    border-color 0.15s ease;
+}
+.promotion-card:hover {
+  border-color: #d5d8df;
+  box-shadow: 0 4px 16px rgba(17, 24, 39, 0.06);
+}
+
+.promotion-image {
+  position: relative;
+  background: #f1f5f9;
+  display: grid;
+  place-items: center;
+  border-right: 1px solid #eef2f7;
+  min-height: 120px;
+}
+.image-placeholder {
+  color: #6b7280;
+  font-size: 14px;
+}
+.discount-badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: #ef4444;
+  color: #fff;
+  font-weight: 800;
+  font-size: 12px;
+  padding: 6px 10px;
+  border-radius: 999px;
+}
+
+.promotion-content {
+  padding: 14px;
+  display: grid;
+  gap: 8px;
+}
+.vehicle-name {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: #111827;
+}
+.company-info .company-label {
+  font-size: 14px;
+  color: #6b7280;
+}
+
+.pricing {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.original-price {
+  color: #9ca3af;
+  text-decoration: line-through;
+}
+.discounted-price {
+  color: #111827;
+  font-weight: 800;
+}
+
+.promotion-details {
+  display: grid;
+  gap: 6px;
+  margin-top: 6px;
+}
+.detail-row {
+  display: flex;
+  gap: 8px;
+  font-size: 14px;
+  color: #374151;
+}
+.detail-label {
+  color: #6b7280;
+  min-width: 64px;
+}
+
+.promotion-period {
+  font-size: 13px;
+  color: #6b7280;
+}
+.period-label {
+  font-weight: 700;
+  color: #374151;
+  margin-right: 6px;
+}
+
+.promotion-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+/* ---- Modals ---- */
+.modal {
+  position: fixed;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 1000;
+}
+.modal.show {
+  display: flex;
+}
+.modal-content {
+  width: min(800px, 94vw);
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.18);
+  overflow: hidden;
+}
+.modal-header,
+.modal-footer {
+  padding: 12px 14px;
+  background: #f9fafb;
+  border-bottom: 1px solid #eef2f7;
+}
+.modal-footer {
+  border-top: 1px solid #eef2f7;
+  border-bottom: none;
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.modal-header h3 {
+  margin: 0;
+}
+.modal-close {
+  background: transparent;
+  border: none;
+  font-size: 1.6rem;
+  line-height: 1;
+  cursor: pointer;
+  color: #374151;
+}
+.modal-body {
+  padding: 14px;
+}
+
+/* Form inside modal */
+.form-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 10px;
+}
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* ---- Responsive ---- */
+@media (max-width: 1024px) {
+  .filter-grid {
+    grid-template-columns: 1fr;
+  }
+  .promotion-card {
+    grid-template-columns: 200px 1fr;
+  }
+}
+@media (max-width: 768px) {
+  .promotion-card {
+    grid-template-columns: 1fr;
+  }
+  .promotion-image {
+    min-height: 160px;
+    border-right: none;
+    border-bottom: 1px solid #eef2f7;
+  }
+}
