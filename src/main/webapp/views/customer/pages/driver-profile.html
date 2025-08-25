@@ -1,0 +1,1285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Driver Profile - Ride Machan</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <style>
+        :root {
+            --primary: #3a0ca3;
+            --primary-light: #4361ee;
+            --secondary: #7209b7;
+            --success: #4cc9f0;
+            --danger: #f72585;
+            --warning: #f8961e;
+            --info: #4895ef;
+            --dark: #1a1a2e;
+            --light: #f8f9fa;
+            --border: #e9ecef;
+            --text: #2d3748;
+            --text-light: #718096;
+            --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            --radius: 10px;
+            --radius-sm: 6px;
+            --sidebar-width: 260px;
+            --header-height: 70px;
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Poppins", sans-serif;
+        }
+
+        body {
+            background-color: #f5f7fb;
+            color: var(--text);
+            overflow-x: hidden;
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: var(--sidebar-width) 1fr;
+            grid-template-rows: var(--header-height) 1fr;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            grid-row: 1 / 3;
+            background-color: rgba(14, 21, 43, 0.94);
+            color: white;
+            overflow-y: auto;
+            transition: var(--transition);
+            box-shadow: var(--shadow);
+            z-index: 1000;
+            position: fixed;
+            height: 100%;
+            width: var(--sidebar-width);
+        }
+
+        .logo {
+  width:120px;
+    height: 150px;
+    margin-left :2.5rem;
+}
+
+.logo img {
+  width: 100%;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+}
+
+        .nav-menu {
+            padding: 10px 0;
+        }
+
+        .nav-item {
+            padding: 12px 25px;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            transition: var(--transition);
+            border-left: 4px solid transparent;
+            margin: 4px 0;
+            border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+        }
+
+        .nav-item:hover,
+        .nav-item.active {
+            background-color: rgba(255, 255, 255, 0.07);
+            border-left: 5px solid rgba(255, 255, 255, 0.241);
+        }
+
+        .nav-item.active {
+            background: linear-gradient(90deg, rgba(67, 97, 238, 0.2), transparent);
+            font-weight: 500;
+        }
+
+        .nav-item i {
+            width: 24px;
+            margin-right: 12px;
+            font-size: 18px;
+            text-align: center;
+        }
+
+        .logout {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            padding: 12px 25px;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            transition: var(--transition);
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .logout:hover {
+            background-color: rgba(244, 34, 34, 0.07);
+            border-left: 5px solid rgba(231, 50, 50, 0.241);
+            color: white;
+        }
+
+        .logout i {
+            width: 24px;
+            margin-right: 12px;
+            font-size: 18px;
+        }
+
+        /* Header */
+        .header {
+            grid-column: 2;
+            background-color: white;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 30px;
+            box-shadow: var(--shadow-sm);
+            z-index: 100;
+            position: sticky;
+            top: 0;
+        }
+
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            color: var(--text);
+            font-weight: 500;
+        }
+
+        .back-btn {
+            margin-right: 10px;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 50%;
+            transition: var(--transition);
+        }
+
+        .back-btn:hover {
+            background-color: var(--light);
+            color: var(--primary);
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+        }
+
+        .notification {
+            position: relative;
+            margin: 0 15px;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: var(--transition);
+        }
+
+        .notification:hover {
+            background-color: rgba(67, 97, 238, 0.1);
+        }
+
+        .notification i {
+            font-size: 18px;
+            color: var(--text-light);
+        }
+
+        .notification .badge {
+            position: absolute;
+            top: 3px;
+            right: 3px;
+            background-color: var(--danger);
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            font-size: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            padding: 6px 10px;
+            border-radius: var(--radius);
+            transition: var(--transition);
+            margin-left: 10px;
+        }
+
+        .profile-img {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--secondary), var(--primary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            margin-right: 12px;
+            font-size: 16px;
+        }
+
+        /* Main Content */
+        .main-content {
+            grid-column: 2;
+            padding: 30px;
+            overflow-y: auto;
+        }
+
+        .driver-profile-container {
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 30px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Driver Details Section */
+        .driver-details {
+            background: white;
+            border-radius: var(--radius);
+            padding: 30px;
+            box-shadow: var(--shadow);
+        }
+
+        .driver-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .driver-avatar {
+            margin-right: 20px;
+        }
+
+        .driver-avatar-img {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--success), var(--info));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 32px;
+            font-weight: 700;
+            border: 3px solid var(--success);
+        }
+
+        .driver-info h2 {
+            color: var(--dark);
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .verified-badge {
+            color: var(--success);
+            font-size: 14px;
+            font-weight: 500;
+            margin-left: 10px;
+        }
+
+        .verified-badge i {
+            margin-right: 5px;
+        }
+
+        .driver-rating {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+        }
+
+        .stars {
+            margin-right: 10px;
+        }
+
+        .stars i {
+            color: #ffd700;
+            font-size: 16px;
+            margin-right: 2px;
+        }
+
+        .rating-text {
+            color: var(--text-light);
+            font-size: 14px;
+        }
+
+        .driver-price {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--primary);
+            margin-top: 5px;
+        }
+
+        .driver-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 25px 0;
+            padding: 20px;
+            background: var(--light);
+            border-radius: var(--radius-sm);
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            color: var(--text);
+            font-size: 14px;
+        }
+
+        .stat-item i {
+            margin-right: 8px;
+            color: var(--primary);
+            width: 16px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin: 25px 0;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px 24px;
+            border-radius: var(--radius);
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            border: none;
+            outline: none;
+            font-size: 14px;
+            text-decoration: none;
+            flex: 1;
+        }
+
+        .btn i {
+            margin-right: 8px;
+            font-size: 16px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(58, 12, 163, 0.2);
+        }
+
+        .btn-outline {
+            border: 2px solid var(--primary-light);
+            color: var(--primary);
+            background-color: transparent;
+        }
+
+        .btn-outline:hover {
+            background-color: var(--primary);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .driver-details-sections {
+            margin: 30px 0;
+        }
+
+        .detail-section {
+            margin-bottom: 25px;
+        }
+
+        .detail-section h3 {
+            color: var(--dark);
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .tag {
+            background: var(--light);
+            color: var(--text);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            border: 1px solid var(--border);
+        }
+
+        .reviews-section {
+            border-top: 1px solid var(--border);
+            padding-top: 25px;
+        }
+
+        .reviews-section h3 {
+            color: var(--dark);
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .review-item {
+            padding: 15px 0;
+            border-bottom: 1px solid var(--light);
+        }
+
+        .review-item:last-child {
+            border-bottom: none;
+        }
+
+        .review-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .reviewer-name {
+            font-weight: 500;
+            color: var(--text);
+        }
+
+        .review-date {
+            font-size: 12px;
+            color: var(--text-light);
+        }
+
+        .review-stars {
+            margin-bottom: 8px;
+        }
+
+        .review-stars i {
+            color: #ffd700;
+            font-size: 14px;
+            margin-right: 2px;
+        }
+
+        .review-text {
+            color: var(--text-light);
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        /* Booking Section */
+        .booking-section {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .booking-card, .availability-section {
+            background: white;
+            border-radius: var(--radius);
+            padding: 25px;
+            box-shadow: var(--shadow);
+        }
+
+        .booking-card h3, .availability-section h3 {
+            color: var(--dark);
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            color: var(--text);
+            font-weight: 500;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            transition: var(--transition);
+            background: white;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-light);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+        }
+
+        .calendar-section h4 {
+            color: var(--text);
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .calendar-grid, .mini-calendar-grid {
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            overflow: hidden;
+        }
+
+        .calendar-header {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            background: var(--light);
+        }
+
+        .calendar-header span {
+            padding: 10px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 12px;
+            color: var(--text-light);
+        }
+
+        .calendar-body {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+        }
+
+        .calendar-body span {
+            padding: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+            border-bottom: 1px solid var(--light);
+            border-right: 1px solid var(--light);
+            font-size: 14px;
+        }
+
+        .calendar-body span:nth-child(7n) {
+            border-right: none;
+        }
+
+        .calendar-body span:hover {
+            background: rgba(67, 97, 238, 0.1);
+        }
+
+        .calendar-body span.selected {
+            background: var(--primary);
+            color: white;
+        }
+
+        .calendar-body span.today {
+            background: var(--success);
+            color: white;
+            font-weight: 600;
+        }
+
+        .calendar-body span.available {
+            background: rgba(76, 201, 240, 0.1);
+            color: var(--success);
+        }
+
+        .calendar-body span.booked {
+            background: rgba(247, 37, 133, 0.1);
+            color: var(--danger);
+            cursor: not-allowed;
+        }
+
+        .btn-book {
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .availability-info p {
+            color: var(--text-light);
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+
+        .calendar-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .nav-btn {
+            background: none;
+            border: none;
+            color: var(--primary);
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 50%;
+            transition: var(--transition);
+        }
+
+        .nav-btn:hover {
+            background: rgba(67, 97, 238, 0.1);
+        }
+
+        .month-year {
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .mini-calendar-grid .calendar-body span {
+            padding: 8px;
+            font-size: 13px;
+        }
+
+        @media (max-width: 1200px) {
+            .driver-profile-container {
+                grid-template-columns: 1fr 320px;
+                gap: 20px;
+            }
+        }
+
+        @media (max-width: 992px) {
+            .container {
+                grid-template-columns: 0 1fr;
+            }
+
+            .sidebar {
+                transform: translateX(-100%);
+                position: fixed;
+                height: 100vh;
+                z-index: 1001;
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+                box-shadow: var(--shadow-lg);
+            }
+
+            .header {
+                padding: 0 20px;
+            }
+
+            .main-content {
+                padding: 20px;
+            }
+
+            .driver-profile-container {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .booking-section {
+                order: -1;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .driver-header {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .driver-avatar {
+                margin-right: 0;
+                margin-bottom: 15px;
+            }
+
+            .driver-stats {
+                grid-template-columns: 1fr;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="logo">
+                    <img src="logo.png" alt="Logo" class="logo">
+                </div>
+                
+            <div class="nav-menu">
+                <div class="nav-item" onclick="goHome()">
+                    <i class="fas fa-house"></i>
+                    <span>Home</span>
+                </div>
+                <div class="nav-item" onclick="goToSearch()">
+                    <i class="fas fa-search"></i>
+                    <span>Search</span>
+                </div>
+                <div class="nav-item active">
+                    <i class="fas fa-box"></i>
+                    <span>Booking</span>
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-cog"></i>
+                    <span>Settings</span>
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-bell"></i>
+                    <span>Notifications</span>
+                </div>
+                <div class="logout">
+                    <i class="fas fa-sign-out"></i>
+                    <span>Logout</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Header -->
+        <div class="header">
+            <div class="breadcrumb">
+                <i class="fas fa-arrow-left back-btn" onclick="goBack()"></i>
+                <span id="breadcrumbText">Back to Drivers</span>
+            </div>
+            <div class="header-actions">
+                <div class="notification">
+                    <i class="fas fa-bell"></i>
+                    <div class="badge">3</div>
+                </div>
+                <div class="notification">
+                    <i class="fas fa-envelope"></i>
+                    <div class="badge">5</div>
+                </div>
+                <div class="user-profile">
+                    <div class="profile-img">K</div>
+                    <div class="user-info">
+                        <div class="user-name">Kamal</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="driver-profile-container">
+                <!-- Left Section - Driver Details -->
+                <div class="driver-details">
+                    <div class="driver-header">
+                        <div class="driver-avatar">
+                            <div class="driver-avatar-img" id="driverAvatarImg">LP</div>
+                        </div>
+                        <div class="driver-info">
+                            <div class="driver-name">
+                                <h2 id="driverName">Lasith Perera</h2>
+                                <span class="verified-badge"><i class="fas fa-check-circle"></i> Verified</span>
+                            </div>
+                            <div class="driver-rating">
+                                <div class="stars" id="driverStars">
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="far fa-star"></i>
+                                </div>
+                                <span class="rating-text" id="ratingText">4.9 (156 reviews)</span>
+                            </div>
+                            <div class="driver-price" id="driverPrice">LKR 2,500/hour</div>
+                        </div>
+                    </div>
+
+                    <div class="driver-stats">
+                        <div class="stat-item">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span id="driverLocation">Colombo, Sri Lanka</span>
+                        </div>
+                        <div class="stat-item">
+                            <i class="fas fa-calendar-alt"></i>
+                            <span id="driverExperience">9 years experience</span>
+                        </div>
+                        <div class="stat-item">
+                            <i class="fas fa-building"></i>
+                            <span id="driverCompany" onclick="viewCompany()" style="cursor: pointer; color: var(--primary);">Company: Ceylon Elite Drivers</span>
+                        </div>
+                    </div>
+
+                    <div class="action-buttons">
+                        <button class="btn btn-primary" onclick="callDriver()">
+                            <i class="fas fa-phone"></i>
+                            <span id="callBtnText">Call +94 77 123 4567</span>
+                        </button>
+                        <button class="btn btn-outline" onclick="messageDriver()">
+                            <i class="fas fa-comment"></i>
+                            Message
+                        </button>
+                    </div>
+
+                    <div class="driver-details-sections">
+                        <!-- Languages -->
+                        <div class="detail-section">
+                            <h3>Languages:</h3>
+                            <div class="tags" id="languageTags">
+                                <span class="tag">Sinhala</span>
+                                <span class="tag">English</span>
+                                <span class="tag">Tamil</span>
+                            </div>
+                        </div>
+
+                        <!-- Specialties -->
+                        <div class="detail-section">
+                            <h3>Specialties:</h3>
+                            <div class="tags" id="specialtyTags">
+                                <span class="tag">Airport transfers</span>
+                                <span class="tag">Long distance</span>
+                                <span class="tag">City tours</span>
+                            </div>
+                        </div>
+
+                        <!-- Vehicle Types -->
+                        <div class="detail-section">
+                            <h3>Vehicle Types:</h3>
+                            <div class="tags">
+                                <span class="tag">Toyota Prius</span>
+                                <span class="tag">Toyota Axio</span>
+                                <span class="tag">Suzuki Alto</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Reviews -->
+                    <div class="reviews-section">
+                        <h3>Recent Reviews</h3>
+                        <div class="review-item">
+                            <div class="review-header">
+                                <span class="reviewer-name">Priya Fernando</span>
+                                <span class="review-date">2024-02-08</span>
+                            </div>
+                            <div class="review-stars">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <p class="review-text">Very friendly and punctual driver. Made the trip comfortable and safe.</p>
+                        </div>
+
+                        <div class="review-item">
+                            <div class="review-header">
+                                <span class="reviewer-name">Ravi Silva</span>
+                                <span class="review-date">2024-01-15</span>
+                            </div>
+                            <div class="review-stars">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <p class="review-text">Clean vehicle and excellent driving skills. Highly recommended!</p>
+                        </div>
+
+                        <div class="review-item">
+                            <div class="review-header">
+                                <span class="reviewer-name">Nimal Perera</span>
+                                <span class="review-date">2024-01-07</span>
+                            </div>
+                            <div class="review-stars">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="far fa-star"></i>
+                            </div>
+                            <p class="review-text">Great service, knows the routes very well. Good experience overall.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Section - Booking -->
+                <div class="booking-section">
+                    <div class="booking-card">
+                        <h3>Book This Driver</h3>
+                        
+                        <div class="booking-form">
+                            <div class="form-group">
+                                <label>Select Date</label>
+                                <input type="date" class="form-control" id="bookingDate" value="2024-08-15">
+                            </div>
+
+                            <div class="calendar-section">
+                                <h4>August 2024</h4>
+                                <div class="calendar-grid">
+                                    <div class="calendar-header">
+                                        <span>Su</span>
+                                        <span>Mo</span>
+                                        <span>Tu</span>
+                                        <span>We</span>
+                                        <span>Th</span>
+                                        <span>Fr</span>
+                                        <span>Sa</span>
+                                    </div>
+                                    <div class="calendar-body">
+                                        <span></span>
+                                        <span></span>
+                                        <span></span>
+                                        <span></span>
+                                        <span onclick="selectDate(1)">1</span>
+                                        <span onclick="selectDate(2)">2</span>
+                                        <span onclick="selectDate(3)">3</span>
+                                        <span onclick="selectDate(4)">4</span>
+                                        <span onclick="selectDate(5)">5</span>
+                                        <span onclick="selectDate(6)">6</span>
+                                        <span onclick="selectDate(7)">7</span>
+                                        <span onclick="selectDate(8)">8</span>
+                                        <span onclick="selectDate(9)">9</span>
+                                        <span onclick="selectDate(10)">10</span>
+                                        <span onclick="selectDate(11)">11</span>
+                                        <span onclick="selectDate(12)">12</span>
+                                        <span onclick="selectDate(13)">13</span>
+                                        <span onclick="selectDate(14)">14</span>
+                                        <span class="selected" onclick="selectDate(15)">15</span>
+                                        <span onclick="selectDate(16)">16</span>
+                                        <span onclick="selectDate(17)">17</span>
+                                        <span onclick="selectDate(18)">18</span>
+                                        <span onclick="selectDate(19)">19</span>
+                                        <span onclick="selectDate(20)">20</span>
+                                        <span onclick="selectDate(21)">21</span>
+                                        <span onclick="selectDate(22)">22</span>
+                                        <span onclick="selectDate(23)">23</span>
+                                        <span onclick="selectDate(24)">24</span>
+                                        <span onclick="selectDate(25)">25</span>
+                                        <span onclick="selectDate(26)">26</span>
+                                        <span onclick="selectDate(27)">27</span>
+                                        <span onclick="selectDate(28)">28</span>
+                                        <span onclick="selectDate(29)">29</span>
+                                        <span onclick="selectDate(30)">30</span>
+                                        <span onclick="selectDate(31)">31</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Select Time</label>
+                                <select class="form-control" id="timeSlot">
+                                    <option>Choose time slot</option>
+                                    <option>08:00 AM</option>
+                                    <option>09:00 AM</option>
+                                    <option>10:00 AM</option>
+                                    <option>11:00 AM</option>
+                                    <option>12:00 PM</option>
+                                    <option>01:00 PM</option>
+                                    <option>02:00 PM</option>
+                                    <option>03:00 PM</option>
+                                    <option>04:00 PM</option>
+                                    <option>05:00 PM</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Trip Duration</label>
+                                <input type="number" class="form-control" id="tripDuration" placeholder="Hours" min="1" max="24">
+                            </div>
+
+                            <div class="form-group">
+                                <label>Select Service</label>
+                                <select class="form-control" id="serviceType">
+                                    <option>Choose service</option>
+                                    <option>Airport Transfer</option>
+                                    <option>City Tour</option>
+                                    <option>Long Distance</option>
+                                    <option>Business Trip</option>
+                                    <option>Regular Service</option>
+                                </select>
+                            </div>
+
+                            <button class="btn btn-primary btn-book" onclick="bookDriver()">
+                                <i class="fas fa-calendar-check"></i>
+                                Book Now
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Availability Calendar -->
+                    <div class="availability-section">
+                        <h3>Availability Calendar</h3>
+                        <div class="availability-info">
+                            <p>Green dates show when driver is available for bookings</p>
+                        </div>
+                        <div class="mini-calendar-grid">
+                            <div class="calendar-nav">
+                                <button class="nav-btn" onclick="previousMonth()"><i class="fas fa-chevron-left"></i></button>
+                                <span class="month-year">August 2024</span>
+                                <button class="nav-btn" onclick="nextMonth()"><i class="fas fa-chevron-right"></i></button>
+                            </div>
+                            <div class="calendar-grid">
+                                <div class="calendar-header">
+                                    <span>Su</span>
+                                    <span>Mo</span>
+                                    <span>Tu</span>
+                                    <span>We</span>
+                                    <span>Th</span>
+                                    <span>Fr</span>
+                                    <span>Sa</span>
+                                </div>
+                                <div class="calendar-body">
+                                    <span></span>
+                                    <span></span>
+                                    <span></span>
+                                    <span></span>
+                                    <span class="available">1</span>
+                                    <span class="available">2</span>
+                                    <span class="available">3</span>
+                                    <span class="available">4</span>
+                                    <span class="booked">5</span>
+                                    <span class="available">6</span>
+                                    <span class="available">7</span>
+                                    <span class="available">8</span>
+                                    <span class="available">9</span>
+                                    <span class="available">10</span>
+                                    <span class="booked">11</span>
+                                    <span class="available">12</span>
+                                    <span class="available">13</span>
+                                    <span class="available">14</span>
+                                    <span class="today available">15</span>
+                                    <span class="available">16</span>
+                                    <span class="available">17</span>
+                                    <span class="available">18</span>
+                                    <span class="available">19</span>
+                                    <span class="available">20</span>
+                                    <span class="available">21</span>
+                                    <span class="available">22</span>
+                                    <span class="available">23</span>
+                                    <span class="available">24</span>
+                                    <span class="available">25</span>
+                                    <span class="available">26</span>
+                                    <span class="available">27</span>
+                                    <span class="available">28</span>
+                                    <span class="available">29</span>
+                                    <span class="available">30</span>
+                                    <span class="available">31</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sample driver data
+        const driversData = [
+            {
+                id: 1,
+                name: "Lasith Perera",
+                initial: "LP",
+                price: 2500,
+                location: "Colombo",
+                experience: 9,
+                rating: 4.9,
+                reviews: 156,
+                languages: ["Sinhala", "English", "Tamil"],
+                specialties: ["Airport transfers", "Long distance", "City tours"],
+                companyId: 1,
+                company: "Ceylon Elite Drivers",
+                phone: "+94 77 123 4567"
+            },
+            {
+                id: 2,
+                name: "Ruwan Silva",
+                initial: "RS",
+                price: 2000,
+                location: "Kandy",
+                experience: 5,
+                rating: 4.7,
+                reviews: 89,
+                languages: ["Sinhala", "English"],
+                specialties: ["Business trips", "Event transportation"],
+                companyId: 2,
+                company: "Hill Country Drivers",
+                phone: "+94 71 456 7890"
+            },
+            {
+                id: 3,
+                name: "Nimal Fernando",
+                initial: "NF",
+                price: 3200,
+                location: "Galle",
+                experience: 12,
+                rating: 4.8,
+                reviews: 203,
+                languages: ["Sinhala", "English"],
+                specialties: ["Tourist guide", "Cultural tours", "Photography tours"],
+                companyId: 3,
+                company: "Southern Coastal Drivers",
+                phone: "+94 91 234 5678"
+            },
+            {
+                id: 4,
+                name: "Asanka Jayawardena",
+                initial: "AJ",
+                price: 2300,
+                location: "Negombo",
+                experience: 6,
+                rating: 4.6,
+                reviews: 124,
+                languages: ["Sinhala", "English"],
+                specialties: ["Airport pickup", "Hotel transfers", "Beach tours"],
+                companyId: 4,
+                company: "West Coast Transport",
+                phone: "+94 31 789 0123"
+            }
+        ];
+
+        let selectedDriver = null;
+
+        function loadDriverProfile() {
+            const driverId = sessionStorage.getItem('selectedDriverId') || '1';
+            selectedDriver = driversData.find(d => d.id == driverId) || driversData[0];
+            
+            if (selectedDriver) {
+                document.getElementById('driverAvatarImg').textContent = selectedDriver.initial;
+                document.getElementById('driverName').textContent = selectedDriver.name;
+                document.getElementById('ratingText').textContent = `${selectedDriver.rating} (${selectedDriver.reviews} reviews)`;
+                document.getElementById('driverPrice').textContent = `LKR ${selectedDriver.price.toLocaleString()}/hour`;
+                document.getElementById('driverLocation').textContent = `${selectedDriver.location}, Sri Lanka`;
+                document.getElementById('driverExperience').textContent = `${selectedDriver.experience} years experience`;
+                document.getElementById('driverCompany').innerHTML = `Company: <span style="cursor: pointer; color: var(--primary);" onclick="viewCompany()">${selectedDriver.company}</span>`;
+                document.getElementById('callBtnText').textContent = `Call ${selectedDriver.phone}`;
+                
+                // Update stars
+                const starsContainer = document.getElementById('driverStars');
+                starsContainer.innerHTML = generateStars(selectedDriver.rating);
+                
+                // Update languages
+                const languageTags = document.getElementById('languageTags');
+                languageTags.innerHTML = selectedDriver.languages.map(lang => 
+                    `<span class="tag">${lang}</span>`
+                ).join('');
+                
+                // Update specialties
+                const specialtyTags = document.getElementById('specialtyTags');
+                specialtyTags.innerHTML = selectedDriver.specialties.map(specialty => 
+                    `<span class="tag">${specialty}</span>`
+                ).join('');
+            }
+
+            // Update breadcrumb based on previous page
+            const previousPage = sessionStorage.getItem('previousPage');
+            const breadcrumbText = document.getElementById('breadcrumbText');
+            if (previousPage === 'driver_search') {
+                breadcrumbText.textContent = 'Back to Drivers';
+            } else {
+                breadcrumbText.textContent = 'Back to Search';
+            }
+        }
+
+        function generateStars(rating) {
+            let stars = '';
+            for (let i = 1; i <= 5; i++) {
+                if (i <= rating) {
+                    stars += '<i class="fas fa-star"></i>';
+                } else {
+                    stars += '<i class="far fa-star"></i>';
+                }
+            }
+            return stars;
+        }
+
+        function selectDate(date) {
+            // Remove previous selection
+            document.querySelectorAll('.calendar-body span').forEach(span => {
+                span.classList.remove('selected');
+            });
+            
+            // Add selection to clicked date
+            event.target.classList.add('selected');
+            
+            // Update date input
+            document.getElementById('bookingDate').value = `2024-08-${date.toString().padStart(2, '0')}`;
+        }
+
+        function callDriver() {
+            if (selectedDriver) {
+                alert(`Calling ${selectedDriver.name} at ${selectedDriver.phone}`);
+            }
+        }
+
+        function messageDriver() {
+            if (selectedDriver) {
+                alert(`Opening message chat with ${selectedDriver.name}...`);
+            }
+        }
+
+        function viewCompany() {
+            if (selectedDriver) {
+                // Store company ID and current page in sessionStorage for navigation
+                sessionStorage.setItem('selectedCompanyId', selectedDriver.companyId);
+                sessionStorage.setItem('previousPage', 'driver_profile');
+                // Navigate to company profile page
+                window.location.href = "company-profile.html";
+            }
+        }
+
+        function bookDriver() {
+            const date = document.getElementById('bookingDate').value;
+            const time = document.getElementById('timeSlot').value;
+            const duration = document.getElementById('tripDuration').value;
+            const service = document.getElementById('serviceType').value;
+            
+            if (!date || time === 'Choose time slot' || !duration || service === 'Choose service') {
+                alert('Please fill in all booking details');
+                return;
+            }
+            
+            if (selectedDriver) {
+                alert(`Booking confirmed!\n\nDriver: ${selectedDriver.name}\nDate: ${date}\nTime: ${time}\nDuration: ${duration} hours\nService: ${service}\n\nYou will receive a confirmation shortly.`);
+            }
+        }
+
+        function goBack() {
+            const previousPage = sessionStorage.getItem('previousPage');
+            if (previousPage === 'driver_search') {
+                window.location.href = "driver_search.html";
+            } else {
+                window.location.href = "search.html";
+            }
+        }
+
+        function goHome() {
+            window.location.href = "index.html";
+        }
+
+        function goToSearch() {
+            window.location.href = "search.html";
+        }
+
+        function previousMonth() {
+            // Implementation for previous month navigation
+            console.log('Previous month clicked');
+        }
+
+        function nextMonth() {
+            // Implementation for next month navigation
+            console.log('Next month clicked');
+        }
+
+        // Initialize page
+        window.addEventListener('load', function() {
+            loadDriverProfile();
+        });
+    </script>
+</body>
+</html>

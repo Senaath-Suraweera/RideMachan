@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <!-- ===================
+                 Meta & Stylesheets
+        =================== -->
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Notifications - Ride Machan</title>
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+        />
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
+        />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+            rel="stylesheet"
+        />
+        <link rel="stylesheet" href="../css/main.css" />
+        <link rel="stylesheet" href="../css/notifications.css" />
+    </head>
+    <body>
+        <div class="container">
+            <!-- Include Navbar -->
+            <div id="navbar-container"></div>
+            
+            <!-- Include Header -->
+            <div id="header-container"></div>
+
+            <!-- ===================
+                     Main Content - Notifications
+            =================== -->
+            <div class="main-content">
+                <!-- Notification Stats -->
+                <div class="notification-stats">
+                    <div class="stat-item">
+                        <div class="stat-icon pending">
+                            <i class="fas fa-bell"></i>
+                        </div>
+                        <div class="stat-info">
+                            <div class="stat-number">5</div>
+                            <div class="stat-label">Pending</div>
+                        </div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-icon read">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="stat-info">
+                            <div class="stat-number">2</div>
+                            <div class="stat-label">Read</div>
+                        </div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-icon confirmed">
+                            <i class="fas fa-circle-check"></i>
+                        </div>
+                        <div class="stat-info">
+                            <div class="stat-number">12</div>
+                            <div class="stat-label">Confirmed</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Notifications List -->
+                <div class="notifications-container" id="notificationList">
+                    <div class="notification-item confirmed">
+                        <div class="notification-icon">
+                            <i class="fas fa-circle-check"></i>
+                        </div>
+                        <div class="notification-content">
+                            <h4>Booking Confirmed - Mercedes C-Class</h4>
+                            <p>Your luxury car is now booked for tomorrow Pickup: Jan 15, 2024 at 9:00 AM from Colombo Fort. Driver: Chaminda Perera | 4.8 ★ Rating</p>
+                        </div>
+                        <div class="notification-meta">
+                            <span class="time">25 minutes ago</span>
+                            <button class="action-btn"><i class="fas fa-ellipsis-vertical"></i></button>
+                        </div>
+                    </div>
+                    
+                    <div class="notification-item pending">
+                        <div class="notification-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="notification-content">
+                            <h4>Payment Pending - BMW X5</h4>
+                            <p>Your booking payment is pending. Please complete payment within 2 hours to confirm your reservation.</p>
+                        </div>
+                        <div class="notification-meta">
+                            <span class="time">1 hour ago</span>
+                            <button class="action-btn"><i class="fas fa-ellipsis-vertical"></i></button>
+                        </div>
+                    </div>
+
+                    <div class="notification-item warning">
+                        <div class="notification-icon">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <div class="notification-content">
+                            <h4>Trip Reminder</h4>
+                            <p>Your trip starts in 2 hours. Make sure to be ready at the pickup location 15 minutes early.</p>
+                        </div>
+                        <div class="notification-meta">
+                            <span class="time">2 hours ago</span>
+                            <button class="action-btn"><i class="fas fa-ellipsis-vertical"></i></button>
+                        </div>
+                    </div>
+
+                    <div class="notification-item info">
+                        <div class="notification-icon">
+                            <i class="fas fa-info-circle"></i>
+                        </div>
+                        <div class="notification-content">
+                            <h4>New Driver Assigned</h4>
+                            <p>Sunil Fernando has been assigned as your driver for tomorrow's trip. Contact: +94 77 123 4567</p>
+                        </div>
+                        <div class="notification-meta">
+                            <span class="time">3 hours ago</span>
+                            <button class="action-btn"><i class="fas fa-ellipsis-vertical"></i></button>
+                        </div>
+                    </div>
+
+                    <div class="notification-item confirmed">
+                        <div class="notification-icon">
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <div class="notification-content">
+                            <h4>Rate Your Recent Trip</h4>
+                            <p>How was your trip with Audi A4? Your feedback helps us improve our service quality.</p>
+                        </div>
+                        <div class="notification-meta">
+                            <span class="time">1 day ago</span>
+                            <button class="action-btn"><i class="fas fa-ellipsis-vertical"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===================
+                     JavaScript
+        =================== -->
+        <script>
+            // Load header and navbar
+            async function loadComponents() {
+                try {
+                    // Load navbar
+                    const navbarResponse = await fetch('../components/navbar.html');
+                    const navbarHTML = await navbarResponse.text();
+                    document.getElementById('navbar-container').innerHTML = navbarHTML;
+
+                    // Load header and set page title
+                    const headerResponse = await fetch('../components/header.html');
+                    let headerHTML = await headerResponse.text();
+                    headerHTML = headerHTML.replace('{{PAGE_TITLE}}', 'Notifications');
+                    document.getElementById('header-container').innerHTML = headerHTML;
+                    
+                    // Initialize components after loading
+                    initializeComponents();
+                } catch (error) {
+                    console.error('Error loading components:', error);
+                }
+            }
+
+            function initializeComponents() {
+                // Set active nav item
+                const notificationNavItem = document.querySelector('[data-page="notifications"]');
+                if (notificationNavItem) {
+                    notificationNavItem.classList.add('active');
+                }
+
+                // Initialize action buttons
+                document.querySelectorAll(".action-btn").forEach(btn => {
+                    btn.addEventListener("click", (e) => {
+                        e.preventDefault();
+                        alert("More actions coming soon!");
+                    });
+                });
+
+                // Simulate notification updates
+                updateNotificationBadges();
+            }
+
+            function updateNotificationBadges() {
+                const bellBadge = document.getElementById("notificationCount");
+                const msgBadge = document.getElementById("messageCount");
+
+                // Simulate notifications decrease after reading
+                setTimeout(() => {
+                    if (bellBadge) bellBadge.textContent = 1;
+                    if (msgBadge) msgBadge.textContent = 3;
+                }, 5000);
+            }
+
+            // Mobile sidebar toggle
+            function toggleSidebar() {
+                const sidebar = document.querySelector(".sidebar");
+                if (sidebar) {
+                    sidebar.classList.toggle("active");
+                }
+            }
+
+            // Load components when DOM is ready
+            document.addEventListener('DOMContentLoaded', loadComponents);
+        </script>
+    </body>
+</html>

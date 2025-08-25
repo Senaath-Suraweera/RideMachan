@@ -1,0 +1,372 @@
+<!-- ===================
+     Header Section Component
+=================== -->
+<div class="header">
+    <div class="hi">
+        <h1>{{PAGE_TITLE}}</h1>
+    </div>
+    
+    <div class="header-actions">
+        <!-- Notifications -->
+        <div class="notification" onclick="showNotifications()">
+            <i class="fas fa-bell"></i>
+            <div class="badge" id="notificationCount">3</div>
+        </div>
+        
+        <div class="notification" onclick="showMessages()">
+            <i class="fas fa-envelope"></i>
+            <div class="badge" id="messageCount">5</div>
+        </div>
+        
+        <!-- User Profile -->
+        <div class="user-profile" onclick="toggleProfileDropdown()">
+            <div class="profile-img" id="profileInitial">K</div>
+            <div class="user-info">
+                <div class="user-name" id="userName">Kamal</div>
+            </div>
+            <div class="profile-dropdown" id="profileDropdown">
+                <a href="../pages/profile.html"><i class="fas fa-user"></i> My Profile</a>
+                <a href="../pages/settings.html"><i class="fas fa-cog"></i> Settings</a>
+                <a href="../pages/bookings.html"><i class="fas fa-calendar"></i> My Bookings</a>
+                <hr>
+                <a href="#" onclick="handleLogout()"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Header Styles */
+
+.header {
+  grid-column: 2;
+  background-color: white;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 30px;
+  box-shadow: var(--shadow-sm);
+  z-index: 100;
+  position: sticky;
+  top: 0;
+}
+
+.header h1 {
+  color: rgba(14, 21, 43, 0.94);
+  line-height: 70px;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+}
+
+/* Notification Icons */
+.notification {
+    position: relative;
+    margin: 0 15px;
+    cursor: pointer;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: var(--transition);
+}
+
+.notification:hover {
+    background-color: rgba(67, 97, 238, 0.1);
+}
+
+.notification i {
+    font-size: 18px;
+    color: var(--text-light);
+    transition: var(--transition);
+}
+
+.notification:hover i {
+    color: var(--primary);
+    transform: translateY(-2px);
+}
+
+.notification .badge {
+    position: absolute;
+    top: 3px;
+    right: 3px;
+    background-color: var(--danger);
+    color: white;
+    border-radius: 50%;
+    width: 18px;
+    height: 18px;
+    font-size: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 3px 6px rgba(247, 37, 133, 0.2);
+    border: 2px solid white;
+    font-weight: 600;
+}
+
+/* User Profile */
+.user-profile {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    padding: 6px 10px;
+    border-radius: var(--radius);
+    transition: var(--transition);
+    margin-left: 10px;
+    position: relative;
+}
+
+.user-profile:hover {
+    background-color: rgba(67, 97, 238, 0.05);
+}
+
+.profile-img {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--secondary), var(--primary));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 600;
+    margin-right: 12px;
+    box-shadow: 0 3px 8px rgba(67, 97, 238, 0.2);
+    font-size: 16px;
+}
+
+.user-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.user-name {
+    font-weight: 600;
+    font-size: 14px;
+}
+
+/* Profile Dropdown */
+.profile-dropdown {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: white;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-lg);
+    min-width: 200px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: var(--transition);
+    z-index: 1000;
+}
+
+.profile-dropdown.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.profile-dropdown a {
+    display: flex;
+    align-items: center;
+    padding: 12px 16px;
+    color: var(--text);
+    text-decoration: none;
+    transition: var(--transition);
+    font-size: 14px;
+}
+
+.profile-dropdown a:hover {
+    background-color: rgba(67, 97, 238, 0.05);
+    color: var(--primary);
+}
+
+.profile-dropdown a i {
+    margin-right: 10px;
+    width: 16px;
+    font-size: 14px;
+}
+
+.profile-dropdown hr {
+    margin: 8px 0;
+    border: none;
+    border-top: 1px solid var(--border);
+}
+
+.profile-dropdown a:first-child {
+    border-radius: var(--radius) var(--radius) 0 0;
+}
+
+.profile-dropdown a:last-child {
+    border-radius: 0 0 var(--radius) var(--radius);
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+    .header {
+        grid-column: 1 / -1;
+        padding-left: 70px;
+    }
+}
+
+@media (max-width: 768px) {
+    .header h1 {
+        font-size: 20px;
+    }
+    
+    .notification {
+        margin: 0 8px;
+    }
+}
+
+@media (max-width: 576px) {
+    .user-info {
+        display: none;
+    }
+    
+    .profile-img {
+        margin-right: 0;
+    }
+}
+</style>
+
+<script>
+// Header functionality
+function initializeHeader() {
+    // Load user data and update header
+    loadUserData();
+    
+    // Load notification counts
+    updateNotificationCounts();
+    
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function(event) {
+        const dropdown = document.getElementById('profileDropdown');
+        const profile = document.querySelector('.user-profile');
+        
+        if (!profile.contains(event.target)) {
+            dropdown.classList.remove('show');
+        }
+    });
+}
+
+function loadUserData() {
+    // In a real application, this would fetch from an API
+    const userData = {
+        name: 'Kamal Silva',
+        email: 'kamal@example.com',
+        phone: '+94 77 123 4567',
+        initial: 'K'
+    };
+    
+    // Update header elements
+    document.getElementById('userName').textContent = userData.name.split(' ')[0];
+    document.getElementById('profileInitial').textContent = userData.initial;
+    document.getElementById('welcomeMessage').textContent = `Welcome back ${userData.name.split(' ')[0]}`;
+}
+
+function updateNotificationCounts() {
+    // In a real application, this would fetch from an API
+    const counts = {
+        notifications: 3,
+        messages: 5
+    };
+    
+    document.getElementById('notificationCount').textContent = counts.notifications;
+    document.getElementById('messageCount').textContent = counts.messages;
+    
+    // Hide badges if count is 0
+    if (counts.notifications === 0) {
+        document.getElementById('notificationCount').style.display = 'none';
+    }
+    if (counts.messages === 0) {
+        document.getElementById('messageCount').style.display = 'none';
+    }
+}
+
+function toggleProfileDropdown() {
+    const dropdown = document.getElementById('profileDropdown');
+    dropdown.classList.toggle('show');
+}
+
+function showNotifications() {
+    // In a real application, this would show notifications panel or navigate to notifications page
+    window.location.href = '../pages/notifications.html';
+}
+
+function showMessages() {
+    // In a real application, this would show messages panel or navigate to messages page
+    console.log('Show messages');
+    alert('Messages feature coming soon!');
+}
+
+function handleLogout() {
+    if (confirm('Are you sure you want to logout?')) {
+        // Clear any stored data
+        localStorage.clear();
+        sessionStorage.clear();
+        
+        // Show logout message
+        showLogoutMessage();
+        
+        // Redirect to login page after brief delay
+        setTimeout(() => {
+            window.location.href = '../auth/login.html';
+        }, 1500);
+    }
+}
+
+function showLogoutMessage() {
+    // Create and show logout notification
+    const notification = document.createElement('div');
+    notification.className = 'logout-notification';
+    notification.innerHTML = `
+        <div style="
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--success);
+            color: white;
+            padding: 15px 20px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            z-index: 9999;
+            animation: slideIn 0.3s ease;
+        ">
+            <i class="fas fa-check-circle"></i>
+            Logged out successfully!
+        </div>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    // Remove notification after delay
+    setTimeout(() => {
+        notification.remove();
+    }, 1200);
+}
+
+// Initialize when DOM is loaded
+document.addEventListener('DOMContentLoaded', initializeHeader);
+
+// Add CSS animation for logout notification
+const style = document.createElement('style');
+style.textContent = `
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+`;
+document.head.appendChild(style);
+</script>

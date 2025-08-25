@@ -19,80 +19,20 @@
         href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
         rel="stylesheet"
     />
-    <link rel="stylesheet" href="booking.css" />
+    <link rel="stylesheet" href="../css/main.css" />
+    <link rel="stylesheet" href="../css/bookings.css" />
 </head>
 <body>
     <div class="container">
         <!-- ===================
-                 Sidebar Navigation
+                 Include Navbar Component
         =================== -->
-        <div class="sidebar">
-            <div class="logo">
-                    <img src="logo.png" alt="Logo" class="logo">
-                </div>
-            <div class="nav-menu">
-                    <!-- Home Section -->
-
-                    <div class="nav-item">
-                        <i class="fas fa-car"></i>
-                        <a href="home.html"><span>Home</span></a>
-                        
-                    </div>
-                    
-                    <div class="nav-item">
-                        <i class="fas fa-car"></i>
-                        <a href="search.html"><span>Search</span></a>
-                    </div>
-                
-                    <div class="nav-item active">
-                        <i class="fas fa-box"></i>
-                        <a href="booking.html"><span>Bookings</span></a>
-                    </div>
-
-                    <div class="nav-item">
-                        <i class="fas fa-cog"></i>
-                        <a href="settings.html"><span>Settings</span></a>
-                    </div>
-                    <div class="nav-item">
-                        <i class="fas fa-bell"></i>
-                        <a href="notifications.html"><span>Notifications</span></a>
-                    </div>
-                    <div class="logout">
-                        <i class="fas fa-sign-out"></i>
-                        <span>Logout</span>
-                    </div>
-                </div>
-        </div>
+        <div id="navbar-container"></div>
 
         <!-- ===================
-                 Header Section
+                 Include Header Component
         =================== -->
-        <div class="header">
-            <div class="hi">
-                <h1>My Bookings</h1>
-                <p class="subtitle">Manage your vehicle reservations</p>
-            </div>
-            <div class="header-actions">
-                <button class="btn btn-primary">
-                    <i class="fas fa-plus"></i>
-                    New Booking
-                </button>
-                <div class="notification">
-                    <a href="#"><i class="fas fa-bell"></i></a>
-                    <div class="badge">3</div>
-                </div>
-                <div class="notification">
-                    <a href="#"><i class="fas fa-envelope"></i></a>
-                    <div class="badge">5</div>
-                </div>
-                <div class="user-profile">
-                    <div class="profile-img">K</div>
-                    <div class="user-info">
-                        <div class="user-name">Kamal</div>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <div id="header-container"></div>
 
         <!-- ===================
                  Main Content Section
@@ -213,15 +153,15 @@
                             </div>
                         </div>
                         <div class="booking-actions">
-                            <button class="btn btn-outline btn-sm">
+                            <button class="btn btn-outline btn-sm" data-target="payment_status.html">
                                 <i class="fas fa-receipt"></i>
                                 View Receipt
                             </button>
-                            <button class="btn btn-primary btn-sm">
+                            <button class="btn btn-primary btn-sm" data-target="message.html">
                                 <i class="fas fa-message"></i>
                                 Message
                             </button>
-                            <button class="btn btn-success btn-sm">
+                            <button class="btn btn-success btn-sm" data-target="tel:+94123456789">
                                 <i class="fas fa-phone"></i>
                                 Call
                             </button>
@@ -235,7 +175,7 @@
                         <i class="fas fa-clock text-warning"></i>
                         Upcoming Vehicle Bookings
                     </h3>
-                    
+
                     <!-- Toyota Prius Booking -->
                     <div class="booking-card">
                         <div class="booking-header">
@@ -279,8 +219,12 @@
                             </div>
                         </div>
                         <div class="booking-actions">
-                            <button class="btn btn-outline btn-sm"><a href="payment_status.html"> Details</button></a>
-                            <button class="btn btn-danger btn-sm">Cancel Booking</button>
+                            <button class="btn btn-outline btn-sm" data-target="payment_status.html">
+                                Details
+                            </button>
+                            <button class="btn btn-danger btn-sm" data-action="cancel">
+                                Cancel Booking
+                            </button>
                         </div>
                     </div>
 
@@ -326,8 +270,12 @@
                             </div>
                         </div>
                         <div class="booking-actions">
-                            <button class="btn btn-primary btn-sm"><a href="payment.html">Pay Now</button></a>
-                            <button class="btn btn-outline btn-sm">Cancel Booking</button>
+                            <button class="btn btn-primary btn-sm" data-target="payment_status.html">
+                                Pay Now
+                            </button>
+                            <button class="btn btn-outline btn-sm" data-action="cancel">
+                                Cancel Booking
+                            </button>
                         </div>
                     </div>
 
@@ -369,8 +317,12 @@
                             </div>
                         </div>
                         <div class="booking-actions">
-                            <button class="btn btn-primary btn-sm">Pay Now</button>
-                            <button class="btn btn-outline btn-sm">Cancel Booking</button>
+                            <button class="btn btn-primary btn-sm" data-target="payment_status.html">
+                                Pay Now
+                            </button>
+                            <button class="btn btn-outline btn-sm" data-action="cancel">
+                                Cancel Booking
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -381,7 +333,7 @@
                         <i class="fas fa-history text-info"></i>
                         Past Vehicle Bookings
                     </h3>
-                    
+
                     <!-- Completed Bookings -->
                     <div class="booking-card completed">
                         <div class="booking-header">
@@ -420,9 +372,15 @@
                             </div>
                         </div>
                         <div class="booking-actions">
-                            <button class="btn btn-outline btn-sm">Download Invoice</button>
-                            <button class="btn btn-primary btn-sm">Rate Service</button>
-                            <button class="btn btn-success btn-sm">Book Again</button>
+                            <button class="btn btn-outline btn-sm" data-target="invoice_download.html">
+                                Download Invoice
+                            </button>
+                            <button class="btn btn-primary btn-sm" data-target="rate_service.html">
+                                Rate Service
+                            </button>
+                            <button class="btn btn-success btn-sm" data-target="rebook.html">
+                                Book Again
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -493,7 +451,7 @@
                                 <span class="service-type">Pool</span>
                             </div>
                         </div>
-                        
+
                         <div class="service-details">
                             <div class="service-info">
                                 <div class="info-row">
@@ -513,7 +471,7 @@
                                     <span class="trip-status">Driver is currently en route with customer arrival at 17:45</span>
                                 </div>
                             </div>
-                            
+
                             <div class="customer-payment-info">
                                 <div class="customer-info">
                                     <span class="customer-label">Customer: Priya Fernando</span>
@@ -529,23 +487,25 @@
                         </div>
 
                         <div class="service-actions">
-                            <button class="btn btn-outline btn-sm">
+                            <button class="btn btn-outline btn-sm" data-target="track_driver.html">
                                 <i class="fas fa-route"></i>
                                 Track Driver
                             </button>
-                            <button class="btn btn-primary btn-sm">
+                            <button class="btn btn-primary btn-sm" data-target="tel:+94123456789">
                                 <i class="fas fa-phone"></i>
                                 Call Driver
                             </button>
-                            <button class="btn btn-warning btn-sm">
+                            <button class="btn btn-warning btn-sm" data-target="message_driver.html">
                                 <i class="fas fa-message"></i>
                                 Message Driver
                             </button>
-                            <button class="btn btn-success btn-sm">
+                            <button class="btn btn-success btn-sm" data-target="tel:+94123456789">
                                 <i class="fas fa-user"></i>
                                 Call Customer
                             </button>
-                            <button class="btn btn-danger btn-sm">Emergency Stop</button>
+                            <button class="btn btn-danger btn-sm" data-action="emergency">
+                                Emergency Stop
+                            </button>
                         </div>
                     </div>
 
@@ -567,14 +527,14 @@
                                 <span class="service-type">Pool</span>
                             </div>
                         </div>
-                        
+
                         <div class="service-details">
                             <div class="service-info">
                                 <div class="info-row">
                                     <span class="label">📅 8/13/2024</span>
                                 </div>
                                 <div class="info-row">
-                                    <span class="label">🕐 14:00 - 22:00 (8 hours)</span>
+                                    <span class="label">🕕 14:00 - 22:00 (8 hours)</span>
                                 </div>
                                 <div class="info-row">
                                     <span class="label">📍 From: Galle Face Green</span>
@@ -587,7 +547,7 @@
                                     <span class="trip-status">Driver is currently en route and with customer around 21:30</span>
                                 </div>
                             </div>
-                            
+
                             <div class="customer-payment-info">
                                 <div class="customer-info">
                                     <span class="customer-label">Customer: Dulki Smith</span>
@@ -603,23 +563,25 @@
                         </div>
 
                         <div class="service-actions">
-                            <button class="btn btn-outline btn-sm">
+                            <button class="btn btn-outline btn-sm" data-target="track_driver.html">
                                 <i class="fas fa-route"></i>
                                 Track Driver
                             </button>
-                            <button class="btn btn-primary btn-sm">
+                            <button class="btn btn-primary btn-sm" data-target="tel:+94123456789">
                                 <i class="fas fa-phone"></i>
                                 Call Driver
                             </button>
-                            <button class="btn btn-warning btn-sm">
+                            <button class="btn btn-warning btn-sm" data-target="message_driver.html">
                                 <i class="fas fa-message"></i>
                                 Message Driver
                             </button>
-                            <button class="btn btn-success btn-sm">
+                            <button class="btn btn-success btn-sm" data-target="tel:+94123456789">
                                 <i class="fas fa-user"></i>
                                 Call Customer
                             </button>
-                            <button class="btn btn-danger btn-sm">Emergency Stop</button>
+                            <button class="btn btn-danger btn-sm" data-action="emergency">
+                                Emergency Stop
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -648,7 +610,7 @@
                                 <span class="service-type">Premium</span>
                             </div>
                         </div>
-                        
+
                         <div class="service-details">
                             <div class="service-info">
                                 <div class="info-row">
@@ -667,7 +629,7 @@
                                     <span class="label">📋 Service: Full day sightseeing tour</span>
                                 </div>
                             </div>
-                            
+
                             <div class="customer-payment-info">
                                 <div class="customer-info">
                                     <span class="customer-label">Customer: Sarah Johnson</span>
@@ -683,15 +645,15 @@
                         </div>
 
                         <div class="service-actions">
-                            <button class="btn btn-primary btn-sm">
+                            <button class="btn btn-primary btn-sm" data-target="payment_status.html">
                                 <i class="fas fa-credit-card"></i>
                                 Pay Now
                             </button>
-                            <button class="btn btn-outline btn-sm">
+                            <button class="btn btn-outline btn-sm" data-target="view_driver_details.html">
                                 <i class="fas fa-eye"></i>
                                 View Details
                             </button>
-                            <button class="btn btn-danger btn-sm">
+                            <button class="btn btn-danger btn-sm" data-action="cancel">
                                 <i class="fas fa-times"></i>
                                 Cancel Booking
                             </button>
@@ -724,7 +686,7 @@
                                 <span class="service-type">Premium</span>
                             </div>
                         </div>
-                        
+
                         <div class="service-details">
                             <div class="service-info">
                                 <div class="info-row">
@@ -743,7 +705,7 @@
                                     <span class="label">📋 Service: Cultural heritage tour</span>
                                 </div>
                             </div>
-                            
+
                             <div class="customer-payment-info">
                                 <div class="customer-info">
                                     <span class="customer-label">Customer: Michael Thompson</span>
@@ -759,15 +721,15 @@
                         </div>
 
                         <div class="service-actions">
-                            <button class="btn btn-outline btn-sm">
+                            <button class="btn btn-outline btn-sm" data-target="invoice_download.html">
                                 <i class="fas fa-download"></i>
                                 Download Invoice
                             </button>
-                            <button class="btn btn-primary btn-sm">
+                            <button class="btn btn-primary btn-sm" data-target="rate_service.html">
                                 <i class="fas fa-star"></i>
                                 Rate Service
                             </button>
-                            <button class="btn btn-success btn-sm">
+                            <button class="btn btn-success btn-sm" data-target="rebook.html">
                                 <i class="fas fa-redo"></i>
                                 Book Again
                             </button>
@@ -792,7 +754,7 @@
                                 <span class="service-type">Standard</span>
                             </div>
                         </div>
-                        
+
                         <div class="service-details">
                             <div class="service-info">
                                 <div class="info-row">
@@ -811,7 +773,7 @@
                                     <span class="label">📋 Service: Hill country tour</span>
                                 </div>
                             </div>
-                            
+
                             <div class="customer-payment-info">
                                 <div class="customer-info">
                                     <span class="customer-label">Customer: Emma Wilson</span>
@@ -827,15 +789,15 @@
                         </div>
 
                         <div class="service-actions">
-                            <button class="btn btn-outline btn-sm">
+                            <button class="btn btn-outline btn-sm" data-target="invoice_download.html">
                                 <i class="fas fa-download"></i>
                                 Download Invoice
                             </button>
-                            <button class="btn btn-primary btn-sm">
+                            <button class="btn btn-primary btn-sm" data-target="rate_service.html">
                                 <i class="fas fa-star"></i>
                                 Rate Service
                             </button>
-                            <button class="btn btn-success btn-sm">
+                            <button class="btn btn-success btn-sm" data-target="rebook.html">
                                 <i class="fas fa-redo"></i>
                                 Book Again
                             </button>
@@ -846,42 +808,150 @@
         </div>
     </div>
 
+    <!-- Component Loading JavaScript -->
     <script>
-        // Tab switching functionality
-        document.querySelectorAll('.tab-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const tab = btn.dataset.tab;
-                
-                // Remove active class from all tabs and content
-                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-                
-                // Add active class to clicked tab and corresponding content
-                btn.classList.add('active');
-                document.getElementById(tab).classList.add('active');
-            });
-        });
+        // Load components
+        function loadComponent(elementId, filePath, callback) {
+            fetch(filePath)
+                .then(response => response.text())
+                .then(html => {
+                    document.getElementById(elementId).innerHTML = html;
+                    if (callback) callback();
+                })
+                .catch(error => console.error('Error loading component:', error));
+        }
 
-        // Filter functionality
-        document.querySelectorAll('.filter-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const category = btn.dataset.category;
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            // Load navbar component
+            loadComponent('navbar-container', '../components/navbar.html', () => {
+                // Navbar loaded, set active state
+                const navItems = document.querySelectorAll('.nav-item');
+                navItems.forEach(item => item.classList.remove('active'));
+                const bookingsNav = document.querySelector('[data-page="bookings"]');
+                if (bookingsNav) bookingsNav.classList.add('active');
+            });
+
+            // Load header component  
+            loadComponent('header-container', '../components/header.html', () => {
+                // Header loaded, set page title
+                const pageTitle = document.querySelector('.hi h1');
+                if (pageTitle) {
+                    pageTitle.textContent = 'My Bookings';
+                    const subtitle = document.querySelector('.subtitle');
+                    if (subtitle) subtitle.textContent = 'Manage your vehicle reservations';
+                }
                 
-                // Remove active class from filter buttons in the same category
-                document.querySelectorAll(`.filter-btn[data-category="${category}"]`).forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                
-                const filter = btn.dataset.filter;
-                const currentTab = document.querySelector('.tab-content.active').id;
-                
-                // Show/hide sections based on filter
-                if (currentTab === 'vehicle-bookings') {
-                    handleVehicleFilter(filter);
-                } else if (currentTab === 'driver-only-bookings') {
-                    handleDriverFilter(filter);
+                // Add "New Booking" button to header actions
+                const headerActions = document.querySelector('.header-actions');
+                if (headerActions && !headerActions.querySelector('.btn-primary')) {
+                    const newBookingBtn = document.createElement('button');
+                    newBookingBtn.className = 'btn btn-primary';
+                    newBookingBtn.innerHTML = '<i class="fas fa-plus"></i> New Booking';
+                    newBookingBtn.onclick = () => window.location.href = 'search.html';
+                    headerActions.insertBefore(newBookingBtn, headerActions.firstChild);
                 }
             });
+
+            // Initialize booking functionality
+            initializeBookingPage();
         });
+
+        // Booking page functionality
+        function initializeBookingPage() {
+            // Tab switching functionality
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const tab = btn.dataset.tab;
+
+                    // Remove active class from all tabs and content
+                    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+
+                    // Add active class to clicked tab and corresponding content
+                    btn.classList.add('active');
+                    const target = document.getElementById(tab);
+                    if (target) target.classList.add('active');
+                });
+            });
+
+            // Filter functionality
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const category = btn.dataset.category;
+
+                    // Remove active class from filter buttons in the same category
+                    document.querySelectorAll(`.filter-btn[data-category="${category}"]`).forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+
+                    const filter = btn.dataset.filter;
+                    const currentTabEl = document.querySelector('.tab-content.active');
+                    const currentTab = currentTabEl ? currentTabEl.id : null;
+
+                    // Show/hide sections based on filter
+                    if (currentTab === 'vehicle-bookings') {
+                        handleVehicleFilter(filter);
+                    } else if (currentTab === 'driver-only-bookings') {
+                        handleDriverFilter(filter);
+                    }
+                });
+            });
+
+            // Initialize default view
+            handleVehicleFilter('all');
+            handleDriverFilter('all');
+
+            // Button navigation
+            document.querySelectorAll('button[data-target]').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const target = btn.dataset.target;
+                    if (!target) return;
+
+                    if (target.startsWith('tel:')) {
+                        window.location.href = target;
+                        return;
+                    }
+
+                    window.location.href = target;
+                });
+            });
+
+            // Handle special actions
+            document.querySelectorAll('button[data-action]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const action = btn.dataset.action;
+                    if (action === 'cancel') {
+                        const confirmed = confirm('Are you sure you want to cancel this booking?');
+                        if (confirmed) {
+                            alert('Booking canceled (demo).');
+                        }
+                    } else if (action === 'emergency') {
+                        const confirmed = confirm('Trigger emergency stop? This will notify the driver and support team.');
+                        if (confirmed) {
+                            alert('Emergency stop triggered (demo).');
+                        }
+                    }
+                });
+            });
+
+            // Auto-assign Pay Now buttons
+            document.querySelectorAll('button.btn').forEach(btn => {
+                const txt = (btn.textContent || '').trim().toLowerCase();
+                if ((!btn.dataset.target || btn.dataset.target === '') && txt.includes('pay now')) {
+                    btn.dataset.target = 'payment_status.html';
+                    btn.addEventListener('click', () => window.location.href = btn.dataset.target);
+                }
+            });
+
+            // Make paid status badges clickable
+            document.querySelectorAll('.status-badge.paid').forEach(el => {
+                el.style.cursor = 'pointer';
+                el.title = 'View payment details';
+                el.addEventListener('click', () => {
+                    window.location.href = 'payment.html';
+                });
+            });
+        }
 
         function handleVehicleFilter(filter) {
             const sections = {
@@ -944,13 +1014,6 @@
                     break;
             }
         }
-
-        // Initialize default view
-        document.addEventListener('DOMContentLoaded', function() {
-            // Show all sections by default
-            handleVehicleFilter('all');
-            handleDriverFilter('all');
-        });
     </script>
 </body>
 </html>

@@ -1,0 +1,1182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Company Profile - Ride Machan</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <style>
+        :root {
+            --primary: #3a0ca3;
+            --primary-light: #4361ee;
+            --secondary: #7209b7;
+            --success: #4cc9f0;
+            --danger: #f72585;
+            --warning: #f8961e;
+            --info: #4895ef;
+            --dark: #1a1a2e;
+            --light: #f8f9fa;
+            --border: #e9ecef;
+            --text: #2d3748;
+            --text-light: #718096;
+            --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            --radius: 10px;
+            --radius-sm: 6px;
+            --sidebar-width: 260px;
+            --header-height: 70px;
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Poppins", sans-serif;
+        }
+
+        body {
+            background-color: #f5f7fb;
+            color: var(--text);
+            overflow-x: hidden;
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: var(--sidebar-width) 1fr;
+            grid-template-rows: var(--header-height) 1fr;
+            min-height: 100vh;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            grid-row: 1 / 3;
+            background-color: rgba(14, 21, 43, 0.94);
+            color: white;
+            overflow-y: auto;
+            transition: var(--transition);
+            box-shadow: var(--shadow);
+            z-index: 1000;
+            position: fixed;
+            height: 100%;
+            width: var(--sidebar-width);
+        }
+
+        .logo {
+  width:120px;
+    height: 150px;
+    margin-left :2.5rem;
+}
+
+.logo img {
+  width: 100%;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+}
+
+        .nav-menu {
+            padding: 10px 0;
+        }
+
+        .nav-item {
+            padding: 12px 25px;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            transition: var(--transition);
+            border-left: 4px solid transparent;
+            margin: 4px 0;
+            border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+        }
+
+        .nav-item:hover,
+        .nav-item.active {
+            background-color: rgba(255, 255, 255, 0.07);
+            border-left: 5px solid rgba(255, 255, 255, 0.241);
+        }
+
+        .nav-item.active {
+            background: linear-gradient(90deg, rgba(67, 97, 238, 0.2), transparent);
+            font-weight: 500;
+        }
+
+        .nav-item i {
+            width: 24px;
+            margin-right: 12px;
+            font-size: 18px;
+            text-align: center;
+        }
+
+        .nav-item a {
+            color: white;
+            text-decoration: none;
+        }
+
+        .logout {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            padding: 12px 25px;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            transition: var(--transition);
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .logout:hover {
+            background-color: rgba(244, 34, 34, 0.07);
+            border-left: 5px solid rgba(231, 50, 50, 0.241);
+            color: white;
+        }
+
+        .logout i {
+            width: 24px;
+            margin-right: 12px;
+            font-size: 18px;
+        }
+
+        /* Header */
+        .header {
+            grid-column: 2;
+            background-color: white;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 30px;
+            box-shadow: var(--shadow-sm);
+            z-index: 100;
+            position: sticky;
+            top: 0;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .back-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: rgba(67, 97, 238, 0.1);
+            color: var(--primary);
+            border: none;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 14px;
+            transition: var(--transition);
+        }
+
+        .back-btn:hover {
+            background: var(--primary);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .header h1 {
+            color: rgba(14, 21, 43, 0.94);
+            font-size: 28px;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+        }
+
+        .notification {
+            position: relative;
+            margin: 0 15px;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: var(--transition);
+        }
+
+        .notification i {
+            font-size: 18px;
+            color: var(--text-light);
+        }
+
+        .notification .badge {
+            position: absolute;
+            top: 3px;
+            right: 3px;
+            background-color: var(--danger);
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            font-size: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            padding: 6px 10px;
+            border-radius: var(--radius);
+            transition: var(--transition);
+            margin-left: 10px;
+        }
+
+        .profile-img {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--secondary), var(--primary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            margin-right: 12px;
+            font-size: 16px;
+        }
+
+        /* Main Content */
+        .main-content {
+            grid-column: 2;
+            padding: 30px;
+            background-color: #f5f7fb;
+            min-height: calc(100vh - var(--header-height));
+            overflow-y: auto;
+        }
+
+        .content-wrapper {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .breadcrumb {
+            margin-bottom: 25px;
+            font-size: 14px;
+            color: var(--text-light);
+        }
+
+        /* Company Header */
+        .company-header {
+            background: white;
+            padding: 30px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 25px;
+        }
+
+        .company-logo {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #26C6C7, #4361ee);
+            border-radius: var(--radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 32px;
+        }
+
+        .company-info h2 {
+            font-size: 28px;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 8px;
+        }
+
+        .location {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+            color: var(--text-light);
+            font-size: 14px;
+        }
+
+        .rating {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+
+        .stars {
+            display: flex;
+            gap: 3px;
+        }
+
+        .stars i {
+            color: #ffd700;
+            font-size: 16px;
+        }
+
+        .rating-text {
+            font-size: 14px;
+            color: var(--text-light);
+        }
+
+        .company-meta {
+            display: flex;
+            gap: 20px;
+            font-size: 14px;
+            color: var(--text-light);
+        }
+
+        /* Profile Grid */
+        .profile-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
+        }
+
+        /* Section Styles */
+        .section {
+            background: white;
+            padding: 25px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 20px;
+        }
+
+        .section h3 {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 20px;
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 12px;
+        }
+
+        .about-section p {
+            line-height: 1.7;
+            color: var(--text-light);
+            font-size: 15px;
+        }
+
+        /* Services Section */
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+
+        .service-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: var(--radius-sm);
+            transition: var(--transition);
+        }
+
+        .service-item:hover {
+            background: rgba(67, 97, 238, 0.05);
+            transform: translateY(-2px);
+        }
+
+        .service-item i {
+            color: var(--primary);
+            font-size: 16px;
+            width: 20px;
+        }
+
+        /* Fleet Section */
+        .fleet-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .fleet-item {
+            padding: 20px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .fleet-item:hover {
+            border-color: var(--primary);
+            box-shadow: var(--shadow);
+            transform: translateY(-2px);
+        }
+
+        .fleet-item h4 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--dark);
+        }
+
+        .fleet-details {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .seats {
+            color: var(--text-light);
+            font-size: 14px;
+        }
+
+        .price {
+            font-weight: 600;
+            color: var(--primary);
+            font-size: 16px;
+        }
+
+        /* Contact Section */
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: var(--radius-sm);
+            transition: var(--transition);
+        }
+
+        .contact-item:hover {
+            background: rgba(67, 97, 238, 0.05);
+        }
+
+        .contact-item i {
+            color: var(--primary);
+            width: 20px;
+            text-align: center;
+        }
+
+        /* Statistics Section */
+        .stat-item {
+            text-align: center;
+            padding: 20px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            margin-bottom: 15px;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .stat-item:hover {
+            border-color: var(--primary);
+            transform: translateY(-3px);
+            box-shadow: var(--shadow);
+        }
+
+        .stat-number {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: var(--text-light);
+        }
+
+        /* Certifications Section */
+        .cert-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: var(--radius-sm);
+            transition: var(--transition);
+        }
+
+        .cert-item:hover {
+            background: rgba(76, 201, 240, 0.05);
+        }
+
+        .cert-item i {
+            color: var(--success);
+            font-size: 16px;
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px 24px;
+            border-radius: var(--radius);
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+            outline: none;
+            font-size: 14px;
+            letter-spacing: 0.3px;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.08);
+            text-decoration: none;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::after {
+            content: "";
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: -100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: 0.5s;
+        }
+
+        .btn:hover::after {
+            left: 100%;
+        }
+
+        .btn i {
+            margin-right: 8px;
+            font-size: 16px;
+            transition: var(--transition);
+        }
+
+        .btn:hover i {
+            transform: translateX(2px);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            color: white;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, var(--secondary), var(--primary));
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(58, 12, 163, 0.2);
+        }
+
+        .btn-outline {
+            border: 2px solid var(--primary-light);
+            color: var(--primary);
+            background-color: transparent;
+            width: 100%;
+        }
+
+        .btn-outline:hover {
+            background-color: var(--primary);
+            color: white;
+            border-color: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(58, 12, 163, 0.2);
+        }
+
+        .btn-sm {
+            padding: 8px 16px;
+            font-size: 13px;
+            border-radius: var(--radius-sm);
+        }
+
+        .action-btn {
+            width: 100%;
+            margin-bottom: 12px;
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .profile-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .services-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .fleet-grid {
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            }
+        }
+
+        @media (max-width: 992px) {
+            .container {
+                grid-template-columns: 0 1fr;
+            }
+
+            .sidebar {
+                transform: translateX(-100%);
+                position: fixed;
+                height: 100vh;
+                z-index: 1001;
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+                box-shadow: var(--shadow-lg);
+            }
+
+            .header {
+                padding: 0 20px;
+                grid-column: 1 / -1;
+            }
+
+            .main-content {
+                grid-column: 1 / -1;
+                padding: 20px;
+            }
+
+            .company-header {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .company-info {
+                text-align: center;
+            }
+
+            .company-meta {
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 24px;
+            }
+
+            .user-info {
+                display: none;
+            }
+
+            .company-header {
+                padding: 20px;
+            }
+
+            .company-info h2 {
+                font-size: 24px;
+            }
+
+            .section {
+                padding: 20px;
+            }
+
+            .section h3 {
+                font-size: 18px;
+            }
+
+            .services-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .fleet-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .company-meta {
+                flex-direction: column;
+                gap: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="logo">
+                    <img src="logo.png" alt="Logo" class="logo">
+                </div>
+                
+            <div class="nav-menu">
+                <div class="nav-item">
+                    <i class="fas fa-house"></i>
+                    <a href="#"><span>Home</span></a>
+                </div>
+                <div class="nav-item active">
+                    <i class="fas fa-car"></i>
+                    <a href="#"><span>Search</span></a>
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-box"></i>
+                    <a href="#"><span>Bookings</span></a>
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-cog"></i>
+                    <a href="#"><span>Settings</span></a>
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-bell"></i>
+                    <a href="#"><span>Notifications</span></a>
+                </div>
+            </div>
+            <div class="logout">
+                <i class="fas fa-sign-out"></i>
+                <span>Logout</span>
+            </div>
+        </div>
+
+        <!-- Header -->
+        <div class="header">
+            <div class="header-left">
+                <button class="back-btn" onclick="goBack()">
+                    <i class="fas fa-arrow-left"></i>
+                    Back
+                </button>
+                <h1>Company Profile</h1>
+            </div>
+            <div class="header-actions">
+                <div class="notification">
+                    <i class="fas fa-bell"></i>
+                    <div class="badge">3</div>
+                </div>
+                <div class="notification">
+                    <i class="fas fa-envelope"></i>
+                    <div class="badge">5</div>
+                </div>
+                <div class="user-profile">
+                    <div class="profile-img">K</div>
+                    <div class="user-info">
+                        <div class="user-name">Kamal</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="content-wrapper">
+                <div class="breadcrumb">
+                    <span>Learn more about our trusted rental partner</span>
+                </div>
+
+                <!-- Company Header -->
+                <div class="company-header">
+                    <div class="company-logo">
+                        <i class="fas fa-car" id="companyIcon"></i>
+                    </div>
+                    <div class="company-info">
+                        <h2 id="companyName">Premium Rentals</h2>
+                        <div class="location">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span id="companyLocation">Colombo 5, Sri Lanka</span>
+                        </div>
+                        <div class="rating">
+                            <div class="stars" id="companyStars">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="far fa-star"></i>
+                            </div>
+                            <span class="rating-text" id="companyRating">4.7 (249 reviews)</span>
+                        </div>
+                        <div class="company-meta" id="companyMeta">
+                            <span>Established: 2018</span>
+                            <span>Years in Service: 6</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="profile-grid">
+                    <!-- Left Column -->
+                    <div class="left-column">
+                        <!-- About Section -->
+                        <div class="section about-section">
+                            <h3>About <span id="aboutCompanyName">Premium Rentals</span></h3>
+                            <p id="companyDescription">Premium Rentals is a leading car rental service provider in Sri Lanka, offering high-quality vehicles for business and leisure travel. We pride ourselves on excellent customer service and maintaining a modern fleet of well-maintained vehicles.</p>
+                        </div>
+
+                        <!-- Services Section -->
+                        <div class="section services-section">
+                            <h3>Services & Features</h3>
+                            <div class="services-grid" id="servicesGrid">
+                                <div class="service-item">
+                                    <i class="fas fa-headset"></i>
+                                    <span>24/7 Customer Support</span>
+                                </div>
+                                <div class="service-item">
+                                    <i class="fas fa-truck"></i>
+                                    <span>Free Delivery & Pickup</span>
+                                </div>
+                                <div class="service-item">
+                                    <i class="fas fa-shield-alt"></i>
+                                    <span>Comprehensive Insurance</span>
+                                </div>
+                                <div class="service-item">
+                                    <i class="fas fa-satellite-dish"></i>
+                                    <span>GPS Navigation</span>
+                                </div>
+                                <div class="service-item">
+                                    <i class="fas fa-tools"></i>
+                                    <span>Emergency Roadside Assistance</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Fleet Section -->
+                        <div class="section fleet-section">
+                            <h3>Our Fleet</h3>
+                            <div class="fleet-grid" id="fleetGrid">
+                                <!-- Fleet items will be populated by JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Column -->
+                    <div class="right-column">
+                        <!-- Contact Information -->
+                        <div class="section contact-section">
+                            <h3>Contact Information</h3>
+                            <div id="contactInfo">
+                                <div class="contact-item">
+                                    <i class="fas fa-phone"></i>
+                                    <span id="companyPhone">+94 11 234 5678</span>
+                                </div>
+                                <div class="contact-item">
+                                    <i class="fas fa-envelope"></i>
+                                    <span id="companyEmail">info@premiumrentals.lk</span>
+                                </div>
+                                <div class="contact-item">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    <span id="companyAddress">Colombo 5, Sri Lanka</span>
+                                </div>
+                            </div>
+                            <button class="btn btn-primary" onclick="contactCompany()">
+                                <i class="fas fa-phone"></i>
+                                Contact Company
+                            </button>
+                        </div>
+
+                        <!-- Statistics -->
+                        <div class="section stats-section">
+                            <h3>Company Statistics</h3>
+                            <div id="companyStats">
+                                <div class="stat-item">
+                                    <div class="stat-number">150+</div>
+                                    <div class="stat-label">Total Vehicles</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-number">5,000+</div>
+                                    <div class="stat-label">Happy Customers</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-number">6</div>
+                                    <div class="stat-label">Years in Service</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Certifications -->
+                        <div class="section certifications-section">
+                            <h3>Certifications & Licenses</h3>
+                            <div id="certifications">
+                                <div class="cert-item">
+                                    <i class="fas fa-check-circle"></i>
+                                    <span>Licensed by Tourism Board</span>
+                                </div>
+                                <div class="cert-item">
+                                    <i class="fas fa-check-circle"></i>
+                                    <span>ISO 9001 Certified</span>
+                                </div>
+                                <div class="cert-item">
+                                    <i class="fas fa-check-circle"></i>
+                                    <span>AA Approved</span>
+                                </div>
+                                <div class="cert-item">
+                                    <i class="fas fa-check-circle"></i>
+                                    <span>Fully Insured Fleet</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Quick Actions -->
+                        <div class="section actions-section">
+                            <h3>Quick Actions</h3>
+                            <button class="btn btn-primary action-btn" onclick="bookNow()">
+                                <i class="fas fa-calendar"></i>
+                                Book Now
+                            </button>
+                            <button class="btn btn-outline action-btn" onclick="writeReview()">
+                                <i class="fas fa-star"></i>
+                                Write Review
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Company data with Sri Lankan context
+        const companyData = {
+            1: {
+                name: "Premium Rentals",
+                location: "Colombo 03, Sri Lanka",
+                rating: 4.7,
+                reviews: 249,
+                established: 2018,
+                yearsInService: 6,
+                phone: "+94 11 234 5678",
+                email: "info@premiumrentals.lk",
+                address: "No. 123, Galle Road, Colombo 03, Sri Lanka",
+                description: "Premium Rentals is a leading car rental service provider in Sri Lanka, offering high-quality vehicles for business and leisure travel. We pride ourselves on excellent customer service and maintaining a modern fleet of well-maintained vehicles across Colombo and major tourist destinations.",
+                totalVehicles: "150+",
+                customers: "5,000+",
+                services: [
+                    { icon: "fas fa-headset", name: "24/7 Customer Support" },
+                    { icon: "fas fa-truck", name: "Free Delivery & Pickup" },
+                    { icon: "fas fa-shield-alt", name: "Comprehensive Insurance" },
+                    { icon: "fas fa-satellite-dish", name: "GPS Navigation" },
+                    { icon: "fas fa-tools", name: "Emergency Roadside Assistance" }
+                ],
+                fleet: [
+                    { name: "Honda Vezel", seats: 5, price: 6500, type: "SUV", id: 1 },
+                    { name: "BMW 3 Series", seats: 5, price: 8500, type: "Sedan", id: 7 },
+                    { name: "Mercedes E-Class", seats: 5, price: 12000, type: "Luxury", id: 8 },
+                    { name: "Toyota Prado", seats: 7, price: 15000, type: "SUV", id: 9 }
+                ]
+            },
+            2: {
+                name: "City Car Rentals",
+                location: "Kandy, Sri Lanka",
+                rating: 4.3,
+                reviews: 187,
+                established: 2015,
+                yearsInService: 9,
+                phone: "+94 81 234 5679",
+                email: "info@citycarrentals.lk",
+                address: "No. 45, Peradeniya Road, Kandy, Sri Lanka",
+                description: "City Car Rentals has been serving the hill country for nearly a decade, providing reliable transportation solutions for tourists and locals alike. Specializing in economy and mid-range vehicles perfect for exploring the scenic routes of central Sri Lanka.",
+                totalVehicles: "85+",
+                customers: "3,200+",
+                services: [
+                    { icon: "fas fa-headset", name: "Customer Support" },
+                    { icon: "fas fa-map-marked-alt", name: "Local Area Expertise" },
+                    { icon: "fas fa-shield-alt", name: "Basic Insurance" },
+                    { icon: "fas fa-gas-pump", name: "Fuel Efficient Fleet" }
+                ],
+                fleet: [
+                    { name: "Toyota Axio", seats: 5, price: 4500, type: "Sedan", id: 2 },
+                    { name: "Honda Fit", seats: 5, price: 4000, type: "Hatchback", id: 10 },
+                    { name: "Nissan Sunny", seats: 5, price: 5000, type: "Sedan", id: 11 }
+                ]
+            },
+            3: {
+                name: "Budget Wheels",
+                location: "Galle, Sri Lanka",
+                rating: 4.0,
+                reviews: 98,
+                established: 2019,
+                yearsInService: 5,
+                phone: "+94 91 234 5680",
+                email: "contact@budgetwheels.lk",
+                address: "No. 78, Matara Road, Galle, Sri Lanka",
+                description: "Budget Wheels focuses on providing affordable transportation solutions for budget-conscious travelers exploring the southern coast of Sri Lanka. Our fleet consists of well-maintained economy vehicles perfect for coastal adventures.",
+                totalVehicles: "45+",
+                customers: "1,800+",
+                services: [
+                    { icon: "fas fa-dollar-sign", name: "Budget Friendly" },
+                    { icon: "fas fa-beach", name: "Coastal Area Specialist" },
+                    { icon: "fas fa-shield-alt", name: "Basic Insurance" },
+                    { icon: "fas fa-phone", name: "Local Support" }
+                ],
+                fleet: [
+                    { name: "Suzuki Alto", seats: 4, price: 3500, type: "Hatchback", id: 3 },
+                    { name: "Maruti 800", seats: 4, price: 2800, type: "Hatchback", id: 12 },
+                    { name: "Toyota Vitz", seats: 5, price: 3800, type: "Hatchback", id: 13 }
+                ]
+            }
+        };
+
+        function loadCompanyProfile() {
+            const companyId = sessionStorage.getItem('selectedCompanyId') || '1';
+            const company = companyData[companyId];
+
+            if (!company) {
+                console.error('Company not found');
+                return;
+            }
+
+            // Update company header
+            document.getElementById('companyName').textContent = company.name;
+            document.getElementById('aboutCompanyName').textContent = company.name;
+            document.getElementById('companyLocation').textContent = company.location;
+            document.getElementById('companyRating').textContent = `${company.rating} (${company.reviews} reviews)`;
+            document.getElementById('companyMeta').innerHTML = `
+                <span>Established: ${company.established}</span>
+                <span>Years in Service: ${company.yearsInService}</span>
+            `;
+
+            // Update stars
+            updateStars('companyStars', company.rating);
+
+            // Update description
+            document.getElementById('companyDescription').textContent = company.description;
+
+            // Update contact info
+            document.getElementById('companyPhone').textContent = company.phone;
+            document.getElementById('companyEmail').textContent = company.email;
+            document.getElementById('companyAddress').textContent = company.address;
+
+            // Update services
+            const servicesGrid = document.getElementById('servicesGrid');
+            servicesGrid.innerHTML = company.services.map(service => `
+                <div class="service-item">
+                    <i class="${service.icon}"></i>
+                    <span>${service.name}</span>
+                </div>
+            `).join('');
+
+            // Update fleet
+            const fleetGrid = document.getElementById('fleetGrid');
+            fleetGrid.innerHTML = company.fleet.map(vehicle => `
+                <div class="fleet-item" onclick="viewVehicleDetails(${vehicle.id})">
+                    <h4>${vehicle.name}</h4>
+                    <div class="fleet-details">
+                        <span class="seats">${vehicle.type} • ${vehicle.seats} seats</span>
+                        <span class="price">LKR ${vehicle.price.toLocaleString()}/day</span>
+                    </div>
+                    <button class="btn btn-outline btn-sm" onclick="event.stopPropagation(); viewVehicleDetails(${vehicle.id})">View Details</button>
+                </div>
+            `).join('');
+
+            // Update statistics
+            document.getElementById('companyStats').innerHTML = `
+                <div class="stat-item">
+                    <div class="stat-number">${company.totalVehicles}</div>
+                    <div class="stat-label">Total Vehicles</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">${company.customers}</div>
+                    <div class="stat-label">Happy Customers</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">${company.yearsInService}</div>
+                    <div class="stat-label">Years in Service</div>
+                </div>
+            `;
+        }
+
+        function updateStars(containerId, rating) {
+            const container = document.getElementById(containerId);
+            let starsHTML = '';
+            
+            for (let i = 1; i <= 5; i++) {
+                if (i <= Math.floor(rating)) {
+                    starsHTML += '<i class="fas fa-star"></i>';
+                } else if (i === Math.ceil(rating) && rating % 1 !== 0) {
+                    starsHTML += '<i class="fas fa-star-half-alt"></i>';
+                } else {
+                    starsHTML += '<i class="far fa-star"></i>';
+                }
+            }
+            
+            container.innerHTML = starsHTML;
+        }
+
+        function contactCompany() {
+            const companyId = sessionStorage.getItem('selectedCompanyId') || '1';
+            const company = companyData[companyId];
+            
+            if (company) {
+                alert(`Contact ${company.name}:\n\nPhone: ${company.phone}\nEmail: ${company.email}\n\nIn a real app, this would open a contact form or call interface.`);
+            }
+        }
+
+        function bookNow() {
+            alert('Redirecting to booking page with company pre-selected...');
+        }
+
+        function writeReview() {
+            alert('Opening review form...\nIn a real application, this would show a review submission form.');
+        }
+
+        function viewVehicleDetails(vehicleId) {
+            // Store vehicle ID and current page for navigation
+            sessionStorage.setItem('selectedVehicleId', vehicleId);
+            sessionStorage.setItem('previousPage', 'company-profile');
+            // Navigate to vehicle profile page
+            window.location.href = 'vehicle-profile.html';
+        }
+
+        function goBack() {
+            const previousPage = sessionStorage.getItem('previousPage');
+            if (previousPage === 'search') {
+                window.location.href = 'search.html';
+            } else if (previousPage === 'vehicle-profile') {
+                window.location.href = 'vehicle-profile.html';
+            } else {
+                // Default fallback
+                window.location.href = 'search.html';
+            }
+        }
+
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 12px 20px;
+                background: ${type === 'success' ? 'var(--success)' : 'var(--info)'};
+                color: white;
+                border-radius: var(--radius);
+                box-shadow: var(--shadow);
+                z-index: 10000;
+                font-weight: 500;
+                transform: translateX(400px);
+                transition: transform 0.3s ease;
+            `;
+            notification.textContent = message;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.transform = 'translateX(0)';
+            }, 100);
+            
+            setTimeout(() => {
+                notification.style.transform = 'translateX(400px)';
+                setTimeout(() => {
+                    document.body.removeChild(notification);
+                }, 300);
+            }, 3000);
+        }
+
+        // Initialize page
+        window.addEventListener('load', function() {
+            loadCompanyProfile();
+        });
+
+        // Add hover effects to interactive elements
+        document.addEventListener('DOMContentLoaded', function() {
+            // Fleet items click effect
+            document.addEventListener('click', function(e) {
+                if (e.target.classList.contains('fleet-item') || e.target.closest('.fleet-item')) {
+                    const fleetItem = e.target.classList.contains('fleet-item') ? e.target : e.target.closest('.fleet-item');
+                    fleetItem.style.transform = 'scale(0.98)';
+                    setTimeout(() => {
+                        fleetItem.style.transform = 'translateY(-2px)';
+                    }, 100);
+                }
+            });
+        });
+    </script>
+</body>
+</html>

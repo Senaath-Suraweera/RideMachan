@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <!-- ===================
+                 Meta & Stylesheets
+        =================== -->
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Settings - Ride Machan</title>
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+        />
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
+        />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+            rel="stylesheet"
+        />
+        <link rel="stylesheet" href="../css/main.css" />
+        <link rel="stylesheet" href="../css/settings.css" />
+    </head>
+    <body>
+        <div class="container">
+            <!-- Include Navbar -->
+            <div id="navbar-container"></div>
+            
+            <!-- Include Header -->
+            <div id="header-container"></div>
+
+            <!-- ===================
+                     Main Content
+            =================== -->
+            <div class="main-content">
+                <div class="settings-container">
+                    <!-- Profile Information Section -->
+                    <div class="settings-card">
+                        <div class="card-header">
+                            <div class="card-title">
+                                <i class="fas fa-user"></i>
+                                <h3>Profile Information</h3>
+                            </div>
+                            <button class="btn btn-outline btn-sm update-profile-btn">
+                                <i class="fas fa-edit"></i>
+                                Update Profile
+                            </button>
+                        </div>
+                        <div class="card-content">
+                            <div class="profile-avatar">
+                                <div class="avatar-circle">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                <div class="avatar-info">
+                                    <h4>Kamal Perera</h4>
+                                    <p>Profile Name</p>
+                                </div>
+                            </div>
+                            
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label>First Name</label>
+                                    <input type="text" value="Kamal" readonly>
+                                </div>
+                                <div class="form-group">
+                                    <label>Last Name</label>
+                                    <input type="text" value="Perera" readonly>
+                                </div>
+                                <div class="form-group">
+                                    <label>Phone Number</label>
+                                    <input type="text" value="077 934 2871" readonly>
+                                </div>
+                                <div class="form-group">
+                                    <label>Email</label>
+                                    <input type="email" value="kamal@gmail.com" readonly>
+                                </div>
+                                <div class="form-group">
+                                    <label>Address</label>
+                                    <input type="text" value="123 Main Street, Colombo" readonly>
+                                </div>
+                                <div class="form-group">
+                                    <label>Location</label>
+                                    <input type="text" value="Colombo 5, Colombo" readonly>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Change Password Section -->
+                    <div class="settings-card">
+                        <div class="card-header">
+                            <div class="card-title">
+                                <i class="fas fa-lock"></i>
+                                <h3>Change Password</h3>
+                            </div>
+                        </div>
+                        <div class="card-content">
+                            <div class="form-grid password-grid">
+                                <div class="form-group full-width">
+                                    <label>Current Password</label>
+                                    <input type="password" placeholder="Enter your current password">
+                                </div>
+                                <div class="form-group full-width">
+                                    <label>New Password</label>
+                                    <input type="password" placeholder="Enter your new password">
+                                </div>
+                                <div class="form-group full-width">
+                                    <label>Confirm New Password</label>
+                                    <input type="password" placeholder="Confirm your new password">
+                                </div>
+                            </div>
+                            <button class="btn btn-primary update-password-btn">
+                                <i class="fas fa-key"></i>
+                                Update Password
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Notifications Section -->
+                    <div class="settings-card">
+                        <div class="card-header">
+                            <div class="card-title">
+                                <i class="fas fa-bell"></i>
+                                <h3>Notification Settings</h3>
+                            </div>
+                        </div>
+                        <div class="card-content">
+                            <div class="notification-setting-item">
+                                <div class="notification-info">
+                                    <h4>New Bookings</h4>
+                                    <p>Get notified when you receive new booking requests</p>
+                                </div>
+                                <div class="toggle-switch">
+                                    <input type="checkbox" id="new-bookings" checked>
+                                    <label for="new-bookings" class="switch"></label>
+                                </div>
+                            </div>
+                            <div class="notification-setting-item">
+                                <div class="notification-info">
+                                    <h4>Booking Confirmations</h4>
+                                    <p>Get notified about booking confirmations and updates</p>
+                                </div>
+                                <div class="toggle-switch">
+                                    <input type="checkbox" id="confirmations" checked>
+                                    <label for="confirmations" class="switch"></label>
+                                </div>
+                            </div>
+                            <div class="notification-setting-item">
+                                <div class="notification-info">
+                                    <h4>Payment Reminders</h4>
+                                    <p>Get notified about pending payments and due dates</p>
+                                </div>
+                                <div class="toggle-switch">
+                                    <input type="checkbox" id="payment-reminders">
+                                    <label for="payment-reminders" class="switch"></label>
+                                </div>
+                            </div>
+                            <div class="notification-setting-item">
+                                <div class="notification-info">
+                                    <h4>Trip Reminders</h4>
+                                    <p>Get reminders about upcoming trips and schedules</p>
+                                </div>
+                                <div class="toggle-switch">
+                                    <input type="checkbox" id="trip-reminders" checked>
+                                    <label for="trip-reminders" class="switch"></label>
+                                </div>
+                            </div>
+                            <div class="notification-setting-item">
+                                <div class="notification-info">
+                                    <h4>Promotional Offers</h4>
+                                    <p>Receive notifications about special offers and discounts</p>
+                                </div>
+                                <div class="toggle-switch">
+                                    <input type="checkbox" id="promotional-offers">
+                                    <label for="promotional-offers" class="switch"></label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Account Security Section -->
+                    <div class="settings-card">
+                        <div class="card-header">
+                            <div class="card-title">
+                                <i class="fas fa-shield-alt"></i>
+                                <h3>Account Security</h3>
+                            </div>
+                        </div>
+                        <div class="card-content">
+                            <div class="security-item">
+                                <div class="security-info">
+                                    <h4>Two-Factor Authentication</h4>
+                                    <p>Add an extra layer of security to your account</p>
+                                </div>
+                                <button class="btn btn-outline btn-sm">
+                                    <i class="fas fa-plus"></i>
+                                    Enable 2FA
+                                </button>
+                            </div>
+                            <div class="security-item">
+                                <div class="security-info">
+                                    <h4>Login Sessions</h4>
+                                    <p>View and manage your active login sessions</p>
+                                </div>
+                                <button class="btn btn-outline btn-sm">
+                                    <i class="fas fa-eye"></i>
+                                    View Sessions
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            // Load header and navbar
+            async function loadComponents() {
+                try {
+                    // Load navbar
+                    const navbarResponse = await fetch('../components/navbar.html');
+                    const navbarHTML = await navbarResponse.text();
+                    document.getElementById('navbar-container').innerHTML = navbarHTML;
+
+                    // Load header and set page title
+                    const headerResponse = await fetch('../components/header.html');
+                    let headerHTML = await headerResponse.text();
+                    headerHTML = headerHTML.replace('{{PAGE_TITLE}}', 'Settings');
+                    document.getElementById('header-container').innerHTML = headerHTML;
+                    
+                    // Initialize components after loading
+                    initializeComponents();
+                } catch (error) {
+                    console.error('Error loading components:', error);
+                }
+            }
+
+            function initializeComponents() {
+                // Set active nav item
+                const settingsNavItem = document.querySelector('[data-page="settings"]');
+                if (settingsNavItem) {
+                    settingsNavItem.classList.add('active');
+                }
+
+                // Toggle switch functionality
+                document.querySelectorAll('.toggle-switch input').forEach(checkbox => {
+                    checkbox.addEventListener('change', function() {
+                        console.log(`${this.id} is now ${this.checked ? 'enabled' : 'disabled'}`);
+                        
+                        // Show confirmation message
+                        showNotification(
+                            `${this.id.replace('-', ' ')} ${this.checked ? 'enabled' : 'disabled'}`,
+                            'success'
+                        );
+                    });
+                });
+
+                // Update profile button functionality
+                const updateProfileBtn = document.querySelector('.update-profile-btn');
+                if (updateProfileBtn) {
+                    updateProfileBtn.addEventListener('click', function() {
+                        const inputs = document.querySelectorAll('.form-grid input[readonly]');
+                        const isReadonly = inputs.length > 0;
+                        
+                        const allInputs = document.querySelectorAll('.form-grid:not(.password-grid) input');
+                        allInputs.forEach(input => {
+                            if (isReadonly) {
+                                input.removeAttribute('readonly');
+                                input.classList.add('editable');
+                            } else {
+                                input.setAttribute('readonly', '');
+                                input.classList.remove('editable');
+                            }
+                        });
+                        
+                        this.innerHTML = isReadonly ? 
+                            '<i class="fas fa-save"></i> Save Profile' : 
+                            '<i class="fas fa-edit"></i> Update Profile';
+
+                        if (!isReadonly) {
+                            showNotification('Profile updated successfully!', 'success');
+                        }
+                    });
+                }
+
+                // Update password button functionality
+                const updatePasswordBtn = document.querySelector('.update-password-btn');
+                if (updatePasswordBtn) {
+                    updatePasswordBtn.addEventListener('click', function() {
+                        const passwordInputs = document.querySelectorAll('.password-grid input');
+                        let allFilled = true;
+                        let currentPassword = '';
+                        let newPassword = '';
+                        let confirmPassword = '';
+                        
+                        passwordInputs.forEach((input, index) => {
+                            if (!input.value.trim()) {
+                                allFilled = false;
+                            } else {
+                                if (index === 0) currentPassword = input.value;
+                                if (index === 1) newPassword = input.value;
+                                if (index === 2) confirmPassword = input.value;
+                            }
+                        });
+                        
+                        if (!allFilled) {
+                            showNotification('Please fill in all password fields.', 'error');
+                            return;
+                        }
+                        
+                        if (newPassword !== confirmPassword) {
+                            showNotification('New passwords do not match.', 'error');
+                            return;
+                        }
+                        
+                        if (newPassword.length < 8) {
+                            showNotification('New password must be at least 8 characters long.', 'error');
+                            return;
+                        }
+                        
+                        // Simulate password update
+                        showNotification('Password updated successfully!', 'success');
+                        passwordInputs.forEach(input => input.value = '');
+                    });
+                }
+
+                // Security buttons
+                document.querySelectorAll('.security-item .btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const action = this.textContent.trim();
+                        showNotification(`${action} feature coming soon!`, 'info');
+                    });
+                });
+            }
+
+            function showNotification(message, type = 'info') {
+                const notification = document.createElement('div');
+                const icons = {
+                    success: 'fa-check-circle',
+                    error: 'fa-exclamation-circle',
+                    info: 'fa-info-circle'
+                };
+                const colors = {
+                    success: 'var(--success)',
+                    error: 'var(--danger)',
+                    info: 'var(--info)'
+                };
+
+                notification.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    background: ${colors[type]};
+                    color: white;
+                    padding: 15px 20px;
+                    border-radius: var(--radius);
+                    box-shadow: var(--shadow);
+                    z-index: 9999;
+                    animation: slideInRight 0.3s ease;
+                    max-width: 300px;
+                `;
+                
+                notification.innerHTML = `
+                    <i class="fas ${icons[type]}"></i>
+                    ${message}
+                `;
+                
+                document.body.appendChild(notification);
+                
+                setTimeout(() => {
+                    notification.style.animation = 'slideOutRight 0.3s ease';
+                    setTimeout(() => notification.remove(), 300);
+                }, 3000);
+            }
+
+            // Add CSS animations
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes slideInRight {
+                    from {
+                        transform: translateX(100%);
+                        opacity: 0;
+                    }
+                    to {
+                        transform: translateX(0);
+                        opacity: 1;
+                    }
+                }
+                @keyframes slideOutRight {
+                    from {
+                        transform: translateX(0);
+                        opacity: 1;
+                    }
+                    to {
+                        transform: translateX(100%);
+                        opacity: 0;
+                    }
+                }
+            `;
+            document.head.appendChild(style);
+
+            // Load components when DOM is ready
+            document.addEventListener('DOMContentLoaded', loadComponents);
+        </script>
+    </body>
+</html>
