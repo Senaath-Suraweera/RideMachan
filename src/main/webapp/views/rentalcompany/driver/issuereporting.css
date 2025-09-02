@@ -17,11 +17,9 @@
   --text-light: #718096;
 
   /* Shadows */
-  --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
-   0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
   --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-  --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
-   0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
 
   /* Border Radius */
   --radius: 10px;
@@ -52,6 +50,27 @@ body {
 }
 
 /* =========================
+  Custom Scrollbar
+  ========================= */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--primary-light);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--primary);
+}
+
+/* =========================
   Layout Container
   ========================= */
 .container {
@@ -73,7 +92,7 @@ body {
   box-shadow: var(--shadow);
   z-index: 1000;
   position: fixed;
-  height:100%;
+  height: 100%;
   width: var(--sidebar-width);
 }
 
@@ -89,16 +108,16 @@ body {
 
 /* Sidebar Logo */
 .logo {
-width: 100px;
-height: 150px;
-margin-left: 2.5rem;
+  width: 120px;
+  height: 150px;
+  margin-left: 2.5rem;
 }
 
 .logo img {
-width: 100%;
-height: auto;
-display: block;
-margin: 0 auto;
+  width: 100%;
+  height: auto;
+  display: block;
+  margin: 0 auto;
 }
 
 /* Sidebar Navigation */
@@ -126,18 +145,13 @@ margin: 0 auto;
   left: 0;
   width: 0;
   height: 1px;
-  background: linear-gradient(
-   90deg,
-   transparent,
-   rgba(255, 255, 255, 0.2),
-   transparent
-  );
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
   transition: var(--transition);
 }
 
 .nav-item a {
-    color: white;
-    text-decoration: none;
+  color: rgba(255, 255, 255, 0.8);
+  text-decoration: none;
 }
 
 .nav-item:hover::after {
@@ -147,7 +161,7 @@ margin: 0 auto;
 .nav-item:hover,
 .nav-item.active {
   background-color: rgba(255, 255, 255, 0.07);
-  border-left:5px solid rgba(255, 255, 255, 0.241);
+  border-left: 5px solid rgba(255, 255, 255, 0.241);
 }
 
 .nav-item.active {
@@ -169,62 +183,57 @@ margin: 0 auto;
 
 /* logout Sidebar Navigation */
 .logout {
-    position: fixed;
-    bottom: 20px;
-    left: 20px;
-    padding-right: 10px;
-    margin-left: 20px;
-    display: flex;
-    align-items: center;
-    cursor: pointer;
-    transition: var(--transition);
-    border-left: 4px solid transparent;
-    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
-    overflow: hidden;
-    color: rgba(255, 255, 255, 0.8);
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  padding-right: 10px;
+  margin-left: 20px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  transition: var(--transition);
+  border-left: 4px solid transparent;
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  overflow: hidden;
+  color: rgba(255, 255, 255, 0.8);
 }
 
 .logout::after {
-    content: "";
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 0;
-    height: 1px;
-    background: linear-gradient(
-        90deg,
-        transparent,
-        rgba(255, 255, 255, 0.2),
-        transparent
-    );
-    transition: var(--transition);
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: var(--transition);
 }
 
 .logout:hover::after {
-    width: 100%;
+  width: 100%;
 }
 
 .logout:hover {
-    background-color: rgba(244, 34, 34, 0.07);
-    border-left: 5px solid rgba(231, 50, 50, 0.241);
-    color: white;
+  background-color: rgba(244, 34, 34, 0.07);
+  border-left: 5px solid rgba(231, 50, 50, 0.241);
+  color: white;
 }
 
 .logout i {
-    width: 24px;
-    margin-right: 12px;
-    font-size: 18px;
-    text-align: center;
-    transition: var(--transition);
+  width: 24px;
+  margin-right: 12px;
+  font-size: 18px;
+  text-align: center;
+  transition: var(--transition);
 }
 
 .logout:hover i {
-    transform: translateY(-2px);
+  transform: translateY(-2px);
 }
 
 .logout a {
-    color: white;
-    text-decoration: none;
+  color: rgba(255, 255, 255, 0.8);
+  text-decoration: none;
 }
 
 /* =========================
@@ -243,9 +252,9 @@ margin: 0 auto;
   top: 0;
 }
 
-.header h1{
-    color: rgba(14, 21, 43, 0.94);
-    line-height: 70px;
+.header h1 {
+  color: rgba(14, 21, 43, 0.94);
+  line-height: 70px;
 }
 
 .header-actions {
@@ -362,20 +371,21 @@ margin: 0 auto;
   box-shadow: var(--shadow);
   padding: 30px;
   margin-bottom: 30px;
-  border: 2px dashed #4cc9f0;
   position: relative;
+  border: 1px solid rgba(0, 0, 0, 0.03);
+  animation: fadeInUp 0.6s ease;
 }
 
 .issue-form-container::before {
   content: "";
   position: absolute;
-  top: -2px;
-  left: -2px;
-  right: -2px;
-  bottom: -2px;
-  border-radius: var(--radius);
-  background: linear-gradient(45deg, #4cc9f0, #4361ee);
-  z-index: -1;
+  top: 0;
+  left: 0;
+  width: 6px;
+  height: 100%;
+  background: linear-gradient(to bottom, var(--primary), var(--primary-light));
+  border-radius: var(--radius) 0 0 var(--radius);
+  opacity: 0.8;
 }
 
 .form-header {
@@ -432,6 +442,7 @@ margin: 0 auto;
   font-size: 14px;
   transition: var(--transition);
   background-color: white;
+  font-family: "Poppins", sans-serif;
 }
 
 .form-control:focus {
@@ -446,7 +457,8 @@ select.form-control {
 
 textarea.form-control {
   resize: vertical;
-  min-height: 80px;
+  min-height: 100px;
+  line-height: 1.5;
 }
 
 /* Upload Section */
@@ -473,6 +485,12 @@ textarea.form-control {
   font-size: 48px;
   color: var(--text-light);
   margin-bottom: 15px;
+  transition: var(--transition);
+}
+
+.upload-area:hover i {
+  color: var(--primary-light);
+  transform: translateY(-2px);
 }
 
 .upload-text {
@@ -494,11 +512,17 @@ textarea.form-control {
 
 .radio-item input[type="radio"] {
   margin-right: 8px;
+  accent-color: var(--primary);
+}
+
+.radio-item label {
+  cursor: pointer;
+  font-size: 14px;
 }
 
 /* Submit Button */
 .submit-btn {
-  background: linear-gradient(135deg, var(--text), #2d3748);
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
   color: white;
   padding: 12px 30px;
   border: none;
@@ -507,12 +531,20 @@ textarea.form-control {
   font-weight: 500;
   transition: var(--transition);
   font-size: 14px;
+  font-family: "Poppins", sans-serif;
+  display: inline-flex;
+  align-items: center;
+  box-shadow: var(--shadow-sm);
 }
 
 .submit-btn:hover {
-  background: linear-gradient(135deg, #1a202c, var(--text));
+  background: linear-gradient(135deg, var(--secondary), var(--primary));
   transform: translateY(-2px);
   box-shadow: var(--shadow);
+}
+
+.submit-btn i {
+  margin-right: 8px;
 }
 
 /* Past Issues Table */
@@ -521,6 +553,21 @@ textarea.form-control {
   border-radius: var(--radius);
   box-shadow: var(--shadow);
   padding: 30px;
+  border: 1px solid rgba(0, 0, 0, 0.03);
+  animation: fadeInUp 0.7s ease;
+  position: relative;
+}
+
+.past-issues-section::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 6px;
+  height: 100%;
+  background: linear-gradient(to bottom, var(--info), var(--success));
+  border-radius: var(--radius) 0 0 var(--radius);
+  opacity: 0.8;
 }
 
 .section-header {
@@ -531,6 +578,12 @@ textarea.form-control {
   border-bottom: 1px solid var(--border);
 }
 
+.section-header i {
+  font-size: 20px;
+  color: var(--primary);
+  margin-right: 12px;
+}
+
 .section-header h2 {
   color: var(--text);
   font-weight: 600;
@@ -539,7 +592,8 @@ textarea.form-control {
 
 .issues-table {
   width: 100%;
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0;
 }
 
 .issues-table th,
@@ -554,6 +608,16 @@ textarea.form-control {
   font-weight: 600;
   color: var(--text);
   font-size: 14px;
+  position: sticky;
+  top: 0;
+}
+
+.issues-table th:first-child {
+  border-top-left-radius: 8px;
+}
+
+.issues-table th:last-child {
+  border-top-right-radius: 8px;
 }
 
 .issues-table td {
@@ -561,41 +625,169 @@ textarea.form-control {
   color: var(--text-light);
 }
 
+.issues-table tbody tr {
+  transition: var(--transition);
+}
+
+.issues-table tbody tr:hover {
+  background-color: rgba(67, 97, 238, 0.03);
+  transform: translateY(-1px);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.04);
+}
+
+.issues-table tr:last-child td {
+  border-bottom: none;
+}
+
 /* Status Badges */
 .status-badge {
-  padding: 4px 12px;
+  padding: 6px 14px;
   border-radius: 20px;
   font-size: 12px;
   font-weight: 500;
-  text-transform: lowercase;
+  text-transform: capitalize;
+  display: inline-flex;
+  align-items: center;
+  line-height: 1;
 }
 
 .status-pending {
-  background-color: rgba(248, 150, 30, 0.1);
+  background-color: rgba(248, 150, 30, 0.15);
   color: var(--warning);
+  border: 1px solid rgba(248, 150, 30, 0.3);
 }
 
 .status-resolved {
-  background-color: rgba(76, 201, 240, 0.1);
+  background-color: rgba(76, 201, 240, 0.15);
   color: var(--success);
+  border: 1px solid rgba(76, 201, 240, 0.3);
+}
+
+/* Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 16px;
+  border-radius: var(--radius-sm);
+  font-weight: 500;
+  cursor: pointer;
+  transition: var(--transition);
+  border: none;
+  outline: none;
+  font-size: 13px;
+  font-family: "Poppins", sans-serif;
+  text-decoration: none;
+}
+
+.btn i {
+  margin-right: 6px;
+  font-size: 14px;
+}
+
+.btn-outline {
+  border: 2px solid var(--primary-light);
+  color: var(--primary);
+  background-color: transparent;
+}
+
+.btn-outline:hover {
+  background-color: var(--primary);
+  color: white;
+  border-color: var(--primary);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(58, 12, 163, 0.2);
+}
+
+.btn-sm {
+  padding: 6px 12px;
+  font-size: 12px;
+}
+
+/* Animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* Responsive */
+@media (max-width: 992px) {
+  .container {
+    grid-template-columns: 0 1fr;
+  }
+
+  .sidebar {
+    transform: translateX(-100%);
+    position: fixed;
+    height: 100vh;
+    z-index: 1001;
+  }
+
+  .sidebar.active {
+    transform: translateX(0);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .header {
+    padding: 0 20px;
+  }
+
+  .main-content {
+    padding: 20px;
+  }
+}
+
 @media (max-width: 768px) {
   .form-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .main-content {
     padding: 20px;
   }
-  
+
   .issues-table {
     font-size: 12px;
   }
-  
+
   .issues-table th,
   .issues-table td {
     padding: 10px;
+  }
+
+  .user-role {
+    display: none;
+  }
+
+  .notification {
+    margin: 0 8px;
+  }
+}
+
+@media (max-width: 576px) {
+  .user-info {
+    display: none;
+  }
+
+  .profile-img {
+    margin-right: 0;
+  }
+
+  .header h1 {
+    font-size: 18px;
+  }
+
+  .form-header h2 {
+    font-size: 18px;
+  }
+
+  .section-header h2 {
+    font-size: 18px;
   }
 }

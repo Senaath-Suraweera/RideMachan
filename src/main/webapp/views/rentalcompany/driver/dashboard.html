@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- ===================
-             Meta & Stylesheets
-    =================== -->
+    <!-- =================== -->
+    <!-- Meta & Stylesheets -->
+    <!-- =================== -->
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Driver Dashboard</title>
@@ -19,13 +19,14 @@
         href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
         rel="stylesheet"
     />
+    <!-- Updated CSS file to match home theme -->
     <link rel="stylesheet" href="dashboard.css" />
 </head>
 <body>
     <div class="container">
-        <!-- ===================
-                 Sidebar Navigation
-        =================== -->
+        <!-- =================== -->
+        <!-- Sidebar Navigation -->
+        <!-- =================== -->
         <div class="sidebar" id="sidebar">
             <div class="logo">
                 <img src="logo.png" alt="Logo" class="logo">
@@ -62,9 +63,9 @@
             </div>
         </div>
         
-        <!-- ===================
-                 Header Section
-        =================== -->
+        <!-- =================== -->
+        <!-- Header Section -->
+        <!-- =================== -->
         <div class="header">
             <div class="header-left">
                 <button class="mobile-menu-toggle" onclick="toggleSidebar()">
@@ -81,9 +82,9 @@
             </div>
         </div>
 
-        <!-- ===================
-                 Main Content
-        =================== -->
+        <!-- =================== -->
+        <!-- Main Content -->
+        <!-- =================== -->
         <div class="main-content">
             <!-- Stats Cards -->
             <div class="stats-section">
@@ -134,22 +135,23 @@
                     <div class="chart-container">
                         <div class="line-chart">
                             <svg viewBox="0 0 200 60" class="line-svg">
+                                <!-- Updated line chart colors to match theme -->
                                 <polyline
                                     fill="none"
-                                    stroke="#4285f4"
+                                    stroke="var(--primary)"
                                     stroke-width="3"
                                     points="10,40 30,35 50,25 70,30 90,20 110,15 130,25 150,20 170,10 190,15"
                                 />
-                                <circle cx="10" cy="40" r="3" fill="#4285f4"/>
-                                <circle cx="30" cy="35" r="3" fill="#4285f4"/>
-                                <circle cx="50" cy="25" r="3" fill="#4285f4"/>
-                                <circle cx="70" cy="30" r="3" fill="#4285f4"/>
-                                <circle cx="90" cy="20" r="3" fill="#4285f4"/>
-                                <circle cx="110" cy="15" r="3" fill="#4285f4"/>
-                                <circle cx="130" cy="25" r="3" fill="#4285f4"/>
-                                <circle cx="150" cy="20" r="3" fill="#4285f4"/>
-                                <circle cx="170" cy="10" r="3" fill="#4285f4"/>
-                                <circle cx="190" cy="15" r="3" fill="#4285f4"/>
+                                <circle cx="10" cy="40" r="3" fill="var(--primary)"/>
+                                <circle cx="30" cy="35" r="3" fill="var(--primary)"/>
+                                <circle cx="50" cy="25" r="3" fill="var(--primary)"/>
+                                <circle cx="70" cy="30" r="3" fill="var(--primary)"/>
+                                <circle cx="90" cy="20" r="3" fill="var(--primary)"/>
+                                <circle cx="110" cy="15" r="3" fill="var(--primary)"/>
+                                <circle cx="130" cy="25" r="3" fill="var(--primary)"/>
+                                <circle cx="150" cy="20" r="3" fill="var(--primary)"/>
+                                <circle cx="170" cy="10" r="3" fill="var(--primary)"/>
+                                <circle cx="190" cy="15" r="3" fill="var(--primary)"/>
                             </svg>
                         </div>
                     </div>
@@ -163,7 +165,7 @@
                     <h3>Pie chart for completed, pending, cancelled, completed bookings</h3>
                     <div class="pie-chart-container">
                         <div class="pie-chart">
-                            <div class="pie-slice" style="--percentage: 65; --color: #4285f4;">
+                            <div class="pie-slice" style="--percentage: 65; --color: var(--primary);">
                                 <span class="percentage">65%</span>
                             </div>
                         </div>
@@ -239,21 +241,112 @@
             });
         });
 
-        // Add click handlers for action buttons
         document.querySelector('.message-btn').addEventListener('click', function() {
-            alert('Message Company feature coming soon!');
+            const btn = this;
+            const originalText = btn.innerHTML;
+            
+            // Show loading state
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+            btn.disabled = true;
+            btn.style.opacity = '0.7';
+            
+            // Simulate API call
+            setTimeout(() => {
+                // Show success state
+                btn.innerHTML = '<i class="fas fa-check"></i> Message Sent!';
+                btn.style.backgroundColor = '#28a745';
+                
+                // Reset after 2 seconds
+                setTimeout(() => {
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                    btn.style.opacity = '1';
+                    btn.style.backgroundColor = '';
+                }, 2000);
+            }, 1500);
         });
 
         document.querySelector('.contact-btn').addEventListener('click', function() {
-            alert('Contact Admin feature coming soon!');
+            const btn = this;
+            const originalText = btn.innerHTML;
+            
+            // Show loading state
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Connecting...';
+            btn.disabled = true;
+            btn.style.opacity = '0.7';
+            
+            // Simulate connection
+            setTimeout(() => {
+                // Show connected state
+                btn.innerHTML = '<i class="fas fa-phone-alt"></i> Connected!';
+                btn.style.backgroundColor = '#28a745';
+                
+                // Show call in progress
+                setTimeout(() => {
+                    btn.innerHTML = '<i class="fas fa-phone-alt fa-pulse"></i> In Call...';
+                    
+                    // End call after 3 seconds
+                    setTimeout(() => {
+                        btn.innerHTML = '<i class="fas fa-phone-slash"></i> Call Ended';
+                        btn.style.backgroundColor = '#6c757d';
+                        
+                        // Reset after 2 seconds
+                        setTimeout(() => {
+                            btn.innerHTML = originalText;
+                            btn.disabled = false;
+                            btn.style.opacity = '1';
+                            btn.style.backgroundColor = '';
+                        }, 2000);
+                    }, 3000);
+                }, 1000);
+            }, 1500);
         });
 
-        // Add logout functionality
         document.querySelector('.logout').addEventListener('click', function() {
+            const logoutItem = this;
+            
             if (confirm('Are you sure you want to logout?')) {
-                alert('Logging out...');
-                // Add actual logout logic here
+                const originalText = logoutItem.innerHTML;
+                
+                // Show loading state
+                logoutItem.innerHTML = '<i class="fas fa-spinner fa-spin"></i><span>Logging out...</span>';
+                logoutItem.style.opacity = '0.7';
+                
+                // Simulate logout process
+                setTimeout(() => {
+                    logoutItem.innerHTML = '<i class="fas fa-check"></i><span>Logged out!</span>';
+                    
+                    // Redirect after showing success
+                    setTimeout(() => {
+                        alert('Redirecting to login page...');
+                        // window.location.href = 'login.html'; // Uncomment for actual redirect
+                    }, 1000);
+                }, 2000);
             }
+        });
+
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('mouseenter', function() {
+                if (!this.classList.contains('active')) {
+                    this.style.transform = 'translateX(5px)';
+                    this.style.transition = 'transform 0.2s ease';
+                }
+            });
+            
+            item.addEventListener('mouseleave', function() {
+                if (!this.classList.contains('active')) {
+                    this.style.transform = 'translateX(0)';
+                }
+            });
+        });
+
+        document.querySelectorAll('.stat-card').forEach(card => {
+            card.addEventListener('click', function() {
+                this.style.transform = 'scale(0.98)';
+                setTimeout(() => {
+                    this.style.transform = 'scale(1)';
+                }, 150);
+            });
         });
     </script>
 </body>

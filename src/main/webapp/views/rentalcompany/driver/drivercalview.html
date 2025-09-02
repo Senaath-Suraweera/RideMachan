@@ -5,8 +5,32 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Driver Calendar View - Ride Machan</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Changed font from Inter to Poppins to match home page theme -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="drivercalview.css">
+  <style>
+    @keyframes slideIn {
+      from {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+    
+    @keyframes slideOut {
+      from {
+        transform: translateX(0);
+        opacity: 1;
+      }
+      to {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+    }
+  </style>
 </head>
 <body>
   <div class="container">
@@ -24,37 +48,36 @@
         <img src="logo.png" alt="Logo" class="logo-img">
       </div>
       <div class="nav-menu">
-                <div class="nav-item">
-                    <i class="fas fa-house"></i>
-                    <a href="dashboard.html"><span> Home</span></a>
-                </div>
-                <div class="nav-item">
-                    <i class="fas fa-user"></i>
-                    <a href="profile.html"><span>Profile</span></a>
-                </div>
-                <div class="nav-item active">
-                    <i class="fas fa-calendar-alt"></i>
-                    <a href="drivercalview.html"><span>Calendar</span></a>
-                </div>
-                <div class="nav-item">
-                    <i class="fas fa-car"></i>
-                    <a href="vehicleview.html"><span>Vehicles</span></a>
-                </div>
-                <div class="nav-item">
-                    <i class="fas fa-users"></i>
-                    <a href="customerview.html"><span>Customer</span></a>
-                </div>
-                <div class="nav-item">
-                    <i class="fas fa-book"></i>
-                    <a href="issuerepirting.html"><span>Reports</span></a>
-                </div>
-                <div class="logout">
-                    <i class="fas fa-sign-out"></i>
-                    <span>Logout</span>
-                </div>
-            </div>
-      
+        <div class="nav-item">
+          <i class="fas fa-house"></i>
+          <a href="dashboard.html"><span> Home</span></a>
+        </div>
+        <div class="nav-item">
+          <i class="fas fa-user"></i>
+          <a href="profile.html"><span>Profile</span></a>
+        </div>
+        <div class="nav-item active">
+          <i class="fas fa-calendar-alt"></i>
+          <a href="drivercalview.html"><span>Calendar</span></a>
+        </div>
+        <div class="nav-item">
+          <i class="fas fa-car"></i>
+          <a href="vehicleview.html"><span>Vehicles</span></a>
+        </div>
+        <div class="nav-item">
+          <i class="fas fa-users"></i>
+          <a href="customerview.html"><span>Customer</span></a>
+        </div>
+        <div class="nav-item">
+          <i class="fas fa-book"></i>
+          <a href="issuerepirting.html"><span>Reports</span></a>
+        </div>
+        <div class="logout">
+          <i class="fas fa-sign-out"></i>
+          <span>Logout</span>
+        </div>
       </div>
+    </div>
 
     <!-- Main Content -->
     <div class="main-content">
@@ -362,6 +385,15 @@
       btn.addEventListener('click', function() {
         document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
         this.classList.add('active');
+        
+        const filterValue = this.textContent;
+        showLoadingState(this);
+        
+        setTimeout(() => {
+          hideLoadingState(this);
+          showSuccessMessage(`Filtered by: ${filterValue}`);
+          // Here you would typically filter the calendar data
+        }, 1000);
       });
     });
 
@@ -371,9 +403,165 @@
         if (!this.classList.contains('other-month')) {
           document.querySelectorAll('.calendar-day').forEach(d => d.classList.remove('selected'));
           this.classList.add('selected');
+          
+          const selectedDate = this.textContent;
+          showSuccessMessage(`Selected date: July ${selectedDate}, 2025`);
         }
       });
     });
+
+    document.querySelectorAll('.summary-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        const btnText = this.textContent.trim();
+        
+        if (btnText.includes('Contact Admin')) {
+          showLoadingState(this);
+          
+          setTimeout(() => {
+            hideLoadingState(this);
+            showSuccessMessage('Connecting to admin... Call initiated!');
+            // Simulate phone call
+            setTimeout(() => {
+              showSuccessMessage('Admin contacted successfully');
+            }, 2000);
+          }, 1500);
+        } else if (btnText.includes('Refresh')) {
+          showLoadingState(this);
+          
+          setTimeout(() => {
+            hideLoadingState(this);
+            showSuccessMessage('Calendar refreshed successfully');
+            // Here you would refresh the calendar data
+          }, 1000);
+        }
+      });
+    });
+
+    document.querySelector('.schedule-btn').addEventListener('click', function() {
+      showLoadingState(this);
+      
+      setTimeout(() => {
+        hideLoadingState(this);
+        showSuccessMessage('Opening schedule manager...');
+        // Here you would open a schedule modal or navigate to schedule page
+      }, 1000);
+    });
+
+    document.querySelectorAll('.action-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        const action = this.textContent.trim();
+        showLoadingState(this);
+        
+        setTimeout(() => {
+          hideLoadingState(this);
+          
+          if (action === 'View Customer') {
+            showSuccessMessage('Opening customer details...');
+            // Here you would navigate to customer view
+          } else if (action === 'View Company Vehicle') {
+            showSuccessMessage('Opening vehicle details...');
+            // Here you would navigate to vehicle view
+          } else if (action === 'Report Issue') {
+            showSuccessMessage('Opening issue report form...');
+            // Here you would open issue reporting modal
+          }
+        }, 1000);
+      });
+    });
+
+    document.querySelectorAll('.nav-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        const isNext = this.querySelector('.fa-chevron-right');
+        const monthElement = document.querySelector('.calendar-month');
+        
+        showLoadingState(this);
+        
+        setTimeout(() => {
+          hideLoadingState(this);
+          if (isNext) {
+            monthElement.textContent = 'August 2025';
+            showSuccessMessage('Moved to next month');
+          } else {
+            monthElement.textContent = 'June 2025';
+            showSuccessMessage('Moved to previous month');
+          }
+        }, 500);
+      });
+    });
+
+    document.querySelector('.filter-input').addEventListener('input', function() {
+      const searchTerm = this.value;
+      if (searchTerm.length > 2) {
+        showSuccessMessage(`Searching for: ${searchTerm}`);
+        // Here you would implement search functionality
+      }
+    });
+
+    document.querySelector('.logout').addEventListener('click', function() {
+      if (confirm('Are you sure you want to logout?')) {
+        showLoadingState(this);
+        
+        setTimeout(() => {
+          hideLoadingState(this);
+          showSuccessMessage('Logging out...');
+          
+          setTimeout(() => {
+            window.location.href = 'login.html';
+          }, 1000);
+        }, 1000);
+      }
+    });
+
+    // Utility functions for loading states and success messages
+    function showLoadingState(button) {
+      const originalText = button.innerHTML;
+      button.dataset.originalText = originalText;
+      button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
+      button.disabled = true;
+      button.style.opacity = '0.7';
+    }
+
+    function hideLoadingState(button) {
+      button.innerHTML = button.dataset.originalText;
+      button.disabled = false;
+      button.style.opacity = '1';
+    }
+
+    function showSuccessMessage(message) {
+      // Create success notification
+      const notification = document.createElement('div');
+      notification.className = 'success-notification';
+      notification.innerHTML = `
+        <i class="fas fa-check-circle"></i>
+        <span>${message}</span>
+      `;
+      notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: linear-gradient(135deg, #4361ee, #3a0ca3);
+        color: white;
+        padding: 12px 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(67, 97, 238, 0.3);
+        z-index: 10000;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-family: 'Poppins', sans-serif;
+        font-size: 14px;
+        animation: slideIn 0.3s ease-out;
+      `;
+      
+      document.body.appendChild(notification);
+      
+      setTimeout(() => {
+        notification.style.animation = 'slideOut 0.3s ease-in';
+        setTimeout(() => {
+          document.body.removeChild(notification);
+        }, 300);
+      }, 3000);
+    }
   </script>
 </body>
 </html>
