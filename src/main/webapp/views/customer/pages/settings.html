@@ -228,6 +228,7 @@
                     let headerHTML = await headerResponse.text();
                     headerHTML = headerHTML.replace('{{PAGE_TITLE}}', 'Settings');
                     document.getElementById('header-container').innerHTML = headerHTML;
+                    
                     // Initialize components after loading
                     initializeComponents();
                 } catch (error) {
@@ -401,6 +402,6 @@
 
             // Load components when DOM is ready
             document.addEventListener('DOMContentLoaded', loadComponents);
-            </script>
+        </script>
     </body>
 </html>

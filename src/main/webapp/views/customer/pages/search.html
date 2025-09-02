@@ -8,308 +8,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="../css/main.css" />
-    <style>
-        /* Page-specific styles */
-        .search-tabs {
-            display: flex;
-            margin-bottom: 25px;
-            background-color: white;
-            border-radius: var(--radius);
-            padding: 8px;
-            box-shadow: var(--shadow-sm);
-        }
-
-        .tab-btn {
-            flex: 1;
-            padding: 12px 20px;
-            border: none;
-            background: transparent;
-            cursor: pointer;
-            border-radius: var(--radius-sm);
-            transition: var(--transition);
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--text-light);
-        }
-
-        .tab-btn i {
-            margin-right: 8px;
-        }
-
-        .tab-btn.active {
-            background: linear-gradient(135deg, var(--primary), var(--primary-light));
-            color: white;
-            box-shadow: 0 3px 8px rgba(67, 97, 238, 0.3);
-        }
-
-        /* Main Content */
-        .main-content {
-            grid-column: 2;
-            padding: 25px 30px;
-            overflow-y: auto;
-        }
-
-        /* Search Form */
-        .search-form-container {
-            background-color: white;
-            border-radius: var(--radius);
-            padding: 25px;
-            box-shadow: var(--shadow-sm);
-            margin-bottom: 25px;
-        }
-
-        .form-row {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            margin-bottom: 20px;
-        }
-
-        .form-group {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .form-group label {
-            font-weight: 500;
-            margin-bottom: 8px;
-            color: var(--text);
-            font-size: 14px;
-        }
-
-        .form-control {
-            width: 100%;
-            padding: 12px 16px;
-            border: 2px solid var(--border);
-            border-radius: var(--radius-sm);
-            font-size: 14px;
-            transition: var(--transition);
-            background: white;
-        }
-
-        .form-control:focus {
-            outline: none;
-            border-color: var(--primary-light);
-            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
-        }
-
-        .search-btn {
-            background: linear-gradient(135deg, var(--primary), var(--primary-light));
-            color: white;
-            border: none;
-            padding: 15px 25px;
-            border-radius: var(--radius);
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 16px;
-            transition: var(--transition);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .search-btn i {
-            margin-right: 8px;
-        }
-
-        .search-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(67, 97, 238, 0.3);
-        }
-
-        /* Filters */
-        .filters-container {
-            background-color: white;
-            border-radius: var(--radius);
-            padding: 25px;
-            box-shadow: var(--shadow-sm);
-            margin-bottom: 25px;
-        }
-
-        .filters-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 20px;
-            margin-bottom: 20px;
-        }
-
-        .filter-group {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .filter-select {
-            padding: 10px 12px;
-            border: 2px solid var(--border);
-            border-radius: var(--radius-sm);
-            font-size: 14px;
-            transition: var(--transition);
-            background-color: white;
-        }
-
-        .apply-btn {
-            background: linear-gradient(135deg, var(--success), #36d399);
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: var(--radius-sm);
-            cursor: pointer;
-            font-weight: 500;
-            transition: var(--transition);
-        }
-
-        /* Search Results */
-        .search-results {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-
-        .vehicle-card {
-            background-color: white;
-            border-radius: var(--radius);
-            padding: 20px;
-            box-shadow: var(--shadow-sm);
-            display: grid;
-            grid-template-columns: 80px 1fr auto;
-            gap: 20px;
-            align-items: start;
-            transition: var(--transition);
-            cursor: pointer;
-        }
-
-        .vehicle-card:hover {
-            transform: translateY(-3px);
-            box-shadow: var(--shadow);
-        }
-
-        .vehicle-image {
-            width: 80px;
-            height: 60px;
-            background: linear-gradient(135deg, #f3f4f6, #e5e7eb);
-            border-radius: var(--radius-sm);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--text-light);
-            font-size: 28px;
-        }
-
-        .vehicle-info h4 {
-            font-size: 18px;
-            font-weight: 600;
-            color: var(--dark);
-            margin-bottom: 8px;
-            cursor: pointer;
-            transition: var(--transition);
-        }
-
-        .vehicle-info h4:hover {
-            color: var(--primary);
-        }
-
-        .price {
-            font-size: 16px;
-            font-weight: 600;
-            color: var(--primary);
-            margin-bottom: 5px;
-        }
-
-        .category {
-            color: var(--text-light);
-            font-size: 14px;
-            margin-bottom: 5px;
-            cursor: pointer;
-            transition: var(--transition);
-        }
-
-        .category:hover {
-            color: var(--primary);
-            text-decoration: underline;
-        }
-
-        .location {
-            color: var(--text-light);
-            font-size: 14px;
-            margin-bottom: 8px;
-        }
-
-        .rating {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-bottom: 8px;
-        }
-
-        .stars {
-            display: flex;
-            gap: 2px;
-        }
-
-        .stars i {
-            color: #fbbf24;
-            font-size: 14px;
-        }
-
-        .stars .far {
-            color: #d1d5db;
-        }
-
-        .review-count {
-            font-size: 12px;
-            color: var(--text-light);
-        }
-
-        .features {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
-            margin-top: 10px;
-        }
-
-        .feature-tag {
-            background-color: rgba(67, 97, 238, 0.1);
-            color: var(--primary);
-            padding: 4px 8px;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: 500;
-        }
-
-        .message-btn {
-            background: linear-gradient(135deg, var(--info), var(--success));
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: var(--radius-sm);
-            cursor: pointer;
-            font-weight: 500;
-            font-size: 14px;
-            transition: var(--transition);
-        }
-
-        .message-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(72, 149, 239, 0.3);
-        }
-
-        .subtitle {
-            color: var(--text-light);
-            font-size: 14px;
-            margin-top: 5px;
-        }
-
-        .seats-info {
-            color: var(--text-light);
-            font-size: 14px;
-            margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-    </style>
+    <link rel="stylesheet" href="../css/search.css" />
 </head>
 <body>
     <div class="container">
@@ -421,6 +120,18 @@
                         </select>
                     </div>
                     <div class="filter-group">
+                        <label>Company</label>
+                        <select class="filter-select" id="companyFilter">
+                            <option value="">Select Company</option>
+                            <option value="Premium Rentals">Premium Rentals</option>
+                            <option value="City Car Rentals">City Car Rentals</option>
+                            <option value="Budget Wheels">Budget Wheels</option>
+                            <option value="Lanka Van Hire">Lanka Van Hire</option>
+                            <option value="Luxury Rides LK">Luxury Rides LK</option>
+                            <option value="Island Transport">Island Transport</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
                         <label>Fuel Type</label>
                         <select class="filter-select" id="fuelType">
                             <option value="">Select</option>
@@ -452,15 +163,26 @@
 
     <script>
         // Load external components
-        function loadComponent(elementId, filePath) {
+        function loadComponent(elementId, filePath, callback) {
             fetch(filePath)
                 .then(response => response.text())
                 .then(data => {
+                    // Replace the PAGE_TITLE placeholder with SEARCH
+                    if (elementId === 'header-container') {
+                        data = data.replace('{{PAGE_TITLE}}', 'SEARCH');
+                    }
+                    
                     document.getElementById(elementId).innerHTML = data;
+                    
                     // Execute any scripts in the loaded content
                     const scripts = document.getElementById(elementId).getElementsByTagName('script');
                     for (let script of scripts) {
                         eval(script.innerHTML);
+                    }
+                    
+                    // Execute callback if provided
+                    if (callback) {
+                        callback();
                     }
                 })
                 .catch(error => console.error('Error loading component:', error));
@@ -469,8 +191,11 @@
         // Load navbar and header on page load
         document.addEventListener('DOMContentLoaded', function() {
             loadComponent('navbar-container', '../components/navbar.html');
-            loadComponent('header-container', '../components/header.html');
-            
+            loadComponent('header-container', '../components/header.html', function() {
+                // Initialize header after it's loaded
+                initializeHeader();
+            });
+
             // Set default datetime values
             const now = new Date();
             const tomorrow = new Date(now);
@@ -632,7 +357,7 @@
                     <div class="vehicle-info">
                         <h4 onclick="viewVehicle(${vehicle.id})">${vehicle.name}</h4>
                         <p class="price">LKR ${vehicle.price.toLocaleString()}/day</p>
-                        <p class="category" onclick="viewCompany(${vehicle.companyId})">${vehicle.company}</p>
+                        <p class="category" onclick="event.stopPropagation(); viewCompany(${vehicle.companyId})" style="cursor: pointer; color: var(--primary); text-decoration: underline;">${vehicle.company}</p>
                         <p class="location">${vehicle.location}, Sri Lanka</p>
                         <div class="rating">
                             <div class="stars">
@@ -692,6 +417,7 @@
         function applyFilters() {
             const priceRange = document.getElementById('priceRange').value;
             const category = document.getElementById('category').value;
+            const companyFilter = document.getElementById('companyFilter').value;
             const fuelType = document.getElementById('fuelType').value;
             const seats = document.getElementById('seats').value;
             
@@ -708,6 +434,10 @@
             
             if (category) {
                 filtered = filtered.filter(v => v.category === category);
+            }
+
+            if (companyFilter) {
+                filtered = filtered.filter(v => v.company === companyFilter);
             }
             
             if (fuelType) {
@@ -727,20 +457,169 @@
         }
 
         function viewVehicle(vehicleId) {
-            sessionStorage.setItem('selectedVehicleId', vehicleId);
-            sessionStorage.setItem('previousPage', 'search');
-            window.location.href = "vehicle-profile.html";
+            // Store vehicle data in sessionStorage for the profile page to use
+            const vehicle = vehicleData.find(v => v.id === vehicleId);
+            if (vehicle) {
+                // Store the vehicle data with localStorage methods - not for this artifact
+                try {
+                    sessionStorage.setItem('selectedVehicle', JSON.stringify(vehicle));
+                    sessionStorage.setItem('searchData', JSON.stringify({
+                        vehicleType: document.getElementById('vehicleType').value,
+                        pickupLocation: document.getElementById('pickupLocation').value,
+                        dropoffLocation: document.getElementById('dropoffLocation').value,
+                        fromDateTime: document.getElementById('fromDateTime').value,
+                        toDateTime: document.getElementById('toDateTime').value
+                    }));
+                } catch(e) {
+                    console.log('SessionStorage not available');
+                }
+                window.location.href = `vehicle-profile.html?id=${vehicleId}`;
+            }
         }
 
         function viewCompany(companyId) {
-            sessionStorage.setItem('selectedCompanyId', companyId);
-            sessionStorage.setItem('previousPage', 'search');
-            window.location.href = "company-profile.html";
+            // Store the selected company ID in sessionStorage and navigate to company profile
+            try {
+                sessionStorage.setItem('selectedCompanyId', companyId.toString());
+            } catch(e) {
+                console.log('SessionStorage not available');
+            }
+            window.location.href = 'company-profile.html';
         }
 
         function sendMessage(vehicleId) {
-            alert(`Opening message dialog for vehicle ID: ${vehicleId}`);
+            const vehicle = vehicleData.find(v => v.id === vehicleId);
+            if (vehicle) {
+                const popup = document.createElement('div');
+                popup.className = 'popup-overlay';
+                popup.innerHTML = `
+                    <div class="popup-content">
+                        <div class="popup-header">
+                            <h3>Send Message</h3>
+                            <button class="close-btn" onclick="closePopup()">&times;</button>
+                        </div>
+                        <div class="popup-body">
+                            <p>Send a message to <strong>${vehicle.company}</strong> about their <strong>${vehicle.name}</strong>:</p>
+                            <textarea class="message-input" placeholder="Type your message here..." rows="4"></textarea>
+                        </div>
+                        <div class="popup-footer">
+                            <button class="btn btn-primary" onclick="sendMessageAction(${vehicle.id})">Send Message</button>
+                            <button class="btn btn-outline" onclick="closePopup()">Cancel</button>
+                        </div>
+                    </div>
+                `;
+                document.body.appendChild(popup);
+            }
         }
+
+        function sendMessageAction(vehicleId) {
+            const messageInput = document.querySelector('.message-input');
+            if (messageInput && messageInput.value.trim()) {
+                alert('Message sent successfully!');
+                closePopup();
+            } else {
+                alert('Please enter a message before sending.');
+            }
+        }
+
+        function bookVehicle(vehicleId) {
+            const vehicle = vehicleData.find(v => v.id === vehicleId);
+            if (vehicle) {
+                alert(`Booking ${vehicle.name} - Redirecting to booking page...`);
+                closePopup();
+                // In a real app, you would redirect to booking page
+                // window.location.href = `booking.html?vehicleId=${vehicleId}`;
+            }
+        }
+
+        function closePopup() {
+            const popup = document.querySelector('.popup-overlay');
+            if (popup) {
+                popup.remove();
+            }
+        }
+
+        // Header functionality (integrated from header.html)
+        function initializeHeader() {
+            setTimeout(() => {
+                const userName = document.getElementById('userName');
+                const profileInitial = document.getElementById('profileInitial');
+                
+                if (userName) userName.textContent = 'Kamal';
+                if (profileInitial) profileInitial.textContent = 'K';
+                
+                updateNotificationCounts();
+            }, 100);
+        }
+
+        function updateNotificationCounts() {
+            setTimeout(() => {
+                const notificationCount = document.getElementById('notificationCount');
+                const messageCount = document.getElementById('messageCount');
+                
+                if (notificationCount) notificationCount.textContent = '3';
+                if (messageCount) messageCount.textContent = '5';
+            }, 100);
+        }
+
+        function toggleProfileDropdown() {
+            const dropdown = document.getElementById('profileDropdown');
+            if (dropdown) {
+                dropdown.classList.toggle('show');
+            }
+        }
+
+        function showNotifications() {
+            alert('Notifications: You have 3 new notifications!');
+        }
+
+        function showMessages() {
+            alert('Messages: You have 5 new messages!');
+        }
+
+        function handleLogout() {
+            if (confirm('Are you sure you want to logout?')) {
+                alert('Logged out successfully!');
+                // In a real app: window.location.href = '../auth/login.html';
+            }
+        }
+
+        // Navbar functionality (integrated from navbar.html)
+        function initializeNavbar() {
+            setTimeout(() => {
+                setActiveNavItem('search');
+            }, 100);
+        }
+
+        function setActiveNavItem(pageName) {
+            setTimeout(() => {
+                document.querySelectorAll('.nav-item').forEach(item => {
+                    item.classList.remove('active');
+                });
+                
+                const activeItem = document.querySelector(`[data-page="${pageName}"]`);
+                if (activeItem) {
+                    activeItem.classList.add('active');
+                }
+            }, 100);
+        }
+
+        // Initialize everything when page loads
+        window.addEventListener('load', function() {
+            initializeNavbar();
+        });
+
+        // Close dropdowns when clicking outside
+        document.addEventListener('click', function(event) {
+            setTimeout(() => {
+                const dropdown = document.getElementById('profileDropdown');
+                const profile = document.querySelector('.user-profile');
+                
+                if (dropdown && profile && !profile.contains(event.target)) {
+                    dropdown.classList.remove('show');
+                }
+            }, 100);
+        });
     </script>
 </body>
 </html>

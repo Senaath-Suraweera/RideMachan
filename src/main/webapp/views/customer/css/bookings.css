@@ -616,6 +616,329 @@
 }
 
 /* =========================
+  Modal Styles
+  ========================= */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.modal-content {
+  background: white;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-lg);
+  max-width: 500px;
+  width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.modal-content.large {
+  max-width: 800px;
+}
+
+.modal-header {
+  padding: 20px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-header.emergency-header {
+  background: rgba(247, 37, 133, 0.1);
+  color: var(--danger);
+}
+
+.modal-header h3 {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: var(--text-light);
+  padding: 0;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-body {
+  padding: 20px;
+}
+
+.modal-actions {
+  padding: 20px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.booking-summary {
+  background: var(--light);
+  padding: 15px;
+  border-radius: var(--radius-sm);
+  margin: 15px 0;
+}
+
+.warning-text {
+  color: var(--warning);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.emergency-text {
+  color: var(--danger);
+  font-weight: 600;
+}
+
+.emergency-options {
+  margin: 15px 0;
+}
+
+.emergency-options label {
+  display: block;
+  margin-bottom: 8px;
+  cursor: pointer;
+}
+
+.emergency-options input {
+  margin-right: 8px;
+}
+
+/* Message Modal Specific Styles */
+.message-thread {
+  max-height: 300px;
+  overflow-y: auto;
+  margin-bottom: 15px;
+  padding: 10px;
+  background: var(--light);
+  border-radius: var(--radius-sm);
+}
+
+.message {
+  margin-bottom: 10px;
+}
+
+.message.sent {
+  text-align: right;
+}
+
+.message.received {
+  text-align: left;
+}
+
+.message-content {
+  display: inline-block;
+  max-width: 80%;
+  padding: 8px 12px;
+  border-radius: 15px;
+  font-size: 14px;
+}
+
+.message.sent .message-content {
+  background: var(--primary);
+  color: white;
+}
+
+.message.received .message-content {
+  background: white;
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+
+.message-time {
+  font-size: 11px;
+  color: var(--text-light);
+  margin-top: 4px;
+}
+
+.message-input {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.message-input input {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  outline: none;
+}
+
+.message-input input:focus {
+  border-color: var(--primary);
+}
+
+/* Tracking Modal Specific Styles */
+.tracking-map {
+  margin-bottom: 20px;
+}
+
+.map-placeholder {
+  height: 300px;
+  background: var(--light);
+  border-radius: var(--radius-sm);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: 2px dashed var(--border);
+}
+
+.map-placeholder i {
+  font-size: 48px;
+  color: var(--text-light);
+  margin-bottom: 10px;
+}
+
+.location-info {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.current-location,
+.eta-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: var(--text);
+}
+
+.tracking-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+/* Rating Modal Specific Styles */
+.service-summary {
+  text-align: center;
+  margin-bottom: 20px;
+  padding: 15px;
+  background: var(--light);
+  border-radius: var(--radius-sm);
+}
+
+.rating-section {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.star-rating {
+  display: flex;
+  justify-content: center;
+  gap: 5px;
+  margin-top: 10px;
+}
+
+.star-rating .fa-star {
+  font-size: 24px;
+  color: var(--border);
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.star-rating .fa-star:hover,
+.star-rating .fa-star.active {
+  color: var(--warning);
+}
+
+.feedback-section textarea {
+  width: 100%;
+  min-height: 100px;
+  padding: 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  outline: none;
+  resize: vertical;
+  font-family: inherit;
+}
+
+.feedback-section textarea:focus {
+  border-color: var(--primary);
+}
+
+/* =========================
+  Notification Toast
+  ========================= */
+.notification-toast {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: white;
+  padding: 15px 20px;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-lg);
+  z-index: 3000;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-left: 4px solid var(--info);
+  transform: translateX(400px);
+  opacity: 0;
+  transition: all 0.3s ease;
+}
+
+.notification-toast.show {
+  transform: translateX(0);
+  opacity: 1;
+}
+
+.notification-toast.success {
+  border-left-color: #10b981;
+}
+
+.notification-toast.warning {
+  border-left-color: var(--warning);
+}
+
+.notification-toast.info {
+  border-left-color: var(--info);
+}
+
+.notification-toast i {
+  font-size: 18px;
+}
+
+.notification-toast.success i {
+  color: #10b981;
+}
+
+.notification-toast.warning i {
+  color: var(--warning);
+}
+
+.notification-toast.info i {
+  color: var(--info);
+}
+
+/* =========================
   Responsive Media Queries
   ========================= */
 @media (max-width: 1200px) {
@@ -691,6 +1014,19 @@
   .status-section {
     align-items: flex-start;
   }
+
+  .modal-content {
+    margin: 20px;
+    width: calc(100% - 40px);
+  }
+
+  .modal-actions {
+    flex-direction: column;
+  }
+
+  .modal-actions .btn {
+    width: 100%;
+  }
 }
 
 @media (max-width: 576px) {
@@ -721,5 +1057,15 @@
   .service-actions .btn {
     padding: 8px 12px;
     font-size: 12px;
+  }
+
+  .notification-toast {
+    right: 10px;
+    left: 10px;
+    transform: translateY(-100px);
+  }
+
+  .notification-toast.show {
+    transform: translateY(0);
   }
 }

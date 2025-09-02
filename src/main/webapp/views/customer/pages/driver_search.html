@@ -8,415 +8,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="../css/main.css" />
-    <style>
-        /* Page-specific styles */
-        .search-tabs {
-            display: flex;
-            margin-bottom: 25px;
-            background-color: white;
-            border-radius: var(--radius);
-            padding: 8px;
-            box-shadow: var(--shadow-sm);
-        }
-
-        .tab-btn {
-            flex: 1;
-            padding: 12px 20px;
-            border: none;
-            background: transparent;
-            cursor: pointer;
-            border-radius: var(--radius-sm);
-            transition: var(--transition);
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--text-light);
-        }
-
-        .tab-btn i {
-            margin-right: 8px;
-        }
-
-        .tab-btn.active {
-            background: linear-gradient(135deg, var(--primary), var(--primary-light));
-            color: white;
-            box-shadow: 0 3px 8px rgba(67, 97, 238, 0.3);
-        }
-
-        /* Main Content */
-        .main-content {
-            grid-column: 2;
-            padding: 30px;
-            overflow-y: auto;
-            background-color: #f5f7fb;
-        }
-
-        /* Search Section */
-        .search-section {
-            background: white;
-            padding: 30px;
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-            margin-bottom: 30px;
-        }
-
-        .page-title {
-            font-size: 28px;
-            font-weight: 700;
-            color: var(--dark);
-            margin-bottom: 8px;
-        }
-
-        .page-subtitle {
-            color: var(--text-light);
-            margin-bottom: 30px;
-            font-size: 16px;
-        }
-
-        .search-form {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            margin-bottom: 25px;
-        }
-
-        .form-group {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .form-group label {
-            font-weight: 500;
-            margin-bottom: 8px;
-            color: var(--text);
-            font-size: 14px;
-        }
-
-        .form-group input,
-        .form-group select {
-            padding: 12px 16px;
-            border: 2px solid var(--border);
-            border-radius: var(--radius-sm);
-            font-size: 14px;
-            transition: var(--transition);
-            background-color: white;
-        }
-
-        .form-group input:focus,
-        .form-group select:focus {
-            outline: none;
-            border-color: var(--primary-light);
-            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
-        }
-
-        .search-btn {
-            background: linear-gradient(135deg, var(--primary), var(--primary-light));
-            color: white;
-            padding: 12px 30px;
-            border: none;
-            border-radius: var(--radius-sm);
-            font-weight: 600;
-            cursor: pointer;
-            transition: var(--transition);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-top: auto;
-        }
-
-        .search-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(58, 12, 163, 0.3);
-        }
-
-        /* Filters Section */
-        .filters-section {
-            background: white;
-            padding: 25px 30px;
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-            margin-bottom: 30px;
-        }
-
-        .filters-title {
-            font-size: 18px;
-            font-weight: 600;
-            margin-bottom: 20px;
-            color: var(--dark);
-        }
-
-        .filters-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            margin-bottom: 20px;
-        }
-
-        .filter-checkbox {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .filter-checkbox input[type="checkbox"] {
-            width: 18px;
-            height: 18px;
-            accent-color: var(--primary);
-        }
-
-        .apply-filters-btn {
-            background-color: var(--info);
-            color: white;
-            padding: 8px 20px;
-            border: none;
-            border-radius: var(--radius-sm);
-            cursor: pointer;
-            font-weight: 500;
-            transition: var(--transition);
-        }
-
-        .apply-filters-btn:hover {
-            background-color: var(--primary);
-            transform: translateY(-1px);
-        }
-
-        /* Results Section */
-        .results-section {
-            background: white;
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-            overflow: hidden;
-        }
-
-        .results-header {
-            padding: 25px 30px;
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .results-title {
-            font-size: 20px;
-            font-weight: 600;
-            color: var(--dark);
-        }
-
-        .sort-dropdown {
-            padding: 8px 16px;
-            border: 2px solid var(--border);
-            border-radius: var(--radius-sm);
-            background-color: white;
-            cursor: pointer;
-        }
-
-        /* Driver Cards */
-        .drivers-list {
-            padding: 20px 30px;
-        }
-
-        .driver-card {
-            display: flex;
-            align-items: center;
-            padding: 25px;
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            margin-bottom: 20px;
-            transition: var(--transition);
-            background: white;
-            cursor: pointer;
-        }
-
-        .driver-card:hover {
-            transform: translateY(-3px);
-            box-shadow: var(--shadow-lg);
-            border-color: var(--primary-light);
-        }
-
-        .driver-avatar {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--info), var(--primary-light));
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 28px;
-            font-weight: 700;
-            margin-right: 25px;
-            box-shadow: 0 4px 12px rgba(67, 97, 238, 0.2);
-        }
-
-        .driver-info {
-            flex: 1;
-        }
-
-        .driver-name {
-            font-size: 20px;
-            font-weight: 600;
-            color: var(--dark);
-            margin-bottom: 5px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            cursor: pointer;
-            transition: var(--transition);
-        }
-
-        .driver-name:hover {
-            color: var(--primary);
-        }
-
-        .verified-badge {
-            background-color: var(--success);
-            color: white;
-            padding: 2px 8px;
-            border-radius: 12px;
-            font-size: 10px;
-            font-weight: 600;
-            text-transform: uppercase;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        .driver-details {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 10px;
-            color: var(--text-light);
-            font-size: 14px;
-        }
-
-        .driver-price {
-            font-size: 18px;
-            font-weight: 700;
-            color: var(--primary);
-            margin-bottom: 8px;
-        }
-
-        .driver-rating {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            margin-bottom: 12px;
-        }
-
-        .stars {
-            color: #fbbf24;
-            font-size: 16px;
-        }
-
-        .rating-text {
-            color: var(--text-light);
-            font-size: 14px;
-        }
-
-        .driver-languages {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 12px;
-        }
-
-        .language-tag {
-            background-color: var(--light);
-            color: var(--text);
-            padding: 4px 10px;
-            border-radius: 15px;
-            font-size: 12px;
-            font-weight: 500;
-        }
-
-        .driver-specialties {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
-
-        .specialty-tag {
-            background-color: rgba(67, 97, 238, 0.1);
-            color: var(--primary);
-            padding: 4px 10px;
-            border-radius: 15px;
-            font-size: 12px;
-            font-weight: 500;
-        }
-
-        .driver-actions {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            align-items: flex-end;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, var(--primary), var(--primary-light));
-            color: white;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(58, 12, 163, 0.3);
-        }
-
-        .btn-outline {
-            background: transparent;
-            color: var(--primary);
-            border: 2px solid var(--primary-light);
-        }
-
-        .btn-outline:hover {
-            background: var(--primary);
-            color: white;
-            transform: translateY(-2px);
-        }
-
-        .driver-company {
-            color: var(--text-light);
-            font-size: 14px;
-            cursor: pointer;
-            transition: var(--transition);
-        }
-
-        .driver-company:hover {
-            color: var(--primary);
-            text-decoration: underline;
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .search-form {
-                grid-template-columns: 1fr;
-            }
-
-            .filters-grid {
-                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            }
-
-            .driver-card {
-                flex-direction: column;
-                text-align: center;
-            }
-
-            .driver-avatar {
-                margin-right: 0;
-                margin-bottom: 15px;
-            }
-
-            .driver-actions {
-                flex-direction: row;
-                justify-content: center;
-                align-items: center;
-                margin-top: 15px;
-            }
-
-            .page-title {
-                font-size: 24px;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="../css/driver_search.css" />
 </head>
 <body>
     <div class="container">
@@ -553,7 +145,11 @@
             fetch(filePath)
                 .then(response => response.text())
                 .then(data => {
-                    document.getElementById(elementId).innerHTML = data;
+                    let modifiedData = data;
+                    if (elementId === 'header-container') {
+                        modifiedData = data.replace('{{PAGE_TITLE}}', 'Driver Search');
+                    }
+                    document.getElementById(elementId).innerHTML = modifiedData;
                     const scripts = document.getElementById(elementId).getElementsByTagName('script');
                     for (let script of scripts) {
                         eval(script.innerHTML);
@@ -720,9 +316,10 @@
                 searchBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Searching...';
                 setTimeout(() => {
                     searchBtn.innerHTML = '<i class="fas fa-search"></i> Search Drivers';
+                    showNotification('Search completed! Found 4 drivers matching your criteria.', 'success');
                 }, 2000);
             } else {
-                alert('Please enter both pickup and drop-off locations');
+                showNotification('Please enter both pickup and drop-off locations', 'warning');
             }
         }
 
@@ -731,6 +328,7 @@
             applyBtn.innerHTML = 'Applying...';
             setTimeout(() => {
                 applyBtn.innerHTML = 'Apply Filters';
+                showNotification('Filters applied successfully!', 'success');
             }, 1000);
         }
 
@@ -749,15 +347,145 @@
         function bookDriver(driverId) {
             const driver = driversData.find(d => d.id === driverId);
             if (driver) {
-                alert(`Booking request sent to ${driver.name}! You will receive a confirmation shortly.`);
+                showBookingPopup(driver);
             }
         }
 
         function messageDriver(driverId) {
             const driver = driversData.find(d => d.id === driverId);
             if (driver) {
-                alert(`Opening chat with ${driver.name}...`);
+                showMessagePopup(driver);
             }
+        }
+
+        function showBookingPopup(driver) {
+            const popup = document.createElement('div');
+            popup.className = 'popup-overlay';
+            popup.innerHTML = `
+                <div class="popup-content">
+                    <div class="popup-header">
+                        <h3>Book ${driver.name}</h3>
+                        <button class="close-btn" onclick="closePopup()">&times;</button>
+                    </div>
+                    <div class="popup-body">
+                        <p><strong>Driver:</strong> ${driver.name}</p>
+                        <p><strong>Company:</strong> ${driver.company}</p>
+                        <p><strong>Rate:</strong> LKR ${driver.price.toLocaleString()}/hour</p>
+                        <p><strong>Location:</strong> ${driver.location}</p>
+                        <br>
+                        <p>Confirm your booking details:</p>
+                        <div class="booking-details">
+                            <label>Trip Date:</label>
+                            <input type="datetime-local" id="bookingDate" class="popup-input">
+                            <label>Duration:</label>
+                            <select id="bookingDuration" class="popup-input">
+                                <option value="1-3">1-3 hours</option>
+                                <option value="4-6">4-6 hours</option>
+                                <option value="7-12">7-12 hours</option>
+                                <option value="1day">1 day</option>
+                                <option value="2days">2+ days</option>
+                            </select>
+                            <label>Special Requirements:</label>
+                            <textarea id="specialRequests" class="popup-input" placeholder="Any special requirements..."></textarea>
+                        </div>
+                    </div>
+                    <div class="popup-footer">
+                        <button class="btn btn-primary" onclick="confirmBooking(${driver.id})">Confirm Booking</button>
+                        <button class="btn btn-outline" onclick="closePopup()">Cancel</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(popup);
+        }
+
+        function showMessagePopup(driver) {
+            const popup = document.createElement('div');
+            popup.className = 'popup-overlay';
+            popup.innerHTML = `
+                <div class="popup-content">
+                    <div class="popup-header">
+                        <h3>Send Message to ${driver.name}</h3>
+                        <button class="close-btn" onclick="closePopup()">&times;</button>
+                    </div>
+                    <div class="popup-body">
+                        <p>Send a message to <strong>${driver.name}</strong> from <strong>${driver.company}</strong>:</p>
+                        <textarea class="message-input popup-input" placeholder="Type your message here..." rows="6"></textarea>
+                    </div>
+                    <div class="popup-footer">
+                        <button class="btn btn-primary" onclick="sendMessage(${driver.id})">Send Message</button>
+                        <button class="btn btn-outline" onclick="closePopup()">Cancel</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(popup);
+        }
+
+        function confirmBooking(driverId) {
+            const driver = driversData.find(d => d.id === driverId);
+            const bookingDate = document.getElementById('bookingDate').value;
+            const duration = document.getElementById('bookingDuration').value;
+            
+            if (!bookingDate) {
+                showNotification('Please select a booking date and time', 'warning');
+                return;
+            }
+            
+            closePopup();
+            showNotification(`Booking request sent to ${driver.name}! You will receive a confirmation shortly.`, 'success');
+        }
+
+        function sendMessage(driverId) {
+            const messageInput = document.querySelector('.message-input');
+            const driver = driversData.find(d => d.id === driverId);
+            
+            if (messageInput && messageInput.value.trim()) {
+                closePopup();
+                showNotification(`Message sent to ${driver.name} successfully!`, 'success');
+            } else {
+                showNotification('Please enter a message before sending.', 'warning');
+            }
+        }
+
+        function closePopup() {
+            const popup = document.querySelector('.popup-overlay');
+            if (popup) {
+                popup.remove();
+            }
+        }
+
+        function showNotification(message, type) {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 12px 20px;
+                background: ${type === 'success' ? 'var(--success)' : type === 'warning' ? 'var(--warning)' : 'var(--info)'};
+                color: white;
+                border-radius: var(--radius);
+                box-shadow: var(--shadow);
+                z-index: 10000;
+                font-weight: 500;
+                transform: translateX(400px);
+                transition: transform 0.3s ease;
+                max-width: 300px;
+            `;
+            notification.textContent = message;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.transform = 'translateX(0)';
+            }, 100);
+            
+            setTimeout(() => {
+                notification.style.transform = 'translateX(400px)';
+                setTimeout(() => {
+                    if (document.body.contains(notification)) {
+                        document.body.removeChild(notification);
+                    }
+                }, 300);
+            }, 3000);
         }
     </script>
 </body>
