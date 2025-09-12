@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Support Ticket</title>
+
+    <!-- Your global layout styles (optional) -->
+    <link rel="stylesheet" href="css/styles.css" />
+    <link rel="stylesheet" href="css/sidebar.css" />
+
+    <!-- Page styles -->
+    <link rel="stylesheet" href="css/support-ticket.css" />
+  </head>
+  <body>
+    <div class="container">
+      <main class="main-content">
+        <!-- Top toolbar -->
+        <div class="ticket-toolbar">
+          <a class="back-link" href="support-ticket-view.html"
+            >← Back to Tickets</a
+          >
+          <button id="saveBtn" class="btn btn-primary">💾 Save Changes</button>
+        </div>
+
+        <!-- Page title -->
+        <header class="ticket-header">
+          <h1>Support Ticket</h1>
+          <p class="muted">Manage and respond to customer support requests</p>
+        </header>
+
+        <!-- Two-column layout -->
+        <div class="ticket-grid">
+          <!-- LEFT COLUMN -->
+          <div class="left-col">
+            <!-- Summary -->
+            <section class="card ticket-summary" id="summaryCard">
+              <div class="summary-row">
+                <div class="id-and-badges">
+                  <div class="ticket-id" id="ticketId">TKT-0000-000</div>
+                  <span id="priorityBadge" class="badge">Priority</span>
+                  <span id="statusBadge" class="badge">Status</span>
+                </div>
+                <div class="meta-grid">
+                  <div class="meta-item">
+                    <div class="meta-label">Date Created</div>
+                    <div class="meta-value" id="dateCreated">—</div>
+                  </div>
+                  <div class="meta-item">
+                    <div class="meta-label">User Role</div>
+                    <div class="meta-value" id="userRole">—</div>
+                  </div>
+                  <div class="meta-item">
+                    <div class="meta-label">Booking ID</div>
+                    <div class="meta-value" id="bookingId">—</div>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <!-- Description -->
+            <section class="card">
+              <div class="card-title">📝 Description</div>
+              <textarea
+                id="descriptionInput"
+                class="form-control textarea"
+                rows="4"
+                placeholder="Describe the issue..."
+              ></textarea>
+            </section>
+
+            <!-- Attached Images -->
+            <section class="card">
+              <div class="card-title">🖼️ Attached Images</div>
+              <div id="imagesGrid" class="images-grid">
+                <!-- image cards will be injected -->
+                <label class="image-card add-card" id="addImageCard">
+                  <input
+                    id="imageInput"
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    hidden
+                  />
+                  <div class="image-icon">🖼️</div>
+                  <div class="image-name">Add Image</div>
+                </label>
+              </div>
+            </section>
+
+            <!-- Admin Notes -->
+            <section class="card">
+              <div class="card-title">🗒️ Admin Notes</div>
+              <textarea
+                id="adminNotesInput"
+                class="form-control textarea"
+                rows="3"
+                placeholder="Add internal notes for other admins..."
+              ></textarea>
+            </section>
+          </div>
+
+          <!-- RIGHT COLUMN -->
+          <aside class="right-col">
+            <!-- Priority Level -->
+            <section class="card side-card">
+              <div class="side-title">Priority Level</div>
+              <select id="prioritySelect" class="form-select">
+                <option value="Low">Low</option>
+                <option value="Medium">Medium</option>
+                <option value="High">High</option>
+                <option value="Urgent">Urgent</option>
+              </select>
+            </section>
+
+            <!-- Ticket Status -->
+            <section class="card side-card">
+              <div class="side-title">Ticket Status</div>
+              <select id="statusSelect" class="form-select">
+                <option value="Open">Open</option>
+                <option value="In Progress">In Progress</option>
+                <option value="Resolved">Resolved</option>
+                <option value="Closed">Closed</option>
+              </select>
+            </section>
+
+            <!-- Quick Actions -->
+            <section class="card side-card">
+              <div class="side-title">Quick Actions</div>
+              <div class="btn-stack">
+                <button id="actionEmail" class="btn btn-secondary">
+                  Send Email to Customer
+                </button>
+                <button id="actionFollowup" class="btn btn-secondary">
+                  Schedule Follow-up
+                </button>
+                <button id="actionEscalate" class="btn btn-secondary">
+                  Escalate to Manager
+                </button>
+                <button id="actionClose" class="btn btn-danger">
+                  Close Ticket
+                </button>
+              </div>
+            </section>
+
+            <!-- Customer Info -->
+            <section class="card side-card">
+              <div class="side-title">Customer Information</div>
+              <div class="kv">
+                <div class="k">Customer Name</div>
+                <div class="v" id="custName">—</div>
+                <div class="k">Email</div>
+                <div class="v" id="custEmail">—</div>
+                <div class="k">Phone</div>
+                <div class="v" id="custPhone">—</div>
+                <div class="k">Total Rentals</div>
+                <div class="v" id="custRentals">—</div>
+              </div>
+            </section>
+          </aside>
+        </div>
+      </main>
+    </div>
+
+    <!-- Page logic -->
+    <script src="js/sidebar.js"></script>
+    <script src="js/support-ticket.js" defer></script>
+  </body>
+</html>

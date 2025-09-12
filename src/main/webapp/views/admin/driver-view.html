@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Driver View</title>
+    <link rel="stylesheet" href="css/driver-view.css" />
+    <link rel="stylesheet" href="css/styles.css" />
+    <link rel="stylesheet" href="css/sidebar.css" />
+  </head>
+  <body>
+    <div class="main-content">
+      <nav class="topbar">
+        <a class="back-link" href="drivers.html">← Back to Drivers</a>
+        <button
+          class="btn btn-primary"
+          id="btnOpenEditDriver"
+          style="float: right"
+        >
+          Edit Driver
+        </button>
+      </nav>
+
+      <main class="driver-view" id="driverView">
+        <!-- Edit Driver Modal -->
+      </main>
+      <div class="modal" id="editDriverModal" aria-hidden="true">
+        <div
+          class="modal-content"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="edmTitle"
+        >
+          <div class="modal-header">
+            <h3 id="edmTitle">Edit Driver</h3>
+            <button class="modal-close" id="closeEditDriver" aria-label="Close">
+              &times;
+            </button>
+          </div>
+
+          <form id="editDriverForm">
+            <div class="modal-body">
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label" for="edName">Full name</label
+                  ><input id="edName" class="form-control" required />
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="edCompany">Company</label
+                  ><input id="edCompany" class="form-control" />
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="edPhone">Phone</label
+                  ><input id="edPhone" class="form-control" />
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="edEmail">Email</label
+                  ><input id="edEmail" class="form-control" type="email" />
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="edLocation">Location</label
+                  ><input id="edLocation" class="form-control" />
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="edAge">Age</label
+                  ><input
+                    id="edAge"
+                    class="form-control"
+                    type="number"
+                    min="0"
+                  />
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="edExp"
+                    >Experience (years)</label
+                  ><input
+                    id="edExp"
+                    class="form-control"
+                    type="number"
+                    min="0"
+                  />
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="edRating">Rating</label
+                  ><input
+                    id="edRating"
+                    class="form-control"
+                    type="number"
+                    min="0"
+                    max="5"
+                    step="0.1"
+                  />
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="edReviews">Reviews</label
+                  ><input
+                    id="edReviews"
+                    class="form-control"
+                    type="number"
+                    min="0"
+                  />
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="edRides">Total rides</label
+                  ><input
+                    id="edRides"
+                    class="form-control"
+                    type="number"
+                    min="0"
+                  />
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="edKm">Total KM</label
+                  ><input
+                    id="edKm"
+                    class="form-control"
+                    type="number"
+                    min="0"
+                  />
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="edOnTime">On-time %</label
+                  ><input
+                    id="edOnTime"
+                    class="form-control"
+                    type="number"
+                    min="0"
+                    max="100"
+                  />
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="edStatus">Status</label
+                  ><input
+                    id="edStatus"
+                    class="form-control"
+                    placeholder="active / inactive"
+                  />
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="edApplied">Joined</label
+                  ><input id="edApplied" class="form-control" />
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="edNIC">NIC</label
+                  ><input id="edNIC" class="form-control" />
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="edLicense">License</label
+                  ><input id="edLicense" class="form-control" />
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="edExpiry">License expiry</label
+                  ><input id="edExpiry" class="form-control" />
+                </div>
+                <div class="form-group" style="grid-column: 1/-1">
+                  <label class="form-label" for="edCats"
+                    >Categories (comma separated)</label
+                  ><input
+                    id="edCats"
+                    class="form-control"
+                    placeholder="A, B1, B"
+                  />
+                </div>
+                <div class="form-group" style="grid-column: 1/-1">
+                  <label class="form-label" for="edDesc">Description</label
+                  ><textarea
+                    id="edDesc"
+                    class="form-control"
+                    rows="3"
+                  ></textarea>
+                </div>
+              </div>
+            </div>
+
+            <div class="modal-footer">
+              <button type="button" class="btn" id="cancelEditDriver">
+                Cancel
+              </button>
+              <button type="submit" class="btn btn-primary">
+                Save Changes
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <script src="js/sidebar.js"></script>
+    <script src="js/driver-view.js"></script>
+  </body>
+</html>

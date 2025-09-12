@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Messages - Ride Machan</title>
+    <link rel="stylesheet" href="css/styles.css" />
+    <link rel="stylesheet" href="css/sidebar.css" />
+    <link rel="stylesheet" href="css/messages.css" />
+  </head>
+  <body>
+    <div class="container">
+      <main class="main-content">
+        <header class="page-header">
+          <div class="header-content">
+            <h1 class="page-title">Messages</h1>
+          </div>
+        </header>
+
+        <div class="messages-container">
+          <!-- Messages Sidebar -->
+          <div class="messages-sidebar">
+            <!-- Filter Tabs -->
+            <div class="message-tabs">
+              <button
+                class="tab-btn active"
+                data-tab="all"
+                onclick="filterMessages('all')"
+              >
+                All
+              </button>
+              <button
+                class="tab-btn"
+                data-tab="users"
+                onclick="filterMessages('users')"
+              >
+                Users Logins
+              </button>
+            </div>
+
+            <!-- Read/Unread Filter -->
+            <div class="read-filter">
+              <button
+                class="filter-btn active"
+                data-filter="all"
+                onclick="filterByRead('all')"
+              >
+                Read/Unread Logins
+              </button>
+            </div>
+
+            <!-- Contact Categories -->
+            <div class="contact-categories">
+              <!-- Admins -->
+              <div class="category-section">
+                <h3 class="category-title">Admins</h3>
+                <div class="contact-list">
+                  <div
+                    class="contact-item active"
+                    data-contact="admin-mike"
+                    onclick="selectContact('admin-mike')"
+                  >
+                    <div class="contact-status online"></div>
+                    <span class="contact-name">Admin Mike</span>
+                  </div>
+                  <div
+                    class="contact-item"
+                    data-contact="admin-sarah"
+                    onclick="selectContact('admin-sarah')"
+                  >
+                    <div class="contact-status offline"></div>
+                    <span class="contact-name">Admin Sarah</span>
+                    <span class="unread-badge">2</span>
+                  </div>
+                  <div
+                    class="contact-item"
+                    data-contact="admin-john"
+                    onclick="selectContact('admin-john')"
+                  >
+                    <div class="contact-status online"></div>
+                    <span class="contact-name">Admin John</span>
+                  </div>
+                  <div
+                    class="contact-item"
+                    data-contact="admin-lisa"
+                    onclick="selectContact('admin-lisa')"
+                  >
+                    <div class="contact-status offline"></div>
+                    <span class="contact-name">Admin Lisa</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Companies -->
+              <div class="category-section">
+                <h3 class="category-title">Companies</h3>
+                <div class="contact-list">
+                  <div
+                    class="contact-item"
+                    data-contact="abc-rentals"
+                    onclick="selectContact('abc-rentals')"
+                  >
+                    <div class="contact-status online"></div>
+                    <span class="contact-name">ABC Rentals</span>
+                    <span class="unread-badge">5</span>
+                  </div>
+                  <div
+                    class="contact-item"
+                    data-contact="quick-drive"
+                    onclick="selectContact('quick-drive')"
+                  >
+                    <div class="contact-status offline"></div>
+                    <span class="contact-name">Quick Drive Co</span>
+                    <span class="unread-badge">1</span>
+                  </div>
+                  <div
+                    class="contact-item"
+                    data-contact="elite-motors"
+                    onclick="selectContact('elite-motors')"
+                  >
+                    <div class="contact-status online"></div>
+                    <span class="contact-name">Elite Motors</span>
+                  </div>
+                  <div
+                    class="contact-item"
+                    data-contact="premium-cars"
+                    onclick="selectContact('premium-cars')"
+                  >
+                    <div class="contact-status offline"></div>
+                    <span class="contact-name">Premium Cars</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Drivers -->
+              <div class="category-section">
+                <h3 class="category-title">Drivers</h3>
+                <div class="contact-list">
+                  <div
+                    class="contact-item"
+                    data-contact="michael-johnson"
+                    onclick="selectContact('michael-johnson')"
+                  >
+                    <div class="contact-status online"></div>
+                    <span class="contact-name">Michael Johnson</span>
+                    <span class="unread-badge">1</span>
+                  </div>
+                  <div
+                    class="contact-item"
+                    data-contact="emma-davis"
+                    onclick="selectContact('emma-davis')"
+                  >
+                    <div class="contact-status online"></div>
+                    <span class="contact-name">Emma Davis</span>
+                  </div>
+                  <div
+                    class="contact-item"
+                    data-contact="david-wilson"
+                    onclick="selectContact('david-wilson')"
+                  >
+                    <div class="contact-status offline"></div>
+                    <span class="contact-name">David Wilson</span>
+                  </div>
+                  <div
+                    class="contact-item"
+                    data-contact="sarah-brown"
+                    onclick="selectContact('sarah-brown')"
+                  >
+                    <div class="contact-status offline"></div>
+                    <span class="contact-name">Sarah Brown</span>
+                    <span class="unread-badge">2</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Providers -->
+              <div class="category-section">
+                <h3 class="category-title">Providers</h3>
+                <div class="contact-list">
+                  <div
+                    class="contact-item"
+                    data-contact="fleet-solutions"
+                    onclick="selectContact('fleet-solutions')"
+                  >
+                    <div class="contact-status online"></div>
+                    <span class="contact-name">Fleet Solutions</span>
+                    <span class="unread-badge">3</span>
+                  </div>
+                  <div
+                    class="contact-item"
+                    data-contact="vehicle-hub"
+                    onclick="selectContact('vehicle-hub')"
+                  >
+                    <div class="contact-status online"></div>
+                    <span class="contact-name">Vehicle Hub</span>
+                  </div>
+                  <div
+                    class="contact-item"
+                    data-contact="auto-partners"
+                    onclick="selectContact('auto-partners')"
+                  >
+                    <div class="contact-status offline"></div>
+                    <span class="contact-name">Auto Partners</span>
+                  </div>
+                  <div
+                    class="contact-item"
+                    data-contact="drive-connect"
+                    onclick="selectContact('drive-connect')"
+                  >
+                    <div class="contact-status offline"></div>
+                    <span class="contact-name">Drive Connect</span>
+                    <span class="unread-badge">1</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Messages Content -->
+          <div class="messages-content">
+            <div class="conversation-placeholder">
+              <div class="placeholder-icon">✈️</div>
+              <h3>Select a conversation</h3>
+              <p>Choose a user from the sidebar to start messaging</p>
+            </div>
+
+            <!-- Chat Interface (Hidden by default) -->
+            <div
+              class="chat-interface"
+              id="chatInterface"
+              style="display: none"
+            >
+              <!-- Chat Header -->
+              <div class="chat-header">
+                <div class="chat-contact-info">
+                  <div class="contact-avatar">
+                    <span class="avatar-text" id="chatAvatarText">AM</span>
+                  </div>
+                  <div class="contact-details">
+                    <h4 class="contact-name" id="chatContactName">
+                      Admin Mike
+                    </h4>
+                    <span class="contact-status-text" id="chatContactStatus"
+                      >Online</span
+                    >
+                  </div>
+                </div>
+                <div class="chat-actions">
+                  <button class="btn btn-secondary" onclick="clearChat()">
+                    Clear Chat
+                  </button>
+                  <button class="btn btn-primary" onclick="archiveChat()">
+                    Archive
+                  </button>
+                </div>
+              </div>
+
+              <!-- Chat Messages -->
+              <div class="chat-messages" id="chatMessages">
+                <!-- Messages will be loaded here -->
+              </div>
+
+              <!-- Chat Input -->
+              <div class="chat-input">
+                <div class="input-container">
+                  <input
+                    type="text"
+                    class="message-input"
+                    id="messageInput"
+                    placeholder="Type a message..."
+                    onkeypress="handleEnterKey(event)"
+                  />
+                  <button class="send-btn" onclick="sendMessage()">
+                    <span class="send-icon">➤</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <script src="js/sidebar.js"></script>
+    <script src="js/messages.js"></script>
+  </body>
+</html>

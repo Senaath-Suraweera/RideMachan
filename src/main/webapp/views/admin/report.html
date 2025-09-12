@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Report</title>
+
+    <!-- match your app’s includes -->
+    <link rel="stylesheet" href="css/styles.css" />
+    <link rel="stylesheet" href="css/sidebar.css" />
+
+    <!-- page styles -->
+    <link rel="stylesheet" href="css/report.css" />
+  </head>
+  <body>
+    <div class="container">
+      <main class="main-content">
+        <div class="report-toolbar">
+          <a class="back-link" href="report-view.html">← Back to Reports</a>
+        </div>
+
+        <header class="report-header">
+          <h1 id="subjectText">Report</h1>
+          <p class="muted">Review the selected report</p>
+        </header>
+
+        <section class="card report-summary">
+          <div class="summary-row">
+            <div class="id-and-badges">
+              <div class="report-id" id="reportId">RPT-0000-000</div>
+              <span id="categoryChip" class="badge">Category</span>
+              <span id="priorityBadge" class="badge">Priority</span>
+              <span id="statusBadge" class="badge">Status</span>
+            </div>
+            <div class="meta-grid">
+              <div class="meta-item">
+                <div class="meta-label">Date Created</div>
+                <div class="meta-value" id="dateCreated">—</div>
+              </div>
+              <div class="meta-item">
+                <div class="meta-label">Reported Party</div>
+                <div class="meta-value" id="reportedRole">—</div>
+              </div>
+              <div class="meta-item">
+                <div class="meta-label">Reporter</div>
+                <div class="meta-value" id="repName">—</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="card-title">📝 Description</div>
+          <div id="descriptionText" class="prose">—</div>
+        </section>
+
+        <section class="card">
+          <div class="card-title">🖼️ Evidence / Attachments</div>
+          <div id="imagesGrid" class="images-grid"></div>
+        </section>
+
+        <aside class="card side-card">
+          <div class="side-title">Reporter Information</div>
+          <div class="kv">
+            <div class="k">Name</div>
+            <div class="v" id="repName2">—</div>
+            <div class="k">Email</div>
+            <div class="v" id="repEmail">—</div>
+            <div class="k">Phone</div>
+            <div class="v" id="repPhone">—</div>
+          </div>
+        </aside>
+      </main>
+    </div>
+
+    <script src="js/report.js"></script>
+    <script src="js/sidebar.js"></script>
+  </body>
+</html>
