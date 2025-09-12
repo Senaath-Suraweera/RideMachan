@@ -1,597 +1,358 @@
-// Individual Renters/Drivers JavaScript
-class DriversManager {
+// Individual Renters — Card list + navigation to renter view
+class IndividualRentersManager {
   constructor() {
-    this.drivers = [
+    // seed with vehicles per renter
+    this.renters = [
       {
         id: 1,
         name: "Rajesh Kumar",
-        company: "Lanka Express",
+        company: "Independent",
         rating: 4.9,
         reviews: 156,
-        description:
-          "Top-rated driver with extensive knowledge of Colombo routes. Available 24/7.",
-        appliedDate: "1/13/2024",
+        description: "Trusted renter with well-maintained fleet in Colombo.",
+        joinDate: "2024-01-13",
         phone: "+94 77 123 4567",
-        email: "rajesh.kumar@lankaexpress.com",
-        age: 32,
-        experience: 8,
+        email: "rajesh.kumar@email.com",
         location: "Colombo",
         status: "active",
-        totalRides: 247,
-        totalKm: 12400,
-        onTimePercentage: 98,
-        licenseNumber: "B1234567",
-        nicNumber: "901234567V",
-        licenseExpiry: "December 2027",
-        categories: ["A, B1, B"],
+        vehicles: [
+          {
+            id: "V-101",
+            make: "Toyota",
+            model: "Axio",
+            year: 2018,
+            regNo: "CAX-1234",
+            dailyRate: 12500,
+            fuelType: "Petrol",
+            transmission: "Auto",
+            seats: 5,
+            rentalCompany: "Lanka Express",
+          },
+          {
+            id: "V-102",
+            make: "Honda",
+            model: "Vezel",
+            year: 2017,
+            regNo: "CBA-2245",
+            dailyRate: 14500,
+            fuelType: "Hybrid",
+            transmission: "Auto",
+            seats: 5,
+            rentalCompany: "Lanka Express",
+          },
+        ],
       },
       {
         id: 2,
         name: "Maria Fernando",
-        company: "Metro Cabs",
+        company: "Independent",
         rating: 4.6,
         reviews: 89,
-        description:
-          "Professional driver specializing in airport transfers. Fluent in English and Sinhala.",
-        appliedDate: "1/14/2024",
+        description: "Airport transfer specialist — Negombo/Katunayake.",
+        joinDate: "2024-01-14",
         phone: "+94 71 555 0123",
-        email: "maria.fernando@metrocabs.lk",
-        age: 29,
-        experience: 5,
+        email: "maria.fernando@email.com",
         location: "Negombo",
         status: "active",
-        totalRides: 189,
-        totalKm: 8950,
-        onTimePercentage: 95,
-        licenseNumber: "B2345678",
-        nicNumber: "912345678V",
-        licenseExpiry: "March 2026",
-        categories: ["B1, B"],
+        vehicles: [
+          {
+            id: "V-201",
+            make: "Suzuki",
+            model: "Wagon R",
+            year: 2019,
+            regNo: "CAA-9087",
+            dailyRate: 9000,
+            fuelType: "Hybrid",
+            transmission: "Auto",
+            seats: 4,
+            rentalCompany: "Metro Cabs",
+          },
+        ],
       },
       {
         id: 3,
         name: "John Silva",
-        company: "City Taxi Service",
+        company: "Independent",
         rating: 4.8,
         reviews: 124,
-        description:
-          "Experienced driver with 8 years of service. Clean driving record and excellent customer service.",
-        appliedDate: "1/15/2024",
+        description: "8 years experience. Clean record. Based in Kandy.",
+        joinDate: "2024-01-15",
         phone: "+94 76 987 6543",
-        email: "john.silva@citytaxi.com",
-        age: 35,
-        experience: 8,
+        email: "john.silva@email.com",
         location: "Kandy",
-        status: "active",
-        totalRides: 312,
-        totalKm: 15600,
-        onTimePercentage: 97,
-        licenseNumber: "B3456789",
-        nicNumber: "923456789V",
-        licenseExpiry: "August 2025",
-        categories: ["A, B1, B, C1"],
+        status: "pending",
+        vehicles: [
+          {
+            id: "V-301",
+            make: "Nissan",
+            model: "Sunny",
+            year: 2016,
+            regNo: "CAR-5511",
+            dailyRate: 8000,
+            fuelType: "Petrol",
+            transmission: "Manual",
+            seats: 5,
+            rentalCompany: "City Taxi Service",
+          },
+          {
+            id: "V-302",
+            make: "Toyota",
+            model: "Aqua",
+            year: 2015,
+            regNo: "KB-8899",
+            dailyRate: 9500,
+            fuelType: "Hybrid",
+            transmission: "Auto",
+            seats: 5,
+            rentalCompany: "City Taxi Service",
+          },
+        ],
       },
     ];
 
-    this.filteredDrivers = [...this.drivers];
-    this.currentDriver = null;
-    this.init();
+    this.filtered = [...this.renters];
+    this.minRating = 0;
+    this.query = "";
+
+    this.cacheEls();
+    this.populateLocationFilter();
+    this.bindEvents();
+    this.render();
   }
 
-  init() {
-    this.renderDrivers();
-    this.setupEventListeners();
+  cacheEls() {
+    this.grid = document.getElementById("rentersGrid");
+    this.title = document.getElementById("rentersListTitle");
+    this.searchInput = document.getElementById("renterSearch");
+    this.locationFilter = document.getElementById("locationFilter");
+    this.statusFilter = document.getElementById("statusFilter");
+    this.minRatingFilter = document.getElementById("minRatingFilter");
+    this.sortSelect = document.getElementById("sortOrder");
+    this.applyBtn = document.getElementById("applyFiltersBtn");
+    this.resetBtn = document.getElementById("resetFiltersBtn");
   }
 
-  setupEventListeners() {
-    // Search
-    const searchInput = document.getElementById("driverSearch");
-    if (searchInput) {
-      searchInput.addEventListener("input", (e) => {
-        this.searchDrivers(e.target.value);
-      });
-    }
-
-    // Sort
-    const sortSelect = document.getElementById("sortOrder");
-    if (sortSelect) {
-      sortSelect.addEventListener("change", (e) => {
-        this.sortDrivers(e.target.value);
-      });
-    }
-
-    // Close modals when clicking the backdrop
-    window.addEventListener("click", (e) => {
-      const driverModal = document.getElementById("driverModal");
-      const registerModal = document.getElementById("registerDriverModal");
-      if (e.target === driverModal) this.closeDriverModal();
-      if (e.target === registerModal) this.closeRegisterDriverModal();
+  bindEvents() {
+    this.searchInput?.addEventListener("input", (e) => {
+      this.query = e.target.value;
+      this.applyFilters();
     });
-
-    // ✅ Driver card clicks (delegate on the grid, not on document)
-    const grid = document.getElementById("driversGrid");
-    if (grid) {
-      grid.addEventListener("click", (e) => {
-        const card = e.target.closest(".driver-card");
-        if (!card || !grid.contains(card)) return;
-        const driverId = Number(card.dataset.driverId);
-        if (Number.isFinite(driverId)) this.showDriverProfile(driverId);
-      });
-
-      // Keyboard accessibility: Enter to open
-      grid.addEventListener("keydown", (e) => {
-        if (e.key !== "Enter") return;
-        const card = e.target.closest(".driver-card");
-        if (!card || !grid.contains(card)) return;
-        const driverId = Number(card.dataset.driverId);
-        if (Number.isFinite(driverId)) this.showDriverProfile(driverId);
-      });
-    }
-  }
-
-  renderDrivers() {
-    const container = document.getElementById("driversGrid");
-    if (!container) return;
-
-    container.innerHTML = "";
-    this.filteredDrivers.forEach((driver) => {
-      const driverCard = this.createDriverCard(driver);
-      container.appendChild(driverCard);
-    });
-  }
-
-  createDriverCard(driver) {
-    const card = document.createElement("div");
-    card.className = "driver-card";
-    card.dataset.driverId = driver.id;
-
-    // Accessibility
-    card.setAttribute("tabindex", "0");
-    card.setAttribute("role", "button");
-    card.setAttribute("aria-label", `Open ${driver.name}'s profile`);
-
-    const initials = driver.name
-      .split(" ")
-      .map((n) => n[0])
-      .join("")
-      .toUpperCase();
-    const starsHTML = this.generateStarsHTML(driver.rating);
-
-    card.innerHTML = `
-      <div class="driver-header">
-        <div class="driver-avatar">
-          <span class="avatar-text">${initials}</span>
-        </div>
-        <div class="driver-basic-info">
-          <h3 class="driver-name">${driver.name}</h3>
-          <p class="driver-company">${driver.company}</p>
-          <div class="driver-rating">
-            <span class="rating-value">${driver.rating}</span>
-            <div class="rating-stars">${starsHTML}</div>
-            <span class="review-count">${driver.reviews} reviews</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="driver-description">
-        <p>${driver.description}</p>
-      </div>
-
-      <div class="driver-meta">
-        <span class="meta-item">Applied: ${driver.appliedDate}</span>
-      </div>
-    `;
-
-    return card;
-  }
-
-  generateStarsHTML(rating) {
-    let starsHTML = "";
-    for (let i = 1; i <= 5; i++) {
-      const activeClass = i <= Math.floor(rating) ? "active" : "";
-      starsHTML += `<span class="star ${activeClass}">★</span>`;
-    }
-    return starsHTML;
-  }
-
-  showDriverProfile(driverId) {
-    const driver = this.drivers.find((d) => d.id === Number(driverId));
-    if (!driver) return;
-    this.currentDriver = driver;
-    this.loadDriverProfileModal(driver);
-  }
-
-  loadDriverProfileModal(driver) {
-    const modal = document.getElementById("driverModal");
-    const content = document.getElementById("driverProfileContent");
-    const title = document.getElementById("driverModalTitle");
-
-    title.textContent = `${driver.name} - Driver Profile`;
-
-    const initials = driver.name
-      .split(" ")
-      .map((n) => n[0])
-      .join("")
-      .toUpperCase();
-
-    content.innerHTML = `
-      <div class="driver-profile-content">
-        <div class="profile-header">
-          <div class="profile-avatar"><span>${initials}</span></div>
-          <div class="profile-basic-info">
-            <h2>${driver.name}</h2>
-            <div class="profile-company">${driver.company}</div>
-            <div class="profile-stats">
-              <div class="stat-item"><span class="stat-value">${
-                driver.totalRides
-              }</span><span class="stat-label">Total Rides</span></div>
-              <div class="stat-item"><span class="stat-value">${
-                driver.rating
-              }</span><span class="stat-label">Avg Rating</span></div>
-              <div class="stat-item"><span class="stat-value">${
-                driver.onTimePercentage
-              }%</span><span class="stat-label">On Time</span></div>
-              <div class="stat-item"><span class="stat-value">${driver.totalKm.toLocaleString()} KM</span><span class="stat-label">Total KM</span></div>
-            </div>
-          </div>
-        </div>
-
-        <div class="profile-details">
-          <div class="detail-section">
-            <h3>📋 Driver Information</h3>
-            <div class="detail-item"><span class="detail-label">Driver Name</span><span class="detail-value">${
-              driver.name
-            }</span></div>
-            <div class="detail-item"><span class="detail-label">Age</span><span class="detail-value">${
-              driver.age
-            } years</span></div>
-            <div class="detail-item"><span class="detail-label">Phone</span><span class="detail-value">${
-              driver.phone
-            }</span></div>
-            <div class="detail-item"><span class="detail-label">Email</span><span class="detail-value">${
-              driver.email
-            }</span></div>
-            <div class="detail-item"><span class="detail-label">Location</span><span class="detail-value">${
-              driver.location
-            }</span></div>
-            <div class="detail-item"><span class="detail-label">Experience</span><span class="detail-value">${
-              driver.experience
-            } years</span></div>
-            <div class="detail-item"><span class="detail-label">Joined</span><span class="detail-value">${
-              driver.appliedDate
-            }</span></div>
-          </div>
-
-          <div class="detail-section">
-            <h3>📊 Driver Statistics</h3>
-            <div class="detail-item"><span class="detail-label">Total Rides</span><span class="detail-value">${
-              driver.totalRides
-            }</span></div>
-            <div class="detail-item"><span class="detail-label">Average Rating</span><span class="detail-value">${
-              driver.rating
-            }/5.0</span></div>
-            <div class="detail-item"><span class="detail-label">Total Reviews</span><span class="detail-value">${
-              driver.reviews
-            }</span></div>
-            <div class="detail-item"><span class="detail-label">On Time %</span><span class="detail-value">${
-              driver.onTimePercentage
-            }%</span></div>
-            <div class="detail-item"><span class="detail-label">Total Distance</span><span class="detail-value">${driver.totalKm.toLocaleString()} KM</span></div>
-            <div class="detail-item"><span class="detail-label">Status</span><span class="detail-value status-${
-              driver.status
-            }">${driver.status.toUpperCase()}</span></div>
-          </div>
-
-          <div class="detail-section document-section">
-            <h3>📄 Documents & Verification</h3>
-            <div class="documents-grid">
-              <div class="document-card">
-                <div class="document-icon">🆔</div>
-                <div class="document-title">NIC Document</div>
-                <div class="document-status verified">Verified</div>
-                <div class="document-id">ID: ${driver.nicNumber}</div>
-                <div class="document-actions">
-                  <button class="btn btn-sm btn-secondary" onclick="viewDocument('nic', ${
-                    driver.id
-                  })">View</button>
-                  <button class="btn btn-sm btn-primary" onclick="downloadDocument('nic', ${
-                    driver.id
-                  })">Download</button>
-                </div>
-              </div>
-
-              <div class="document-card">
-                <div class="document-icon">🚗</div>
-                <div class="document-title">Driving License</div>
-                <div class="document-status verified">Verified</div>
-                <div class="document-id">License: ${driver.licenseNumber}</div>
-                <div class="document-info">
-                  <div>Expires: ${driver.licenseExpiry}</div>
-                  <div>Categories: ${driver.categories}</div>
-                </div>
-                <div class="document-actions">
-                  <button class="btn btn-sm btn-secondary" onclick="viewDocument('license', ${
-                    driver.id
-                  })">View</button>
-                  <button class="btn btn-sm btn-primary" onclick="downloadDocument('license', ${
-                    driver.id
-                  })">Download</button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>`;
-
-    modal.classList.add("show");
-    modal.style.display = "flex";
-    document.body.style.overflow = "hidden";
-  }
-
-  closeDriverModal() {
-    const modal = document.getElementById("driverModal");
-    modal.classList.remove("show");
-    modal.style.display = "none";
-    document.body.style.overflow = "";
-    this.currentDriver = null;
-  }
-
-  searchDrivers(query) {
-    const searchTerm = (query || "").toLowerCase().trim();
-    this.filteredDrivers = this.drivers.filter(
-      (d) =>
-        d.name.toLowerCase().includes(searchTerm) ||
-        d.company.toLowerCase().includes(searchTerm) ||
-        d.location.toLowerCase().includes(searchTerm)
+    [
+      this.locationFilter,
+      this.statusFilter,
+      this.minRatingFilter,
+      this.sortSelect,
+    ].forEach((el) =>
+      el?.addEventListener("change", () => this.applyFilters())
     );
-    this.renderDrivers();
-    this.showSearchResults(searchTerm);
+    this.applyBtn?.addEventListener("click", () => this.applyFilters());
+    this.resetBtn?.addEventListener("click", () => this.resetFilters());
+
+    document.addEventListener("click", (e) => {
+      const card = e.target.closest(".renter-card");
+      if (!card) return;
+      const id = Number(card.dataset.renterId);
+      const renter = this.renters.find((r) => r.id === id);
+      if (!renter) return;
+
+      // stash and go to view page
+      try {
+        sessionStorage.setItem("selectedRenter", JSON.stringify(renter));
+      } catch {}
+      window.location.href = `individual-renter-view.html?id=${id}`;
+    });
   }
 
-  sortDrivers(criteria) {
-    switch (criteria) {
-      case "name_asc":
-        this.filteredDrivers.sort((a, b) => a.name.localeCompare(b.name));
-        break;
+  populateLocationFilter() {
+    if (!this.locationFilter) return;
+    [...new Set(this.renters.map((r) => r.location))].sort().forEach((loc) => {
+      const o = document.createElement("option");
+      o.value = loc;
+      o.textContent = loc;
+      this.locationFilter.appendChild(o);
+    });
+  }
+
+  applyFilters() {
+    const q = (this.query || "").toLowerCase().trim();
+    const loc = this.locationFilter?.value || "";
+    const status = this.statusFilter?.value || "";
+    const minR = Number(this.minRatingFilter?.value || 0);
+    const sort = this.sortSelect?.value || "name_asc";
+
+    this.filtered = this.renters.filter((r) => {
+      const matchQ =
+        !q ||
+        r.name.toLowerCase().includes(q) ||
+        (r.company || "").toLowerCase().includes(q) ||
+        String(r.id) === q.replace(/^#/, "");
+      const matchLoc = !loc || r.location === loc;
+      const matchStatus = !status || r.status === status;
+      const matchRating = !minR || (r.rating || 0) >= minR;
+      return matchQ && matchLoc && matchStatus && matchRating;
+    });
+
+    this.sort(sort);
+    this.render();
+  }
+
+  resetFilters() {
+    if (this.searchInput) this.searchInput.value = "";
+    if (this.locationFilter) this.locationFilter.value = "";
+    if (this.statusFilter) this.statusFilter.value = "";
+    if (this.minRatingFilter) this.minRatingFilter.value = "";
+    if (this.sortSelect) this.sortSelect.value = "name_asc";
+    this.query = "";
+    this.filtered = [...this.renters];
+    this.render();
+  }
+
+  sort(key) {
+    const byName = (a, b) => a.name.localeCompare(b.name);
+    const byId = (a, b) => a.id - b.id;
+    const byRating = (a, b) => (b.rating || 0) - (a.rating || 0);
+
+    switch (key) {
       case "name_desc":
-        this.filteredDrivers.sort((a, b) => b.name.localeCompare(a.name));
+        this.filtered.sort((a, b) => b.name.localeCompare(a.name));
         break;
-      case "rating_desc":
-        this.filteredDrivers.sort((a, b) => b.rating - a.rating);
+      case "id_asc":
+        this.filtered.sort(byId);
+        break;
+      case "id_desc":
+        this.filtered.sort((a, b) => b.id - a.id);
         break;
       case "rating_asc":
-        this.filteredDrivers.sort((a, b) => a.rating - b.rating);
+        this.filtered.sort((a, b) => (a.rating || 0) - (b.rating || 0));
+        break;
+      case "rating_desc":
+        this.filtered.sort(byRating);
         break;
       default:
-        this.filteredDrivers.sort((a, b) => a.name.localeCompare(b.name));
-    }
-    this.renderDrivers();
-  }
-
-  showSearchResults(query) {
-    if (query) {
-      this.showSuccessMessage(
-        `Found ${this.filteredDrivers.length} driver(s) matching "${query}"`
-      );
+        this.filtered.sort(byName);
     }
   }
 
+  render() {
+    if (!this.grid) return;
+    this.grid.innerHTML = "";
+    if (!this.filtered.length) {
+      this.grid.innerHTML = `<div style="padding:16px;color:#6b7280;">No renters match your filters.</div>`;
+    } else {
+      this.filtered.forEach((r) => this.grid.appendChild(this.card(r)));
+    }
+    if (this.title)
+      this.title.textContent = `Individual Renters (${this.filtered.length})`;
+  }
+
+  card(r) {
+    const el = document.createElement("div");
+    el.className = "renter-card";
+    el.dataset.renterId = String(r.id);
+    const initials = this.initials(r.name);
+    const stars = this.stars(r.rating);
+    el.innerHTML = `
+      <div class="renter-avatar"><span class="avatar-text">${initials}</span></div>
+      <div class="renter-info">
+        <h4>${r.name}</h4>
+        <div class="renter-details">
+          <span>📍 ${r.location}</span>
+          <span>🆔 #${r.id}</span>
+          <span>🏷️ ${r.company || "Independent"}</span>
+        </div>
+        <div class="renter-desc">${r.description || ""}</div>
+        <div class="renter-rating">
+          <div class="rating-stars">${stars}</div>
+          <span class="rating-value">${(r.rating || 0).toFixed(1)}</span>
+          <span class="review-count" style="color:#6c757d;font-size:12px;">${
+            r.reviews
+          } reviews</span>
+          <span class="status-badge ${
+            r.status === "active" ? "active" : "pending"
+          }">${r.status.toUpperCase()}</span>
+        </div>
+      </div>
+    `;
+    return el;
+  }
+
+  initials(name) {
+    return String(name)
+      .trim()
+      .split(/\s+/)
+      .map((p) => p[0] || "")
+      .join("")
+      .slice(0, 2)
+      .toUpperCase();
+  }
+  stars(rating) {
+    const filled = Math.round(rating || 0);
+    return Array.from(
+      { length: 5 },
+      (_, i) => `<span class="star ${i < filled ? "active" : ""}">⭐</span>`
+    ).join("");
+  }
+
+  // Register modal helpers
   openRegisterDriverModal() {
-    const modal = document.getElementById("registerDriverModal");
-    modal.classList.add("show");
-    modal.style.display = "flex";
+    const m = document.getElementById("registerDriverModal");
+    m?.classList.add("show");
+    m.style.display = "flex";
     document.body.style.overflow = "hidden";
   }
-
   closeRegisterDriverModal() {
-    const modal = document.getElementById("registerDriverModal");
-    modal.classList.remove("show");
-    modal.style.display = "none";
+    const m = document.getElementById("registerDriverModal");
+    m?.classList.remove("show");
+    m.style.display = "none";
     document.body.style.overflow = "";
-    this.resetRegisterForm();
+    document.getElementById("registerDriverForm")?.reset();
   }
-
-  resetRegisterForm() {
-    const form = document.getElementById("registerDriverForm");
-    if (form) {
-      form.reset();
-      form
-        .querySelectorAll(".form-control")
-        .forEach((i) => i.classList.remove("success", "error"));
-      form.querySelectorAll(".form-feedback").forEach((f) => f.remove());
-    }
-  }
-
   registerDriver() {
     const form = document.getElementById("registerDriverForm");
-    const formData = new FormData(form);
-
-    const driverData = {
-      id: this.drivers.length + 1,
-      name: formData.get("fullName"),
-      age: parseInt(formData.get("age")),
-      phone: formData.get("phone"),
-      email: formData.get("email"),
-      location: formData.get("location"),
-      company: formData.get("company") || "Independent",
-      experience: parseInt(formData.get("experience")),
-      licenseNumber: formData.get("licenseNumber"),
-      nicNumber: formData.get("nicNumber"),
-      appliedDate: new Date().toLocaleDateString(),
+    const fd = new FormData(form);
+    const renter = {
+      id: Math.max(0, ...this.renters.map((r) => r.id)) + 1,
+      name: fd.get("fullName"),
+      age: Number(fd.get("age")),
+      phone: fd.get("phone"),
+      email: fd.get("email"),
+      location: fd.get("location"),
+      company: fd.get("company") || "Independent",
+      description: "New individual renter awaiting verification",
+      joinDate: new Date().toISOString().slice(0, 10),
       rating: 0,
       reviews: 0,
-      totalRides: 0,
-      totalKm: 0,
-      onTimePercentage: 0,
       status: "pending",
-      description: "New driver awaiting verification",
+      vehicles: [],
     };
-
-    if (!this.validateDriverForm(driverData)) return;
-
-    this.drivers.push(driverData);
-    this.filteredDrivers = [...this.drivers];
-    this.renderDrivers();
+    this.renters.push(renter);
+    this.applyFilters();
     this.closeRegisterDriverModal();
-    this.showSuccessMessage(
-      "Driver registered successfully! Verification pending."
-    );
+    this.toast("Renter registered successfully! Verification pending.");
   }
 
-  validateDriverForm(data) {
-    let isValid = true;
-    const form = document.getElementById("registerDriverForm");
-
-    // Clear previous feedback
-    form.querySelectorAll(".form-feedback").forEach((f) => f.remove());
-
-    // Requireds
-    const required = {
-      fullName: "Full Name is required",
-      age: "Age is required",
-      phone: "Phone Number is required",
-      location: "Location is required",
-      experience: "Experience is required",
-      licenseNumber: "License Number is required",
-      nicNumber: "NIC Number is required",
-    };
-
-    Object.entries(required).forEach(([field, message]) => {
-      const input = form.querySelector(`[name="${field}"]`);
-      const value = data[field === "fullName" ? "name" : field];
-      if (!value || (typeof value === "string" && value.trim() === "")) {
-        this.showFieldError(input, message);
-        isValid = false;
-      } else {
-        this.showFieldSuccess(input);
-      }
-    });
-
-    // Age range
-    if (data.age && (data.age < 21 || data.age > 65)) {
-      this.showFieldError(
-        form.querySelector('[name="age"]'),
-        "Age must be between 21 and 65"
-      );
-      isValid = false;
-    }
-
-    // Phone format
-    const phoneRegex = /^(\+94|0)?[0-9]{9,10}$/;
-    if (
-      data.phone &&
-      !phoneRegex.test(String(data.phone).replace(/\s+/g, ""))
-    ) {
-      this.showFieldError(
-        form.querySelector('[name="phone"]'),
-        "Please enter a valid phone number"
-      );
-      isValid = false;
-    }
-
-    // Email (optional)
-    if (data.email) {
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(data.email)) {
-        this.showFieldError(
-          form.querySelector('[name="email"]'),
-          "Please enter a valid email address"
-        );
-        isValid = false;
-      }
-    }
-
-    return isValid;
-  }
-
-  showFieldError(input, message) {
-    input.classList.remove("success");
-    input.classList.add("error");
-    const feedback = document.createElement("div");
-    feedback.className = "form-feedback error";
-    feedback.textContent = message;
-    input.parentNode.appendChild(feedback);
-  }
-
-  showFieldSuccess(input) {
-    input.classList.remove("error");
-    input.classList.add("success");
-  }
-
-  showSuccessMessage(message) {
+  toast(msg) {
     const el = document.createElement("div");
-    el.className = "success-notification";
-    el.textContent = message;
-    el.style.cssText = `
-      position: fixed; top: 20px; right: 20px; background: #28a745; color: white;
-      padding: 12px 20px; border-radius: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-      z-index: 1001; animation: slideInRight 0.3s ease;
-    `;
+    el.textContent = msg;
+    el.style.cssText =
+      "position:fixed;right:16px;bottom:16px;background:#2c3e50;color:#fff;padding:10px 14px;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,.2);z-index:1001;";
     document.body.appendChild(el);
-    setTimeout(() => el.remove(), 3000);
-  }
-
-  editDriver() {
-    if (!this.currentDriver) return;
-    console.log("Edit driver:", this.currentDriver);
-    this.showSuccessMessage("Driver profile editing opened!");
-  }
-
-  getDriverStats() {
-    return {
-      total: this.drivers.length,
-      active: this.drivers.filter((d) => d.status === "active").length,
-      pending: this.drivers.filter((d) => d.status === "pending").length,
-      averageRating:
-        this.drivers.reduce((s, d) => s + d.rating, 0) / this.drivers.length,
-      totalRides: this.drivers.reduce((s, d) => s + d.totalRides, 0),
-      averageExperience:
-        this.drivers.reduce((s, d) => s + d.experience, 0) /
-        this.drivers.length,
-    };
+    setTimeout(() => el.remove(), 2200);
   }
 }
 
-/* ---- Global wrappers for HTML inline handlers ---- */
+// global handlers for inline onclicks
 function openRegisterDriverModal() {
-  window.driversManager?.openRegisterDriverModal();
+  window.__rMgr?.openRegisterDriverModal();
 }
 function closeRegisterDriverModal() {
-  window.driversManager?.closeRegisterDriverModal();
+  window.__rMgr?.closeRegisterDriverModal();
 }
 function registerDriver() {
-  window.driversManager?.registerDriver();
-}
-function closeDriverModal() {
-  window.driversManager?.closeDriverModal();
-}
-function editDriver() {
-  window.driversManager?.editDriver();
-}
-function viewDocument(type, driverId) {
-  console.log(`Viewing ${type} for #${driverId}`);
-  alert(`Opening ${type} document viewer...`);
-}
-function downloadDocument(type, driverId) {
-  console.log(`Downloading ${type} for #${driverId}`);
-  alert(`Downloading ${type} document...`);
+  window.__rMgr?.registerDriver();
 }
 
-/* ---- Bootstrap on DOM ready ---- */
+// boot
 document.addEventListener("DOMContentLoaded", () => {
-  window.driversManager = new DriversManager();
+  window.__rMgr = new IndividualRentersManager();
 });
-
-/* ---- Inline CSS for form feedback animations ---- */
-const style = document.createElement("style");
-style.textContent = `
-  @keyframes slideInRight { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-  .form-control.success { border-color: #28a745; box-shadow: 0 0 0 2px rgba(40,167,69,0.2); }
-  .form-control.error   { border-color: #dc3545; box-shadow: 0 0 0 2px rgba(220,53,69,0.2); }
-  .form-feedback { font-size: 12px; margin-top: 4px; }
-  .form-feedback.success { color: #28a745; }
-  .form-feedback.error   { color: #dc3545; }
-  .document-info { font-size: 11px; color: #6c757d; margin-top: 4px; }
-  .document-id   { font-size: 11px; color: #495057; margin-top: 4px; font-family: monospace; }
-`;
-document.head.appendChild(style);

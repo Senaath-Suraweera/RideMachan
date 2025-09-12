@@ -14,7 +14,7 @@
 
 /* Align if your app uses a fixed sidebar */
 body.with-sidebar .main-content {
-  margin-left: 280px;
+  margin-left: 260px;
 }
 body {
   background: #f5f7fb;
@@ -160,4 +160,20 @@ body {
   .requests-table tbody td:nth-child(3) {
     display: none;
   } /* hide email on small screens */
+}
+/* === Theme chip highlight (match .btn-primary gradient) === */
+.chip.active {
+  background: linear-gradient(
+    135deg,
+    var(--primary, #3a0ca3),
+    var(--primary-light, #4361ee)
+  );
+  color: #fff;
+  border-color: transparent;
+  box-shadow: 0 6px 15px rgba(67, 97, 238, 0.25);
+}
+
+.chip:focus-visible {
+  outline: 2px solid rgba(67, 97, 238, 0.65);
+  outline-offset: 2px;
 }

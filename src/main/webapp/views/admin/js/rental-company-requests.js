@@ -14,23 +14,23 @@
     },
     {
       id: 2,
-      name: "Quick Ride Solutions",
-      email: "contact@quickride.lk",
-      phone: "+94 71 987 6543",
-      submitted: "1/29/2024" /*, companyId: 2*/,
+      name: "Hill Country Motors",
+      email: "contact@hillcountry.lk",
+      phone: "+94 81 555 0192",
+      submitted: "1/28/2024",
     },
     {
       id: 3,
-      name: "Metro Car Rentals",
-      email: "info@metrocars.com",
-      phone: "+94 76 555 0123",
-      submitted: "1/28/2024" /*, companyId: 3*/,
+      name: "Negombo Express",
+      email: "hello@negomboexpress.lk",
+      phone: "+94 31 224 7789",
+      submitted: "1/27/2024",
     },
     {
       id: 4,
-      name: "City Cab Network",
-      email: "support@citycab.lk",
-      phone: "+94 75 444 9876",
+      name: "Beachside Wheels",
+      email: "hi@beachsidewheels.lk",
+      phone: "+94 71 999 1122",
       submitted: "1/27/2024",
     },
     {
@@ -42,8 +42,10 @@
     },
   ];
 
+  // ===== Sort state =====
   let alphaSort = "az"; // 'az' | 'za'
   let dateSort = "new"; // 'new' | 'old'
+  let lastChanged = "date"; // 'alpha' | 'date' — which filter was touched last
 
   document.addEventListener("DOMContentLoaded", () => {
     if (document.querySelector(".sidebar"))
@@ -52,21 +54,36 @@
     render();
   });
 
+  // ===== Comparators =====
+  function alphaCmp(a, b) {
+    const cmp = a.name.localeCompare(b.name);
+    return alphaSort === "az" ? cmp : -cmp;
+  }
+  function dateCmp(a, b) {
+    const diff = new Date(b.submitted) - new Date(a.submitted); // newest first
+    return dateSort === "new" ? diff : -diff;
+  }
+
+  // ===== Render table =====
   function render() {
-    const byName = (a, b) => a.name.localeCompare(b.name);
-    let sorted = [...requests].sort(byName);
-    if (alphaSort === "za") sorted.reverse();
-    sorted = stableSort(sorted, (a, b) =>
-      dateSort === "new"
-        ? new Date(b.submitted) - new Date(a.submitted)
-        : new Date(a.submitted) - new Date(b.submitted)
-    );
+    let sorted = [...requests];
+
+    // Apply the last-changed filter as PRIMARY, other as SECONDARY (stable)
+    if (lastChanged === "alpha") {
+      sorted = stableSort(sorted, dateCmp); // secondary
+      sorted = stableSort(sorted, alphaCmp); // primary
+    } else {
+      sorted = stableSort(sorted, alphaCmp); // secondary
+      sorted = stableSort(sorted, dateCmp); // primary
+    }
 
     const tbody = $("#requestsTbody");
+    if (!tbody) return;
     tbody.innerHTML = "";
     sorted.forEach((req, i) => tbody.appendChild(row(req, i)));
   }
 
+  // ===== Build a row =====
   function row(req, i) {
     const tr = document.createElement("tr");
     tr.dataset.id = req.id;
@@ -86,18 +103,20 @@
       </td>
     `;
 
-    // Click anywhere on the row (except the buttons) → open the company view
+    // Row/links open the profile view
     tr.addEventListener("click", (e) => {
-      if (e.target.closest(".actions")) return; // don't navigate when clicking action buttons
+      if (e.target.closest(".actions")) return; // ignore clicks on action buttons
       goToCompanyView(req);
     });
     tr.querySelectorAll(".go-view").forEach((el) => {
       el.addEventListener("click", (e) => {
         e.preventDefault();
+        e.stopPropagation();
         goToCompanyView(req);
       });
     });
 
+    // Accept/Reject actions
     tr.querySelector(".btn-accept").addEventListener("click", (e) => {
       e.stopPropagation();
       toast(`Accepted: ${req.name}`);
@@ -119,7 +138,7 @@
     render();
   }
 
-  // Open rental-company-view.html (prefer id; otherwise pass name)
+  // ===== Navigation =====
   function goToCompanyView(req) {
     const url = new URL("rental-company-view.html", location.href);
     if (req.companyId) {
@@ -130,39 +149,49 @@
     location.href = url.toString();
   }
 
+  // ===== Chips (A–Z/Z–A and Newest/Oldest) =====
   function bindSortChips() {
+    // A–Z / Z–A
     $("#alphaSort")?.addEventListener("click", (e) => {
       const btn = e.target.closest(".chip");
       if (!btn) return;
-      alphaSort = btn.dataset.sort;
+      alphaSort = btn.dataset.sort; // 'az' | 'za'
+      lastChanged = "alpha";
       setActive("#alphaSort", btn);
       render();
     });
+
+    // Newest / Oldest
     $("#dateSort")?.addEventListener("click", (e) => {
       const btn = e.target.closest(".chip");
       if (!btn) return;
-      dateSort = btn.dataset.sort;
+      dateSort = btn.dataset.sort; // 'new' | 'old'
+      lastChanged = "date";
       setActive("#dateSort", btn);
       render();
     });
   }
+
   function setActive(groupSel, btn) {
     $$(groupSel + " .chip").forEach((c) => c.classList.remove("active"));
     btn.classList.add("active");
   }
 
+  // ===== Utils =====
   function stableSort(arr, cmp) {
     return arr
       .map((v, i) => ({ v, i }))
       .sort((a, b) => cmp(a.v, b.v) || a.i - b.i)
       .map((o) => o.v);
   }
+
   function escapeHTML(s) {
     return String(s)
       .replaceAll("&", "&amp;")
       .replaceAll("<", "&lt;")
       .replaceAll(">", "&gt;");
   }
+
   function escapeAttr(s) {
     return String(s).replaceAll('"', "&quot;").replaceAll("<", "&lt;");
   }

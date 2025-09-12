@@ -9,6 +9,7 @@ CREATE TABLE IF NOT EXISTS `Admin` (
     `adminid`             INT NOT NULL AUTO_INCREMENT,
     `username`       VARCHAR(50) NOT NULL,
     `email`          VARCHAR(255) NOT NULL,
+    `phonenumber`    VARCHAR(20),
     `hashedpassword` CHAR(44) CHARACTER SET ascii COLLATE ascii_general_ci NOT NULL, -- Base64(SHA-256)
     `salt`           CHAR(24) CHARACTER SET ascii COLLATE ascii_general_ci NOT NULL, -- Base64(16 bytes)
     PRIMARY KEY (`adminid`)
@@ -100,6 +101,9 @@ CREATE TABLE IF NOT EXISTS `Vehicle` (
     `enginenumber` VARCHAR(30) NOT NULL,
     `chasisnumber` VARCHAR(30) NOT NULL,
     `registrationdocumentation` LONGBLOB NOT NULL,
+    `vehicleimages` LONGBLOB NOT NULL,
+    `description` VARCHAR(300),
+    `milage` VARCHAR(10),
     `company_id` INT,
     `provider_id` INT,
     PRIMARY KEY (`vehicleid`),

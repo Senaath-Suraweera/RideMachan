@@ -2,14 +2,10 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Rental Companies - Ride Machan</title>
-
-    <!-- your global css -->
+    <title>Rental Companies – RideMachan</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="stylesheet" href="css/styles.css" />
     <link rel="stylesheet" href="css/sidebar.css" />
-
-    <!-- page css -->
     <link rel="stylesheet" href="css/rental-companies.css" />
   </head>
   <body>
@@ -18,93 +14,219 @@
         <header class="page-header">
           <div class="header-content">
             <h1 class="page-title">Rental Companies</h1>
+            <p class="page-subtitle companies-count">Loading companies...</p>
           </div>
           <div class="header-actions">
-            <!-- redirect (no modal) -->
-            <a class="btn btn-primary" href="rentalcomp-reg.html"
-              >+ Register Company</a
+            <button class="btn btn-primary" id="btnOpenRegisterCompany">
+              + Register Company
+            </button>
+            <a class="btn btn-secondary" href="rental-company-requests.html"
+              >Pending Requests</a
             >
           </div>
         </header>
-
-        <!-- Tabs (optional) -->
-        <div class="nav-tabs">
-          <button class="tab-btn" onclick="showPendingRequests()">
-            Pending Requests
-          </button>
-          <button class="tab-btn active" onclick="showAllCompanies()">
-            All Companies
-          </button>
-        </div>
 
         <!-- Search & Filters -->
         <section class="search-filter-section">
           <div class="filter-row">
             <div class="form-group">
+              <label class="form-label" for="nameSearch">Company name</label>
               <input
-                type="text"
-                class="form-control"
-                placeholder="Search by name"
                 id="nameSearch"
-              />
-            </div>
-            <div class="form-group">
-              <input
-                type="text"
                 class="form-control"
-                placeholder="Search by location"
-                id="locationSearch"
+                placeholder="e.g., ABC Rentals"
+                autocomplete="off"
               />
             </div>
+
             <div class="form-group">
-              <div
-                class="rating-filter"
-                id="ratingFilter"
-                aria-label="Minimum rating"
-              >
-                <span class="star" data-value="1">⭐</span>
-                <span class="star" data-value="2">⭐</span>
-                <span class="star" data-value="3">⭐</span>
-                <span class="star" data-value="4">⭐</span>
-                <span class="star" data-value="5">⭐</span>
-              </div>
+              <label class="form-label" for="locationFilter">Location</label>
+              <select id="locationFilter" class="form-select">
+                <option value="">All</option>
+              </select>
             </div>
+
             <div class="form-group">
-              <select class="form-select" id="sortSelect">
+              <label class="form-label" for="sortSelect">Sort</label>
+              <select id="sortSelect" class="form-select">
                 <option value="name_asc">Name: A → Z</option>
                 <option value="name_desc">Name: Z → A</option>
                 <option value="rating_desc">Rating: High → Low</option>
                 <option value="rating_asc">Rating: Low → High</option>
               </select>
             </div>
-          </div>
 
-          <div class="filter-options">
-            <label class="checkbox-container">
-              <input type="checkbox" id="withDriverFilter" />
-              <span class="checkmark"></span>
-              with driver
-            </label>
+            <div class="form-group">
+              <label class="form-label">Min rating</label>
+              <div class="rating-stars" id="ratingFilter">
+                <button type="button" class="star" data-value="1">⭐</button>
+                <button type="button" class="star" data-value="2">⭐</button>
+                <button type="button" class="star" data-value="3">⭐</button>
+                <button type="button" class="star" data-value="4">⭐</button>
+                <button type="button" class="star" data-value="5">⭐</button>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">With driver</label>
+              <label class="checkbox-container">
+                <input id="withDriverFilter" type="checkbox" />
+                <span class="checkmark"></span>
+                <span>Show companies offering a driver</span>
+              </label>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="fleetMin">Min fleet size</label>
+              <input
+                id="fleetMin"
+                class="form-control"
+                type="number"
+                min="0"
+                placeholder="e.g., 10"
+              />
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="fleetMax">Max fleet size</label>
+              <input
+                id="fleetMax"
+                class="form-control"
+                type="number"
+                min="0"
+                placeholder="e.g., 100"
+              />
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="reviewsMin">Min reviews</label>
+              <input
+                id="reviewsMin"
+                class="form-control"
+                type="number"
+                min="0"
+                placeholder="e.g., 20"
+              />
+            </div>
           </div>
 
           <div class="search-actions">
-            <button class="btn btn-primary" onclick="searchCompanies()">
-              🔍 Search
-            </button>
-            <button class="btn btn-secondary" onclick="clearFilters()">
-              Clear
-            </button>
+            <button id="btnSearch" class="btn btn-primary">Search</button>
+            <button id="btnReset" class="btn btn-secondary">Reset</button>
           </div>
         </section>
 
-        <!-- Grid -->
+        <!-- Results -->
         <section class="companies-section">
           <div class="companies-grid" id="companiesGrid"></div>
         </section>
+        <!-- Register Company Modal -->
+        <div class="modal" id="registerCompanyModal" aria-hidden="true">
+          <div
+            class="modal-content"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="rcmTitle"
+          >
+            <div class="modal-header">
+              <h3 id="rcmTitle">Register New Company</h3>
+              <button
+                class="modal-close"
+                id="closeRegisterCompany"
+                aria-label="Close"
+              >
+                &times;
+              </button>
+            </div>
+
+            <form id="registerCompanyForm">
+              <div class="modal-body">
+                <div class="form-row">
+                  <div class="form-group">
+                    <label class="form-label" for="rcName">Company name</label>
+                    <input
+                      id="rcName"
+                      class="form-control"
+                      required
+                      placeholder="e.g., ABC Rentals"
+                    />
+                  </div>
+
+                  <div class="form-group">
+                    <label class="form-label" for="rcLocation">Location</label>
+                    <input
+                      id="rcLocation"
+                      class="form-control"
+                      required
+                      placeholder="e.g., Colombo"
+                    />
+                  </div>
+
+                  <div class="form-group">
+                    <label class="form-label" for="rcFleet">Fleet size</label>
+                    <input
+                      id="rcFleet"
+                      class="form-control"
+                      type="number"
+                      min="0"
+                      placeholder="e.g., 25"
+                    />
+                  </div>
+
+                  <div class="form-group">
+                    <label class="form-label">Offers driver</label>
+                    <label class="checkbox-container">
+                      <input id="rcWithDriver" type="checkbox" />
+                      <span class="checkmark"></span>
+                      <span>Yes, we offer a driver</span>
+                    </label>
+                  </div>
+
+                  <div class="form-group">
+                    <label class="form-label" for="rcPhone">Phone</label>
+                    <input
+                      id="rcPhone"
+                      class="form-control"
+                      placeholder="+94 …"
+                    />
+                  </div>
+
+                  <div class="form-group">
+                    <label class="form-label" for="rcEmail">Email</label>
+                    <input
+                      id="rcEmail"
+                      class="form-control"
+                      type="email"
+                      placeholder="name@company.lk"
+                    />
+                  </div>
+
+                  <div class="form-group" style="grid-column: 1 / -1">
+                    <label class="form-label" for="rcDesc">Description</label>
+                    <textarea
+                      id="rcDesc"
+                      class="form-control"
+                      rows="3"
+                      placeholder="Short description"
+                    ></textarea>
+                  </div>
+                </div>
+              </div>
+
+              <div class="modal-footer">
+                <button type="button" class="btn" id="cancelRegisterCompany">
+                  Cancel
+                </button>
+                <button type="submit" class="btn btn-primary">
+                  Save Company
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
       </main>
     </div>
 
-    <!-- page js -->
     <script src="js/sidebar.js"></script>
     <script src="js/rental-companies.js"></script>
   </body>

@@ -165,3 +165,21 @@ body {
     grid-template-columns: 1fr;
   }
 }
+
+/* Vertical rhythm for the single report view */
+.main-content {
+  display: grid;
+  gap: 16px; /* space between header, cards, and aside */
+}
+
+/* Slightly more room under the page header */
+.report-header {
+  margin-bottom: 4px;
+}
+
+/* Consistent spacing between cards if the grid is overridden elsewhere */
+.card + .card,
+.card + .side-card,
+.report-summary + .card {
+  margin-top: 12px;
+}

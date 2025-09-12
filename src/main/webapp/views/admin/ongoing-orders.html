@@ -5,10 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Ongoing Bookings - RideMachan</title>
     <link rel="stylesheet" href="css/styles.css" />
-    <link rel="stylesheet" href="css/sidebar.css" />
     <link rel="stylesheet" href="css/ongoing-orders.css" />
   </head>
-  <body>
+  <body class="no-sidebar>
     <div class="container">
       <div class="main-content">
         <div class="page-header">
@@ -73,15 +72,15 @@
                 class="btn btn-secondary filter-toggle"
                 onclick="toggleFilters()"
               >
-                ⚙️ Instant toggle button
+                Instant toggle button
               </button>
               <select class="form-select" id="sortSelect">
-                <option>📊 Descending</option>
-                <option>📈 Ascending</option>
-                <option>📅 Date (Newest)</option>
-                <option>📅 Date (Oldest)</option>
-                <option>💰 Price (High to Low)</option>
-                <option>💰 Price (Low to High)</option>
+                <option>Descending</option>
+                <option>Ascending</option>
+                <option>Date (Newest)</option>
+                <option>Date (Oldest)</option>
+                <option>Price (High to Low)</option>
+                <option>Price (Low to High)</option>
               </select>
             </div>
           </div>
@@ -282,8 +281,6 @@
         </div>
       </div>
     </div>
-
-    <script src="js/sidebar.js"></script>
     <script src="js/ongoing-orders.js"></script>
   </body>
 </html>

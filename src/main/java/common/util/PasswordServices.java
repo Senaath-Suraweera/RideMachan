@@ -25,4 +25,10 @@ public class PasswordServices {
         }
     }
 
+    public static boolean verifyPassword(String password, String salt, String expectedHash) {
+        String hashed = hashPassword(password, salt);
+        return hashed.equals(expectedHash);
+    }
+
+
 }

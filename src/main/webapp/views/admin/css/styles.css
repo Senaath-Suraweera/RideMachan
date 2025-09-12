@@ -216,3 +216,92 @@ body {
     padding: 20px;
   }
 }
+
+/* === Forms (shared) === */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 200px;
+}
+.form-label {
+  font-size: 12px;
+  color: #5f6368;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.form-control,
+.form-select {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid #dadce0;
+  border-radius: 10px;
+  background: #fff;
+  color: #202124;
+  font-size: 14px;
+  transition: border-color 0.2s, box-shadow 0.2s, background-color 0.2s;
+}
+.form-control::placeholder {
+  color: #9aa0a6;
+}
+
+.form-control:hover,
+.form-select:hover {
+  border-color: #c6c9cf;
+}
+.form-control:focus,
+.form-select:focus {
+  outline: none;
+  border-color: #4361ee;
+  box-shadow: 0 0 0 4px rgba(67, 97, 238, 0.12);
+}
+
+/* Nice caret for selects */
+.form-select {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%235f6368' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 40px; /* room for caret */
+}
+
+/* Date picker tweaks (WebKit) */
+input[type="date"].form-control {
+  color-scheme: light; /* consistent picker colors */
+}
+input[type="date"].form-control::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  opacity: 0.8;
+  filter: invert(43%) sepia(66%) saturate(2318%) hue-rotate(209deg)
+    brightness(93%) contrast(92%);
+}
+
+/* Disabled */
+.form-control:disabled,
+.form-select:disabled {
+  background: #f8f9fa;
+  color: #9aa0a6;
+  cursor: not-allowed;
+}
+
+/* Compact layout polish inside the filter section */
+.search-filter-section .filter-row {
+  gap: 16px;
+}
+.search-filter-section .form-group {
+  min-width: 220px;
+}
+
+/* no-sidebar: expand content full width on this page */
+body.no-sidebar .container {
+  display: block;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 16px;
+}
+body.no-sidebar .main-content {
+  margin: 0;
+}

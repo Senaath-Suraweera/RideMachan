@@ -1,93 +1,17 @@
-// Admins Page JavaScript - modeled after Customers manager
+// Admins Manager - now hooked to backend signup endpoint
 class AdminsManager {
   constructor() {
-    // Seed admins (replace with API in production)
-    this.admins = [
-      {
-        id: 1,
-        fullName: "Kaviru Hapuarachchi",
-        email: "kaviru@ridemachan.lk",
-        phone: "+94 77 345 6789",
-        employeeId: "RM-OPS-1001",
-        permissionLevel: "super-admin",
-        department: "operations",
-        status: "active",
-        createdAt: "2024-06-18T10:00:00Z",
-      },
-      {
-        id: 2,
-        fullName: "Sanjalee Dassanayake",
-        email: "sanjalee@ridemachan.lk",
-        phone: "+94 71 123 4567",
-        employeeId: "RM-CS-1057",
-        permissionLevel: "admin",
-        department: "customer-service",
-        status: "active",
-        createdAt: "2024-12-01T12:30:00Z",
-      },
-      {
-        id: 3,
-        fullName: "Ishara Fernando",
-        email: "ishara@ridemachan.lk",
-        phone: "+94 70 234 5678",
-        employeeId: "RM-MKT-1103",
-        permissionLevel: "moderator",
-        department: "marketing",
-        status: "inactive",
-        createdAt: "2023-09-20T09:00:00Z",
-      },
-      {
-        id: 4,
-        fullName: "Emily Brown",
-        email: "emily@ridemachan.lk",
-        phone: "+94 76 987 6543",
-        employeeId: "RM-TEC-1204",
-        permissionLevel: "support",
-        department: "technical",
-        status: "suspended",
-        createdAt: "2025-02-10T07:45:00Z",
-      },
-      {
-        id: 5,
-        fullName: "Kaviru Hapuarachchi",
-        email: "kaviru@ridemachan.lk",
-        phone: "+94 77 345 6789",
-        employeeId: "RM-OPS-1001",
-        permissionLevel: "super-admin",
-        department: "operations",
-        status: "active",
-        createdAt: "2024-06-18T10:00:00Z",
-      },
-    ];
-
-    this.filteredAdmins = [...this.admins];
+    this.admins = []; // will load from backend
+    this.filteredAdmins = [];
     this.init();
   }
 
-  // ---------- Init ----------
-  init() {
+  async init() {
     this.setupEventListeners();
-    this.applyFilters(); // renders + updates count
+    await this.loadAdmins();
   }
 
   setupEventListeners() {
-    // Search button
-    const searchBtn = document.querySelector(".search-btn");
-    if (searchBtn)
-      searchBtn.addEventListener("click", () => this.searchAdmins());
-
-    // Live filter on inputs
-    const nameInput = document.getElementById("adminNameFilter");
-    const idInput = document.getElementById("adminIdFilter");
-    const sortInput = document.getElementById("sortOrder");
-
-    [nameInput, idInput, sortInput].forEach((el) => {
-      if (!el) return;
-      const evt = el.tagName === "SELECT" ? "change" : "input";
-      el.addEventListener(evt, () => this.applyFilters());
-    });
-
-    // Register admin form
     const regForm = document.getElementById("registerAdminForm");
     if (regForm) {
       regForm.addEventListener("submit", (e) => {
@@ -95,113 +19,140 @@ class AdminsManager {
         this.registerAdmin();
       });
     }
-
-    // Edit admin form
-    const editForm = document.getElementById("editAdminForm");
-    if (editForm) {
-      editForm.addEventListener("submit", (e) => {
-        e.preventDefault();
-        this.updateAdmin();
-      });
-    }
   }
 
-  // ---------- Filtering ----------
-  searchAdmins() {
+  async loadAdmins() {
+    try {
+      const res = await fetch("/admin/list");
+      if (res.ok) {
+        const result = await res.json();
+        this.admins = result.admins || [];
+      }
+    } catch (err) {
+      console.error("Failed to load admins:", err);
+    }
     this.applyFilters();
   }
 
   applyFilters() {
-    const nameFilter = (
-      document.getElementById("adminNameFilter")?.value || ""
-    ).toLowerCase();
-    const idFilter = (
-      document.getElementById("adminIdFilter")?.value || ""
-    ).toLowerCase();
-    const sortOrder =
-      document.getElementById("sortOrder")?.value || "ascending";
-
-    // Filter
-    this.filteredAdmins = this.admins.filter((a) => {
-      const byName = a.fullName.toLowerCase().includes(nameFilter);
-      const byId = (a.employeeId || String(a.id))
-        .toLowerCase()
-        .includes(idFilter);
-      return byName && byId;
-    });
-
-    // Sort
-    const statusWeight = { active: 0, inactive: 1, suspended: 2 };
-    this.filteredAdmins.sort((a, b) => {
-      if (sortOrder === "ascending") {
-        return a.fullName.localeCompare(b.fullName);
-      } else if (sortOrder === "descending") {
-        return b.fullName.localeCompare(a.fullName);
-      } else if (sortOrder === "recent") {
-        return new Date(b.createdAt) - new Date(a.createdAt);
-      } else if (sortOrder === "status") {
-        const sa = statusWeight[a.status] ?? 99;
-        const sb = statusWeight[b.status] ?? 99;
-        if (sa !== sb) return sa - sb;
-        return a.fullName.localeCompare(b.fullName);
-      }
-      return 0;
-    });
-
+    this.filteredAdmins = [...this.admins];
     this.renderAdmins();
     this.updateAdminsCount();
   }
 
-  // ---------- Render ----------
   renderAdmins() {
     const list = document.getElementById("adminsList");
     if (!list) return;
     list.innerHTML = "";
 
     this.filteredAdmins.forEach((admin) => {
-      list.appendChild(this.createAdminCard(admin));
+      const card = this.createAdminCard(admin);
+
+      // 🔗 attach delete event here
+      const deleteBtn = card.querySelector('[data-action="delete"]');
+      if (deleteBtn) {
+        deleteBtn.addEventListener("click", () => {
+          if (
+            confirm(`Are you sure you want to delete admin #${admin.adminId}?`)
+          ) {
+            this.deleteAdmin(admin.adminId);
+          }
+        });
+      }
+
+      list.appendChild(card);
     });
   }
+
+  // In AdminsManager class
 
   createAdminCard(admin) {
     const card = document.createElement("div");
     card.className = "admin-card";
-    card.dataset.adminId = admin.id;
-
-    const statusClass =
-      admin.status === "active"
-        ? "status-active"
-        : admin.status === "suspended"
-        ? "status-suspended"
-        : "status-inactive";
+    card.dataset.adminId = admin.adminId;
 
     card.innerHTML = `
-      <div class="admin-info">
-        <div class="admin-id">#${admin.id}</div>
-        <div class="admin-details">
-          <h3 class="admin-name">${this.escape(admin.fullName)}</h3>
-          <p class="admin-permission">${this.escape(admin.permissionLevel)}</p>
-        </div>
-        <div class="admin-status">
-          <span class="status-badge ${statusClass}">
-            <span class="status-indicator"></span>
-            ${this.capitalize(admin.status)}
-          </span>
-        </div>
+    <div class="admin-info">
+      <div class="admin-id">#${admin.adminId}</div>
+      <div class="admin-details">
+        <h3 class="admin-name">${this.escape(admin.username)}</h3>
+        <p class="admin-permission">${this.escape(admin.email)}</p>
+        <p>${this.escape(admin.phoneNumber)}</p>
       </div>
-      <div class="admin-actions">
-        <button class="btn btn-secondary btn-sm" data-action="edit">Edit</button>
-        <button class="btn btn-danger btn-sm" data-action="delete">Delete</button>
-      </div>
-    `;
+    </div>
+    <div class="admin-actions">
+      <button class="btn btn-secondary btn-sm" data-action="edit">Edit</button>
+      <button class="btn btn-danger btn-sm" data-action="delete">Delete</button>
+    </div>
+  `;
 
-    // Actions
+    // Attach edit event
     const editBtn = card.querySelector('[data-action="edit"]');
-    const delBtn = card.querySelector('[data-action="delete"]');
-    editBtn.addEventListener("click", () => this.editAdmin(admin.id));
-    delBtn.addEventListener("click", () => this.deleteAdmin(admin.id));
+    if (editBtn) {
+      editBtn.addEventListener("click", () => {
+        this.populateEditModal(admin);
+        this.openEditAdminModal();
+      });
+    }
 
     return card;
+  }
+
+  populateEditModal(admin) {
+    document.getElementById("editAdminId").value = admin.adminId;
+    document.getElementById("editFullName").value = admin.username;
+    document.getElementById("editEmail").value = admin.email;
+    document.getElementById("editPhone").value = admin.phoneNumber;
+  }
+
+  async updateAdmin() {
+    const id = document.getElementById("editAdminId").value;
+    const username = document.getElementById("editFullName").value.trim();
+    const email = document.getElementById("editEmail").value.trim();
+    const phoneNumber = document.getElementById("editPhone").value.trim();
+
+    const payload = { adminId: id, username, email, phoneNumber };
+
+    try {
+      const res = await fetch("/admin/update", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const result = await res.json();
+      if (result.status === "success") {
+        this.closeEditAdminModal();
+        this.toast("Admin updated successfully");
+        await this.loadAdmins();
+      } else {
+        this.toast("Error: " + (result.message || "Update failed"));
+      }
+    } catch (err) {
+      console.error("Update failed:", err);
+      this.toast("Server error");
+    }
+  }
+
+  async deleteAdmin(adminId) {
+    try {
+      const res = await fetch("/admin/delete", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ adminId }),
+      });
+      const result = await res.json();
+      console.log("Delete response:", result);
+
+      if (result.status === "success") {
+        this.toast("Admin deleted successfully");
+        await this.loadAdmins();
+      } else {
+        this.toast("Error: " + (result.message || "Delete failed"));
+      }
+    } catch (err) {
+      console.error("Delete failed:", err);
+      this.toast("Server error");
+    }
   }
 
   updateAdminsCount() {
@@ -212,7 +163,6 @@ class AdminsManager {
   // ---------- Modals ----------
   openRegisterAdminModal() {
     const modal = document.getElementById("registerAdminModal");
-    if (!modal) return;
     modal.classList.add("show");
     modal.style.display = "flex";
     document.body.style.overflow = "hidden";
@@ -220,134 +170,60 @@ class AdminsManager {
 
   closeRegisterAdminModal() {
     const modal = document.getElementById("registerAdminModal");
-    if (!modal) return;
     modal.classList.remove("show");
     modal.style.display = "none";
     document.body.style.overflow = "";
     document.getElementById("registerAdminForm")?.reset();
-    this.clearErrors("#registerAdminForm");
   }
 
   openEditAdminModal() {
-    const modal = document.getElementById("editAdminModal");
-    if (!modal) return;
-    modal.classList.add("show");
-    modal.style.display = "flex";
-    document.body.style.overflow = "hidden";
+    document.getElementById("editAdminModal").classList.add("show");
   }
-
   closeEditAdminModal() {
-    const modal = document.getElementById("editAdminModal");
-    if (!modal) return;
-    modal.classList.remove("show");
-    modal.style.display = "none";
-    document.body.style.overflow = "";
-    this.clearErrors("#editAdminForm");
+    document.getElementById("editAdminModal").classList.remove("show");
   }
 
-  // ---------- CRUD ----------
-  registerAdmin() {
+  // ---------- Register Admin ----------
+  async registerAdmin() {
     const form = document.getElementById("registerAdminForm");
-    if (!form) return;
-
     const data = Object.fromEntries(new FormData(form).entries());
 
-    // Validate
-    let ok = true;
     this.clearErrors("#registerAdminForm");
-
-    const requireField = (name, msg) => {
-      if (!data[name] || !String(data[name]).trim()) {
-        this.setError(`#registerAdminForm [name="${name}"]`, msg);
-        ok = false;
-      }
-    };
-
-    requireField("fullName", "Full name is required");
-    requireField("email", "Email is required");
-    requireField("phone", "Phone number is required");
-    requireField("permissionLevel", "Permission level is required");
-    requireField("password", "Password is required");
-    requireField("confirmPassword", "Please confirm the password");
 
     if (data.password !== data.confirmPassword) {
       this.setError(
         `#registerAdminForm [name="confirmPassword"]`,
         "Passwords do not match"
       );
-      ok = false;
+      return;
     }
 
-    if (!ok) return;
-
-    const nextId = this.admins.length
-      ? Math.max(...this.admins.map((a) => a.id)) + 1
-      : 1;
-    const admin = {
-      id: nextId,
-      fullName: data.fullName.trim(),
+    const payload = {
+      username: data.fullName.trim(),
       email: data.email.trim(),
-      phone: data.phone.trim(),
-      employeeId:
-        (data.employeeId || "").trim() ||
-        `RM-${nextId.toString().padStart(4, "0")}`,
-      permissionLevel: data.permissionLevel,
-      department: data.department || "",
-      status: "active",
-      createdAt: new Date().toISOString(),
+      phoneNumber: data.phone.trim(),
+      password: data.password.trim(),
     };
 
-    this.admins.push(admin);
-    this.closeRegisterAdminModal();
-    this.applyFilters();
-    this.toast("Admin registered successfully");
-  }
+    try {
+      const res = await fetch("/admin/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const result = await res.json();
 
-  editAdmin(id) {
-    const admin = this.admins.find((a) => a.id === id);
-    if (!admin) return;
-
-    // Fill form
-    document.getElementById("editAdminId").value = String(admin.id);
-    document.getElementById("editFullName").value = admin.fullName;
-    document.getElementById("editEmail").value = admin.email;
-    document.getElementById("editPhone").value = admin.phone;
-    document.getElementById("editEmployeeId").value = admin.employeeId || "";
-    document.getElementById("editPermissionLevel").value =
-      admin.permissionLevel;
-    document.getElementById("editDepartment").value = admin.department || "";
-    document.getElementById("editStatus").value = admin.status;
-
-    this.openEditAdminModal();
-  }
-
-  updateAdmin() {
-    const form = document.getElementById("editAdminForm");
-    if (!form) return;
-
-    const data = Object.fromEntries(new FormData(form).entries());
-    const id = Number(data.adminId);
-    const admin = this.admins.find((a) => a.id === id);
-    if (!admin) return;
-
-    admin.fullName = data.fullName.trim();
-    admin.email = data.email.trim();
-    admin.phone = data.phone.trim();
-    admin.employeeId = (data.employeeId || "").trim();
-    admin.permissionLevel = data.permissionLevel;
-    admin.department = data.department || "";
-    admin.status = data.status;
-
-    this.closeEditAdminModal();
-    this.applyFilters();
-    this.toast("Admin updated");
-  }
-
-  deleteAdmin(id) {
-    if (!confirm("Delete this admin?")) return;
-    this.admins = this.admins.filter((a) => a.id !== id);
-    this.applyFilters();
-    this.toast("Admin deleted");
+      if (result.status === "success") {
+        this.closeRegisterAdminModal();
+        this.toast("Admin registered successfully");
+        await this.loadAdmins();
+      } else {
+        this.toast("Error: " + (result.message || "Signup failed"));
+      }
+    } catch (err) {
+      console.error("Signup failed:", err);
+      this.toast("Server error");
+    }
   }
 
   // ---------- Validation & helpers ----------
@@ -390,39 +266,28 @@ class AdminsManager {
   }
 
   escape(s) {
-    return String(s)
+    return String(s || "")
       .replaceAll("&", "&amp;")
       .replaceAll("<", "&lt;")
       .replaceAll(">", "&gt;")
       .replaceAll('"', "&quot;")
       .replaceAll("'", "&#039;");
   }
-
-  capitalize(s) {
-    s = String(s || "");
-    return s.charAt(0).toUpperCase() + s.slice(1);
-  }
 }
 
-// ---------- Global helpers for inline HTML handlers ----------
+// ---------- Global helpers ----------
 window.addEventListener("DOMContentLoaded", () => {
   window.adminsManager = new AdminsManager();
 });
 
 function searchAdmins() {
-  window.adminsManager?.searchAdmins();
+  window.adminsManager?.applyFilters();
 }
 function openRegisterAdminModal() {
   window.adminsManager?.openRegisterAdminModal();
 }
 function closeRegisterAdminModal() {
   window.adminsManager?.closeRegisterAdminModal();
-}
-function editAdmin(id) {
-  window.adminsManager?.editAdmin(Number(id));
-}
-function deleteAdmin(id) {
-  window.adminsManager?.deleteAdmin(Number(id));
 }
 function closeEditAdminModal() {
   window.adminsManager?.closeEditAdminModal();

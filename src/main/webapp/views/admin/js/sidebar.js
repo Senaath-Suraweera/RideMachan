@@ -27,18 +27,15 @@ class SidebarManager {
             <h3 class="nav-section-title">General</h3>
             <ul class="nav-menu">
               <li class="nav-item"><a href="dashboard.html" class="nav-link" data-page="dashboard"><span class="nav-icon dashboard"></span>Dashboard</a></li>
-              <li class="nav-item"><a href="ongoing-orders.html" class="nav-link" data-page="ongoing-orders"><span class="nav-icon orders"></span>Ongoing Orders</a></li>
-              <li class="nav-item"><a href="past-orders.html" class="nav-link" data-page="past-orders"><span class="nav-icon past-orders"></span>Past Orders</a></li>
               <li class="nav-item"><a href="earnings.html" class="nav-link" data-page="earnings"><span class="nav-icon earnings"></span>Earnings</a></li>
               <li class="nav-item"><a href="promotions.html" class="nav-link" data-page="promotions"><span class="nav-icon promotions"></span>Promotions</a></li>
-              <li class="nav-item"><a href="settings.html" class="nav-link" data-page="settings"><span class="nav-icon settings"></span>Settings</a></li>
             </ul>
           </div>
           <div class="nav-section">
             <h3 class="nav-section-title">Users</h3>
             <ul class="nav-menu">
               <li class="nav-item"><a href="admins.html" class="nav-link" data-page="admins"><span class="nav-icon admins"></span>Admins</a></li>
-              <li class="nav-item"><a href="individual-renters.html" class="nav-link" data-page="individual-renters"><span class="nav-icon individual-renters"></span>Individual renters</a></li>
+              <li class="nav-item"><a href="individual-renters.html" class="nav-link" data-page="individual-renters"><span class="nav-icon individual-renters"></span>Individual Providers</a></li>
               <li class="nav-item"><a href="customers.html" class="nav-link" data-page="customers"><span class="nav-icon customers"></span>Customers</a></li>
               <li class="nav-item"><a href="rental-companies.html" class="nav-link" data-page="rental-companies"><span class="nav-icon rental-companies"></span>Rental Companies</a></li>
               <li class="nav-item"><a href="drivers.html" class="nav-link" data-page="drivers"><span class="nav-icon drivers"></span>Drivers</a></li>
@@ -150,6 +147,7 @@ class SidebarManager {
       messages: "messages",
       drivers: "drivers",
       "driver-view": "drivers",
+      "customer-view": "customers",
     };
     return (
       pageMap[filename] || localStorage.getItem("activePage") || "dashboard"
@@ -159,9 +157,19 @@ class SidebarManager {
 
 function handleLogout() {
   if (confirm("Are you sure you want to logout?")) {
-    localStorage.clear();
-    sessionStorage.clear();
-    window.location.href = "login.html";
+    fetch("/admin/logout", {
+      method: "GET",
+      credentials: "include", // ensure session cookie is sent
+    })
+      .then(() => {
+        localStorage.clear();
+        sessionStorage.clear();
+        window.location.href = "/views/admin/login.html"; // go back to login page
+      })
+      .catch((err) => {
+        console.error("Logout failed:", err);
+        window.location.href = "/views/admin/login.html";
+      });
   }
 }
 

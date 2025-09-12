@@ -1,7 +1,6 @@
-// Customers Page JavaScript (clean, fully wired for filterable Minimum Rating inside the filter bar)
+// Customers Page JavaScript (theme-matched filters + cards render)
 class CustomersManager {
   constructor() {
-    // --- Seed data (you can replace with your API/db) ---
     this.customers = [
       {
         id: 1,
@@ -146,182 +145,183 @@ class CustomersManager {
     ];
 
     this.filteredCustomers = [...this.customers];
-
-    // Old standalone rating widget state (if used): keep, but we filter with minRating
-    this.currentRating = 5;
-
-    // Minimum rating filter (0 = no minimum)
     this.minRating = 0;
 
     this.init();
   }
 
-  // -------- Init & Events --------
   init() {
+    this.cacheEls();
+    this.populateLocationFilter();
+    this.initializeRatingFilter();
     this.setupEventListeners();
-    this.initializeRatingSystem(); // legacy #customerRating (if present)
-    this.initializeRatingFilter(); // new #ratingFilter (in the filter bar)
     this.renderCustomers();
     this.updateCustomerCount();
   }
 
+  cacheEls() {
+    // grid + counts
+    this.grid = document.querySelector(".customers-grid");
+    // IMPORTANT: target the list title, not the filter title
+    this.listTitle = document.querySelector(
+      ".customers-section .section-title"
+    ); // fixes wrong heading update
+
+    // filter inputs
+    this.nameEl = document.getElementById("customerNameFilter");
+    this.nicEl = document.getElementById("nicFilter");
+    this.locEl = document.getElementById("locationFilter");
+    this.statEl = document.getElementById("statusFilter");
+    this.joinFrom = document.getElementById("joinFrom");
+    this.joinTo = document.getElementById("joinTo");
+    this.bookMinEl = document.getElementById("bookingsMin");
+    this.bookMaxEl = document.getElementById("bookingsMax");
+    this.sortEl = document.getElementById("sortOrder");
+  }
+
   setupEventListeners() {
-    // Search button (inline onclick exists in HTML, but add listeners too)
-    const searchBtn = document.querySelector(".search-actions .btn-primary");
-    if (searchBtn) {
-      searchBtn.addEventListener("click", () => this.searchCustomers());
-    }
+    // search/clear buttons (also present inline in HTML)
+    document
+      .querySelector(".search-actions .btn-primary")
+      ?.addEventListener("click", () => this.applyFilters());
+    document
+      .querySelector(".search-actions .btn-secondary")
+      ?.addEventListener("click", () => this.clearFilters());
 
-    // Clear filters button
-    const clearBtn = document.querySelector(".search-actions .btn-secondary");
-    if (clearBtn) {
-      clearBtn.addEventListener("click", () => this.clearFilters());
-    }
+    // type-to-filter
+    [this.nameEl, this.nicEl, this.bookMinEl, this.bookMaxEl].forEach((el) =>
+      el?.addEventListener("input", () => this.applyFilters())
+    );
+    // change-to-filter
+    [this.locEl, this.statEl, this.sortEl, this.joinFrom, this.joinTo].forEach(
+      (el) => el?.addEventListener("change", () => this.applyFilters())
+    );
 
-    // Filter inputs live-typing
-    const nameInput = document.getElementById("customerNameFilter");
-    const nicInput = document.getElementById("nicFilter");
-    const sortInput = document.getElementById("sortOrder");
-
-    [nameInput, nicInput, sortInput].forEach((input) => {
-      if (input) {
-        const eventName = input.tagName === "SELECT" ? "change" : "input";
-        input.addEventListener(eventName, () => this.applyFilters());
-      }
-    });
-
-    // Customer card click (open details, optional)
+    // card click -> optional details
     document.addEventListener("click", (e) => {
       const card = e.target.closest(".customer-card");
       if (card) this.showCustomerDetails(Number(card.dataset.customerId));
     });
 
-    // Register form submission (if modal exists)
-    const form = document.getElementById("registerForm");
-    if (form) {
-      form.addEventListener("submit", (e) => {
-        e.preventDefault();
-        this.registerCustomer();
-      });
-    }
+    // register form submit
+    document.getElementById("registerForm")?.addEventListener("submit", (e) => {
+      e.preventDefault();
+      this.registerCustomer();
+    });
   }
 
-  // -------- Rating widgets --------
-  // New: stars inside the search filter bar (id="ratingFilter")
+  /* ---------- Helpers ---------- */
+  parseDate(s) {
+    return s ? new Date(s + "T00:00:00") : null;
+  }
+  toNum(v) {
+    const n = Number(v);
+    return Number.isFinite(n) ? n : NaN;
+  }
+
+  populateLocationFilter() {
+    if (!this.locEl) return;
+    const uniq = [...new Set(this.customers.map((c) => c.location))].sort();
+    uniq.forEach((loc) => {
+      const o = document.createElement("option");
+      o.value = loc;
+      o.textContent = loc;
+      this.locEl.appendChild(o);
+    });
+  }
+
   initializeRatingFilter() {
     const container = document.getElementById("ratingFilter");
     if (!container) return;
-
     const stars = Array.from(container.querySelectorAll(".star"));
-
-    const paint = (value) => {
-      stars.forEach((s) => {
-        const v =
-          Number(s.dataset.value || s.textContent.trim().length || 0) ||
-          Number(s.dataset.value) ||
-          0;
-        s.classList.toggle("active", v <= value);
-      });
-    };
-
+    const paint = (value) =>
+      stars.forEach((s) =>
+        s.classList.toggle("active", Number(s.dataset.value) <= value)
+      );
     stars.forEach((star) => {
       star.addEventListener("click", () => {
         this.minRating = Number(star.dataset.value || 0);
         paint(this.minRating);
         this.applyFilters();
       });
-
       star.addEventListener("mouseenter", () =>
         paint(Number(star.dataset.value || 0))
       );
     });
-
     container.addEventListener("mouseleave", () => paint(this.minRating));
     paint(this.minRating);
   }
 
-  // Legacy: the big “Customer Rating Section” widget (id="customerRating")
-  // We’ll keep it interactive; clicking a star here ALSO acts as a minimum-rating filter.
-  initializeRatingSystem() {
-    const ratingStars = document.querySelectorAll("#customerRating .star");
-    if (!ratingStars.length) return;
-
-    ratingStars.forEach((star, index) => {
-      star.addEventListener("click", () => {
-        this.setRating(index + 1);
-        this.minRating = index + 1;
-        this.applyFilters();
-      });
-      star.addEventListener("mouseenter", () => {
-        this.highlightStars(index + 1);
-      });
-    });
-
-    const ratingContainer = document.getElementById("customerRating");
-    if (ratingContainer) {
-      ratingContainer.addEventListener("mouseleave", () => {
-        this.highlightStars(this.currentRating);
-      });
-    }
-
-    this.highlightStars(this.currentRating);
-  }
-
-  setRating(rating) {
-    this.currentRating = rating;
-    this.highlightStars(rating);
-  }
-
-  highlightStars(rating) {
-    document.querySelectorAll("#customerRating .star").forEach((star, i) => {
-      if (i < rating) star.classList.add("active");
-      else star.classList.remove("active");
-    });
-  }
-
-  // -------- Filtering --------
-  searchCustomers() {
-    this.applyFilters();
-    this.showSearchResults();
-  }
-
+  /* ---------- Filtering ---------- */
   applyFilters() {
-    const nameFilter = (
-      document.getElementById("customerNameFilter")?.value || ""
-    ).toLowerCase();
-    const nicFilter = (
-      document.getElementById("nicFilter")?.value || ""
-    ).toLowerCase();
-    const sortOrder =
-      document.getElementById("sortOrder")?.value || "ascending";
+    const nameFilter = (this.nameEl?.value || "").toLowerCase();
+    const nicFilter = (this.nicEl?.value || "").toLowerCase();
+    const sortOrder = this.sortEl?.value || "ascending";
 
-    this.filteredCustomers = this.customers.filter((customer) => {
-      const matchesName = customer.name.toLowerCase().includes(nameFilter);
-      const matchesNIC = customer.nic.toLowerCase().includes(nicFilter);
-      const matchesRating = customer.rating >= (this.minRating || 0);
-      return matchesName && matchesNIC && matchesRating;
+    const loc = this.locEl?.value || "";
+    const status = this.statEl?.value || "";
+    const minRating = this.minRating || 0;
+
+    const joinFrom = this.parseDate(this.joinFrom?.value);
+    const joinTo = this.parseDate(this.joinTo?.value);
+    const minBk = this.toNum(this.bookMinEl?.value);
+    const maxBk = this.toNum(this.bookMaxEl?.value);
+
+    this.filteredCustomers = this.customers.filter((c) => {
+      const matchesName = c.name.toLowerCase().includes(nameFilter);
+      const matchesNIC = c.nic.toLowerCase().includes(nicFilter);
+      const matchesLoc = !loc || c.location === loc;
+      const matchesStat = !status || c.status === status;
+      const matchesRat = c.rating >= minRating;
+
+      const jd = this.parseDate(c.joinDate);
+      const matchesJoin =
+        (!joinFrom || jd >= joinFrom) && (!joinTo || jd <= joinTo);
+
+      const matchesBookings =
+        (isNaN(minBk) || c.bookings >= minBk) &&
+        (isNaN(maxBk) || c.bookings <= maxBk);
+
+      return (
+        matchesName &&
+        matchesNIC &&
+        matchesLoc &&
+        matchesStat &&
+        matchesRat &&
+        matchesJoin &&
+        matchesBookings
+      );
     });
 
-    // Sort by Name A→Z / Z→A
-    this.filteredCustomers.sort((a, b) => {
-      const c = a.name.localeCompare(b.name);
-      return sortOrder === "ascending" ? c : -c;
-    });
+    // sort
+    this.filteredCustomers.sort(
+      (a, b) =>
+        (sortOrder === "ascending" ? 1 : -1) * a.name.localeCompare(b.name)
+    );
 
     this.renderCustomers();
     this.updateCustomerCount();
   }
 
   clearFilters() {
-    const nameInput = document.getElementById("customerNameFilter");
-    const nicInput = document.getElementById("nicFilter");
-    const sortInput = document.getElementById("sortOrder");
-
-    if (nameInput) nameInput.value = "";
-    if (nicInput) nicInput.value = "";
-    if (sortInput) sortInput.value = "ascending";
-
-    // Reset minimum rating and unpaint stars in filter bar
+    const ids = [
+      "customerNameFilter",
+      "nicFilter",
+      "sortOrder",
+      "locationFilter",
+      "statusFilter",
+      "joinFrom",
+      "joinTo",
+      "bookingsMin",
+      "bookingsMax",
+    ];
+    ids.forEach((id) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      if (el.tagName === "SELECT")
+        el.value = id === "sortOrder" ? "ascending" : "";
+      else el.value = "";
+    });
     this.minRating = 0;
     document
       .querySelectorAll("#ratingFilter .star")
@@ -332,61 +332,53 @@ class CustomersManager {
     this.updateCustomerCount();
   }
 
-  showSearchResults() {
-    // Optionally show a toast/snackbar or a small note.
-    // Keeping it minimal to avoid UI conflicts.
-  }
-
-  // -------- Rendering --------
+  /* ---------- Rendering ---------- */
   renderCustomers() {
-    const container = document.querySelector(".customers-grid");
-    if (!container) return;
-    container.innerHTML = "";
-
-    this.filteredCustomers.forEach((customer) => {
-      const card = this.createCustomerCard(customer);
-      container.appendChild(card);
-    });
+    if (!this.grid) return;
+    this.grid.innerHTML = "";
+    if (!this.filteredCustomers.length) {
+      this.grid.innerHTML = `<div style="padding:16px;color:#6b7280;">No customers match your filters.</div>`;
+      return;
+    }
+    this.filteredCustomers.forEach((c) =>
+      this.grid.appendChild(this.createCustomerCard(c))
+    );
   }
 
-  createCustomerCard(customer) {
+  createCustomerCard(c) {
     const card = document.createElement("div");
     card.className = "customer-card";
-    card.dataset.customerId = customer.id;
+    card.dataset.customerId = c.id;
 
-    const initials = this.getInitials(customer.name);
-    const starsHTML = this.generateStarsHTML(customer.rating);
+    const initials = this.getInitials(c.name);
+    const stars = this.generateStarsHTML(c.rating);
 
     card.innerHTML = `
       <div class="customer-avatar"><span class="avatar-text">${initials}</span></div>
       <div class="customer-info">
-        <h4 class="customer-name">${customer.name}</h4>
+        <h4 class="customer-name">${c.name}</h4>
         <div class="customer-details">
-          <div class="detail-item"><span class="detail-icon">ID: </span><span class="detail-text">${
-            customer.nic
+          <div class="detail-item"><span class="detail-icon">NIC:</span><span class="detail-text">${
+            c.nic
           }</span></div>
           <div class="detail-item"><span class="detail-icon">📧</span><span class="detail-text">${
-            customer.email
+            c.email
           }</span></div>
           <div class="detail-item"><span class="detail-icon">📞</span><span class="detail-text">${
-            customer.phone
+            c.phone
           }</span></div>
           <div class="detail-item"><span class="detail-icon">📍</span><span class="detail-text">${
-            customer.location
+            c.location
           }</span></div>
         </div>
-        <div class="customer-description"><p>${
-          customer.description || ""
-        }</p></div>
+        <div class="customer-description"><p>${c.description || ""}</p></div>
         <div class="customer-rating">
-          <div class="rating-stars">${starsHTML}</div>
-          <span class="rating-value">${customer.rating.toFixed(1)}</span>
-          <span class="review-count">${customer.reviews} reviews</span>
+          <div class="rating-stars">${stars}</div>
+          <span class="rating-value">${c.rating.toFixed(1)}</span>
+          <span class="review-count">${c.reviews} reviews</span>
           <div class="status-badge ${
-            customer.status === "active" ? "status-active" : "status-inactive"
-          }">
-            ${customer.status === "active" ? "Active" : "Inactive"}
-          </div>
+            c.status === "active" ? "status-active" : "status-inactive"
+          }">${c.status === "active" ? "Active" : "Inactive"}</div>
         </div>
       </div>
     `;
@@ -395,36 +387,27 @@ class CustomersManager {
 
   generateStarsHTML(rating) {
     const filled = Math.round(rating);
-    let html = "";
-    for (let i = 1; i <= 5; i++) {
-      html += `<span class="star ${i <= filled ? "active" : ""}">⭐</span>`;
-    }
-    return html;
+    return Array.from(
+      { length: 5 },
+      (_, i) => `<span class="star ${i < filled ? "active" : ""}">⭐</span>`
+    ).join("");
   }
 
   updateCustomerCount() {
-    const countEl = document.querySelector(".section-title");
-    if (countEl)
-      countEl.textContent = `Customer List (${this.filteredCustomers.length})`;
+    if (this.listTitle)
+      this.listTitle.textContent = `Customer List (${this.filteredCustomers.length})`;
   }
 
-  // -------- Details & Utilities --------
-  showCustomerDetails(customerId) {
-    const customer = this.customers.find((c) => c.id === customerId);
-    if (!customer) return;
-    // If you have a dedicated details modal/page, wire it here.
-    // For now, just a lightweight alert to confirm click wiring:
-    console.log("Customer details:", customer);
+  /* ---------- Misc ---------- */
+  showCustomerDetails(id) {
+    /* hook up details modal here if needed */
   }
-
   getInitials(name) {
-    const parts = name.trim().split(/\s+/);
-    const a = (parts[0] || "")[0] || "";
-    const b = (parts[1] || "")[0] || "";
-    return (a + b).toUpperCase();
+    const p = name.trim().split(/\s+/);
+    return ((p[0] || "")[0] || "") + ((p[1] || "")[0] || "");
   }
 
-  // -------- Register Modal (optional) --------
+  // Register modal
   openRegisterModal() {
     const modal = document.getElementById("registerModal");
     if (!modal) return;
@@ -432,7 +415,6 @@ class CustomersManager {
     modal.style.display = "block";
     document.body.style.overflow = "hidden";
   }
-
   closeRegisterModal() {
     const modal = document.getElementById("registerModal");
     if (!modal) return;
@@ -443,8 +425,7 @@ class CustomersManager {
   }
 
   resetForm() {
-    const form = document.getElementById("registerForm");
-    if (form) form.reset();
+    document.getElementById("registerForm")?.reset();
     document
       .querySelectorAll(".form-group .error")
       .forEach((el) => (el.textContent = ""));
@@ -466,16 +447,14 @@ class CustomersManager {
         err.textContent = msg || "";
       }
     };
-
-    // Requireds
     if (!data.fullName?.trim()) {
       setError("fullName", "Full name is required");
       ok = false;
     } else setError("fullName", "");
-    if (!data.nic?.trim()) {
-      setError("nic", "NIC is required");
+    if (!data.nicNumber?.trim()) {
+      setError("nicNumber", "NIC is required");
       ok = false;
-    } else setError("nic", "");
+    } else setError("nicNumber", "");
     if (!data.email?.trim()) {
       setError("email", "Email is required");
       ok = false;
@@ -484,14 +463,12 @@ class CustomersManager {
       setError("phone", "Phone is required");
       ok = false;
     } else setError("phone", "");
-
     return ok;
   }
 
   registerCustomer() {
     const form = document.getElementById("registerForm");
     if (!form) return;
-
     const data = Object.fromEntries(new FormData(form).entries());
     if (!this.validateForm(data)) return;
 
@@ -500,16 +477,16 @@ class CustomersManager {
         ? Math.max(...this.customers.map((c) => c.id)) + 1
         : 1,
       name: data.fullName.trim(),
-      nic: data.nic.trim(),
+      nic: data.nicNumber.trim(), // <-- fixed mapping
       email: data.email.trim(),
       phone: data.phone.trim(),
       joinDate: new Date().toISOString().slice(0, 10),
       bookings: Number(data.bookings || 0),
-      location: data.location || "Colombo",
+      location: data.city || "Colombo",
       rating: Number(data.rating || 4.0),
       reviews: Number(data.reviews || 0),
       status: "active",
-      description: data.description || "",
+      description: data.address || "",
     };
 
     this.customers.push(newCustomer);
@@ -521,47 +498,20 @@ class CustomersManager {
   toast(message) {
     const el = document.createElement("div");
     el.textContent = message;
-    el.style.cssText = `
-      position: fixed; right: 16px; bottom: 16px;
-      background: #2c3e50; color: #fff; padding: 10px 14px;
-      border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-      z-index: 1001;
-    `;
+    el.style.cssText = `position:fixed;right:16px;bottom:16px;background:#2c3e50;color:#fff;padding:10px 14px;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,.2);z-index:1001;`;
     document.body.appendChild(el);
     setTimeout(() => el.remove(), 2200);
   }
-
-  // Optional utility to export visible customers as JSON
-  exportCustomers() {
-    const data = {
-      exportDate: new Date().toISOString(),
-      total: this.filteredCustomers.length,
-      customers: this.filteredCustomers,
-    };
-    const blob = new Blob([JSON.stringify(data, null, 2)], {
-      type: "application/json",
-    });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `customers_export_${
-      new Date().toISOString().split("T")[0]
-    }.json`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-  }
 }
 
-// ------- Global helpers for inline onclicks in HTML -------
+// Boot
 window.addEventListener("DOMContentLoaded", () => {
   window.customersManager = new CustomersManager();
 });
 
-// For <button onclick="searchCustomers()"> etc.
+// Global helpers for inline onclicks
 function searchCustomers() {
-  window.customersManager?.searchCustomers();
+  window.customersManager?.applyFilters();
 }
 function clearFilters() {
   window.customersManager?.clearFilters();
@@ -572,7 +522,27 @@ function openRegisterModal() {
 function closeRegisterModal() {
   window.customersManager?.closeRegisterModal();
 }
-// Optional: expose export (if you add a button for it)
 function exportCustomers() {
-  window.customersManager?.exportCustomers();
+  window.customersManager?.exportCustomers?.();
 }
+
+// --- Open Customer View on card click ---
+document.addEventListener("click", (e) => {
+  const card = e.target.closest(".customer-card");
+  if (!card) return;
+
+  const id = Number(card.getAttribute("data-customer-id"));
+  if (!Number.isFinite(id)) return;
+
+  // Your seed data already exists here (CustomersManager.customers)
+  // Find the customer and stash it for the details page.
+  try {
+    const manager = window.__customersManager || null;
+    const data = manager?.customers || []; // if you expose it, else adapt
+    const selected = Array.isArray(data) ? data.find((c) => c.id === id) : null;
+    if (selected)
+      sessionStorage.setItem("selectedCustomer", JSON.stringify(selected));
+  } catch (_) {}
+
+  window.location.href = `customer-view.html?id=${id}`;
+});

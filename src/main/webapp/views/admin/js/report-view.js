@@ -175,12 +175,14 @@
     const search = $("#reportSearch");
     const status = $("#statusFilter");
     const cat = $("#categoryFilter");
-    const pri = $("#priorityFilter"); // may not exist in your HTML
+    const pri = $("#priorityFilter"); // may be absent
+    const apply = $("#applyFiltersBtn"); // ✅ new
 
     if (search) search.addEventListener("input", render);
     if (status) status.addEventListener("change", render);
     if (cat) cat.addEventListener("change", render);
     if (pri) pri.addEventListener("change", render);
+    if (apply) apply.addEventListener("click", render); // ✅ new
   }
 
   function applyFilters(rows) {

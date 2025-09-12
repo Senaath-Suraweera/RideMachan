@@ -1,7 +1,6 @@
-// Drivers page behavior — mirrors CustomersManager filters (name, second field, sort, min rating)
+// Drivers page behavior — list, filters, register driver modal
 class DriversManager {
   constructor() {
-    // Seed demo data (replace with API)
     this.drivers = [
       {
         id: 1,
@@ -48,80 +47,127 @@ class DriversManager {
         description: "8 years' experience, clean record, excellent service.",
       },
     ];
-
     this.filteredDrivers = [...this.drivers];
-
-    // Minimum rating filter state (0 = off), mirroring customers.js
     this.minRating = 0;
-
     this.init();
   }
 
-  // ---------- Init ----------
   init() {
+    this.cacheEls();
     this.setupEventListeners();
-    this.initializeRatingFilter(); // new stars in filter row
+    this.initializeRatingFilter();
+    this.bindRegisterModal(); // NEW
     this.renderDrivers();
     this.updateCount();
   }
 
-  setupEventListeners() {
-    // Search / Clear actions (same pattern as customers.js)
-    const searchBtn = document.querySelector(".search-actions .btn-primary");
-    const clearBtn = document.querySelector(".search-actions .btn-secondary");
-    if (searchBtn)
-      searchBtn.addEventListener("click", () => this.searchDrivers());
-    if (clearBtn) clearBtn.addEventListener("click", () => this.clearFilters());
+  cacheEls() {
+    this.grid = document.getElementById("driversGrid");
+    this.nameInput = document.getElementById("driverNameFilter");
+    this.licenseInput = document.getElementById("licenseFilter");
+    this.sortInput = document.getElementById("sortOrder");
+    this.searchBtn = document.querySelector(".search-actions .btn-primary");
+    this.clearBtn = document.querySelector(".search-actions .btn-secondary");
 
-    // Live filter inputs
-    const nameInput = document.getElementById("driverNameFilter");
-    const licenseInput = document.getElementById("licenseFilter");
-    const sortInput = document.getElementById("sortOrder");
-    [nameInput, licenseInput, sortInput].forEach((el) => {
-      if (!el) return;
-      const evt = el.tagName === "SELECT" ? "change" : "input";
-      el.addEventListener(evt, () => this.applyFilters());
-    });
-
-    // Card click → navigate to driver-view.html?id=ID
-    const grid = document.getElementById("driversGrid");
-    if (grid) {
-      grid.addEventListener("click", (e) => {
-        const card = e.target.closest(".driver-card");
-        if (!card || !grid.contains(card)) return;
-        const id = Number(card.dataset.driverId);
-        if (Number.isFinite(id)) {
-          const driver = this.drivers.find((d) => d.id === id);
-          if (driver) {
-            sessionStorage.setItem("selectedDriver", JSON.stringify(driver));
-          }
-          window.location.href = `driver-view.html?id=${id}`;
-        }
-      });
-      grid.addEventListener("keydown", (e) => {
-        if (e.key !== "Enter") return;
-        const card = e.target.closest(".driver-card");
-        if (!card || !grid.contains(card)) return;
-        const id = Number(card.dataset.driverId);
-        if (Number.isFinite(id))
-          window.location.href = `driver-view.html?id=${id}`;
-      });
-    }
+    // Modal bits
+    this.btnOpenRegister = document.getElementById("btnOpenRegisterDriver");
+    this.modal = document.getElementById("registerDriverModal");
+    this.btnCloseRegister = document.getElementById("closeRegisterDriver");
+    this.btnCancelRegister = document.getElementById("cancelRegisterDriver");
+    this.formRegister = document.getElementById("registerDriverForm");
   }
 
-  // ---------- Rating stars in filter bar (like Customers) ----------
+  setupEventListeners() {
+    this.searchBtn?.addEventListener("click", () => this.searchDrivers());
+    this.clearBtn?.addEventListener("click", () => this.clearFilters());
+    [this.nameInput, this.licenseInput].forEach((el) =>
+      el?.addEventListener("input", () => this.applyFilters())
+    );
+    this.sortInput?.addEventListener("change", () => this.applyFilters());
+
+    // Card click → driver view
+    this.grid?.addEventListener("click", (e) => {
+      const card = e.target.closest(".driver-card");
+      if (!card || !this.grid.contains(card)) return;
+      const id = Number(card.dataset.driverId);
+      const driver = this.drivers.find((d) => d.id === id);
+      if (driver)
+        sessionStorage.setItem("selectedDriver", JSON.stringify(driver));
+      location.href = `driver-view.html?id=${id}`;
+    });
+    this.grid?.addEventListener("keydown", (e) => {
+      if (e.key !== "Enter") return;
+      const card = e.target.closest(".driver-card");
+      if (!card || !this.grid.contains(card)) return;
+      const id = Number(card.dataset.driverId);
+      location.href = `driver-view.html?id=${id}`;
+    });
+  }
+
+  /* ===== Register Driver modal ===== */
+  bindRegisterModal() {
+    const open = () => this.modal?.classList.add("show");
+    const close = () => {
+      this.modal?.classList.remove("show");
+      this.formRegister?.reset();
+    };
+
+    this.btnOpenRegister?.addEventListener("click", open);
+    this.btnCloseRegister?.addEventListener("click", close);
+    this.btnCancelRegister?.addEventListener("click", close);
+    this.modal?.addEventListener("click", (e) => {
+      if (e.target === this.modal) close();
+    });
+
+    this.formRegister?.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const name = document.getElementById("rdName").value.trim();
+      const company = document.getElementById("rdCompany").value.trim();
+      const licenseNumber = document.getElementById("rdLicense").value.trim();
+      if (!name || !licenseNumber)
+        return alert("Please fill Name and License number.");
+
+      const nicNumber = document.getElementById("rdNIC").value.trim();
+      const email = document.getElementById("rdEmail").value.trim();
+      const phone = document.getElementById("rdPhone").value.trim();
+      const location = document.getElementById("rdLocation").value.trim();
+      const appliedDate =
+        document.getElementById("rdApplied").value ||
+        new Date().toISOString().slice(0, 10);
+      const rating = Number(document.getElementById("rdRating").value || 0);
+      const reviews = Number(document.getElementById("rdReviews").value || 0);
+      const description = document.getElementById("rdDesc").value.trim();
+
+      const newDriver = {
+        id: Date.now(),
+        name,
+        company,
+        licenseNumber,
+        nicNumber,
+        email,
+        phone,
+        location,
+        appliedDate,
+        rating,
+        reviews,
+        description,
+      };
+      this.drivers.unshift(newDriver);
+      this.filteredDrivers = [...this.drivers];
+      this.applyFilters();
+      close();
+    });
+  }
+
+  /* ===== Filters ===== */
   initializeRatingFilter() {
     const container = document.getElementById("ratingFilter");
     if (!container) return;
     const stars = Array.from(container.querySelectorAll(".star"));
-
-    const paint = (value) => {
-      stars.forEach((s) => {
-        const v = Number(s.dataset.value || 0);
-        s.classList.toggle("active", v <= value);
-      });
-    };
-
+    const paint = (v) =>
+      stars.forEach((s) =>
+        s.classList.toggle("active", Number(s.dataset.value) <= v)
+      );
     stars.forEach((star) => {
       star.addEventListener("click", () => {
         this.minRating = Number(star.dataset.value || 0);
@@ -132,130 +178,101 @@ class DriversManager {
         paint(Number(star.dataset.value || 0))
       );
     });
-
     container.addEventListener("mouseleave", () => paint(this.minRating));
     paint(this.minRating);
   }
-
-  // ---------- Filtering / Sorting ----------
   searchDrivers() {
     this.applyFilters();
   }
-
   applyFilters() {
-    const nameFilter = (
-      document.getElementById("driverNameFilter")?.value || ""
-    ).toLowerCase();
-    const licFilter = (
-      document.getElementById("licenseFilter")?.value || ""
-    ).toLowerCase();
-    const sortOrder =
-      document.getElementById("sortOrder")?.value || "ascending";
-
-    this.filteredDrivers = this.drivers.filter((d) => {
-      const byName = d.name.toLowerCase().includes(nameFilter);
-      const byLicense =
-        d.licenseNumber.toLowerCase().includes(licFilter) ||
-        (d.nicNumber || "").toLowerCase().includes(licFilter);
-      const byRating = d.rating >= (this.minRating || 0);
-      return byName && byLicense && byRating;
-    });
-
-    this.filteredDrivers.sort((a, b) => {
-      const c = a.name.localeCompare(b.name);
-      return sortOrder === "ascending" ? c : -c;
-    });
-
+    const name = (this.nameInput?.value || "").toLowerCase();
+    const lic = (this.licenseInput?.value || "").toLowerCase();
+    const order = this.sortInput?.value || "ascending";
+    this.filteredDrivers = this.drivers.filter(
+      (d) =>
+        d.name.toLowerCase().includes(name) &&
+        (d.licenseNumber.toLowerCase().includes(lic) ||
+          (d.nicNumber || "").toLowerCase().includes(lic)) &&
+        d.rating >= (this.minRating || 0)
+    );
+    this.filteredDrivers.sort((a, b) =>
+      order === "ascending"
+        ? a.name.localeCompare(b.name)
+        : b.name.localeCompare(a.name)
+    );
     this.renderDrivers();
     this.updateCount();
   }
-
   clearFilters() {
-    const nameInput = document.getElementById("driverNameFilter");
-    const licenseInput = document.getElementById("licenseFilter");
-    const sortInput = document.getElementById("sortOrder");
-    if (nameInput) nameInput.value = "";
-    if (licenseInput) licenseInput.value = "";
-    if (sortInput) sortInput.value = "ascending";
-
-    // Reset min rating and unpaint
+    if (this.nameInput) this.nameInput.value = "";
+    if (this.licenseInput) this.licenseInput.value = "";
+    if (this.sortInput) this.sortInput.value = "ascending";
     this.minRating = 0;
     document
       .querySelectorAll("#ratingFilter .star")
       .forEach((s) => s.classList.remove("active"));
-
     this.filteredDrivers = [...this.drivers];
     this.renderDrivers();
     this.updateCount();
   }
 
-  // ---------- Render ----------
+  /* ===== Render ===== */
   renderDrivers() {
-    const grid = document.getElementById("driversGrid");
-    if (!grid) return;
-    grid.innerHTML = "";
-    this.filteredDrivers.forEach((driver) =>
-      grid.appendChild(this.createCard(driver))
+    if (!this.grid) return;
+    this.grid.innerHTML = "";
+    this.filteredDrivers.forEach((d) =>
+      this.grid.appendChild(this.createCard(d))
     );
   }
-
-  createCard(driver) {
+  createCard(d) {
     const card = document.createElement("div");
     card.className = "driver-card";
-    card.dataset.driverId = driver.id;
-    card.setAttribute("tabindex", "0");
-    card.setAttribute("role", "button");
-    card.setAttribute("aria-label", `Open ${driver.name}'s profile`);
-
-    const initials = this.getInitials(driver.name);
-    const starsHTML = this.generateStarsHTML(driver.rating);
-
+    card.dataset.driverId = d.id;
+    card.tabIndex = 0;
+    card.role = "button";
+    const initials = this.getInitials(d.name);
+    const stars = this.generateStarsHTML(d.rating);
     card.innerHTML = `
       <div class="driver-avatar"><span class="avatar-text">${initials}</span></div>
       <div class="driver-info">
-        <h4 class="driver-name">${this.escape(driver.name)}</h4>
-        <p class="driver-company">${this.escape(driver.company)}</p>
-
+        <h4 class="driver-name">${this.escape(d.name)}</h4>
+        <p class="driver-company">${this.escape(d.company || "")}</p>
         <div class="driver-details">
-          <span>📍 ${this.escape(driver.location)}</span>
-          <span>🪪 ${this.escape(driver.licenseNumber)}</span>
-          <span>📅 Applied ${this.escape(driver.appliedDate)}</span>
+          <span>📍 ${this.escape(d.location || "—")}</span>
+          <span>🪪 ${this.escape(d.licenseNumber)}</span>
+          <span>📅 Applied ${this.escape(d.appliedDate || "—")}</span>
         </div>
-
         <div class="driver-description"><p>${this.escape(
-          driver.description
+          d.description || ""
         )}</p></div>
-
         <div class="driver-rating">
-          <div class="rating-stars-inline">${starsHTML}</div>
-          <span class="rating-value">${driver.rating.toFixed(1)}</span>
-          <span class="review-count">${driver.reviews} reviews</span>
+          <div class="rating-stars-inline">${stars}</div>
+          <span class="rating-value">${(Number(d.rating) || 0).toFixed(
+            1
+          )}</span>
+          <span class="review-count">${Number(d.reviews || 0)} reviews</span>
         </div>
-      </div>
-    `;
+      </div>`;
     return card;
   }
-
-  generateStarsHTML(rating) {
-    const filled = Math.round(rating);
-    let html = "";
-    for (let i = 1; i <= 5; i++) {
-      html += `<span class="star ${i <= filled ? "active" : ""}">⭐</span>`;
-    }
-    return html;
+  generateStarsHTML(r) {
+    const f = Math.round(r || 0);
+    return Array.from(
+      { length: 5 },
+      (_, i) => `<span class="star ${i + 1 <= f ? "active" : ""}">⭐</span>`
+    ).join("");
   }
-
   updateCount() {
     const el = document.querySelector(".drivers-section .section-title");
     if (el) el.textContent = `Driver List (${this.filteredDrivers.length})`;
   }
 
-  // ---------- Utils ----------
+  /* Utils */
   getInitials(name) {
-    const parts = name.trim().split(/\s+/);
+    const p = name.trim().split(/\s+/);
     return (
-      ((parts[0] || "")[0] || "").toUpperCase() +
-      ((parts[1] || "")[0] || "").toUpperCase()
+      ((p[0] || "")[0] || "").toUpperCase() +
+      ((p[1] || "")[0] || "").toUpperCase()
     );
   }
   escape(s) {
@@ -267,8 +284,6 @@ class DriversManager {
       .replaceAll("'", "&#039;");
   }
 }
-
-/* Bootstrap manager and inline helpers (same pattern as customers.js) */
 window.addEventListener("DOMContentLoaded", () => {
   window.driversManager = new DriversManager();
 });

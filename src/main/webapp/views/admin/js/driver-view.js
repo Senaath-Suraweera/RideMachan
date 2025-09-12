@@ -1,10 +1,8 @@
-// Robust Driver View renderer (merges saved data with defaults to avoid undefined errors)
+// Driver View with Edit modal
 (function () {
-  // Align with sidebar if present
   if (document.querySelector(".sidebar"))
     document.body.classList.add("with-sidebar");
 
-  // ----- COMPLETE local dataset (acts as the source of truth) -----
   const DATA = [
     {
       id: 1,
@@ -77,7 +75,6 @@
     },
   ];
 
-  // Defaults to guarantee every field exists
   const DEFAULTS = {
     id: 0,
     name: "—",
@@ -101,55 +98,68 @@
     categories: [],
   };
 
-  // ---------- Helpers ----------
-  const $ = (sel) => document.querySelector(sel);
+  const $ = (s, r = document) => r.querySelector(s);
   const esc = (s) =>
     String(s)
       .replaceAll("&", "&amp;")
       .replaceAll("<", "&lt;")
       .replaceAll(">", "&gt;");
-  const n = (v, d = 0) => (Number.isFinite(Number(v)) ? Number(v) : d); // coerce to number or default
-  const fmt = (v) => n(v, 0).toLocaleString(); // safe number formatting
+  const num = (v, d = 0) => (Number.isFinite(Number(v)) ? Number(v) : d);
+  const fmt = (v) => num(v, 0).toLocaleString();
 
-  function getIdFromURL() {
-    const q = new URLSearchParams(location.search);
-    const id = Number(q.get("id"));
-    return Number.isFinite(id) ? id : null;
-  }
+  let currentId = null;
+  let currentIndex = -1;
 
-  // Merge precedence: DEFAULTS <- BASE(DATA) <- SAVED(sessionStorage)
-  function getNormalizedDriver(id) {
-    const base = DATA.find((d) => d.id === id) || null;
+  document.addEventListener("DOMContentLoaded", () => {
+    currentId = getIdFromURL();
 
-    let saved = null;
-    const raw = sessionStorage.getItem("selectedDriver");
-    if (raw) {
+    let drv = null;
+    if (Number.isFinite(currentId)) {
+      currentIndex = DATA.findIndex((d) => d.id === currentId);
+      drv = getNormalizedDriver(currentId);
+    } else {
+      // Fallback to last selected driver in sessionStorage
       try {
-        const parsed = JSON.parse(raw);
-        // allow either {id} or full object; ensure it matches current id
-        if (parsed && Number(parsed.id) === id) saved = parsed;
+        const raw = sessionStorage.getItem("selectedDriver");
+        if (raw) {
+          const saved = JSON.parse(raw);
+          if (saved && Number.isFinite(Number(saved.id))) {
+            currentId = Number(saved.id);
+            currentIndex = DATA.findIndex((d) => d.id === currentId);
+            drv = { ...DEFAULTS, ...(DATA[currentIndex] || {}), ...saved };
+          }
+        }
       } catch {}
     }
 
+    if (!drv) {
+      renderEmpty("Driver not found.");
+      // Still wire the modal with defaults so the button works
+      wireEditModal(DEFAULTS);
+      return;
+    }
+
+    renderDriver(drv);
+    wireEditModal(drv);
+  });
+
+  function getNormalizedDriver(id) {
+    const base = DATA.find((d) => d.id === id) || null;
+    let saved = null;
+    try {
+      const raw = sessionStorage.getItem("selectedDriver");
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (parsed && Number(parsed.id) === id) saved = parsed;
+      }
+    } catch {}
     if (!base && !saved) return null;
     return { ...DEFAULTS, ...(base || {}), ...(saved || {}) };
-  }
-
-  function renderEmpty(message) {
-    const mount = $("#driverView");
-    if (!mount) return;
-    mount.innerHTML = `
-      <div class="empty-state" style="background:#fff;border:1px solid #e6e8ec;border-radius:12px;padding:20px;text-align:center;">
-        <p style="margin:0 0 12px;color:#374151;">${esc(message)}</p>
-        <a class="btn" href="drivers.html" style="display:inline-block;padding:10px 14px;border-radius:10px;background:#4f46e5;color:#fff;text-decoration:none;">Back to Drivers</a>
-      </div>
-    `;
   }
 
   function renderDriver(drv) {
     const mount = $("#driverView");
     if (!mount) return;
-
     const initials = String(drv.name)
       .split(" ")
       .map((n) => n[0] || "")
@@ -166,11 +176,11 @@
             <div class="stat-item"><span class="stat-value">${fmt(
               drv.totalRides
             )}</span><span class="stat-label">Total Rides</span></div>
-            <div class="stat-item"><span class="stat-value">${n(
+            <div class="stat-item"><span class="stat-value">${num(
               drv.rating,
               0
             ).toFixed(1)}</span><span class="stat-label">Avg Rating</span></div>
-            <div class="stat-item"><span class="stat-value">${n(
+            <div class="stat-item"><span class="stat-value">${num(
               drv.onTimePercentage,
               0
             )}%</span><span class="stat-label">On Time</span></div>
@@ -187,9 +197,8 @@
           <div class="detail-item"><span class="detail-label">Driver Name</span><span class="detail-value">${esc(
             drv.name
           )}</span></div>
-          <div class="detail-item"><span class="detail-label">Age</span><span class="detail-value">${n(
-            drv.age,
-            0
+          <div class="detail-item"><span class="detail-label">Age</span><span class="detail-value">${num(
+            drv.age
           )} years</span></div>
           <div class="detail-item"><span class="detail-label">Phone</span><span class="detail-value">${esc(
             drv.phone
@@ -200,9 +209,8 @@
           <div class="detail-item"><span class="detail-label">Location</span><span class="detail-value">${esc(
             drv.location
           )}</span></div>
-          <div class="detail-item"><span class="detail-label">Experience</span><span class="detail-value">${n(
-            drv.experience,
-            0
+          <div class="detail-item"><span class="detail-label">Experience</span><span class="detail-value">${num(
+            drv.experience
           )} years</span></div>
           <div class="detail-item"><span class="detail-label">Joined</span><span class="detail-value">${esc(
             drv.appliedDate
@@ -214,16 +222,14 @@
           <div class="detail-item"><span class="detail-label">Total Rides</span><span class="detail-value">${fmt(
             drv.totalRides
           )}</span></div>
-          <div class="detail-item"><span class="detail-label">Average Rating</span><span class="detail-value">${n(
-            drv.rating,
-            0
+          <div class="detail-item"><span class="detail-label">Average Rating</span><span class="detail-value">${num(
+            drv.rating
           ).toFixed(1)}/5.0</span></div>
           <div class="detail-item"><span class="detail-label">Total Reviews</span><span class="detail-value">${fmt(
             drv.reviews
           )}</span></div>
-          <div class="detail-item"><span class="detail-label">On Time %</span><span class="detail-value">${n(
-            drv.onTimePercentage,
-            0
+          <div class="detail-item"><span class="detail-label">On Time %</span><span class="detail-value">${num(
+            drv.onTimePercentage
           )}%</span></div>
           <div class="detail-item"><span class="detail-label">Total Distance</span><span class="detail-value">${fmt(
             drv.totalKm
@@ -264,25 +270,119 @@
       </section>
     `;
 
-    mount.querySelectorAll(".document-actions .btn").forEach((btn) => {
+    mount.querySelectorAll(".document-actions .btn").forEach((btn) =>
       btn.addEventListener("click", () => {
         const type = btn.getAttribute("data-doc");
         alert(
           `${type === "nic" ? "NIC" : "License"} document action triggered`
         );
-      });
+      })
+    );
+  }
+
+  /* ===== Edit modal ===== */
+  function wireEditModal(driver) {
+    const modal = $("#editDriverModal");
+    const openBtn = $("#btnOpenEditDriver");
+    const closeBtn = $("#closeEditDriver");
+    const cancelBtn = $("#cancelEditDriver");
+    const form = $("#editDriverForm");
+
+    const open = () => {
+      prefill(driver);
+      modal?.classList.add("show");
+    };
+    const close = () => {
+      modal?.classList.remove("show");
+    };
+
+    openBtn?.addEventListener("click", open);
+    closeBtn?.addEventListener("click", close);
+    cancelBtn?.addEventListener("click", close);
+    modal?.addEventListener("click", (e) => {
+      if (e.target === modal) close();
+    });
+
+    form?.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const updated = {
+        ...driver,
+        name: $("#edName").value.trim(),
+        company: $("#edCompany").value.trim(),
+        phone: $("#edPhone").value.trim(),
+        email: $("#edEmail").value.trim(),
+        location: $("#edLocation").value.trim(),
+        age: num($("#edAge").value),
+        experience: num($("#edExp").value),
+        rating: num($("#edRating").value),
+        reviews: num($("#edReviews").value),
+        totalRides: num($("#edRides").value),
+        totalKm: num($("#edKm").value),
+        onTimePercentage: num($("#edOnTime").value),
+        status: $("#edStatus").value.trim(),
+        appliedDate: $("#edApplied").value.trim(),
+        nicNumber: $("#edNIC").value.trim(),
+        licenseNumber: $("#edLicense").value.trim(),
+        licenseExpiry: $("#edExpiry").value.trim(),
+        categories: ($("#edCats").value || "")
+          .split(",")
+          .map((s) => s.trim())
+          .filter(Boolean),
+        description: $("#edDesc").value.trim(),
+      };
+
+      // Persist to sessionStorage and in-memory DATA (if present)
+      sessionStorage.setItem("selectedDriver", JSON.stringify(updated));
+      if (currentIndex >= 0)
+        DATA[currentIndex] = { ...DATA[currentIndex], ...updated };
+
+      renderDriver(updated);
+      close();
     });
   }
 
-  // ---------- Bootstrap ----------
-  document.addEventListener("DOMContentLoaded", () => {
-    const id = getIdFromURL();
-    if (!Number.isFinite(id))
-      return renderEmpty("Missing driver id in the URL.");
+  function prefill(d) {
+    const set = (id, v) => {
+      const el = document.getElementById(id);
+      if (el) el.value = v ?? "";
+    };
+    set("edName", d.name);
+    set("edCompany", d.company);
+    set("edPhone", d.phone);
+    set("edEmail", d.email);
+    set("edLocation", d.location);
+    set("edAge", d.age);
+    set("edExp", d.experience);
+    set("edRating", d.rating);
+    set("edReviews", d.reviews);
+    set("edRides", d.totalRides);
+    set("edKm", d.totalKm);
+    set("edOnTime", d.onTimePercentage);
+    set("edStatus", d.status);
+    set("edApplied", d.appliedDate);
+    set("edNIC", d.nicNumber);
+    set("edLicense", d.licenseNumber);
+    set("edExpiry", d.licenseExpiry);
+    set(
+      "edCats",
+      Array.isArray(d.categories)
+        ? d.categories.join(", ")
+        : String(d.categories || "")
+    );
+    set("edDesc", d.description);
+  }
 
-    const driver = getNormalizedDriver(id);
-    if (!driver) return renderEmpty(`Driver not found for id ${id}.`);
-
-    renderDriver(driver);
-  });
+  function getIdFromURL() {
+    const q = new URLSearchParams(location.search);
+    const id = Number(q.get("id"));
+    return Number.isFinite(id) ? id : null;
+  }
+  function renderEmpty(msg) {
+    const mount = $("#driverView");
+    if (!mount) return;
+    mount.innerHTML = `<div class="empty-state" style="background:#fff;border:1px solid #e6e8ec;border-radius:12px;padding:20px;text-align:center;">
+      <p style="margin:0 0 12px;color:#374151;">${esc(msg)}</p>
+      <a class="btn" href="drivers.html" style="display:inline-block;padding:10px 14px;border-radius:10px;background:#4f46e5;color:#fff;text-decoration:none;">Back to Drivers</a>
+    </div>`;
+  }
 })();

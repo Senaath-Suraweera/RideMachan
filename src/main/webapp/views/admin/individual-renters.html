@@ -9,188 +9,102 @@
     <link rel="stylesheet" href="css/individual-renters.css" />
   </head>
   <body>
-    <div class="container">
-      <main class="main-content">
-        <header class="page-header">
-          <div class="header-content">
-            <h1 class="page-title">Drivers</h1>
-            <div class="header-actions">
-              <button
-                class="btn btn-primary"
-                onclick="openRegisterDriverModal()"
-              >
-                + Register Driver
-              </button>
-            </div>
-          </div>
-        </header>
+    <!-- Sidebar auto-inject -->
+    <script src="js/sidebar.js"></script>
 
-        <!-- Search and Filter Section -->
-        <div class="search-filter-section">
-          <div class="filter-row">
-            <div class="form-group">
-              <input
-                type="text"
-                class="form-control"
-                placeholder="Search drivers..."
-                id="driverSearch"
-              />
-            </div>
-            <div class="form-group">
-              <select class="form-select" id="sortOrder">
-                <option value="name_asc">Name: A to Z</option>
-                <option value="name_desc">Name: Z to A</option>
-                <option value="rating_desc">Rating: High to Low</option>
-                <option value="rating_asc">Rating: Low to High</option>
-              </select>
-            </div>
+    <main class="main-content">
+      <header class="page-header">
+        <div class="header-content">
+          <h1 class="page-title">Individual Renters</h1>
+          <div class="header-actions">
+            <button class="btn btn-primary" onclick="openRegisterDriverModal()">
+              + Register Renter
+            </button>
           </div>
         </div>
+      </header>
 
-        <!-- Drivers Grid -->
-        <div class="drivers-section">
-          <div class="drivers-grid" id="driversGrid">
-            <!-- Driver 1 -->
-            <div class="driver-card" data-driver-id="1">
-              <div class="driver-header">
-                <div class="driver-avatar">
-                  <span class="avatar-text">RK</span>
-                </div>
-                <div class="driver-basic-info">
-                  <h3 class="driver-name">Rajesh Kumar</h3>
-                  <p class="driver-company">Lanka Express</p>
-                  <div class="driver-rating">
-                    <span class="rating-value">4.9</span>
-                    <div class="rating-stars">
-                      <span class="star active">★</span>
-                      <span class="star active">★</span>
-                      <span class="star active">★</span>
-                      <span class="star active">★</span>
-                      <span class="star active">★</span>
-                    </div>
-                    <span class="review-count">156 reviews</span>
-                  </div>
-                </div>
-              </div>
+      <!-- Search and Filter Section -->
+      <section class="search-filter-section card" role="search">
+        <div class="filter-row">
+          <div class="form-group">
+            <label class="form-label" for="renterSearch">Search</label>
+            <input
+              id="renterSearch"
+              class="form-control"
+              type="text"
+              placeholder="Name, company, or ID"
+              autocomplete="off"
+            />
+          </div>
 
-              <div class="driver-description">
-                <p>
-                  Top-rated driver with extensive knowledge of Colombo routes.
-                  Available 24/7.
-                </p>
-              </div>
+          <div class="form-group">
+            <label class="form-label" for="locationFilter">Location</label>
+            <select id="locationFilter" class="form-select">
+              <option value="">All</option>
+              <!-- populated by JS -->
+            </select>
+          </div>
 
-              <div class="driver-meta">
-                <span class="meta-item">Applied: 1/13/2024</span>
-              </div>
-            </div>
+          <div class="form-group">
+            <label class="form-label" for="statusFilter">Status</label>
+            <select id="statusFilter" class="form-select">
+              <option value="">All</option>
+              <option value="active">Active</option>
+              <option value="pending">Pending</option>
+            </select>
+          </div>
 
-            <!-- Driver 2 -->
-            <div class="driver-card" data-driver-id="2">
-              <div class="driver-header">
-                <div class="driver-avatar">
-                  <span class="avatar-text">MF</span>
-                </div>
-                <div class="driver-basic-info">
-                  <h3 class="driver-name">Maria Fernando</h3>
-                  <p class="driver-company">Metro Cabs</p>
-                  <div class="driver-rating">
-                    <span class="rating-value">4.6</span>
-                    <div class="rating-stars">
-                      <span class="star active">★</span>
-                      <span class="star active">★</span>
-                      <span class="star active">★</span>
-                      <span class="star active">★</span>
-                      <span class="star">★</span>
-                    </div>
-                    <span class="review-count">89 reviews</span>
-                  </div>
-                </div>
-              </div>
+          <div class="form-group">
+            <label class="form-label" for="minRatingFilter">Min rating</label>
+            <select id="minRatingFilter" class="form-select">
+              <option value="">Any</option>
+              <option value="4.5">4.5+</option>
+              <option value="4.0">4.0+</option>
+              <option value="3.5">3.5+</option>
+              <option value="3.0">3.0+</option>
+            </select>
+          </div>
 
-              <div class="driver-description">
-                <p>
-                  Professional driver specializing in airport transfers. Fluent
-                  in English and Sinhala.
-                </p>
-              </div>
+          <div class="form-group">
+            <label class="form-label" for="sortOrder">Sort</label>
+            <select id="sortOrder" class="form-select">
+              <option value="name_asc">Name: A → Z</option>
+              <option value="name_desc">Name: Z → A</option>
+              <option value="rating_desc">Rating: High → Low</option>
+              <option value="rating_asc">Rating: Low → High</option>
+              <option value="id_asc">ID: Low → High</option>
+              <option value="id_desc">ID: High → Low</option>
+            </select>
+          </div>
 
-              <div class="driver-meta">
-                <span class="meta-item">Applied: 1/14/2024</span>
-              </div>
-            </div>
-
-            <!-- Driver 3 -->
-            <div class="driver-card" data-driver-id="3">
-              <div class="driver-header">
-                <div class="driver-avatar">
-                  <span class="avatar-text">JS</span>
-                </div>
-                <div class="driver-basic-info">
-                  <h3 class="driver-name">John Silva</h3>
-                  <p class="driver-company">City Taxi Service</p>
-                  <div class="driver-rating">
-                    <span class="rating-value">4.8</span>
-                    <div class="rating-stars">
-                      <span class="star active">★</span>
-                      <span class="star active">★</span>
-                      <span class="star active">★</span>
-                      <span class="star active">★</span>
-                      <span class="star active">★</span>
-                    </div>
-                    <span class="review-count">124 reviews</span>
-                  </div>
-                </div>
-              </div>
-
-              <div class="driver-description">
-                <p>
-                  Experienced driver with 8 years of service. Clean driving
-                  record and excellent customer service.
-                </p>
-              </div>
-
-              <div class="driver-meta">
-                <span class="meta-item">Applied: 1/15/2024</span>
-              </div>
-            </div>
+          <div class="search-actions">
+            <button class="btn btn-primary" id="applyFiltersBtn">Search</button>
+            <button class="btn btn-secondary" id="resetFiltersBtn">
+              Reset
+            </button>
           </div>
         </div>
-      </main>
-    </div>
+      </section>
 
-    <!-- Driver Profile Modal -->
-    <div class="modal" id="driverModal">
-      <div class="modal-content driver-profile-modal">
-        <div class="modal-header">
-          <h3 id="driverModalTitle">Driver Profile</h3>
-          <button class="modal-close" onclick="closeDriverModal()">
-            &times;
-          </button>
+      <!-- Renters list as cards -->
+      <section class="renters-section card">
+        <div class="section-header">
+          <h3 class="section-title" id="rentersListTitle">
+            Individual Renters (0)
+          </h3>
         </div>
-        <div class="modal-body">
-          <div id="driverProfileContent">
-            <!-- Driver profile content will be loaded here -->
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button class="btn btn-secondary" onclick="closeDriverModal()">
-            Close
-          </button>
-          <button class="btn btn-primary" onclick="editDriver()">
-            Edit Profile
-          </button>
-        </div>
-      </div>
-    </div>
+        <div class="renters-grid" id="rentersGrid"></div>
+      </section>
+    </main>
 
-    <!-- Register Driver Modal -->
-    <div class="modal" id="registerDriverModal">
+    <!-- Register Renter Modal (reusing your existing structure) -->
+    <div class="modal" id="registerDriverModal" aria-hidden="true">
       <div class="modal-content">
         <div class="modal-header">
-          <h3>Register New Driver</h3>
+          <h3>Register New Individual Renter</h3>
           <button class="modal-close" onclick="closeRegisterDriverModal()">
-            &times;
+            ×
           </button>
         </div>
         <div class="modal-body">
@@ -211,8 +125,8 @@
                   type="number"
                   class="form-control"
                   name="age"
-                  min="21"
-                  max="65"
+                  min="18"
+                  max="80"
                   required
                 />
               </div>
@@ -239,27 +153,26 @@
               </div>
               <div class="form-group">
                 <label class="form-label">Company</label>
-                <input type="text" class="form-control" name="company" />
+                <input
+                  type="text"
+                  class="form-control"
+                  name="company"
+                  placeholder="Independent if blank"
+                />
               </div>
             </div>
             <div class="form-group">
-              <label class="form-label">Experience (Years) *</label>
+              <label class="form-label">Experience (Years)</label>
               <input
                 type="number"
                 class="form-control"
                 name="experience"
-                min="1"
-                required
+                min="0"
               />
             </div>
             <div class="form-group">
-              <label class="form-label">License Number *</label>
-              <input
-                type="text"
-                class="form-control"
-                name="licenseNumber"
-                required
-              />
+              <label class="form-label">Business Registration No.</label>
+              <input type="text" class="form-control" name="licenseNumber" />
             </div>
             <div class="form-group">
               <label class="form-label">NIC Number *</label>
@@ -280,13 +193,12 @@
             Cancel
           </button>
           <button class="btn btn-primary" onclick="registerDriver()">
-            Register Driver
+            Register Renter
           </button>
         </div>
       </div>
     </div>
 
-    <script src="js/sidebar.js"></script>
     <script src="js/individual-renters.js"></script>
   </body>
 </html>

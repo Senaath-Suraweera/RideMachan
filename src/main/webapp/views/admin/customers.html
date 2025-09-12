@@ -20,39 +20,53 @@
               </button>
             </div>
           </div>
-          <p class="page-subtitle">Customers</p>
         </header>
 
         <!-- Search and Filter Section -->
-        <div class="search-filter-section">
+        <div class="search-filter-section" role="search">
           <h3 class="section-title">Search & Filter Customers</h3>
 
           <div class="filter-row">
             <div class="form-group">
-              <label class="form-label">Customer Name</label>
+              <label class="form-label" for="customerNameFilter"
+                >Customer Name</label
+              >
               <input
                 type="text"
                 class="form-control"
-                placeholder="Enter name"
                 id="customerNameFilter"
+                placeholder="Enter name"
+                autocomplete="off"
               />
             </div>
+
             <div class="form-group">
-              <label class="form-label">NIC Number</label>
+              <label class="form-label" for="nicFilter">NIC Number</label>
               <input
                 type="text"
                 class="form-control"
-                placeholder="Enter NIC"
                 id="nicFilter"
+                placeholder="Enter NIC"
+                autocomplete="off"
               />
             </div>
+
             <div class="form-group">
-              <label class="form-label">Sort Order</label>
-              <select class="form-select" id="sortOrder">
-                <option value="ascending">Ascending</option>
-                <option value="descending">Descending</option>
+              <label class="form-label" for="locationFilter">Location</label>
+              <select class="form-select" id="locationFilter">
+                <option value="">All</option>
               </select>
             </div>
+
+            <div class="form-group">
+              <label class="form-label" for="statusFilter">Status</label>
+              <select class="form-select" id="statusFilter">
+                <option value="">All</option>
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
+              </select>
+            </div>
+
             <div class="form-group">
               <label class="form-label">Minimum Rating</label>
               <div
@@ -69,6 +83,46 @@
               <small class="rating-text"
                 >Click a star to set the minimum rating</small
               >
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="joinFrom">Joined From</label>
+              <input type="date" class="form-control" id="joinFrom" />
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="joinTo">Joined To</label>
+              <input type="date" class="form-control" id="joinTo" />
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="bookingsMin">Min Bookings</label>
+              <input
+                type="number"
+                class="form-control"
+                id="bookingsMin"
+                min="0"
+                placeholder="e.g., 5"
+              />
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="bookingsMax">Max Bookings</label>
+              <input
+                type="number"
+                class="form-control"
+                id="bookingsMax"
+                min="0"
+                placeholder="e.g., 25"
+              />
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="sortOrder">Sort</label>
+              <select class="form-select" id="sortOrder">
+                <option value="ascending">Name: A → Z</option>
+                <option value="descending">Name: Z → A</option>
+              </select>
             </div>
           </div>
 

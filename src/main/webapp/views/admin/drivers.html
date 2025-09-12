@@ -18,9 +18,9 @@
             <h1 class="page-title">Drivers</h1>
             <div class="header-actions">
               <!-- Redirect to a page instead of opening a modal -->
-              <a class="btn btn-primary" href="driver-reg.html"
-                >+ Register Driver</a
-              >
+              <button class="btn btn-primary" id="btnOpenRegisterDriver">
+                + Register Driver
+              </button>
             </div>
           </div>
           <p class="page-subtitle">Drivers</p>
@@ -95,6 +95,143 @@
           </div>
           <div class="drivers-grid" id="driversGrid"></div>
         </section>
+
+        <!-- Register Driver Modal -->
+        <div class="modal" id="registerDriverModal" aria-hidden="true">
+          <div
+            class="modal-content"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="rdmTitle"
+          >
+            <div class="modal-header">
+              <h3 id="rdmTitle">Register New Driver</h3>
+              <button
+                class="modal-close"
+                id="closeRegisterDriver"
+                aria-label="Close"
+              >
+                &times;
+              </button>
+            </div>
+
+            <form id="registerDriverForm">
+              <div class="modal-body">
+                <div class="form-row">
+                  <div class="form-group">
+                    <label class="form-label" for="rdName">Full name</label>
+                    <input
+                      id="rdName"
+                      class="form-control"
+                      required
+                      placeholder="e.g., Ruwan Perera"
+                    />
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label" for="rdCompany">Company</label>
+                    <input
+                      id="rdCompany"
+                      class="form-control"
+                      placeholder="e.g., Metro Cabs"
+                    />
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label" for="rdLicense"
+                      >License number</label
+                    >
+                    <input
+                      id="rdLicense"
+                      class="form-control"
+                      required
+                      placeholder="e.g., B1234567"
+                    />
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label" for="rdNIC">NIC number</label>
+                    <input
+                      id="rdNIC"
+                      class="form-control"
+                      placeholder="e.g., 90XXXXXXXXV"
+                    />
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label" for="rdEmail">Email</label>
+                    <input
+                      id="rdEmail"
+                      class="form-control"
+                      type="email"
+                      placeholder="name@company.lk"
+                    />
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label" for="rdPhone">Phone</label>
+                    <input
+                      id="rdPhone"
+                      class="form-control"
+                      placeholder="+94 …"
+                    />
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label" for="rdLocation">Location</label>
+                    <input
+                      id="rdLocation"
+                      class="form-control"
+                      placeholder="e.g., Colombo"
+                    />
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label" for="rdApplied"
+                      >Applied date</label
+                    >
+                    <input id="rdApplied" class="form-control" type="date" />
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label" for="rdRating">Rating</label>
+                    <input
+                      id="rdRating"
+                      class="form-control"
+                      type="number"
+                      min="0"
+                      max="5"
+                      step="0.1"
+                      value="0"
+                    />
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label" for="rdReviews">Reviews</label>
+                    <input
+                      id="rdReviews"
+                      class="form-control"
+                      type="number"
+                      min="0"
+                      value="0"
+                    />
+                  </div>
+                  <div class="form-group" style="grid-column: 1 / -1">
+                    <label class="form-label" for="rdDesc"
+                      >Short description</label
+                    >
+                    <textarea
+                      id="rdDesc"
+                      class="form-control"
+                      rows="3"
+                      placeholder="Add a short bio…"
+                    ></textarea>
+                  </div>
+                </div>
+              </div>
+
+              <div class="modal-footer">
+                <button type="button" class="btn" id="cancelRegisterDriver">
+                  Cancel
+                </button>
+                <button type="submit" class="btn btn-primary">
+                  Save Driver
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
       </main>
     </div>
 

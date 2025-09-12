@@ -1,17 +1,47 @@
-/* ---- Card + layout scaffolding ---- */
+/* === Theme tokens (fallbacks used if global vars exist) === */
+:root {
+  --brand-600: var(--primary-600, #4361ee);
+  --brand-700: var(--primary-700, #374bd1);
+  --brand-ring: rgba(67, 97, 238, 0.15);
+
+  --card-bg: #fff;
+  --card-border: #e6e8ec;
+  --card-shadow: 0 2px 10px rgba(17, 24, 39, 0.04);
+
+  --surface: #f9fafb;
+  --text-900: #111827;
+  --text-700: #374151;
+  --muted-600: #6b7280;
+  --muted-400: #9ca3af;
+
+  --danger-500: #ef4444;
+}
+
+/* === Section spacing & wrappers === */
+.page-header {
+  margin-bottom: 16px;
+}
+.filters-section {
+  margin-bottom: 16px;
+}
+.promotions-section {
+  margin-top: 16px;
+}
+
+/* Card shells */
 .filters-section,
 .promotions-section {
-  background: #fff;
-  border: 1px solid #e6e8ec;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
   border-radius: 12px;
-  box-shadow: 0 2px 10px rgba(17, 24, 39, 0.04);
+  box-shadow: var(--card-shadow);
   padding: 16px;
 }
 
-/* ---- Filters ---- */
+/* === Filters === */
 .filter-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(280px, 1fr));
+  grid-template-columns: repeat(3, minmax(280px, 1fr));
   gap: 16px 24px;
 }
 .filter-group {
@@ -21,33 +51,30 @@
 }
 .filter-label {
   font-weight: 600;
-  color: #374151;
+  color: var(--text-700);
   font-size: 14px;
 }
+.filter-options {
+  margin-top: 10px;
+}
+.search-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 12px;
+}
 
+/* Let global form styles take the lead; only add focus ring alignment */
 .form-control,
 .form-select {
-  width: 100%;
-  height: 40px;
-  padding: 8px 12px;
-  border: 1px solid #e0e0e0;
-  border-radius: 10px;
-  outline: none;
-  background: #fff;
-  color: #111827;
   transition: border-color 0.15s, box-shadow 0.15s;
 }
 .form-control:focus,
 .form-select:focus {
-  border-color: #6366f1;
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+  border-color: var(--brand-600);
+  box-shadow: 0 0 0 4px var(--brand-ring);
 }
 
-.filter-options {
-  margin-top: 10px;
-}
-
-/* Custom checkbox (used for "with driver") */
+/* Custom checkbox */
 .checkbox-container {
   display: inline-flex;
   align-items: center;
@@ -55,7 +82,7 @@
   cursor: pointer;
   user-select: none;
   font-size: 14px;
-  color: #374151;
+  color: var(--text-700);
 }
 .checkbox-container input {
   display: none;
@@ -66,13 +93,12 @@
   border-radius: 4px;
   border: 1px solid #cfd6e4;
   background: #fff;
-  display: inline-block;
   position: relative;
   transition: all 0.15s ease;
 }
 .checkbox-container input:checked + .checkmark {
-  background: #4f46e5;
-  border-color: #4f46e5;
+  background: var(--brand-600);
+  border-color: var(--brand-600);
 }
 .checkbox-container input:checked + .checkmark::after {
   content: "";
@@ -86,60 +112,21 @@
   transform: rotate(45deg);
 }
 
-.search-actions {
-  display: flex;
-  justify-content: flex-start;
-  gap: 10px;
-  margin-top: 10px;
-}
-
-/* ---- Buttons ---- */
-.btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 10px 14px;
-  border-radius: 10px;
-  border: 1px solid transparent;
-  font-weight: 600;
-  cursor: pointer;
-  user-select: none;
-}
-.btn-sm {
-  padding: 8px 12px;
-  font-size: 14px;
-}
-.btn-primary {
-  background: #14a3b8;
-  color: #fff;
-}
-.btn-primary:hover {
-  background: #0f8da0;
-}
-.btn-secondary {
-  background: #111827;
-  color: #fff;
-}
-.btn-secondary:hover {
-  background: #0b1220;
-}
-
-/* ---- Promotions Grid & Card ---- */
+/* === Promotions grid & cards === */
 .promotions-grid {
   display: grid;
-  gap: 16px;
+  gap: 20px;
 }
+
 .promotion-card {
   display: grid;
   grid-template-columns: 220px 1fr;
   gap: 16px;
-  border: 1px solid #e6e8ec;
-  border-radius: 10px;
-  padding: 0;
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
   background: #fff;
   overflow: hidden;
-  transition: box-shadow 0.15s ease, transform 0.05s ease,
-    border-color 0.15s ease;
+  transition: box-shadow 0.15s, transform 0.05s, border-color 0.15s;
 }
 .promotion-card:hover {
   border-color: #d5d8df;
@@ -162,7 +149,7 @@
   position: absolute;
   top: 10px;
   left: 10px;
-  background: #ef4444;
+  background: var(--danger-500);
   color: #fff;
   font-weight: 800;
   font-size: 12px;
@@ -179,24 +166,23 @@
   margin: 0;
   font-size: 18px;
   font-weight: 700;
-  color: #111827;
+  color: var(--text-900);
 }
 .company-info .company-label {
   font-size: 14px;
   color: #6b7280;
 }
-
 .pricing {
   display: flex;
   align-items: center;
   gap: 12px;
 }
 .original-price {
-  color: #9ca3af;
+  color: var(--muted-400);
   text-decoration: line-through;
 }
 .discounted-price {
-  color: #111827;
+  color: var(--text-900);
   font-weight: 800;
 }
 
@@ -209,7 +195,7 @@
   display: flex;
   gap: 8px;
   font-size: 14px;
-  color: #374151;
+  color: var(--text-700);
 }
 .detail-label {
   color: #6b7280;
@@ -222,17 +208,16 @@
 }
 .period-label {
   font-weight: 700;
-  color: #374151;
+  color: var(--text-700);
   margin-right: 6px;
 }
-
 .promotion-actions {
   display: flex;
   gap: 8px;
-  margin-top: 6px;
+  margin-top: 8px;
 }
 
-/* ---- Modals ---- */
+/* === Modals === */
 .modal {
   position: fixed;
   inset: 0;
@@ -255,7 +240,7 @@
 .modal-header,
 .modal-footer {
   padding: 12px 14px;
-  background: #f9fafb;
+  background: var(--surface);
   border-bottom: 1px solid #eef2f7;
 }
 .modal-footer {
@@ -279,7 +264,7 @@
   font-size: 1.6rem;
   line-height: 1;
   cursor: pointer;
-  color: #374151;
+  color: var(--text-700);
 }
 .modal-body {
   padding: 14px;
@@ -298,7 +283,7 @@
   gap: 6px;
 }
 
-/* ---- Responsive ---- */
+/* === Responsive === */
 @media (max-width: 1024px) {
   .filter-grid {
     grid-template-columns: 1fr;

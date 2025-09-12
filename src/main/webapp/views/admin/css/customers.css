@@ -479,3 +479,91 @@ header {
 .form-feedback.error {
   color: #dc3545;
 }
+
+/* === Theme tokens (fallbacks if global vars not present) === */
+:root {
+  --brand-600: var(--primary-600, #4361ee);
+  --brand-700: var(--primary-700, #374bd1);
+  --brand-ring: rgba(67, 97, 238, 0.15);
+
+  --surface: #f9fafb;
+  --card: #fff;
+  --border: #e6e8ec;
+  --text-900: #111827;
+  --text-700: #374151;
+  --muted-600: #6b7280;
+
+  --success-600: #16a34a;
+  --warning-600: #d97706;
+}
+
+/* Section wrappers to match the rest of the app */
+.page-header {
+  margin-bottom: 16px;
+}
+.search-filter-section {
+  margin-bottom: 16px;
+}
+.search-filter-section,
+.customers-section {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(17, 24, 39, 0.04);
+  padding: 16px;
+}
+
+/* Filter layout tidy */
+.search-filter-section .filter-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px 16px;
+}
+.search-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+/* Form polish (let global styles lead; just align focus ring) */
+.form-label {
+  font-size: 12px;
+  color: #5f6368;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.form-control:focus,
+.form-select:focus {
+  border-color: var(--brand-600);
+  box-shadow: 0 0 0 4px var(--brand-ring);
+}
+
+/* Card hover & avatar gradient to match brand */
+.customer-card:hover {
+  border-color: var(--brand-600);
+}
+.customer-avatar {
+  background: linear-gradient(135deg, var(--brand-600), #22c55e);
+}
+
+/* Status badges (active/inactive) */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 78px;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.25px;
+  padding: 6px 10px;
+  border-radius: 999px;
+}
+.status-active {
+  background: rgba(22, 163, 74, 0.12);
+  color: var(--success-600);
+}
+.status-inactive {
+  background: rgba(217, 119, 6, 0.12);
+  color: var(--warning-600);
+}
