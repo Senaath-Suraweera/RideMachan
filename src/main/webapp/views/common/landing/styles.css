@@ -18,7 +18,6 @@ body {
 
 /* Header */
 .header {
-  /* Updated header background color to #0E152B */
   background: #0e152b;
   color: white;
   padding: 0.5rem 0;
@@ -35,9 +34,18 @@ body {
 }
 
 .logo {
-  height: 100px;          /* Keep original height so header size doesn’t change */
-  transform: scale(1.3); /* Make it appear larger */
-  transform-origin: center; /* Scale from center, not corner */
+    width: 80px;
+    height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.logo img {
+    width: auto;
+    height: auto;
+    display: block;
+    margin: 0 auto;
 }
 
 .nav-menu {
@@ -56,10 +64,104 @@ body {
   color: #fbbf24;
 }
 
-.nav-actions {
-  display: flex;
-  gap: 1rem;
+/* Login Popup Styles */
+.login-popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: none;
   align-items: center;
+  justify-content: center;
+  z-index: 2000;
+}
+
+.popup-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(5px);
+}
+
+.popup-content {
+  background: white;
+  border-radius: 12px;
+  padding: 2rem;
+  width: 90%;
+  max-width: 400px;
+  position: relative;
+  z-index: 2001;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  animation: popupSlideIn 0.3s ease-out;
+}
+
+@keyframes popupSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.popup-close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: none;
+  border: none;
+  font-size: 2rem;
+  color: #999;
+  cursor: pointer;
+  transition: color 0.3s;
+  padding: 0;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.popup-close:hover {
+  color: #333;
+}
+
+.popup-header {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.popup-header h3 {
+  color: #0e152b;
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.popup-header p {
+  color: #666;
+}
+
+.popup-footer {
+  text-align: center;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #eee;
+}
+
+.signup-link {
+  color: #3b82f6;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.signup-link:hover {
+  text-decoration: underline;
 }
 
 .btn-login {
@@ -74,13 +176,11 @@ body {
 
 .btn-login:hover {
   background: white;
-  /* Updated hover color to match new header color */
   color: #0e152b;
 }
 
 .btn-primary {
   background: #fbbf24;
-  /* Updated button text color to match new header color */
   color: #0e152b;
   border: none;
   padding: 0.75rem 1.5rem;
@@ -108,12 +208,10 @@ body {
 
 .btn-secondary:hover {
   background: white;
-  /* Updated hover color to match new header color */
   color: #0e152b;
 }
 
 .btn-dark {
-  /* Updated dark button background to new color scheme */
   background: #0e152b;
   color: white;
   border: none;
@@ -126,7 +224,6 @@ body {
 }
 
 .btn-dark:hover {
-  /* Updated hover state for dark button */
   background: #1a1f35;
 }
 
@@ -136,7 +233,6 @@ body {
 
 /* Hero Section */
 .hero {
-  /* Updated hero gradient to match business transform section gradient */
   background: linear-gradient(135deg, #0e152b 0%, #1e3a5f 50%, #3b82f6 100%);
   position: relative;
   color: white;
@@ -147,7 +243,6 @@ body {
   overflow: hidden;
 }
 
-/* Removed complex overlay gradients to match business section simplicity */
 .hero::before {
   content: "";
   position: absolute;
@@ -159,18 +254,10 @@ body {
   z-index: 1;
 }
 
-/* Removed animated gradient overlay */
-.hero::after {
-  display: none;
-}
-
-/* Removed keyframe animation */
-
 .hero-content {
   display: flex;
   gap: 4rem;
   align-items: center;
-  /* Ensure content appears above gradient overlays */
   position: relative;
   z-index: 3;
 }
@@ -229,7 +316,6 @@ body {
 
 .booking-card h3 {
   margin-bottom: 1.5rem;
-  /* Updated booking card header color */
   color: #0e152b;
   font-size: 1.5rem;
 }
@@ -270,7 +356,6 @@ body {
   text-align: center;
   font-size: 2.5rem;
   margin-bottom: 1rem;
-  /* Updated section header color */
   color: #0e152b;
 }
 
@@ -321,7 +406,6 @@ body {
 .feature-card h4 {
   font-size: 1.25rem;
   margin-bottom: 1rem;
-  /* Updated feature card header color */
   color: #0e152b;
 }
 
@@ -340,7 +424,6 @@ body {
   text-align: center;
   font-size: 2.5rem;
   margin-bottom: 1rem;
-  /* Updated section header color */
   color: #0e152b;
 }
 
@@ -363,7 +446,6 @@ body {
   width: 30px;
   height: 30px;
   background: #fbbf24;
-  /* Updated step number text color */
   color: #0e152b;
   border-radius: 50%;
   display: flex;
@@ -389,7 +471,6 @@ body {
 .step-card h4 {
   font-size: 1.25rem;
   margin-bottom: 1rem;
-  /* Updated step card header color */
   color: #0e152b;
 }
 
@@ -400,7 +481,6 @@ body {
 
 /* CTA Section */
 .cta-section {
-  /* Updated CTA section gradient to use #0E152B */
   background: linear-gradient(135deg, #0e152b 0%, #1e3a5f 50%, #3b82f6 100%);
   color: white;
   padding: 80px 0;
@@ -428,7 +508,6 @@ body {
   text-align: center;
   font-size: 2.5rem;
   margin-bottom: 1rem;
-  /* Updated partner network header color */
   color: #0e152b;
 }
 
@@ -472,7 +551,6 @@ body {
 .partner-card h3 {
   font-size: 1.5rem;
   margin-bottom: 0.5rem;
-  /* Updated partner card header color */
   color: #0e152b;
 }
 
@@ -500,28 +578,6 @@ body {
   font-size: 0.9rem;
 }
 
-.commission-rate {
-  background: #f1f5f9;
-  padding: 1rem;
-  border-radius: 8px;
-  margin-bottom: 2rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.rate {
-  color: #666;
-  font-weight: 500;
-}
-
-.percentage {
-  font-size: 1.5rem;
-  font-weight: bold;
-  /* Updated percentage text color */
-  color: #0e152b;
-}
-
 .learn-more {
   display: block;
   margin-top: 1rem;
@@ -536,7 +592,6 @@ body {
 
 /* Business Transform */
 .business-transform {
-  /* Updated business transform gradient to use #0E152B */
   background: linear-gradient(135deg, #0e152b 0%, #1e3a5f 50%, #3b82f6 100%);
   color: white;
   padding: 80px 0;
@@ -579,7 +634,6 @@ body {
 
 /* Footer */
 .footer {
-  /* Updated footer background to #0E152B */
   background: #0e152b;
   color: white;
   padding: 60px 0 20px;
@@ -638,7 +692,6 @@ body {
 .social-links a {
   width: 40px;
   height: 40px;
-  /* Updated social links background */
   background: #1a1f35;
   border-radius: 50%;
   display: flex;
@@ -651,12 +704,10 @@ body {
 
 .social-links a:hover {
   background: #fbbf24;
-  /* Updated social links hover color */
   color: #0e152b;
 }
 
 .footer-bottom {
-  /* Updated footer bottom border color */
   border-top: 1px solid #1a1f35;
   padding-top: 2rem;
   display: flex;
@@ -737,6 +788,11 @@ body {
     flex-wrap: wrap;
     justify-content: center;
   }
+
+  .popup-content {
+    width: 95%;
+    padding: 1.5rem;
+  }
 }
 
 @media (max-width: 480px) {
@@ -771,5 +827,9 @@ body {
   .features-grid {
     grid-template-columns: 1fr;
     grid-template-rows: auto;
+  }
+
+  .popup-content {
+    padding: 1rem;
   }
 }

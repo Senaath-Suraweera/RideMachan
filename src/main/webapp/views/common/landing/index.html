@@ -12,7 +12,7 @@
     <header class="header">
         <div class="container">
             <div class="nav-brand">
-                <img src="logo.png" alt="RideMachan" class="logo">
+                <img src="/logo.png" alt="RideMachan" class="logo">
             </div>
             <nav class="nav-menu">
                 <a href="#features">Features</a>
@@ -20,12 +20,36 @@
                 <a href="#how-it-works">How it Works</a>
                 <a href="#contact">Contact</a>
             </nav>
-            <div class="nav-actions">
-                <button class="btn-login">Login</button>
-                <button class="btn-primary">Get Started</button>
-            </div>
         </div>
     </header>
+
+    <!-- Login Popup -->
+    <div class="login-popup" id="loginPopup">
+        <div class="popup-overlay" id="popupOverlay"></div>
+        <div class="popup-content">
+            <button class="popup-close" id="closePopup">&times;</button>
+            <div class="popup-header">
+                <h3>Welcome to RideMachan</h3>
+                <p>Please login to continue booking</p>
+            </div>
+            <div class="login-form">
+                <form>
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" placeholder="Enter your email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" placeholder="Enter your password" required>
+                    </div>
+                    <button type="submit" class="btn-primary btn-full">Login</button>
+                </form>
+                <div class="popup-footer">
+                    <p>Don't have an account? <a href="customer_sign-in.html" class="signup-link">Sign up here</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Hero Section -->
     <section class="hero">
@@ -51,7 +75,6 @@
                     </div>
 
                     <div class="hero-buttons">
-                        <!-- Added specific navigation functionality to buttons -->
                         <button class="btn-primary" id="book-ride-btn">Book Your Ride</button>
                         <button class="btn-secondary" id="become-partner-btn">Become a Partner</button>
                     </div>
@@ -247,13 +270,7 @@
                         <li><i class="fas fa-check"></i> Professional driver network access</li>
                     </ul>
 
-                    <div class="commission-rate">
-                        <span class="rate">Commission Rate</span>
-                        <span class="percentage">15-20%</span>
-                    </div>
-
                     <button class="btn-dark">Register Your Company</button>
-                    <a href="#" class="learn-more">Learn More</a>
                 </div>
 
                 <div class="partner-card highlighted">
@@ -261,7 +278,7 @@
                         <i class="fas fa-user"></i>
                     </div>
                     <h3>Individual Owners</h3>
-                    <p>Turn your car into a source of income</p>
+                    <p>Turn your vehicle into a source of income</p>
                     
                     <ul class="partner-features">
                         <li><i class="fas fa-check"></i> Earn passive income from your vehicle</li>
@@ -272,13 +289,7 @@
                         <li><i class="fas fa-check"></i> Marketing and customer support</li>
                     </ul>
 
-                    <div class="commission-rate">
-                        <span class="rate">Earn Up To</span>
-                        <span class="percentage">LKR 300k+</span>
-                    </div>
-
                     <button class="btn-primary">List Your Vehicle</button>
-                    <a href="#" class="learn-more">Calculate Earnings</a>
                 </div>
             </div>
         </div>
@@ -305,7 +316,7 @@
                 </div>
             </div>
 
-            <button class="btn-primary">Start Your Partnership Today</button>
+            <button class="btn-primary" id="start-partnership-btn">Start Your Partnership Today</button>
         </div>
     </section>
 

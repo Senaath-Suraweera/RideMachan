@@ -1,5 +1,38 @@
 // Mobile menu toggle
 document.addEventListener("DOMContentLoaded", () => {
+  // Login popup functionality
+  const loginPopup = document.getElementById("loginPopup");
+  const popupOverlay = document.getElementById("popupOverlay");
+  const closePopup = document.getElementById("closePopup");
+
+  // Show popup function
+  function showLoginPopup() {
+    loginPopup.style.display = "flex";
+    document.body.style.overflow = "hidden";
+  }
+
+  // Hide popup function
+  function hideLoginPopup() {
+    loginPopup.style.display = "none";
+    document.body.style.overflow = "auto";
+  }
+
+  // Close popup events
+  if (closePopup) {
+    closePopup.addEventListener("click", hideLoginPopup);
+  }
+
+  if (popupOverlay) {
+    popupOverlay.addEventListener("click", hideLoginPopup);
+  }
+
+  // Close popup on escape key
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && loginPopup.style.display === "flex") {
+      hideLoginPopup();
+    }
+  });
+
   // Smooth scrolling for navigation links
   const navLinks = document.querySelectorAll('a[href^="#"]')
   navLinks.forEach((link) => {
@@ -23,56 +56,37 @@ document.addEventListener("DOMContentLoaded", () => {
   if (bookingForm) {
     bookingForm.addEventListener("submit", (e) => {
       e.preventDefault()
-      alert("Booking search functionality would be implemented here!")
+      window.location.href = "customer_sign-in.html";
     })
   }
 
-  // CTA buttons
-  const ctaButtons = document.querySelectorAll(".btn-primary")
-  ctaButtons.forEach((button) => {
-    if (
-      button.textContent.includes("Book") ||
-      button.textContent.includes("Start") ||
-      button.textContent.includes("Search")
-    ) {
-      button.addEventListener("click", () => {
-        alert("Booking system would be integrated here!")
-      })
-    }
-  })
-
-  // Partner registration buttons
-  const partnerButtons = document.querySelectorAll(".btn-dark, .btn-primary")
-  partnerButtons.forEach((button) => {
-    if (button.textContent.includes("Register") || button.textContent.includes("List")) {
-      button.addEventListener("click", () => {
-        alert("Partner registration system would be implemented here!")
-      })
-    }
-  })
-
-  // Specific navigation functionality for main CTA buttons
+  // Book Your Ride button - show login popup
   const bookRideBtn = document.getElementById("book-ride-btn")
-  const becomePartnerBtn = document.getElementById("become-partner-btn")
-  const startJourneyBtn = document.getElementById("start-journey-btn")
-  const ctaStartJourneyBtn = document.getElementById("cta-start-journey")
-
-  // Book Your Ride button - scroll to booking form
   if (bookRideBtn) {
     bookRideBtn.addEventListener("click", () => {
-      const bookingCard = document.querySelector(".booking-card")
-      if (bookingCard) {
-        const headerHeight = document.querySelector(".header").offsetHeight
-        const targetPosition = bookingCard.offsetTop - headerHeight - 20
-        window.scrollTo({
-          top: targetPosition,
-          behavior: "smooth",
-        })
-      }
+      showLoginPopup();
+    })
+  }
+
+  // Start Your Journey button - redirect to customer sign-in
+  const startJourneyBtn = document.getElementById("start-journey-btn")
+  if (startJourneyBtn) {
+    startJourneyBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      window.location.href = "customer_sign-in.html";
+    })
+  }
+
+  // CTA Start Your Journey button - redirect to customer sign-in
+  const ctaStartJourneyBtn = document.getElementById("cta-start-journey")
+  if (ctaStartJourneyBtn) {
+    ctaStartJourneyBtn.addEventListener("click", () => {
+      window.location.href = "customer_sign-in.html";
     })
   }
 
   // Become a Partner button - scroll to partner network section
+  const becomePartnerBtn = document.getElementById("become-partner-btn")
   if (becomePartnerBtn) {
     becomePartnerBtn.addEventListener("click", () => {
       const partnerSection = document.querySelector(".partner-network")
@@ -87,13 +101,14 @@ document.addEventListener("DOMContentLoaded", () => {
     })
   }
 
-  // Start Your Journey buttons - scroll to booking form
-  if (startJourneyBtn) {
-    startJourneyBtn.addEventListener("click", () => {
-      const bookingCard = document.querySelector(".booking-card")
-      if (bookingCard) {
+  // Start Partnership Today button - scroll to partner network section
+  const startPartnershipBtn = document.getElementById("start-partnership-btn")
+  if (startPartnershipBtn) {
+    startPartnershipBtn.addEventListener("click", () => {
+      const partnerSection = document.querySelector(".partner-network")
+      if (partnerSection) {
         const headerHeight = document.querySelector(".header").offsetHeight
-        const targetPosition = bookingCard.offsetTop - headerHeight - 20
+        const targetPosition = partnerSection.offsetTop - headerHeight
         window.scrollTo({
           top: targetPosition,
           behavior: "smooth",
@@ -102,17 +117,18 @@ document.addEventListener("DOMContentLoaded", () => {
     })
   }
 
-  if (ctaStartJourneyBtn) {
-    ctaStartJourneyBtn.addEventListener("click", () => {
-      const bookingCard = document.querySelector(".booking-card")
-      if (bookingCard) {
-        const headerHeight = document.querySelector(".header").offsetHeight
-        const targetPosition = bookingCard.offsetTop - headerHeight - 20
-        window.scrollTo({
-          top: targetPosition,
-          behavior: "smooth",
-        })
-      }
+  // Partner registration buttons
+  const registerCompanyBtn = document.querySelector(".partner-card .btn-dark");
+  if (registerCompanyBtn) {
+    registerCompanyBtn.addEventListener("click", () => {
+      window.location.href = "company_sign-in.html";
+    })
+  }
+
+  const listVehicleBtn = document.querySelector(".partner-card .btn-primary");
+  if (listVehicleBtn && listVehicleBtn.textContent.includes("List")) {
+    listVehicleBtn.addEventListener("click", () => {
+      window.location.href = "individual_renters_sign-in.html";
     })
   }
 
