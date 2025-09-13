@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vehicle Details - Ride Machan</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <!-- Updated to use main.css and vehicle-profile.css -->
+    <link rel="stylesheet" href="../css/main.css" />
+    <link rel="stylesheet" href="../css/vehicle-profile.css" />
+</head>
+<body>
+    <div class="container">
+        <!-- Include Sidebar Navigation -->
+        <div id="navbar-container"></div>
+
+        <!-- Include Header -->
+        <div id="header-container"></div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Added back button section -->
+            <div class="back-section">
+                <button class="back-btn" onclick="goBack()">
+                    <i class="fas fa-arrow-left"></i>
+                    Back to Search
+                </button>
+            </div>
+
+            <div class="vehicle-details-container">
+                <!-- Left Section -->
+                <div class="left-section">
+                    <!-- Vehicle Info -->
+                    <div class="vehicle-info">
+                        <div class="vehicle-header">
+                            <div class="vehicle-image-large">
+                                <i class="fas fa-car"></i>
+                            </div>
+                            <div class="vehicle-basic-info">
+                                <h2 id="vehicleName">Honda Vezel</h2>
+                                <div class="vehicle-company" id="vehicleCompany" onclick="viewCompany()">Premium Rentals Colombo</div>
+                                <div class="vehicle-location" id="vehicleLocation">Colombo 03, Sri Lanka</div>
+                                <div class="vehicle-rating">
+                                    <div class="stars" id="vehicleStars">
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="far fa-star"></i>
+                                    </div>
+                                    <span class="rating-text" id="ratingText">47 reviews</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="vehicle-meta" id="vehicleMeta">
+                            <div class="meta-item">
+                                <span class="meta-label">Year:</span>
+                                <span class="meta-value">2022</span>
+                            </div>
+                            <div class="meta-item">
+                                <span class="meta-label">Mileage:</span>
+                                <span class="meta-value">16 km/L</span>
+                            </div>
+                            <div class="meta-item">
+                                <span class="meta-label">Engine:</span>
+                                <span class="meta-value">1.5L Hybrid</span>
+                            </div>
+                            <div class="meta-item">
+                                <span class="meta-label">Color:</span>
+                                <span class="meta-value">Pearl White</span>
+                            </div>
+                        </div>
+
+                        <!-- Key Features -->
+                        <div class="key-features">
+                            <h3>Key Features</h3>
+                            <div class="features-list" id="featuresList">
+                                <div class="feature-item">
+                                    <div class="feature-icon transmission">
+                                        <i class="fas fa-cogs"></i>
+                                    </div>
+                                    <div class="feature-content">
+                                        <div class="feature-title">Transmission</div>
+                                        <div class="feature-subtitle">CVT Automatic</div>
+                                    </div>
+                                </div>
+                                <div class="feature-item">
+                                    <div class="feature-icon fuel">
+                                        <i class="fas fa-gas-pump"></i>
+                                    </div>
+                                    <div class="feature-content">
+                                        <div class="feature-title">Fuel Type</div>
+                                        <div class="feature-subtitle">Hybrid Petrol</div>
+                                    </div>
+                                </div>
+                                <div class="feature-item">
+                                    <div class="feature-icon seating">
+                                        <i class="fas fa-users"></i>
+                                    </div>
+                                    <div class="feature-content">
+                                        <div class="feature-title">Seating Capacity</div>
+                                        <div class="feature-subtitle">5 Passengers</div>
+                                    </div>
+                                </div>
+                                <div class="feature-item">
+                                    <div class="feature-icon ac">
+                                        <i class="fas fa-snowflake"></i>
+                                    </div>
+                                    <div class="feature-content">
+                                        <div class="feature-title">Air Conditioning</div>
+                                        <div class="feature-subtitle">Dual Zone AC</div>
+                                    </div>
+                                </div>
+                                <div class="feature-item">
+                                    <div class="feature-icon luggage">
+                                        <i class="fas fa-suitcase"></i>
+                                    </div>
+                                    <div class="feature-content">
+                                        <div class="feature-title">Luggage Capacity</div>
+                                        <div class="feature-subtitle">3-4 Large Bags</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Rating and Reviews -->
+                    <div class="rating-reviews">
+                        <h3>Rating and Reviews</h3>
+                        <div class="overall-rating">
+                            <div class="rating-score" id="overallRating">4.7</div>
+                            <div class="rating-breakdown">
+                                <div class="rating-stars">
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="far fa-star"></i>
+                                </div>
+                                <div class="rating-summary" id="ratingSummary">Based on 47 customer reviews</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Section -->
+                <div class="right-section">
+                    <!-- Booking Card -->
+                    <div class="booking-card">
+                        <h3>Book This Vehicle</h3>
+                        <div class="rate-info">
+                            <div class="rate-label">Starting from</div>
+                            <div class="price" id="vehiclePrice">LKR 6,500<span class="price-period">/day</span></div>
+                        </div>
+                        
+                        <div class="availability-status available">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Available Now</span>
+                        </div>
+                        
+                        <div class="availability-text">
+                            Next available: Immediately
+                        </div>
+                        
+                        <!-- Updated buttons to match styling and functionality -->
+                        <button class="btn btn-primary" onclick="bookVehicle()">
+                            <i class="fas fa-calendar-plus"></i>
+                            Book Now
+                        </button>
+                        
+                        <button class="btn btn-outline" onclick="messageOwner()">
+                            <i class="fas fa-comment"></i>
+                            Message Owner
+                        </button>
+                        
+                        <button class="btn btn-outline" id="wishlistBtn" onclick="toggleWishlist()">
+                            <i class="far fa-heart"></i>
+                            Add to Wishlist
+                        </button>
+                    </div>
+
+                    <!-- License Requirements -->
+                    <div class="booking-card">
+                        <h3>License Requirements</h3>
+                        <div class="license-info">
+                            <div class="license-item">
+                                <i class="fas fa-id-card text-success"></i>
+                                <div class="license-content">
+                                    <div class="license-title">Valid Driver's License</div>
+                                    <div class="license-subtitle">Required for all drivers</div>
+                                </div>
+                            </div>
+                            <div class="license-item">
+                                <i class="fas fa-globe text-primary"></i>
+                                <div class="license-content">
+                                    <div class="license-title">International Driving Permit</div>
+                                    <div class="license-subtitle">For non-local licenses</div>
+                                </div>
+                            </div>
+                            <div class="license-item">
+                                <i class="fas fa-calendar text-muted"></i>
+                                <div class="license-content">
+                                    <div class="license-title">Minimum 2 Years Experience</div>
+                                    <div class="license-subtitle">Valid driving experience required</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Load components function
+        function loadComponent(elementId, filePath) {
+            fetch(filePath)
+                .then(response => response.text())
+                .then(data => {
+                    let modifiedData = data;
+                    if (elementId === 'header-container') {
+                        modifiedData = data.replace('{{PAGE_TITLE}}', 'Vehicle Details');
+                    }
+                    document.getElementById(elementId).innerHTML = modifiedData;
+                    const scripts = document.getElementById(elementId).getElementsByTagName('script');
+                    for (let script of scripts) {
+                        eval(script.innerHTML);
+                    }
+                })
+                .catch(error => console.error('Error loading component:', error));
+        }
+
+        // Sample detailed vehicle data for Sri Lankan context
+        const vehicleDetails = {
+            1: {
+                name: "Honda Vezel",
+                company: "Premium Rentals Colombo",
+                companyId: 1,
+                location: "Colombo 03, Sri Lanka",
+                price: 6500,
+                rating: 4.7,
+                reviews: 47,
+                year: 2022,
+                mileage: "16 km/L",
+                engine: "1.5L Hybrid",
+                color: "Pearl White",
+                transmission: "CVT Automatic",
+                fuel: "Hybrid Petrol",
+                seats: 5,
+                ac: "Dual Zone AC",
+                luggage: "3-4 Large Bags",
+                features: ["GPS Navigation", "Bluetooth", "A/C", "Leather Seats", "Sunroof"]
+            },
+            2: {
+                name: "Toyota Axio",
+                company: "City Car Rentals",
+                companyId: 2,
+                location: "Kandy, Sri Lanka",
+                price: 4500,
+                rating: 4.5,
+                reviews: 32,
+                year: 2021,
+                mileage: "14 km/L",
+                engine: "1.5L Petrol",
+                color: "Silver Metallic",
+                transmission: "Manual",
+                fuel: "Petrol",
+                seats: 5,
+                ac: "Standard AC",
+                luggage: "2-3 Large Bags",
+                features: ["A/C", "Bluetooth", "Power Steering"]
+            },
+            3: {
+                name: "Suzuki Alto",
+                company: "Budget Wheels",
+                companyId: 3,
+                location: "Galle, Sri Lanka",
+                price: 3500,
+                rating: 4.2,
+                reviews: 18,
+                year: 2020,
+                mileage: "18 km/L",
+                engine: "1.0L Petrol",
+                color: "White",
+                transmission: "Manual",
+                fuel: "Petrol",
+                seats: 4,
+                ac: "Standard AC",
+                luggage: "2 Medium Bags",
+                features: ["A/C", "Power Steering"]
+            }
+        };
+
+        let isWishlisted = false;
+
+        function loadVehicleDetails() {
+            // Get vehicle ID from sessionStorage or URL parameter
+            const vehicleId = sessionStorage.getItem('selectedVehicleId') || '1';
+            const vehicle = vehicleDetails[vehicleId];
+
+            if (!vehicle) {
+                console.error('Vehicle not found');
+                return;
+            }
+
+            // Update vehicle information
+            document.getElementById('vehicleName').textContent = vehicle.name;
+            document.getElementById('vehicleCompany').textContent = vehicle.company;
+            document.getElementById('vehicleLocation').textContent = vehicle.location;
+            document.getElementById('vehiclePrice').innerHTML = `LKR ${vehicle.price.toLocaleString()}<span class="price-period">/day</span>`;
+            document.getElementById('overallRating').textContent = vehicle.rating;
+            document.getElementById('ratingText').textContent = `${vehicle.reviews} reviews`;
+            document.getElementById('ratingSummary').textContent = `Based on ${vehicle.reviews} customer reviews`;
+
+            // Update stars
+            updateStars('vehicleStars', vehicle.rating);
+            
+            // Update meta information
+            const metaContainer = document.getElementById('vehicleMeta');
+            metaContainer.innerHTML = `
+                <div class="meta-item">
+                    <span class="meta-label">Year:</span>
+                    <span class="meta-value">${vehicle.year}</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">Mileage:</span>
+                    <span class="meta-value">${vehicle.mileage}</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">Engine:</span>
+                    <span class="meta-value">${vehicle.engine}</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">Color:</span>
+                    <span class="meta-value">${vehicle.color}</span>
+                </div>
+            `;
+
+            // Update features
+            const featuresContainer = document.getElementById('featuresList');
+            featuresContainer.innerHTML = `
+                <div class="feature-item">
+                    <div class="feature-icon transmission">
+                        <i class="fas fa-cogs"></i>
+                    </div>
+                    <div class="feature-content">
+                        <div class="feature-title">Transmission</div>
+                        <div class="feature-subtitle">${vehicle.transmission}</div>
+                    </div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon fuel">
+                        <i class="fas fa-gas-pump"></i>
+                    </div>
+                    <div class="feature-content">
+                        <div class="feature-title">Fuel Type</div>
+                        <div class="feature-subtitle">${vehicle.fuel}</div>
+                    </div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon seating">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="feature-content">
+                        <div class="feature-title">Seating Capacity</div>
+                        <div class="feature-subtitle">${vehicle.seats} Passengers</div>
+                    </div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon ac">
+                        <i class="fas fa-snowflake"></i>
+                    </div>
+                    <div class="feature-content">
+                        <div class="feature-title">Air Conditioning</div>
+                        <div class="feature-subtitle">${vehicle.ac}</div>
+                    </div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon luggage">
+                        <i class="fas fa-suitcase"></i>
+                    </div>
+                    <div class="feature-content">
+                        <div class="feature-title">Luggage Capacity</div>
+                        <div class="feature-subtitle">${vehicle.luggage}</div>
+                    </div>
+                </div>
+            `;
+
+            // Store company ID for navigation
+            sessionStorage.setItem('selectedCompanyId', vehicle.companyId);
+        }
+
+        function updateStars(containerId, rating) {
+            const container = document.getElementById(containerId);
+            let starsHTML = '';
+            
+            for (let i = 1; i <= 5; i++) {
+                if (i <= rating) {
+                    starsHTML += '<i class="fas fa-star"></i>';
+                } else {
+                    starsHTML += '<i class="far fa-star"></i>';
+                }
+            }
+            
+            container.innerHTML = starsHTML;
+        }
+
+        function bookVehicle() {
+            const vehicleId = sessionStorage.getItem('selectedVehicleId') || '1';
+            const vehicle = vehicleDetails[vehicleId];
+            if (vehicle) {
+                showBookingPopup(vehicle);
+            }
+        }
+
+        function messageOwner() {
+            const vehicleId = sessionStorage.getItem('selectedVehicleId') || '1';
+            const vehicle = vehicleDetails[vehicleId];
+            if (vehicle) {
+                showMessagePopup(vehicle);
+            }
+        }
+
+        function showBookingPopup(vehicle) {
+            const popup = document.createElement('div');
+            popup.className = 'popup-overlay';
+            popup.innerHTML = `
+                <div class="popup-content">
+                    <div class="popup-header">
+                        <h3>Book ${vehicle.name}</h3>
+                        <button class="close-btn" onclick="closePopup()">&times;</button>
+                    </div>
+                    <div class="popup-body">
+                        <p><strong>Vehicle:</strong> ${vehicle.name}</p>
+                        <p><strong>Company:</strong> ${vehicle.company}</p>
+                        <p><strong>Rate:</strong> LKR ${vehicle.price.toLocaleString()}/day</p>
+                        <p><strong>Location:</strong> ${vehicle.location}</p>
+                        <br>
+                        <p>Confirm your booking details:</p>
+                        <div class="booking-details">
+                            <label>Pickup Date:</label>
+                            <input type="datetime-local" id="bookingDate" class="popup-input">
+                            <label>Return Date:</label>
+                            <input type="datetime-local" id="returnDate" class="popup-input">
+                            <label>Pickup Location:</label>
+                            <input type="text" id="pickupLocation" class="popup-input" placeholder="Enter pickup location">
+                            <label>Special Requirements:</label>
+                            <textarea id="specialRequests" class="popup-input" placeholder="Any special requirements..."></textarea>
+                        </div>
+                    </div>
+                    <div class="popup-footer">
+                        <button class="btn btn-primary" onclick="confirmBooking(${vehicleId})">Confirm Booking</button>
+                        <button class="btn btn-outline" onclick="closePopup()">Cancel</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(popup);
+        }
+
+        function showMessagePopup(vehicle) {
+            const popup = document.createElement('div');
+            popup.className = 'popup-overlay';
+            popup.innerHTML = `
+                <div class="popup-content">
+                    <div class="popup-header">
+                        <h3>Send Message to ${vehicle.company}</h3>
+                        <button class="close-btn" onclick="closePopup()">&times;</button>
+                    </div>
+                    <div class="popup-body">
+                        <p>Send a message about <strong>${vehicle.name}</strong> to <strong>${vehicle.company}</strong>:</p>
+                        <textarea class="message-input popup-input" placeholder="Type your message here..." rows="6"></textarea>
+                    </div>
+                    <div class="popup-footer">
+                        <button class="btn btn-primary" onclick="sendMessage()">Send Message</button>
+                        <button class="btn btn-outline" onclick="closePopup()">Cancel</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(popup);
+        }
+
+        function confirmBooking(vehicleId) {
+            const vehicle = vehicleDetails[vehicleId];
+            const bookingDate = document.getElementById('bookingDate').value;
+            const returnDate = document.getElementById('returnDate').value;
+            
+            if (!bookingDate || !returnDate) {
+                showNotification('Please select pickup and return dates', 'warning');
+                return;
+            }
+            
+            closePopup();
+            showNotification(`Booking request sent for ${vehicle.name}! You will receive a confirmation shortly.`, 'success');
+        }
+
+        function sendMessage() {
+            const messageInput = document.querySelector('.message-input');
+            
+            if (messageInput && messageInput.value.trim()) {
+                closePopup();
+                showNotification('Message sent successfully!', 'success');
+            } else {
+                showNotification('Please enter a message before sending.', 'warning');
+            }
+        }
+
+        function closePopup() {
+            const popup = document.querySelector('.popup-overlay');
+            if (popup) {
+                popup.remove();
+            }
+        }
+
+        function toggleWishlist() {
+            const wishlistBtn = document.getElementById('wishlistBtn');
+            const icon = wishlistBtn.querySelector('i');
+            
+            if (!isWishlisted) {
+                icon.classList.remove('far');
+                icon.classList.add('fas');
+                wishlistBtn.style.background = 'var(--danger)';
+                wishlistBtn.style.color = 'white';
+                wishlistBtn.style.borderColor = 'var(--danger)';
+                wishlistBtn.innerHTML = '<i class="fas fa-heart"></i> Added to Wishlist';
+                isWishlisted = true;
+                
+                showNotification('Vehicle added to wishlist!', 'success');
+            } else {
+                icon.classList.remove('fas');
+                icon.classList.add('far');
+                wishlistBtn.style.background = 'transparent';
+                wishlistBtn.style.color = 'var(--primary)';
+                wishlistBtn.style.borderColor = 'var(--primary-light)';
+                wishlistBtn.innerHTML = '<i class="far fa-heart"></i> Add to Wishlist';
+                isWishlisted = false;
+                
+                showNotification('Vehicle removed from wishlist!', 'info');
+            }
+        }
+
+        function viewCompany() {
+            const companyId = sessionStorage.getItem('selectedCompanyId');
+            sessionStorage.setItem('previousPage', 'vehicle-profile');
+            window.location.href = 'company-profile.html';
+        }
+
+        function goBack() {
+            const previousPage = sessionStorage.getItem('previousPage');
+            if (previousPage === 'search' || previousPage === 'driver_search') {
+                window.location.href = 'search.html';
+            } else {
+                window.location.href = 'search.html';
+            }
+        }
+
+        function showNotification(message, type) {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 12px 20px;
+                background: ${type === 'success' ? 'var(--success)' : type === 'warning' ? 'var(--warning)' : 'var(--info)'};
+                color: white;
+                border-radius: var(--radius);
+                box-shadow: var(--shadow);
+                z-index: 10000;
+                font-weight: 500;
+                transform: translateX(400px);
+                transition: transform 0.3s ease;
+                max-width: 300px;
+            `;
+            notification.textContent = message;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.transform = 'translateX(0)';
+            }, 100);
+            
+            setTimeout(() => {
+                notification.style.transform = 'translateX(400px)';
+                setTimeout(() => {
+                    if (document.body.contains(notification)) {
+                        document.body.removeChild(notification);
+                    }
+                }, 300);
+            }, 3000);
+        }
+
+        // Load navbar and header on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadComponent('navbar-container', '../components/navbar.html');
+            loadComponent('header-container', '../components/header.html');
+            
+            // Load initial vehicle data
+            setTimeout(() => {
+                loadVehicleDetails();
+            }, 200);
+        });
+    </script>
+</body>
+</html>

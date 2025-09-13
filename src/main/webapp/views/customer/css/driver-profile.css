@@ -1,0 +1,670 @@
+/* =========================
+  Driver Profile Specific Styles
+  ========================= */
+
+/* Main Content */
+.main-content {
+    grid-column: 2;
+    padding: 30px;
+    overflow-y: auto;
+}
+
+.content-wrapper {
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.breadcrumb {
+    color: var(--text-light);
+    font-size: 14px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+}
+
+.back-btn {
+    background: none;
+    border: none;
+    color: var(--primary);
+    cursor: pointer;
+    padding: 8px 12px;
+    border-radius: var(--radius-sm);
+    transition: var(--transition);
+    margin-right: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 500;
+}
+
+.back-btn:hover {
+    background-color: rgba(67, 97, 238, 0.1);
+    transform: translateX(-2px);
+}
+
+.driver-profile-container {
+    display: grid;
+    grid-template-columns: 1fr 350px;
+    gap: 30px;
+}
+
+/* Driver Details Section */
+.driver-details {
+    background: white;
+    border-radius: var(--radius);
+    padding: 30px;
+    box-shadow: var(--shadow);
+    transition: var(--transition);
+}
+
+.driver-details:hover {
+    box-shadow: var(--shadow-lg);
+}
+
+.driver-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+.driver-avatar {
+    margin-right: 20px;
+}
+
+.driver-avatar-img {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--success), var(--info));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 32px;
+    font-weight: 700;
+    border: 3px solid var(--success);
+    box-shadow: 0 8px 25px rgba(76, 201, 240, 0.2);
+    transition: var(--transition);
+}
+
+.driver-avatar-img:hover {
+    transform: scale(1.05);
+}
+
+.driver-info h2 {
+    color: var(--dark);
+    font-size: 28px;
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+
+.driver-name {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.verified-badge {
+    color: var(--success);
+    font-size: 14px;
+    font-weight: 500;
+    margin-left: 10px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.verified-badge i {
+    font-size: 16px;
+}
+
+.driver-rating {
+    display: flex;
+    align-items: center;
+    margin: 10px 0;
+}
+
+.stars {
+    margin-right: 10px;
+}
+
+.stars i {
+    color: #ffd700;
+    font-size: 16px;
+    margin-right: 2px;
+    transition: var(--transition);
+}
+
+.stars:hover i {
+    transform: scale(1.1);
+}
+
+.rating-text {
+    color: var(--text-light);
+    font-size: 14px;
+}
+
+.driver-price {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--primary);
+    margin-top: 5px;
+}
+
+.driver-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    margin: 25px 0;
+    padding: 20px;
+    background: var(--light);
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+}
+
+.stat-item {
+    display: flex;
+    align-items: center;
+    color: var(--text);
+    font-size: 14px;
+    transition: var(--transition);
+}
+
+.stat-item:hover {
+    color: var(--primary);
+}
+
+.stat-item i {
+    margin-right: 8px;
+    color: var(--primary);
+    width: 16px;
+}
+
+.company-link {
+    cursor: pointer;
+    color: var(--primary);
+    transition: var(--transition);
+}
+
+.company-link:hover {
+    color: var(--secondary);
+    text-decoration: underline;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 15px;
+    margin: 25px 0;
+}
+
+.driver-details-sections {
+    margin: 30px 0;
+}
+
+.detail-section {
+    margin-bottom: 25px;
+}
+
+.detail-section h3 {
+    color: var(--dark);
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+.tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.tag {
+    background: var(--light);
+    color: var(--text);
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 13px;
+    border: 1px solid var(--border);
+    transition: var(--transition);
+}
+
+.tag:hover {
+    background: rgba(67, 97, 238, 0.1);
+    border-color: var(--primary-light);
+    color: var(--primary);
+}
+
+.reviews-section {
+    border-top: 1px solid var(--border);
+    padding-top: 25px;
+}
+
+.reviews-section h3 {
+    color: var(--dark);
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 20px;
+}
+
+.review-item {
+    padding: 15px 0;
+    border-bottom: 1px solid var(--light);
+    transition: var(--transition);
+}
+
+.review-item:hover {
+    background: rgba(67, 97, 238, 0.02);
+    border-radius: var(--radius-sm);
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.review-item:last-child {
+    border-bottom: none;
+}
+
+.review-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.reviewer-name {
+    font-weight: 500;
+    color: var(--text);
+}
+
+.review-date {
+    font-size: 12px;
+    color: var(--text-light);
+}
+
+.review-stars {
+    margin-bottom: 8px;
+}
+
+.review-stars i {
+    color: #ffd700;
+    font-size: 14px;
+    margin-right: 2px;
+}
+
+.review-text {
+    color: var(--text-light);
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+/* Booking Section */
+.booking-section {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.booking-card, .availability-section {
+    background: white;
+    border-radius: var(--radius);
+    padding: 25px;
+    box-shadow: var(--shadow);
+    transition: var(--transition);
+}
+
+.booking-card:hover, .availability-section:hover {
+    box-shadow: var(--shadow-lg);
+}
+
+.booking-card h3, .availability-section h3 {
+    color: var(--dark);
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 20px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    color: var(--text);
+    font-weight: 500;
+    margin-bottom: 8px;
+    font-size: 14px;
+}
+
+.form-control {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    transition: var(--transition);
+    background: white;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: var(--primary-light);
+    box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+}
+
+.calendar-section h4 {
+    color: var(--text);
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 15px;
+}
+
+.calendar-grid, .mini-calendar-grid {
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+}
+
+.calendar-header {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    background: var(--light);
+}
+
+.calendar-header span {
+    padding: 10px;
+    text-align: center;
+    font-weight: 600;
+    font-size: 12px;
+    color: var(--text-light);
+}
+
+.calendar-body {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+}
+
+.calendar-body span {
+    padding: 10px;
+    text-align: center;
+    cursor: pointer;
+    transition: var(--transition);
+    border-bottom: 1px solid var(--light);
+    border-right: 1px solid var(--light);
+    font-size: 14px;
+}
+
+.calendar-body span:nth-child(7n) {
+    border-right: none;
+}
+
+.calendar-body span:hover {
+    background: rgba(67, 97, 238, 0.1);
+    transform: scale(1.05);
+}
+
+.calendar-body span.selected {
+    background: var(--primary);
+    color: white;
+    font-weight: 600;
+}
+
+.calendar-body span.today {
+    background: var(--success);
+    color: white;
+    font-weight: 600;
+}
+
+.calendar-body span.available {
+    background: rgba(76, 201, 240, 0.1);
+    color: var(--success);
+}
+
+.calendar-body span.booked {
+    background: rgba(247, 37, 133, 0.1);
+    color: var(--danger);
+    cursor: not-allowed;
+}
+
+.btn-book {
+    width: 100%;
+    margin-top: 10px;
+}
+
+.availability-info p {
+    color: var(--text-light);
+    font-size: 14px;
+    margin-bottom: 15px;
+}
+
+.calendar-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.nav-btn {
+    background: none;
+    border: none;
+    color: var(--primary);
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 50%;
+    transition: var(--transition);
+}
+
+.nav-btn:hover {
+    background: rgba(67, 97, 238, 0.1);
+    transform: scale(1.1);
+}
+
+.month-year {
+    font-weight: 600;
+    color: var(--text);
+}
+
+.mini-calendar-grid .calendar-body span {
+    padding: 8px;
+    font-size: 13px;
+}
+
+/* Message Popup Styles */
+.popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: var(--transition);
+}
+
+.popup-overlay.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+.popup-content {
+    background: white;
+    padding: 30px;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-lg);
+    max-width: 500px;
+    width: 90%;
+    position: relative;
+    transform: scale(0.9);
+    transition: var(--transition);
+}
+
+.popup-overlay.show .popup-content {
+    transform: scale(1);
+}
+
+.popup-header {
+    margin-bottom: 20px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.popup-header h3 {
+    margin: 0;
+    color: var(--text);
+    font-size: 20px;
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: var(--text-light);
+    transition: var(--transition);
+    padding: 5px;
+    border-radius: 50%;
+}
+
+.close-btn:hover {
+    background: rgba(247, 37, 133, 0.1);
+    color: var(--danger);
+}
+
+.popup-body {
+    margin: 20px 0;
+}
+
+.popup-footer {
+    margin-top: 20px;
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+}
+
+.message-input {
+    width: 100%;
+    min-height: 100px;
+    padding: 12px;
+    border: 2px solid var(--border);
+    border-radius: var(--radius-sm);
+    resize: vertical;
+    font-family: inherit;
+    font-size: 14px;
+    transition: var(--transition);
+}
+
+.message-input:focus {
+    outline: none;
+    border-color: var(--primary-light);
+    box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+}
+
+/* Notification Styles */
+.notification-toast {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 15px 20px;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    z-index: 10001;
+    font-weight: 500;
+    transform: translateX(400px);
+    transition: transform 0.3s ease;
+    max-width: 350px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.notification-toast.show {
+    transform: translateX(0);
+}
+
+.notification-toast.success {
+    background: var(--success);
+    color: white;
+}
+
+.notification-toast.info {
+    background: var(--info);
+    color: white;
+}
+
+.notification-toast.warning {
+    background: var(--warning);
+    color: white;
+}
+
+.notification-toast.error {
+    background: var(--danger);
+    color: white;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+    .driver-profile-container {
+        grid-template-columns: 1fr 320px;
+        gap: 20px;
+    }
+}
+
+@media (max-width: 992px) {
+    .main-content {
+        padding: 20px;
+    }
+    
+    .driver-profile-container {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    
+    .booking-section {
+        order: -1;
+    }
+}
+
+@media (max-width: 768px) {
+    .driver-header {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .driver-avatar {
+        margin-right: 0;
+        margin-bottom: 15px;
+    }
+
+    .driver-stats {
+        grid-template-columns: 1fr;
+    }
+
+    .action-buttons {
+        flex-direction: column;
+    }
+    
+    .popup-content {
+        width: 95%;
+        padding: 20px;
+    }
+}
+
+@media (max-width: 576px) {
+    .main-content {
+        padding: 15px;
+    }
+    
+    .driver-details {
+        padding: 20px;
+    }
+    
+    .booking-card, .availability-section {
+        padding: 20px;
+    }
+}

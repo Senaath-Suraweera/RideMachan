@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RideMachan - Your Journey, Our Vehicles</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="nav-brand">
+                <img src="/logo.png" alt="RideMachan" class="logo">
+            </div>
+            <nav class="nav-menu">
+                <a href="#features">Features</a>
+                <a href="#partners">Partners</a>
+                <a href="#how-it-works">How it Works</a>
+                <a href="#contact">Contact</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Login Popup -->
+    <div class="login-popup" id="loginPopup">
+        <div class="popup-overlay" id="popupOverlay"></div>
+        <div class="popup-content">
+            <button class="popup-close" id="closePopup">&times;</button>
+            <div class="popup-header">
+                <h3>Welcome to RideMachan</h3>
+                <p>Please login to continue booking</p>
+            </div>
+            <div class="login-form">
+                <form>
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" placeholder="Enter your email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" placeholder="Enter your password" required>
+                    </div>
+                    <button type="submit" class="btn-primary btn-full">Login</button>
+                </form>
+                <div class="popup-footer">
+                    <p>Don't have an account? <a href="customer_sign-in.html" class="signup-link">Sign up here</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <div class="hero-text">
+                    <h1>Your Journey,<br>Our Vehicles</h1>
+                    <p>Rent cars across Sri Lanka with ease. Self-drive or with professional drivers. Book instantly, drive confidently.</p>
+                    
+                    <div class="hero-features">
+                        <div class="feature-item">
+                            <i class="fas fa-car"></i>
+                            <span>New Fleet</span>
+                        </div>
+                        <div class="feature-item">
+                            <i class="fas fa-shield-alt"></i>
+                            <span>Fully Insured</span>
+                        </div>
+                        <div class="feature-item">
+                            <i class="fas fa-headset"></i>
+                            <span>24/7 Support</span>
+                        </div>
+                    </div>
+
+                    <div class="hero-buttons">
+                        <button class="btn-primary" id="book-ride-btn">Book Your Ride</button>
+                        <button class="btn-secondary" id="become-partner-btn">Become a Partner</button>
+                    </div>
+
+                    <div class="hero-stats">
+                        <span><strong>5000+</strong> Cars Available</span>
+                        <span><strong>50+</strong> Locations</span>
+                        <span><strong>24/7</strong> Support</span>
+                    </div>
+                </div>
+
+                <div class="hero-booking">
+                    <div class="booking-card">
+                        <h3>Quick Booking</h3>
+                        <form class="booking-form">
+                            <div class="form-group">
+                                <label>Pickup Location</label>
+                                <select>
+                                    <option>Colombo Airport</option>
+                                    <option>Kandy</option>
+                                    <option>Galle</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Pickup Date</label>
+                                    <input type="date" value="2024-01-15">
+                                </div>
+                                <div class="form-group">
+                                    <label>Return Date</label>
+                                    <input type="date" value="2024-01-18">
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn-primary btn-full" id="start-journey-btn">Search Available Cars</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Why Choose Section -->
+    <section class="why-choose">
+        <div class="container">
+            <h2>Why Choose RideMachan?</h2>
+            <p class="section-subtitle">Experience the best car rental service in Sri Lanka with our comprehensive platform</p>
+            
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-cars"></i>
+                    </div>
+                    <h4>Wide Vehicle Selection</h4>
+                    <p>From economy cars to luxury vehicles, find the perfect ride for your journey across Sri Lanka.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-user-tie"></i>
+                    </div>
+                    <h4>Driver Options</h4>
+                    <p>Choose between self-drive or hire professional drivers with local knowledge for all areas of Sri Lanka.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-shield-check"></i>
+                    </div>
+                    <h4>Fully Insured</h4>
+                    <p>All vehicles come with comprehensive insurance coverage for your peace of mind during your journey.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <h4>24/7 Support</h4>
+                    <p>Round the clock customer support to assist you throughout your rental period.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-map-marked-alt"></i>
+                    </div>
+                    <h4>Island-wide Coverage</h4>
+                    <p>Our service spans all major locations across Sri Lanka for maximum convenience.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-credit-card"></i>
+                    </div>
+                    <h4>Flexible Payment</h4>
+                    <p>Multiple payment options including cash, cards, and digital payments.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <h4>Customer Service</h4>
+                    <p>Dedicated support team ready to help you with any questions or concerns.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-award"></i>
+                    </div>
+                    <h4>Quality Guarantee</h4>
+                    <p>All vehicles are regularly maintained and thoroughly inspected for your safety.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works -->
+    <section class="how-it-works" id="how-it-works">
+        <div class="container">
+            <h2>How It Works</h2>
+            <p class="section-subtitle">Get on the road in 4 simple steps</p>
+            
+            <div class="steps-grid">
+                <div class="step-card">
+                    <div class="step-number">1</div>
+                    <div class="step-icon">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <h4>Search & Select</h4>
+                    <p>Browse our fleet selection of vehicles and choose the perfect car for your needs.</p>
+                </div>
+
+                <div class="step-card">
+                    <div class="step-number">2</div>
+                    <div class="step-icon">
+                        <i class="fas fa-calendar-alt"></i>
+                    </div>
+                    <h4>Book Your Dates</h4>
+                    <p>Choose your pickup and return dates, select location, and add any additional services.</p>
+                </div>
+
+                <div class="step-card">
+                    <div class="step-number">3</div>
+                    <div class="step-icon">
+                        <i class="fas fa-lock"></i>
+                    </div>
+                    <h4>Secure Payment</h4>
+                    <p>Complete your booking with our secure payment system. Multiple payment options available.</p>
+                </div>
+
+                <div class="step-card">
+                    <div class="step-number">4</div>
+                    <div class="step-icon">
+                        <i class="fas fa-key"></i>
+                    </div>
+                    <h4>Pick Up & Drive</h4>
+                    <p>Collect your vehicle at the selected location and start your journey across Sri Lanka.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Ready to Get Started -->
+    <section class="cta-section">
+        <div class="container">
+            <h2>Ready to Get Started?</h2>
+            <p>Join thousands of satisfied customers who trust RideMachan for their transportation needs</p>
+            <button class="btn-primary" id="cta-start-journey">Start Your Journey</button>
+        </div>
+    </section>
+
+    <!-- Partner Network -->
+    <section class="partner-network" id="partners">
+        <div class="container">
+            <h2>Join Our Partner Network</h2>
+            <p class="section-subtitle">Whether you're a rental company or an individual vehicle owner, RideMachan helps you maximize your earning potential</p>
+            
+            <div class="partner-cards">
+                <div class="partner-card">
+                    <div class="partner-icon">
+                        <i class="fas fa-building"></i>
+                    </div>
+                    <h3>Rental Companies</h3>
+                    <p>Earn more by joining our platform</p>
+                    
+                    <ul class="partner-features">
+                        <li><i class="fas fa-check"></i> Expand your reach across Sri Lanka</li>
+                        <li><i class="fas fa-check"></i> Access to nationwide customer base</li>
+                        <li><i class="fas fa-check"></i> Professional fleet management tools</li>
+                        <li><i class="fas fa-check"></i> Real-time fleet management</li>
+                        <li><i class="fas fa-check"></i> Automated booking system</li>
+                        <li><i class="fas fa-check"></i> Professional driver network access</li>
+                    </ul>
+
+                    <button class="btn-dark">Register Your Company</button>
+                </div>
+
+                <div class="partner-card highlighted">
+                    <div class="partner-icon">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <h3>Individual Owners</h3>
+                    <p>Turn your vehicle into a source of income</p>
+                    
+                    <ul class="partner-features">
+                        <li><i class="fas fa-check"></i> Earn passive income from your vehicle</li>
+                        <li><i class="fas fa-check"></i> Flexible rental periods</li>
+                        <li><i class="fas fa-check"></i> Comprehensive insurance coverage</li>
+                        <li><i class="fas fa-check"></i> Professional maintenance standards</li>
+                        <li><i class="fas fa-check"></i> Secure payment processing</li>
+                        <li><i class="fas fa-check"></i> Marketing and customer support</li>
+                    </ul>
+
+                    <button class="btn-primary">List Your Vehicle</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Business Transform -->
+    <section class="business-transform">
+        <div class="container">
+            <h2>Ready to Transform Your Business?</h2>
+            <p>Join hundreds of satisfied partners who have already digitized their rental operations with RideMachan</p>
+            
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-number">500+</div>
+                    <div class="stat-label">Registered Vehicles</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">2000+</div>
+                    <div class="stat-label">Happy Customers</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">99%</div>
+                    <div class="stat-label">Customer Satisfaction</div>
+                </div>
+            </div>
+
+            <button class="btn-primary" id="start-partnership-btn">Start Your Partnership Today</button>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer" id="contact">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="#about">About Us</a></li>
+                        <li><a href="#cars">Our Fleet</a></li>
+                        <li><a href="#locations">Locations</a></li>
+                        <li><a href="#contact">Contact Us</a></li>
+                        <li><a href="#faq">FAQ</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-section">
+                    <h4>Services</h4>
+                    <ul>
+                        <li><a href="#self-drive">Self-Drive Rentals</a></li>
+                        <li><a href="#chauffeur">Chauffeur Services</a></li>
+                        <li><a href="#corporate">Corporate Solutions</a></li>
+                        <li><a href="#long-term">Long-term Rentals</a></li>
+                        <li><a href="#airport">Airport Transfers</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-section">
+                    <h4>Contact Us</h4>
+                    <div class="contact-info">
+                        <p><i class="fas fa-phone"></i> +94 11 234 5678</p>
+                        <p><i class="fas fa-envelope"></i> info@ridemachan.lk</p>
+                        <p><i class="fas fa-map-marker-alt"></i> 123 Galle Road, Colombo 03, Sri Lanka</p>
+                    </div>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-linkedin"></i></a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <div class="footer-links">
+                    <a href="#privacy">Privacy Policy</a>
+                    <a href="#terms">Terms of Service</a>
+                    <a href="#cookies">Cookie Policy</a>
+                </div>
+                <p>&copy; 2024 RideMachan. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

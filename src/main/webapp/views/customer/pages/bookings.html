@@ -1,0 +1,1426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- ===================
+             Meta & Stylesheets
+    =================== -->
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Bookings - Ride Booker</title>
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+    />
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
+    />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../css/main.css" />
+    <link rel="stylesheet" href="../css/bookings.css" />
+</head>
+<body>
+    <div class="container">
+        <!-- ===================
+                 Include Navbar Component
+        =================== -->
+        <div id="navbar-container"></div>
+
+        <!-- ===================
+                 Include Header Component
+        =================== -->
+        <div id="header-container"></div>
+
+        <!-- ===================
+                 Main Content Section
+        =================== -->
+        <div class="main-content">
+            <!-- Booking Categories -->
+            <div class="booking-categories">
+                <div class="category-tabs">
+                    <button class="tab-btn active" data-tab="vehicle-bookings">
+                        <i class="fas fa-car"></i>
+                        Vehicle Bookings
+                    </button>
+                    <button class="tab-btn" data-tab="driver-only-bookings">
+                        <i class="fas fa-user-tie"></i>
+                        Driver Only Bookings
+                    </button>
+                </div>
+            </div>
+
+            <!-- Vehicle Bookings Section -->
+            <div class="tab-content active" id="vehicle-bookings">
+                <!-- Booking Type Filter -->
+                <div class="booking-filters">
+                    <div class="filter-tabs">
+                        <button class="filter-btn active" data-filter="all" data-category="vehicle">
+                            <i class="fas fa-list"></i>
+                            All
+                        </button>
+                        <button class="filter-btn" data-filter="active" data-category="vehicle">
+                            <i class="fas fa-play"></i>
+                            Active
+                        </button>
+                        <button class="filter-btn" data-filter="upcoming" data-category="vehicle">
+                            <i class="fas fa-clock"></i>
+                            Upcoming
+                        </button>
+                        <button class="filter-btn" data-filter="past" data-category="vehicle">
+                            <i class="fas fa-history"></i>
+                            Past
+                        </button>
+                    </div>
+                </div>
+
+
+
+                <!-- Active Vehicle Booking -->
+                <div class="booking-section vehicle-active">
+                    <h3 class="section-title">
+                        <i class="fas fa-play-circle text-success"></i>
+                        Active Vehicle Booking
+                    </h3>
+                    <div class="booking-card active-booking">
+                        <div class="booking-header">
+                            <div class="vehicle-info">
+                                <div class="vehicle-icon">
+                                    <i class="fas fa-car"></i>
+                                </div>
+                                <div class="vehicle-details">
+                                    <h4>Toyota Prius</h4>
+                                    <span class="vehicle-status active">Active</span>
+                                </div>
+                            </div>
+                            <div class="booking-status">
+                                <span class="status-badge paid" data-target="payment_status.html">Paid</span>
+                            </div>
+                        </div>
+                        <div class="booking-content">
+                            <div class="booking-info">
+                                <div class="info-row">
+                                    <span class="label">Date:</span>
+                                    <span class="value">8/13/2024</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="label">Time:</span>
+                                    <span class="value">09:00 - 18:00</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="label">Pickup:</span>
+                                    <span class="value">Colombo Fort Railway Station</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="label">Range:</span>
+                                    <span class="value">Kandy City Center</span>
+                                </div>
+                            </div>
+                            <div class="driver-info">
+                                <div class="driver-avatar">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                <div class="driver-details">
+                                    <span class="driver-name">Driver: Lasith Perera</span>
+                                    <div class="driver-rating">
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        4.8
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="amount-info">
+                                <span class="amount">LKR 15,000</span>
+                            </div>
+                        </div>
+                        <div class="booking-actions">
+                            <button class="btn btn-outline btn-sm" data-target="payment_status.html">
+                                <i class="fas fa-receipt"></i>
+                                View Receipt
+                            </button>
+                            <button class="btn btn-primary btn-sm" data-action="message">
+                                <i class="fas fa-message"></i>
+                                Message
+                            </button>
+                            <button class="btn btn-success btn-sm" data-action="call">
+                                <i class="fas fa-phone"></i>
+                                Call
+                            </button>
+                            <button class="btn btn-warning btn-sm" data-action="track">
+                                <i class="fas fa-map-marker-alt"></i>
+                                Track Vehicle
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Upcoming Vehicle Bookings -->
+                <div class="booking-section vehicle-upcoming">
+                    <h3 class="section-title">
+                        <i class="fas fa-clock text-warning"></i>
+                        Upcoming Vehicle Bookings
+                    </h3>
+
+                    <!-- Toyota Prius Booking -->
+                    <div class="booking-card">
+                        <div class="booking-header">
+                            <div class="vehicle-info">
+                                <div class="vehicle-icon">
+                                    <i class="fas fa-car"></i>
+                                </div>
+                                <div class="vehicle-details">
+                                    <h4>Toyota Prius</h4>
+                                    <span class="booking-id">Booking ID: CC-2024-009</span>
+                                </div>
+                            </div>
+                            <div class="booking-status">
+                                <span class="status-badge paid" data-target="payment_status.html">Paid</span>
+                                <span class="booking-type">Morning</span>
+                            </div>
+                        </div>
+                        <div class="booking-content">
+                            <div class="booking-info">
+                                <div class="info-row">
+                                    <span class="label">8/16/2024 - 8/16/2024</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="label">06:00 - 18:00</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="label">Colombo Fort Railway Station</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="label">To: Bandaranaike International Airport</span>
+                                </div>
+                            </div>
+                            <div class="driver-info">
+                                <span class="driver-name">Ruwan Silva (4.7⭐)</span>
+                                <div class="contact-info">
+                                    <span class="phone" data-action="call">📞 Call</span>
+                                    <span class="message" data-action="message">💬 Message</span>
+                                </div>
+                                <span class="amount">LKR 12,000</span>
+                                <span class="vehicle-number">SMI-**** 4537</span>
+                            </div>
+                        </div>
+                        <div class="booking-actions">
+                            <button class="btn btn-outline btn-sm" data-action="details">
+                                <i class="fas fa-eye"></i>
+                                Details
+                            </button>
+                            <button class="btn btn-warning btn-sm" data-action="message">
+                                <i class="fas fa-message"></i>
+                                Message Driver
+                            </button>
+                            <button class="btn btn-danger btn-sm" data-action="cancel">
+                                <i class="fas fa-times"></i>
+                                Cancel Booking
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Toyota Aqua Booking -->
+                    <div class="booking-card">
+                        <div class="booking-header">
+                            <div class="vehicle-info">
+                                <div class="vehicle-icon">
+                                    <i class="fas fa-car"></i>
+                                </div>
+                                <div class="vehicle-details">
+                                    <h4>Toyota Aqua</h4>
+                                    <span class="booking-id">Booking ID: BB-2024-010</span>
+                                </div>
+                            </div>
+                            <div class="booking-status">
+                                <span class="status-badge payment-pending" data-target="payment.html">Payment Pending</span>
+                                <span class="booking-type">Morning</span>
+                            </div>
+                        </div>
+                        <div class="booking-content">
+                            <div class="booking-info">
+                                <div class="info-row">
+                                    <span class="label">8/18/2024 - 8/18/2024</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="label">06:00 - 20:00</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="label">Galle Face Green</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="label">To: Sigiriya Rock Fortress</span>
+                                </div>
+                            </div>
+                            <div class="driver-info">
+                                <span class="driver-name">Chaminda Fernando (4.6⭐)</span>
+                                <div class="contact-info">
+                                    <span class="phone" data-action="call">📞 Call</span>
+                                    <span class="message" data-action="message">💬 Message</span>
+                                </div>
+                                <span class="amount">LKR 25,000</span>
+                            </div>
+                        </div>
+                        <div class="booking-actions">
+                            <button class="btn btn-primary btn-sm" data-target="payment.html">
+                                <i class="fas fa-credit-card"></i>
+                                Pay Now
+                            </button>
+                            <button class="btn btn-outline btn-sm" data-action="details">
+                                <i class="fas fa-eye"></i>
+                                View Details
+                            </button>
+                            <button class="btn btn-danger btn-sm" data-action="cancel">
+                                <i class="fas fa-times"></i>
+                                Cancel Booking
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Suzuki Alto Booking -->
+                    <div class="booking-card">
+                        <div class="booking-header">
+                            <div class="vehicle-info">
+                                <div class="vehicle-icon">
+                                    <i class="fas fa-car"></i>
+                                </div>
+                                <div class="vehicle-details">
+                                    <h4>Suzuki Alto</h4>
+                                    <span class="booking-id">Budget Car Rental</span>
+                                </div>
+                            </div>
+                            <div class="booking-status">
+                                <span class="status-badge payment-pending" data-target="payment.html">Payment Pending</span>
+                                <span class="booking-type">Morning</span>
+                            </div>
+                        </div>
+                        <div class="booking-content">
+                            <div class="booking-info">
+                                <div class="info-row">
+                                    <span class="label">8/20/2024 - 8/20/2024</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="label">06:00 - 17:00</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="label">Kandy City Centre</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="label">To: Temple of the Tooth</span>
+                                </div>
+                            </div>
+                            <div class="driver-info">
+                                <span class="driver-name">Self Drive Rental</span>
+                                <span class="amount">LKR 8,500</span>
+                            </div>
+                        </div>
+                        <div class="booking-actions">
+                            <button class="btn btn-primary btn-sm" data-target="payment.html">
+                                <i class="fas fa-credit-card"></i>
+                                Pay Now
+                            </button>
+                            <button class="btn btn-outline btn-sm" data-action="details">
+                                <i class="fas fa-eye"></i>
+                                View Details
+                            </button>
+                            <button class="btn btn-danger btn-sm" data-action="cancel">
+                                <i class="fas fa-times"></i>
+                                Cancel Booking
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Past Vehicle Bookings -->
+                <div class="booking-section vehicle-past">
+                    <h3 class="section-title">
+                        <i class="fas fa-history text-info"></i>
+                        Past Vehicle Bookings
+                    </h3>
+
+                    <!-- Completed Bookings -->
+                    <div class="booking-card completed">
+                        <div class="booking-header">
+                            <div class="vehicle-info">
+                                <div class="vehicle-icon">
+                                    <i class="fas fa-car"></i>
+                                </div>
+                                <div class="vehicle-details">
+                                    <h4>Toyota Prius</h4>
+                                    <span class="booking-id">Booking ID: LL-2024-004</span>
+                                </div>
+                            </div>
+                            <div class="booking-status">
+                                <span class="status-badge completed" data-target="payment_status.html">Completed</span>
+                            </div>
+                        </div>
+                        <div class="booking-content">
+                            <div class="booking-info">
+                                <div class="info-row">
+                                    <span class="label">8/10/2024 - 8/10/2024</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="label">09:00 - 18:00</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="label">Colombo Airport</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="label">To: Kandy Queens Hotel</span>
+                                </div>
+                            </div>
+                            <div class="driver-info">
+                                <span class="driver-name">Lasith Perera (4.8⭐)</span>
+                                <span class="amount">LKR 18,000</span>
+                                <span class="payment-ref">Payment ID: 5847456754268</span>
+                            </div>
+                        </div>
+                        <div class="booking-actions">
+                            <button class="btn btn-outline btn-sm" data-action="invoice">
+                                <i class="fas fa-download"></i>
+                                Download Invoice
+                            </button>
+                            <button class="btn btn-primary btn-sm" data-action="rate">
+                                <i class="fas fa-star"></i>
+                                Rate Service
+                            </button>
+                            <button class="btn btn-success btn-sm" data-action="rebook">
+                                <i class="fas fa-redo"></i>
+                                Book Again
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Driver Only Bookings Section -->
+            <div class="tab-content" id="driver-only-bookings">
+                <!-- Driver Booking Filters -->
+                <div class="booking-filters">
+                    <div class="filter-tabs">
+                        <button class="filter-btn active" data-filter="all" data-category="driver">
+                            <i class="fas fa-list"></i>
+                            All
+                        </button>
+                        <button class="filter-btn" data-filter="active" data-category="driver">
+                            <i class="fas fa-play"></i>
+                            Active
+                        </button>
+                        <button class="filter-btn" data-filter="upcoming" data-category="driver">
+                            <i class="fas fa-clock"></i>
+                            Upcoming
+                        </button>
+                        <button class="filter-btn" data-filter="past" data-category="driver">
+                            <i class="fas fa-history"></i>
+                            Past
+                        </button>
+                    </div>
+                </div>
+                
+
+                <!-- Active Driver Bookings -->
+                <div class="booking-section driver-active">
+                    <h3 class="section-title">
+                        <i class="fas fa-play-circle text-success"></i>
+                        Active Driver Services
+                    </h3>
+
+                    <!-- Driver Booking Card 1 -->
+                    <div class="driver-booking-card active-service">
+                        <div class="driver-header">
+                            <div class="driver-info">
+                                <div class="driver-avatar-large">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                <div class="driver-main-info">
+                                    <h4>Lasith Perera</h4>
+                                    <span class="driver-company">Grand Elite Drivers</span>
+                                    <span class="booking-id">Booking ID: GED-2024-007</span>
+                                </div>
+                            </div>
+                            <div class="status-section">
+                                <span class="status-badge active-progress" data-target="payment_status.html">Active - In Progress</span>
+                                <span class="service-type">Pool</span>
+                            </div>
+                        </div>
+
+                        <div class="service-details">
+                            <div class="service-info">
+                                <div class="info-row">
+                                    <span class="label">📅 8/13/2024</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="label">🕘 09:00 - 18:00 (9 hours)</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="label">📍 From: Colombo Fort Railway Station</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="label">📍 To: Bandaranaike International Airport</span>
+                                </div>
+                                <div class="progress-indicator">
+                                    <span class="progress-text">🟢 Live Trip in Progress</span>
+                                    <span class="trip-status">Driver is currently en route with customer arrival at 17:45</span>
+                                </div>
+                            </div>
+
+                            <div class="customer-payment-info">
+                                <div class="customer-info">
+                                    <span class="customer-label">Customer: Priya Fernando</span>
+                                </div>
+                                <div class="payment-info">
+                                    <span class="amount">LKR 15,000</span>
+                                    <span class="eta">ETA: 17:45</span>
+                                </div>
+                                <div class="rating-info">
+                                    Rating: 4.9/5
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="service-actions">
+                            <button class="btn btn-outline btn-sm" data-action="track">
+                                <i class="fas fa-route"></i>
+                                Track Driver
+                            </button>
+                            <button class="btn btn-primary btn-sm" data-action="call">
+                                <i class="fas fa-phone"></i>
+                                Call Driver
+                            </button>
+                            <button class="btn btn-warning btn-sm" data-action="message">
+                                <i class="fas fa-message"></i>
+                                Message Driver
+                            </button>
+                            <button class="btn btn-success btn-sm" data-action="call-customer">
+                                <i class="fas fa-user"></i>
+                                Call Customer
+                            </button>
+                            <button class="btn btn-danger btn-sm" data-action="emergency">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                Emergency Stop
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Driver Booking Card 2 -->
+                    <div class="driver-booking-card active-service">
+                        <div class="driver-header">
+                            <div class="driver-info">
+                                <div class="driver-avatar-large">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                <div class="driver-main-info">
+                                    <h4>Ruwan Silva</h4>
+                                    <span class="driver-company">Professional Drivers LK</span>
+                                    <span class="booking-id">Booking ID: PDL-2024-009</span>
+                                </div>
+                            </div>
+                            <div class="status-section">
+                                <span class="status-badge active-progress" data-target="payment_status.html">Active - In Progress</span>
+                                <span class="service-type">Pool</span>
+                            </div>
+                        </div>
+
+                        <div class="service-details">
+                            <div class="service-info">
+                                <div class="info-row">
+                                    <span class="label">📅 8/13/2024</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="label">🕕 14:00 - 22:00 (8 hours)</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="label">📍 From: Galle Face Green</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="label">📍 To: Kandy City Centre</span>
+                                </div>
+                                <div class="progress-indicator">
+                                    <span class="progress-text">🟢 Live Trip in Progress</span>
+                                    <span class="trip-status">Driver is currently en route and with customer around 21:30</span>
+                                </div>
+                            </div>
+
+                            <div class="customer-payment-info">
+                                <div class="customer-info">
+                                    <span class="customer-label">Customer: Dulki Smith</span>
+                                </div>
+                                <div class="payment-info">
+                                    <span class="amount">LKR 19,000</span>
+                                    <span class="eta">ETA: 21:30</span>
+                                </div>
+                                <div class="rating-info">
+                                    Rating: 4.7/5
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="service-actions">
+                            <button class="btn btn-outline btn-sm" data-action="track">
+                                <i class="fas fa-route"></i>
+                                Track Driver
+                            </button>
+                            <button class="btn btn-primary btn-sm" data-action="call">
+                                <i class="fas fa-phone"></i>
+                                Call Driver
+                            </button>
+                            <button class="btn btn-warning btn-sm" data-action="message">
+                                <i class="fas fa-message"></i>
+                                Message Driver
+                            </button>
+                            <button class="btn btn-success btn-sm" data-action="call-customer">
+                                <i class="fas fa-user"></i>
+                                Call Customer
+                            </button>
+                            <button class="btn btn-danger btn-sm" data-action="emergency">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                Emergency Stop
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Upcoming Driver Bookings -->
+                <div class="booking-section driver-upcoming">
+                    <h3 class="section-title">
+                        <i class="fas fa-clock text-warning"></i>
+                        Upcoming Driver Services
+                    </h3>
+
+                    <div class="driver-booking-card">
+                        <div class="driver-header">
+                            <div class="driver-info">
+                                <div class="driver-avatar-large">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                <div class="driver-main-info">
+                                    <h4>Chaminda Fernando</h4>
+                                    <span class="driver-company">City Drivers Network</span>
+                                    <span class="booking-id">Booking ID: CDN-2024-015</span>
+                                </div>
+                            </div>
+                            <div class="status-section">
+                                <span class="status-badge payment-pending" data-target="payment.html">Payment Pending</span>
+                                <span class="service-type">Premium</span>
+                            </div>
+                        </div>
+
+                        <div class="service-details">
+                            <div class="service-info">
+                                <div class="info-row">
+                                    <span class="label">📅 8/20/2024</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="label">🕘 08:00 - 20:00 (12 hours)</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="label">📍 From: Negombo Beach Resort</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="label">📍 To: Ella Rock Viewpoint</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="label">📋 Service: Full day sightseeing tour</span>
+                                </div>
+                            </div>
+
+                            <div class="customer-payment-info">
+                                <div class="customer-info">
+                                    <span class="customer-label">Customer: Sarah Johnson</span>
+                                </div>
+                                <div class="payment-info">
+                                    <span class="amount">LKR 28,000</span>
+                                    <span class="eta">Starts: 08:00</span>
+                                </div>
+                                <div class="rating-info">
+                                    Driver Rating: 4.6/5
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="service-actions">
+                            <button class="btn btn-primary btn-sm" data-target="payment.html">
+                                <i class="fas fa-credit-card"></i>
+                                Pay Now
+                            </button>
+                            <button class="btn btn-outline btn-sm" data-action="details">
+                                <i class="fas fa-eye"></i>
+                                View Details
+                            </button>
+                            <button class="btn btn-warning btn-sm" data-action="message">
+                                <i class="fas fa-message"></i>
+                                Message Driver
+                            </button>
+                            <button class="btn btn-danger btn-sm" data-action="cancel">
+                                <i class="fas fa-times"></i>
+                                Cancel Booking
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Past Driver Bookings -->
+                <div class="booking-section driver-past">
+                    <h3 class="section-title">
+                        <i class="fas fa-history text-info"></i>
+                        Past Driver Services
+                    </h3>
+
+                    <!-- Completed Driver Service 1 -->
+                    <div class="driver-booking-card completed">
+                        <div class="driver-header">
+                            <div class="driver-info">
+                                <div class="driver-avatar-large">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                <div class="driver-main-info">
+                                    <h4>Nimal Rathnayake</h4>
+                                    <span class="driver-company">Elite Travel Services</span>
+                                    <span class="booking-id">Booking ID: ETS-2024-003</span>
+                                </div>
+                            </div>
+                            <div class="status-section">
+                                <span class="status-badge completed" data-target="payment_status.html">Completed</span>
+                                <span class="service-type">Premium</span>
+                            </div>
+                        </div>
+
+                        <div class="service-details">
+                            <div class="service-info">
+                                <div class="info-row">
+                                    <span class="label">📅 8/8/2024</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="label">🕘 06:00 - 22:00 (16 hours)</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="label">📍 From: Colombo Hilton Hotel</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="label">📍 To: Sigiriya Ancient Rock</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="label">📋 Service: Cultural heritage tour</span>
+                                </div>
+                            </div>
+
+                            <div class="customer-payment-info">
+                                <div class="customer-info">
+                                    <span class="customer-label">Customer: Michael Thompson</span>
+                                </div>
+                                <div class="payment-info">
+                                    <span class="amount">LKR 35,000</span>
+                                    <span class="payment-ref">Payment ID: 9876543210123</span>
+                                </div>
+                                <div class="rating-info">
+                                    Service Rating: 5.0/5 ⭐
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="service-actions">
+                            <button class="btn btn-outline btn-sm" data-action="invoice">
+                                <i class="fas fa-download"></i>
+                                Download Invoice
+                            </button>
+                            <button class="btn btn-primary btn-sm" data-action="rate">
+                                <i class="fas fa-star"></i>
+                                Rate Service
+                            </button>
+                            <button class="btn btn-success btn-sm" data-action="rebook">
+                                <i class="fas fa-redo"></i>
+                                Book Again
+                            </button>
+                            <button class="btn btn-warning btn-sm" data-action="support">
+                                <i class="fas fa-headset"></i>
+                                Contact Support
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Completed Driver Service 2 -->
+                    <div class="driver-booking-card completed">
+                        <div class="driver-header">
+                            <div class="driver-info">
+                                <div class="driver-avatar-large">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                <div class="driver-main-info">
+                                    <h4>Sunil Wickramasinghe</h4>
+                                    <span class="driver-company">Mountain View Drivers</span>
+                                    <span class="booking-id">Booking ID: MVD-2024-001</span>
+                                </div>
+                            </div>
+                            <div class="status-section">
+                                <span class="status-badge completed" data-target="payment_status.html">Completed</span>
+                                <span class="service-type">Standard</span>
+                            </div>
+                        </div>
+
+                        <div class="service-details">
+                            <div class="service-info">
+                                <div class="info-row">
+                                    <span class="label">📅 8/5/2024</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="label">🕘 09:00 - 17:00 (8 hours)</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="label">📍 From: Kandy Railway Station</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="label">📍 To: Nuwara Eliya Tea Gardens</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="label">📋 Service: Hill country tour</span>
+                                </div>
+                            </div>
+
+                            <div class="customer-payment-info">
+                                <div class="customer-info">
+                                    <span class="customer-label">Customer: Emma Wilson</span>
+                                </div>
+                                <div class="payment-info">
+                                    <span class="amount">LKR 18,500</span>
+                                    <span class="payment-ref">Payment ID: 5647382910456</span>
+                                </div>
+                                <div class="rating-info">
+                                    Service Rating: 4.8/5 ⭐
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="service-actions">
+                            <button class="btn btn-outline btn-sm" data-action="invoice">
+                                <i class="fas fa-download"></i>
+                                Download Invoice
+                            </button>
+                            <button class="btn btn-primary btn-sm" data-action="rate">
+                                <i class="fas fa-star"></i>
+                                Rate Service
+                            </button>
+                            <button class="btn btn-success btn-sm" data-action="rebook">
+                                <i class="fas fa-redo"></i>
+                                Book Again
+                            </button>
+                            <button class="btn btn-info btn-sm" data-action="trip-summary">
+                                <i class="fas fa-map"></i>
+                                Trip Summary
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Templates -->
+    <div id="message-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-message"></i> Send Message</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="message-thread">
+                    <div class="message received">
+                        <div class="message-content">Hello! I'm ready for the trip today.</div>
+                        <div class="message-time">10:30 AM</div>
+                    </div>
+                    <div class="message sent">
+                        <div class="message-content">Perfect! I'll be there at the pickup location by 9:00 AM.</div>
+                        <div class="message-time">10:32 AM</div>
+                    </div>
+                </div>
+                <div class="message-input">
+                    <input type="text" placeholder="Type your message...">
+                    <button class="btn btn-primary"><i class="fas fa-paper-plane"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="tracking-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-content large">
+            <div class="modal-header">
+                <h3><i class="fas fa-map-marker-alt"></i> Live Tracking</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="tracking-map">
+                    <div class="map-placeholder">
+                        <i class="fas fa-map"></i>
+                        <p>Interactive Map View</p>
+                        <div class="location-info">
+                            <div class="current-location">
+                                <i class="fas fa-car"></i>
+                                <span>Current Location: En route to Kandy</span>
+                            </div>
+                            <div class="eta-info">
+                                <i class="fas fa-clock"></i>
+                                <span>ETA: 2h 15min</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="tracking-actions">
+                    <button class="btn btn-primary" data-action="call"><i class="fas fa-phone"></i> Call Driver</button>
+                    <button class="btn btn-warning" data-action="message"><i class="fas fa-message"></i> Send Message</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="rating-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-star"></i> Rate Your Experience</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="service-summary">
+                    <h4>Toyota Prius - Lasith Perera</h4>
+                    <p>Colombo to Kandy • LKR 18,000</p>
+                </div>
+                <div class="rating-section">
+                    <p>How was your overall experience?</p>
+                    <div class="star-rating">
+                        <i class="fas fa-star" data-rating="1"></i>
+                        <i class="fas fa-star" data-rating="2"></i>
+                        <i class="fas fa-star" data-rating="3"></i>
+                        <i class="fas fa-star" data-rating="4"></i>
+                        <i class="fas fa-star" data-rating="5"></i>
+                    </div>
+                </div>
+                <div class="feedback-section">
+                    <textarea placeholder="Share your feedback (optional)"></textarea>
+                </div>
+                <div class="modal-actions">
+                    <button class="btn btn-outline" onclick="closeModal('rating-modal')">Skip</button>
+                    <button class="btn btn-primary" onclick="submitRating()">Submit Rating</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Component Loading JavaScript -->
+    <script>
+        // Load components
+        function loadComponent(elementId, filePath, callback) {
+            fetch(filePath)
+                .then(response => response.text())
+                .then(html => {
+                    document.getElementById(elementId).innerHTML = html;
+                    if (callback) callback();
+                })
+                .catch(error => console.error('Error loading component:', error));
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            // Load navbar component
+            loadComponent('navbar-container', '../components/navbar.html', () => {
+                // Navbar loaded, set active state
+                const navItems = document.querySelectorAll('.nav-item');
+                navItems.forEach(item => item.classList.remove('active'));
+                const bookingsNav = document.querySelector('[data-page="bookings"]');
+                if (bookingsNav) bookingsNav.classList.add('active');
+            });
+
+            // Load header component  
+            loadComponent('header-container', '../components/header.html', () => {
+                // Header loaded, set page title
+                const pageTitle = document.querySelector('.hi h1');
+                if (pageTitle) {
+                    pageTitle.textContent = 'My Bookings';
+                    const subtitle = document.querySelector('.subtitle');
+                    if (subtitle) subtitle.textContent = 'Manage your vehicle reservations';
+                }
+                
+                // Add "New Booking" button to header actions
+                const headerActions = document.querySelector('.header-actions');
+                if (headerActions && !headerActions.querySelector('.btn-primary')) {
+                    const newBookingBtn = document.createElement('button');
+                    newBookingBtn.className = 'btn btn-primary';
+                    newBookingBtn.innerHTML = '<i class="fas fa-plus"></i> New Booking';
+                    newBookingBtn.onclick = () => window.location.href = 'search.html';
+                    headerActions.insertBefore(newBookingBtn, headerActions.firstChild);
+                }
+            });
+
+            // Initialize booking functionality
+            initializeBookingPage();
+        });
+
+        // Booking page functionality
+        function initializeBookingPage() {
+            // Tab switching functionality
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const tab = btn.dataset.tab;
+
+                    // Remove active class from all tabs and content
+                    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+
+                    // Add active class to clicked tab and corresponding content
+                    btn.classList.add('active');
+                    const target = document.getElementById(tab);
+                    if (target) target.classList.add('active');
+                });
+            });
+
+            // Filter functionality
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const category = btn.dataset.category;
+
+                    // Remove active class from filter buttons in the same category
+                    document.querySelectorAll(`.filter-btn[data-category="${category}"]`).forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+
+                    const filter = btn.dataset.filter;
+                    const currentTabEl = document.querySelector('.tab-content.active');
+                    const currentTab = currentTabEl ? currentTabEl.id : null;
+
+                    // Show/hide sections based on filter
+                    if (currentTab === 'vehicle-bookings') {
+                        handleVehicleFilter(filter);
+                    } else if (currentTab === 'driver-only-bookings') {
+                        handleDriverFilter(filter);
+                    }
+                });
+            });
+
+            // Initialize default view
+            handleVehicleFilter('all');
+            handleDriverFilter('all');
+
+            // Button navigation for specific target links
+            document.querySelectorAll('button[data-target], span[data-target]').forEach(element => {
+                element.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const target = element.dataset.target;
+                    if (!target) return;
+
+                    if (target.startsWith('tel:')) {
+                        window.location.href = target;
+                        return;
+                    }
+
+                    // Navigation with smooth transition
+                    document.body.style.opacity = '0.8';
+                    setTimeout(() => {
+                        window.location.href = target;
+                    }, 200);
+                });
+            });
+
+            // Handle functional actions
+            document.querySelectorAll('button[data-action], span[data-action]').forEach(element => {
+                element.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const action = element.dataset.action;
+                    handleAction(action, element);
+                });
+            });
+
+            // Make clickable elements have proper cursor
+            document.querySelectorAll('[data-target], [data-action]').forEach(element => {
+                element.style.cursor = 'pointer';
+            });
+
+            // Add hover effects for status badges
+            document.querySelectorAll('.status-badge[data-target]').forEach(badge => {
+                badge.style.cursor = 'pointer';
+                badge.style.transition = 'all 0.3s ease';
+                
+                badge.addEventListener('mouseenter', () => {
+                    badge.style.transform = 'scale(1.05)';
+                    badge.style.boxShadow = '0 4px 8px rgba(0,0,0,0.1)';
+                });
+                
+                badge.addEventListener('mouseleave', () => {
+                    badge.style.transform = 'scale(1)';
+                    badge.style.boxShadow = 'none';
+                });
+            });
+        }
+
+        function handleAction(action, element) {
+            switch(action) {
+                case 'message':
+                    showMessageModal();
+                    break;
+                case 'call':
+                    makeCall();
+                    break;
+                case 'call-customer':
+                    makeCustomerCall();
+                    break;
+                case 'track':
+                    showTrackingModal();
+                    break;
+                case 'cancel':
+                    showCancelModal(element);
+                    break;
+                case 'emergency':
+                    showEmergencyModal(element);
+                    break;
+                case 'rate':
+                    showRatingModal();
+                    break;
+                case 'rebook':
+                    handleRebook(element);
+                    break;
+                case 'invoice':
+                    downloadInvoice();
+                    break;
+                case 'details':
+                    showBookingDetails(element);
+                    break;
+                case 'support':
+                    contactSupport();
+                    break;
+                case 'trip-summary':
+                    showTripSummary();
+                    break;
+            }
+        }
+
+        function showMessageModal() {
+            showModal('message-modal');
+        }
+
+        function makeCall() {
+            showNotification('Calling driver...', 'info');
+            // Simulate call
+            setTimeout(() => {
+                window.location.href = 'tel:+94123456789';
+            }, 1000);
+        }
+
+        function makeCustomerCall() {
+            showNotification('Calling customer...', 'info');
+            setTimeout(() => {
+                window.location.href = 'tel:+94712345678';
+            }, 1000);
+        }
+
+        function showTrackingModal() {
+            showModal('tracking-modal');
+        }
+
+        function showRatingModal() {
+            showModal('rating-modal');
+        }
+
+        function handleRebook(element) {
+            showNotification('Redirecting to booking page...', 'info');
+            setTimeout(() => {
+                window.location.href = 'search.html';
+            }, 1000);
+        }
+
+        function downloadInvoice() {
+            showNotification('Preparing invoice download...', 'info');
+            setTimeout(() => {
+                showNotification('Invoice downloaded successfully!', 'success');
+            }, 2000);
+        }
+
+        function showBookingDetails(element) {
+            const bookingCard = element.closest('.booking-card, .driver-booking-card');
+            const vehicleName = bookingCard.querySelector('h4').textContent;
+            const bookingId = bookingCard.querySelector('.booking-id').textContent;
+            
+            showNotification(`Loading details for ${vehicleName}...`, 'info');
+        }
+
+        function contactSupport() {
+            showNotification('Connecting to support team...', 'info');
+            setTimeout(() => {
+                window.location.href = 'tel:+94701234567';
+            }, 1500);
+        }
+
+        function showTripSummary() {
+            showNotification('Loading trip summary...', 'info');
+        }
+
+        function showModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.style.display = 'flex';
+                setTimeout(() => modal.style.opacity = '1', 10);
+            }
+        }
+
+        function closeModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.style.opacity = '0';
+                setTimeout(() => modal.style.display = 'none', 300);
+            }
+        }
+
+        function handleVehicleFilter(filter) {
+            const sections = {
+                'vehicle-active': document.querySelector('.vehicle-active'),
+                'vehicle-upcoming': document.querySelector('.vehicle-upcoming'),
+                'vehicle-past': document.querySelector('.vehicle-past')
+            };
+
+            // Hide all sections first
+            Object.values(sections).forEach(section => {
+                if (section) section.style.display = 'none';
+            });
+
+            // Show sections based on filter
+            switch(filter) {
+                case 'all':
+                    Object.values(sections).forEach(section => {
+                        if (section) section.style.display = 'block';
+                    });
+                    break;
+                case 'active':
+                    if (sections['vehicle-active']) sections['vehicle-active'].style.display = 'block';
+                    break;
+                case 'upcoming':
+                    if (sections['vehicle-upcoming']) sections['vehicle-upcoming'].style.display = 'block';
+                    break;
+                case 'past':
+                    if (sections['vehicle-past']) sections['vehicle-past'].style.display = 'block';
+                    break;
+            }
+        }
+
+        function handleDriverFilter(filter) {
+            const sections = {
+                'driver-active': document.querySelector('.driver-active'),
+                'driver-upcoming': document.querySelector('.driver-upcoming'),
+                'driver-past': document.querySelector('.driver-past')
+            };
+
+            // Hide all sections first
+            Object.values(sections).forEach(section => {
+                if (section) section.style.display = 'none';
+            });
+
+            // Show sections based on filter
+            switch(filter) {
+                case 'all':
+                    Object.values(sections).forEach(section => {
+                        if (section) section.style.display = 'block';
+                    });
+                    break;
+                case 'active':
+                    if (sections['driver-active']) sections['driver-active'].style.display = 'block';
+                    break;
+                case 'upcoming':
+                    if (sections['driver-upcoming']) sections['driver-upcoming'].style.display = 'block';
+                    break;
+                case 'past':
+                    if (sections['driver-past']) sections['driver-past'].style.display = 'block';
+                    break;
+            }
+        }
+
+        function showCancelModal(btn) {
+            const bookingCard = btn.closest('.booking-card, .driver-booking-card');
+            const vehicleName = bookingCard.querySelector('h4').textContent;
+            const bookingId = bookingCard.querySelector('.booking-id').textContent;
+            
+            const modal = document.createElement('div');
+            modal.className = 'modal-overlay';
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3><i class="fas fa-exclamation-triangle"></i> Cancel Booking</h3>
+                        <button class="modal-close">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Are you sure you want to cancel this booking?</p>
+                        <div class="booking-summary">
+                            <strong>${vehicleName}</strong><br>
+                            <small>${bookingId}</small>
+                        </div>
+                        <p class="warning-text">This action cannot be undone. Cancellation fees may apply.</p>
+                    </div>
+                    <div class="modal-actions">
+                        <button class="btn btn-outline" onclick="closeCancelModal()">
+                            <i class="fas fa-times"></i> Keep Booking
+                        </button>
+                        <button class="btn btn-danger" onclick="confirmCancel()">
+                            <i class="fas fa-trash"></i> Confirm Cancel
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            modal.style.display = 'flex';
+            setTimeout(() => modal.style.opacity = '1', 10);
+            
+            // Close modal functionality
+            modal.querySelector('.modal-close').onclick = closeCancelModal;
+            modal.onclick = (e) => {
+                if (e.target === modal) closeCancelModal();
+            };
+        }
+
+        function showEmergencyModal(btn) {
+            const modal = document.createElement('div');
+            modal.className = 'modal-overlay';
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <div class="modal-header emergency-header">
+                        <h3><i class="fas fa-exclamation-triangle"></i> Emergency Stop</h3>
+                        <button class="modal-close">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <p class="emergency-text">This will immediately notify the driver and support team.</p>
+                        <p>Emergency services will be contacted if necessary.</p>
+                        <div class="emergency-options">
+                            <label><input type="checkbox" checked> Notify Support Team</label>
+                            <label><input type="checkbox"> Contact Emergency Services</label>
+                        </div>
+                    </div>
+                    <div class="modal-actions">
+                        <button class="btn btn-outline" onclick="closeEmergencyModal()">
+                            <i class="fas fa-times"></i> Cancel
+                        </button>
+                        <button class="btn btn-danger" onclick="confirmEmergency()">
+                            <i class="fas fa-exclamation-triangle"></i> Trigger Emergency Stop
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            modal.style.display = 'flex';
+            setTimeout(() => modal.style.opacity = '1', 10);
+            
+            // Close modal functionality
+            modal.querySelector('.modal-close').onclick = closeEmergencyModal;
+            modal.onclick = (e) => {
+                if (e.target === modal) closeEmergencyModal();
+            };
+        }
+
+        function closeCancelModal() {
+            const modal = document.querySelector('.modal-overlay');
+            if (modal) {
+                modal.style.opacity = '0';
+                setTimeout(() => modal.remove(), 300);
+            }
+        }
+
+        function closeEmergencyModal() {
+            const modal = document.querySelector('.modal-overlay');
+            if (modal) {
+                modal.style.opacity = '0';
+                setTimeout(() => modal.remove(), 300);
+            }
+        }
+
+        function confirmCancel() {
+            closeCancelModal();
+            showNotification('Booking cancelled successfully', 'success');
+        }
+
+        function confirmEmergency() {
+            closeEmergencyModal();
+            showNotification('Emergency stop activated. Support team notified.', 'warning');
+        }
+
+        function submitRating() {
+            closeModal('rating-modal');
+            showNotification('Thank you for your feedback!', 'success');
+        }
+
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `notification-toast ${type}`;
+            notification.innerHTML = `
+                <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'warning' ? 'exclamation-triangle' : 'info-circle'}"></i>
+                <span>${message}</span>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.classList.add('show');
+            }, 100);
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+
+        // Modal event listeners
+        document.addEventListener('click', (e) => {
+            if (e.target.classList.contains('modal-close')) {
+                const modal = e.target.closest('.modal-overlay');
+                if (modal) {
+                    modal.style.opacity = '0';
+                    setTimeout(() => {
+                        if (modal.id) {
+                            modal.style.display = 'none';
+                        } else {
+                            modal.remove();
+                        }
+                    }, 300);
+                }
+            }
+        });
+
+        // Star rating functionality
+        document.addEventListener('click', (e) => {
+            if (e.target.matches('.star-rating .fa-star')) {
+                const rating = parseInt(e.target.dataset.rating);
+                const stars = e.target.parentNode.querySelectorAll('.fa-star');
+                
+                stars.forEach((star, index) => {
+                    if (index < rating) {
+                        star.classList.add('active');
+                        star.style.color = '#f8961e';
+                    } else {
+                        star.classList.remove('active');
+                        star.style.color = '#e9ecef';
+                    }
+                });
+            }
+        });
+
+        // Message input functionality
+        document.addEventListener('keypress', (e) => {
+            if (e.target.matches('.message-input input') && e.key === 'Enter') {
+                const input = e.target;
+                const message = input.value.trim();
+                if (message) {
+                    addMessageToThread(message);
+                    input.value = '';
+                }
+            }
+        });
+
+        function addMessageToThread(message) {
+            const thread = document.querySelector('.message-thread');
+            const messageElement = document.createElement('div');
+            messageElement.className = 'message sent';
+            messageElement.innerHTML = `
+                <div class="message-content">${message}</div>
+                <div class="message-time">${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</div>
+            `;
+            thread.appendChild(messageElement);
+            thread.scrollTop = thread.scrollHeight;
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Search - Ride Machan</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="../css/main.css" />
+    <link rel="stylesheet" href="../css/search.css" />
+</head>
+<body>
+    <div class="container">
+        <!-- Include Sidebar Navigation -->
+        <div id="navbar-container"></div>
+
+        <!-- Include Header -->
+        <div id="header-container"></div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Search Tabs -->
+            <div class="search-tabs">
+                <button class="tab-btn active" data-tab="vehicles" onclick="switchTab('vehicles')" type="button">
+                    <i class="fas fa-car"></i>
+                    Vehicles
+                </button>
+                <button class="tab-btn" data-tab="drivers" onclick="switchTab('drivers')" type="button">
+                    <i class="fas fa-user"></i>
+                    Drivers
+                </button>
+            </div>
+
+            <!-- Search Form -->
+            <div class="search-form-container">
+                <h2 style="margin-bottom: 20px; color: var(--dark); font-size: 24px;">Find Your Perfect Vehicle</h2>
+                <p class="subtitle" style="margin-bottom: 25px;">Search through thousands of vehicles across Sri Lanka</p>
+                
+                <div class="search-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="vehicleType">Vehicle Type</label>
+                            <select class="form-control" id="vehicleType">
+                                <option value="">Select vehicle type</option>
+                                <option value="car">Car</option>
+                                <option value="suv">SUV</option>
+                                <option value="van">Van</option>
+                                <option value="truck">Truck</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="pickupLocation">From</label>
+                            <select class="form-control" id="pickupLocation">
+                                <option value="">Pick up location</option>
+                                <option value="colombo">Colombo</option>
+                                <option value="kandy">Kandy</option>
+                                <option value="galle">Galle</option>
+                                <option value="negombo">Negombo</option>
+                                <option value="jaffna">Jaffna</option>
+                                <option value="trincomalee">Trincomalee</option>
+                                <option value="anuradhapura">Anuradhapura</option>
+                                <option value="matara">Matara</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="dropoffLocation">To</label>
+                            <select class="form-control" id="dropoffLocation">
+                                <option value="">Drop off location</option>
+                                <option value="colombo">Colombo</option>
+                                <option value="kandy">Kandy</option>
+                                <option value="galle">Galle</option>
+                                <option value="negombo">Negombo</option>
+                                <option value="jaffna">Jaffna</option>
+                                <option value="trincomalee">Trincomalee</option>
+                                <option value="anuradhapura">Anuradhapura</option>
+                                <option value="matara">Matara</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="fromDateTime">From Date & Time</label>
+                            <input type="datetime-local" class="form-control" id="fromDateTime">
+                        </div>
+                        <div class="form-group">
+                            <label for="toDateTime">To Date & Time</label>
+                            <input type="datetime-local" class="form-control" id="toDateTime">
+                        </div>
+                    </div>
+
+                    <button class="search-btn" onclick="performSearch()" type="button">
+                        <i class="fas fa-search"></i>
+                        <span id="searchBtnText">Search Vehicles</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Filters -->
+            <div class="filters-container">
+                <h3 style="margin-bottom: 20px; color: var(--dark);">Filters</h3>
+                <div class="filters-grid">
+                    <div class="filter-group">
+                        <label>Price Range</label>
+                        <select class="filter-select" id="priceRange">
+                            <option value="">Select</option>
+                            <option value="0-5000">LKR 0 - 5,000</option>
+                            <option value="5000-10000">LKR 5,000 - 10,000</option>
+                            <option value="10000+">LKR 10,000+</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Category</label>
+                        <select class="filter-select" id="category">
+                            <option value="">Select</option>
+                            <option value="economy">Economy</option>
+                            <option value="premium">Premium</option>
+                            <option value="luxury">Luxury</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Company</label>
+                        <select class="filter-select" id="companyFilter">
+                            <option value="">Select Company</option>
+                            <option value="Premium Rentals">Premium Rentals</option>
+                            <option value="City Car Rentals">City Car Rentals</option>
+                            <option value="Budget Wheels">Budget Wheels</option>
+                            <option value="Lanka Van Hire">Lanka Van Hire</option>
+                            <option value="Luxury Rides LK">Luxury Rides LK</option>
+                            <option value="Island Transport">Island Transport</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Fuel Type</label>
+                        <select class="filter-select" id="fuelType">
+                            <option value="">Select</option>
+                            <option value="petrol">Petrol</option>
+                            <option value="diesel">Diesel</option>
+                            <option value="hybrid">Hybrid</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>No of Seats</label>
+                        <select class="filter-select" id="seats">
+                            <option value="">Select</option>
+                            <option value="2">2</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                            <option value="7+">7+</option>
+                        </select>
+                    </div>
+                </div>
+                <button class="apply-btn" onclick="applyFilters()" type="button">Apply Filters</button>
+            </div>
+
+            <!-- Search Results -->
+            <div class="search-results" id="searchResults">
+                <!-- Results will be populated by JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Load external components
+        function loadComponent(elementId, filePath, callback) {
+            fetch(filePath)
+                .then(response => response.text())
+                .then(data => {
+                    // Replace the PAGE_TITLE placeholder with SEARCH
+                    if (elementId === 'header-container') {
+                        data = data.replace('{{PAGE_TITLE}}', 'SEARCH');
+                    }
+                    
+                    document.getElementById(elementId).innerHTML = data;
+                    
+                    // Execute any scripts in the loaded content
+                    const scripts = document.getElementById(elementId).getElementsByTagName('script');
+                    for (let script of scripts) {
+                        eval(script.innerHTML);
+                    }
+                    
+                    // Execute callback if provided
+                    if (callback) {
+                        callback();
+                    }
+                })
+                .catch(error => console.error('Error loading component:', error));
+        }
+
+        // Load navbar and header on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadComponent('navbar-container', '../components/navbar.html');
+            loadComponent('header-container', '../components/header.html', function() {
+                // Initialize header after it's loaded
+                initializeHeader();
+            });
+
+            // Set default datetime values
+            const now = new Date();
+            const tomorrow = new Date(now);
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            
+            document.getElementById('fromDateTime').value = now.toISOString().slice(0, 16);
+            document.getElementById('toDateTime').value = tomorrow.toISOString().slice(0, 16);
+            
+            // Load initial vehicle data
+            renderVehicles(vehicleData);
+        });
+
+        // Current active tab
+        let currentTab = 'vehicles';
+
+        // Sample vehicle data with Sri Lankan content
+        const vehicleData = [
+            {
+                id: 1,
+                name: "Honda Vezel",
+                price: 6500,
+                company: "Premium Rentals",
+                companyId: 1,
+                location: "Colombo 03",
+                rating: 4.7,
+                reviews: 47,
+                seats: 5,
+                features: ["GPS Navigation", "Bluetooth", "A/C", "Leather Seats"],
+                category: "premium",
+                fuel: "hybrid",
+                type: "suv"
+            },
+            {
+                id: 2,
+                name: "Toyota Axio",
+                price: 4500,
+                company: "City Car Rentals",
+                companyId: 2,
+                location: "Kandy",
+                rating: 4.5,
+                reviews: 32,
+                seats: 5,
+                features: ["A/C", "Bluetooth", "Power Steering"],
+                category: "economy",
+                fuel: "petrol",
+                type: "car"
+            },
+            {
+                id: 3,
+                name: "Suzuki Alto",
+                price: 3500,
+                company: "Budget Wheels",
+                companyId: 3,
+                location: "Galle",
+                rating: 4.2,
+                reviews: 18,
+                seats: 4,
+                features: ["A/C", "Power Steering"],
+                category: "economy",
+                fuel: "petrol",
+                type: "car"
+            },
+            {
+                id: 4,
+                name: "Toyota Hiace",
+                price: 8500,
+                company: "Lanka Van Hire",
+                companyId: 4,
+                location: "Negombo",
+                rating: 4.6,
+                reviews: 25,
+                seats: 14,
+                features: ["A/C", "GPS", "Spacious", "Bluetooth"],
+                category: "premium",
+                fuel: "diesel",
+                type: "van"
+            },
+            {
+                id: 5,
+                name: "BMW X3",
+                price: 12500,
+                company: "Luxury Rides LK",
+                companyId: 5,
+                location: "Colombo 07",
+                rating: 4.9,
+                reviews: 56,
+                seats: 5,
+                features: ["Premium Sound", "Sunroof", "GPS", "Leather Interior"],
+                category: "luxury",
+                fuel: "petrol",
+                type: "suv"
+            },
+            {
+                id: 6,
+                name: "Nissan Caravan",
+                price: 7500,
+                company: "Island Transport",
+                companyId: 6,
+                location: "Anuradhapura",
+                rating: 4.3,
+                reviews: 22,
+                seats: 9,
+                features: ["A/C", "GPS", "Spacious Luggage"],
+                category: "premium",
+                fuel: "diesel",
+                type: "van"
+            }
+        ];
+
+        let filteredVehicles = [...vehicleData];
+
+        function switchTab(tab) {
+            if (tab === 'drivers') {
+                window.location.href = "driver_search.html";
+                return;
+            }
+
+            currentTab = tab;
+            
+            // Update tab UI
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            const btn = document.querySelector(`[data-tab="${tab}"]`);
+            if (btn) btn.classList.add('active');
+            
+            // Update search button text
+            const searchBtnText = document.getElementById('searchBtnText');
+            searchBtnText.textContent = tab === 'drivers' ? 'Search Drivers' : 'Search Vehicles';
+            
+            // Clear results when switching tabs
+            document.getElementById('searchResults').innerHTML = '';
+        }
+
+        function performSearch() {
+            if (currentTab === 'drivers') {
+                window.location.href = "driver_search.html";
+            } else {
+                searchVehicles();
+            }
+        }
+
+        function renderVehicles(vehicles) {
+            const resultsContainer = document.getElementById('searchResults');
+            resultsContainer.innerHTML = '';
+
+            if (vehicles.length === 0) {
+                resultsContainer.innerHTML = '<p style="text-align: center; color: var(--text-light); padding: 40px;">No vehicles found matching your criteria.</p>';
+                return;
+            }
+
+            vehicles.forEach(vehicle => {
+                const vehicleCard = document.createElement('div');
+                vehicleCard.className = 'vehicle-card';
+                vehicleCard.onclick = () => viewVehicle(vehicle.id);
+                
+                vehicleCard.innerHTML = `
+                    <div class="vehicle-image">
+                        <i class="fas fa-car"></i>
+                    </div>
+                    <div class="vehicle-info">
+                        <h4 onclick="viewVehicle(${vehicle.id})">${vehicle.name}</h4>
+                        <p class="price">LKR ${vehicle.price.toLocaleString()}/day</p>
+                        <p class="category" onclick="event.stopPropagation(); viewCompany(${vehicle.companyId})" style="cursor: pointer; color: var(--primary); text-decoration: underline;">${vehicle.company}</p>
+                        <p class="location">${vehicle.location}, Sri Lanka</p>
+                        <div class="rating">
+                            <div class="stars">
+                                ${generateStars(vehicle.rating)}
+                            </div>
+                            <span class="review-count">${vehicle.reviews} reviews</span>
+                        </div>
+                        <div class="seats-info">
+                            <i class="fas fa-users"></i>
+                            ${vehicle.seats} seats
+                        </div>
+                        <div class="features">
+                            ${vehicle.features.map(feature => `<span class="feature-tag">${feature}</span>`).join('')}
+                        </div>
+                    </div>
+                    <div class="vehicle-actions">
+                        <button class="message-btn" onclick="event.stopPropagation(); sendMessage(${vehicle.id})">Message</button>
+                    </div>
+                `;
+                
+                resultsContainer.appendChild(vehicleCard);
+            });
+        }
+
+        function generateStars(rating) {
+            let stars = '';
+            for (let i = 1; i <= 5; i++) {
+                if (i <= rating) {
+                    stars += '<i class="fas fa-star"></i>';
+                } else {
+                    stars += '<i class="far fa-star"></i>';
+                }
+            }
+            return stars;
+        }
+
+        function searchVehicles() {
+            const vehicleType = document.getElementById('vehicleType').value;
+            const pickupLocation = document.getElementById('pickupLocation').value;
+            
+            let results = vehicleData;
+            
+            if (vehicleType) {
+                results = results.filter(vehicle => vehicle.type === vehicleType);
+            }
+            
+            if (pickupLocation) {
+                results = results.filter(vehicle => 
+                    vehicle.location.toLowerCase().includes(pickupLocation.toLowerCase())
+                );
+            }
+            
+            filteredVehicles = results;
+            renderVehicles(filteredVehicles);
+        }
+
+        function applyFilters() {
+            const priceRange = document.getElementById('priceRange').value;
+            const category = document.getElementById('category').value;
+            const companyFilter = document.getElementById('companyFilter').value;
+            const fuelType = document.getElementById('fuelType').value;
+            const seats = document.getElementById('seats').value;
+            
+            let filtered = [...vehicleData];
+            
+            if (priceRange) {
+                const [min, max] = priceRange.split('-');
+                if (max === undefined) {
+                    filtered = filtered.filter(v => v.price >= parseInt(min.replace('+', '')));
+                } else {
+                    filtered = filtered.filter(v => v.price >= parseInt(min) && v.price <= parseInt(max));
+                }
+            }
+            
+            if (category) {
+                filtered = filtered.filter(v => v.category === category);
+            }
+
+            if (companyFilter) {
+                filtered = filtered.filter(v => v.company === companyFilter);
+            }
+            
+            if (fuelType) {
+                filtered = filtered.filter(v => v.fuel === fuelType);
+            }
+            
+            if (seats) {
+                if (seats === '7+') {
+                    filtered = filtered.filter(v => v.seats >= 7);
+                } else {
+                    filtered = filtered.filter(v => v.seats == parseInt(seats));
+                }
+            }
+            
+            filteredVehicles = filtered;
+            renderVehicles(filteredVehicles);
+        }
+
+        function viewVehicle(vehicleId) {
+            // Store vehicle data in sessionStorage for the profile page to use
+            const vehicle = vehicleData.find(v => v.id === vehicleId);
+            if (vehicle) {
+                // Store the vehicle data with localStorage methods - not for this artifact
+                try {
+                    sessionStorage.setItem('selectedVehicle', JSON.stringify(vehicle));
+                    sessionStorage.setItem('searchData', JSON.stringify({
+                        vehicleType: document.getElementById('vehicleType').value,
+                        pickupLocation: document.getElementById('pickupLocation').value,
+                        dropoffLocation: document.getElementById('dropoffLocation').value,
+                        fromDateTime: document.getElementById('fromDateTime').value,
+                        toDateTime: document.getElementById('toDateTime').value
+                    }));
+                } catch(e) {
+                    console.log('SessionStorage not available');
+                }
+                window.location.href = `vehicle-profile.html?id=${vehicleId}`;
+            }
+        }
+
+        function viewCompany(companyId) {
+            // Store the selected company ID in sessionStorage and navigate to company profile
+            try {
+                sessionStorage.setItem('selectedCompanyId', companyId.toString());
+            } catch(e) {
+                console.log('SessionStorage not available');
+            }
+            window.location.href = 'company-profile.html';
+        }
+
+        function sendMessage(vehicleId) {
+            const vehicle = vehicleData.find(v => v.id === vehicleId);
+            if (vehicle) {
+                const popup = document.createElement('div');
+                popup.className = 'popup-overlay';
+                popup.innerHTML = `
+                    <div class="popup-content">
+                        <div class="popup-header">
+                            <h3>Send Message</h3>
+                            <button class="close-btn" onclick="closePopup()">&times;</button>
+                        </div>
+                        <div class="popup-body">
+                            <p>Send a message to <strong>${vehicle.company}</strong> about their <strong>${vehicle.name}</strong>:</p>
+                            <textarea class="message-input" placeholder="Type your message here..." rows="4"></textarea>
+                        </div>
+                        <div class="popup-footer">
+                            <button class="btn btn-primary" onclick="sendMessageAction(${vehicle.id})">Send Message</button>
+                            <button class="btn btn-outline" onclick="closePopup()">Cancel</button>
+                        </div>
+                    </div>
+                `;
+                document.body.appendChild(popup);
+            }
+        }
+
+        function sendMessageAction(vehicleId) {
+            const messageInput = document.querySelector('.message-input');
+            if (messageInput && messageInput.value.trim()) {
+                alert('Message sent successfully!');
+                closePopup();
+            } else {
+                alert('Please enter a message before sending.');
+            }
+        }
+
+        function bookVehicle(vehicleId) {
+            const vehicle = vehicleData.find(v => v.id === vehicleId);
+            if (vehicle) {
+                alert(`Booking ${vehicle.name} - Redirecting to booking page...`);
+                closePopup();
+                // In a real app, you would redirect to booking page
+                // window.location.href = `booking.html?vehicleId=${vehicleId}`;
+            }
+        }
+
+        function closePopup() {
+            const popup = document.querySelector('.popup-overlay');
+            if (popup) {
+                popup.remove();
+            }
+        }
+
+        // Header functionality (integrated from header.html)
+        function initializeHeader() {
+            setTimeout(() => {
+                const userName = document.getElementById('userName');
+                const profileInitial = document.getElementById('profileInitial');
+                
+                if (userName) userName.textContent = 'Kamal';
+                if (profileInitial) profileInitial.textContent = 'K';
+                
+                updateNotificationCounts();
+            }, 100);
+        }
+
+        function updateNotificationCounts() {
+            setTimeout(() => {
+                const notificationCount = document.getElementById('notificationCount');
+                const messageCount = document.getElementById('messageCount');
+                
+                if (notificationCount) notificationCount.textContent = '3';
+                if (messageCount) messageCount.textContent = '5';
+            }, 100);
+        }
+
+        function toggleProfileDropdown() {
+            const dropdown = document.getElementById('profileDropdown');
+            if (dropdown) {
+                dropdown.classList.toggle('show');
+            }
+        }
+
+        function showNotifications() {
+            alert('Notifications: You have 3 new notifications!');
+        }
+
+        function showMessages() {
+            alert('Messages: You have 5 new messages!');
+        }
+
+        function handleLogout() {
+            if (confirm('Are you sure you want to logout?')) {
+                alert('Logged out successfully!');
+                // In a real app: window.location.href = '../auth/login.html';
+            }
+        }
+
+        // Navbar functionality (integrated from navbar.html)
+        function initializeNavbar() {
+            setTimeout(() => {
+                setActiveNavItem('search');
+            }, 100);
+        }
+
+        function setActiveNavItem(pageName) {
+            setTimeout(() => {
+                document.querySelectorAll('.nav-item').forEach(item => {
+                    item.classList.remove('active');
+                });
+                
+                const activeItem = document.querySelector(`[data-page="${pageName}"]`);
+                if (activeItem) {
+                    activeItem.classList.add('active');
+                }
+            }, 100);
+        }
+
+        // Initialize everything when page loads
+        window.addEventListener('load', function() {
+            initializeNavbar();
+        });
+
+        // Close dropdowns when clicking outside
+        document.addEventListener('click', function(event) {
+            setTimeout(() => {
+                const dropdown = document.getElementById('profileDropdown');
+                const profile = document.querySelector('.user-profile');
+                
+                if (dropdown && profile && !profile.contains(event.target)) {
+                    dropdown.classList.remove('show');
+                }
+            }, 100);
+        });
+    </script>
+</body>
+</html>

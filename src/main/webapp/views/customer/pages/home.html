@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- ===================
+             Meta & Stylesheets
+    =================== -->
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard - Ride Machan</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="../css/main.css" />
+    <link rel="stylesheet" href="../css/home.css" />
+</head>
+<body>
+    <div class="container">
+        <!-- Include Navbar Component -->
+        <div id="navbar-container"></div>
+
+        <!-- Include Header Component -->
+        <div id="header-container"></div>
+
+        <!-- ===================
+                 Main Content Area
+        =================== -->
+        <div class="main-content">
+            <!-- Page Title & Actions -->
+            <div class="page-title">
+                <div class="title">Dashboard</div>
+            </div>
+
+            <!-- Stats Cards -->
+            <div class="stats-cards">
+                <!-- Active Booking Card -->
+                <div class="stat-card" onclick="navigateToBookings('active')">
+                    <div class="card-header">
+                        <div>
+                            <div class="card-label">Active</div>
+                            <div class="card-value" id="activeCount">1</div>
+                        </div>
+                        <div class="card-icon purple">
+                            <i class="fas fa-car"></i>
+                        </div>
+                    </div>
+                    <div class="card-change green">
+                        <span>Currently Active</span>
+                    </div>
+                </div>
+
+                <!-- Upcoming Bookings Card -->
+                <div class="stat-card" onclick="navigateToBookings('upcoming')">
+                    <div class="card-header">
+                        <div>
+                            <div class="card-value" id="upcomingCount">2</div>
+                            <div class="card-label">Upcoming</div>
+                        </div>
+                        <div class="card-icon blue">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                    </div>
+                    <div class="card-change positive">
+                        <span>Scheduled Bookings</span>
+                    </div>
+                </div>
+
+                <!-- Completed Rides Card -->
+                <div class="stat-card" onclick="navigateToBookings('completed')">
+                    <div class="card-header">
+                        <div>
+                            <div class="card-value" id="completedCount">12</div>
+                            <div class="card-label">Completed</div>
+                        </div>
+                        <div class="card-icon green">
+                            <i class="fas fa-check"></i>
+                        </div>
+                    </div>
+                    <div class="card-change">
+                        <span>Total Rides</span>
+                    </div>
+                </div>
+
+                <!-- Monthly Spending Card -->
+                <div class="stat-card" onclick="showSpendingDetails()">
+                    <div class="card-header">
+                        <div>
+                            <div class="card-value" id="monthlySpend">LKR 45,750</div>
+                            <div class="card-label">This Month</div>
+                        </div>
+                        <div class="card-icon orange">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                    </div>
+                    <div class="card-change positive">
+                        <span>Total Spent</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===================
+                     Quick Actions Section
+            =================== -->
+            <div class="quick-actions">
+                <h3>Quick Actions</h3>
+                <div class="quick-actions-grid">
+                    <a href="../pages/search.html" class="action-btn">
+                        <i class="fas fa-search"></i>
+                        Find Vehicle
+                    </a>
+                    <a href="../pages/bookings.html" class="action-btn outline">
+                        <i class="fas fa-calendar"></i>
+                        View Bookings
+                    </a>
+                    <button class="action-btn outline" onclick="showEmergencyContact()">
+                        <i class="fas fa-phone"></i>
+                        Emergency Help
+                    </button>
+                </div>
+            </div>
+           
+
+            <!-- ===================
+                     Recent Activity Section
+            =================== --><!--
+            <div class="recent-activity">
+                <h3>Recent Activity</h3>
+                <div class="activity-list" id="activityList">-->
+                    <!-- Activity items will be loaded dynamically --><!--
+                </div>
+            </div>
+        </div>
+    </div>-->
+
+    <script>
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', function() {
+            loadComponents();
+            loadDashboardData();
+            loadRecentActivity();
+        });
+
+        // Load navbar and header components
+        async function loadComponents() {
+            try {
+                // Load navbar
+                const navbarResponse = await fetch('../components/navbar.html');
+                const navbarHtml = await navbarResponse.text();
+                document.getElementById('navbar-container').innerHTML = navbarHtml;
+
+                // Load header
+                const headerResponse = await fetch('../components/header.html');
+                const headerHtml = await headerResponse.text();
+                const customizedHeader = headerHtml.replace('{{PAGE_TITLE}}', 'WELCOME BACK KAMAL');
+                document.getElementById('header-container').innerHTML = customizedHeader;
+                // Execute scripts from loaded components
+                executeComponentScripts();
+            } catch (error) {
+                console.error('Error loading components:', error);
+            }
+        }
+
+        // Execute scripts from loaded components
+        function executeComponentScripts() {
+            const scripts = document.querySelectorAll('#navbar-container script, #header-container script');
+            scripts.forEach(script => {
+                const newScript = document.createElement('script');
+                newScript.textContent = script.textContent;
+                document.body.appendChild(newScript);
+            });
+        }
+
+        // Load dashboard data
+        function loadDashboardData() {
+            // In a real application, this would fetch from an API
+            const dashboardData = {
+                active: 1,
+                upcoming: 2,
+                completed: 12,
+                monthlySpending: 45750
+            };
+
+            // Update stats cards
+            document.getElementById('activeCount').textContent = dashboardData.active;
+            document.getElementById('upcomingCount').textContent = dashboardData.upcoming;
+            document.getElementById('completedCount').textContent = dashboardData.completed;
+            document.getElementById('monthlySpend').textContent = `LKR ${dashboardData.monthlySpending.toLocaleString()}`;
+        }
+
+        // Load recent activity
+        function loadRecentActivity() {
+            const activities = [
+                {
+                    type: 'success',
+                    title: 'Booking Confirmed',
+                    description: 'Mercedes C-Class - Royal Motors, Colombo',
+                    time: '23 minutes ago'
+                },
+                {
+                    type: 'success',
+                    title: 'Payment Successful',
+                    description: 'LKR 15,750 paid for BMW X5 (3rd Mar 2025)',
+                    time: '2 hours ago'
+                },
+                {
+                    type: 'info',
+                    title: 'Reminder',
+                    description: 'Your booking starts in 2 hours - Toyota Camry',
+                    time: '4 hours ago'
+                },
+                {
+                    type: 'warning',
+                    title: 'Booking Modified',
+                    description: 'Pick-up time changed to 10:00 AM',
+                    time: '1 day ago'
+                }
+            ];
+
+            const activityList = document.getElementById('activityList');
+            activityList.innerHTML = '';
+
+            activities.forEach(activity => {
+                const activityItem = document.createElement('div');
+                activityItem.className = 'activity-item';
+                activityItem.innerHTML = `
+                    <div class="activity-icon ${activity.type}"></div>
+                    <div class="activity-content">
+                        <div class="activity-title">${activity.title}</div>
+                        <div class="activity-description">${activity.description}</div>
+                    </div>
+                    <div class="activity-time">${activity.time}</div>
+                `;
+                activityList.appendChild(activityItem);
+            });
+        }
+
+        // Navigation functions
+        function navigateToBookings(filter = '') {
+            const url = filter ? `../pages/bookings.html?filter=${filter}` : '../pages/bookings.html';
+            window.location.href = url;
+        }
+
+        function showSpendingDetails() {
+            // In a real application, this would show a detailed spending breakdown
+            alert('Monthly Spending Breakdown:\n\nCompleted Rides: LKR 42,000\nCancellation Fees: LKR 2,500\nExtra Services: LKR 1,250\n\nTotal: LKR 45,750');
+        }
+
+        function showEmergencyContact() {
+            const emergencyInfo = `
+                Emergency Contacts:
+                
+                🚨 Police: 119
+                🚑 Ambulance: 1990
+                🔧 Roadside Assistance: +94 77 911 911
+                📞 Ride Machan Support: +94 11 234 5678
+                
+                Your current booking ID: RM-2025-001234
+            `;
+            alert(emergencyInfo);
+        }
+
+        // Add smooth loading animation
+        function showLoadingSpinner(show = true) {
+            let spinner = document.querySelector('.loading-spinner');
+            
+            if (show && !spinner) {
+                spinner = document.createElement('div');
+                spinner.className = 'loading-spinner';
+                spinner.innerHTML = `
+                    <div style="
+                        position: fixed;
+                        top: 50%;
+                        left: 50%;
+                        transform: translate(-50%, -50%);
+                        background: white;
+                        padding: 20px;
+                        border-radius: 10px;
+                        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+                        z-index: 9999;
+                        text-align: center;
+                    ">
+                        <i class="fas fa-spinner fa-spin" style="font-size: 24px; color: var(--primary); margin-bottom: 10px;"></i>
+                        <div>Loading...</div>
+                    </div>
+                `;
+                document.body.appendChild(spinner);
+            } else if (!show && spinner) {
+                spinner.remove();
+            }
+        }
+
+        // Handle real-time updates (placeholder for WebSocket implementation)
+        function setupRealTimeUpdates() {
+            // In a real application, this would establish WebSocket connection
+            // for real-time booking updates, notifications, etc.
+            
+            setInterval(() => {
+                // Simulate periodic data refresh
+                updateNotificationBadges();
+            }, 30000); // Update every 30 seconds
+        }
+
+        function updateNotificationBadges() {
+            // This would fetch latest notification counts
+            // and update the header badges accordingly
+        }
+
+        // Initialize real-time updates
+        setTimeout(setupRealTimeUpdates, 2000);
+
+        // Add keyboard shortcuts
+        document.addEventListener('keydown', function(event) {
+            if (event.ctrlKey || event.metaKey) {
+                switch(event.key) {
+                    case 's':
+                        event.preventDefault();
+                        window.location.href = '../pages/search.html';
+                        break;
+                    case 'b':
+                        event.preventDefault();
+                        window.location.href = '../pages/bookings.html';
+                        break;
+                    case 'p':
+                        event.preventDefault();
+                        window.location.href = '../pages/profile.html';
+                        break;
+                }
+            }
+        });
+    </script>
+
+    <!-- Add some additional styling for loading states and animations -->
+    <style>
+        .stat-card {
+            transition: all 0.3s ease;
+        }
+        
+        .stat-card:active {
+            transform: translateY(-5px) scale(0.98);
+        }
+        
+        .activity-item {
+            transition: all 0.2s ease;
+        }
+        
+        .activity-item:hover {
+            cursor: pointer;
+            background-color: rgba(67, 97, 238, 0.02);
+        }
+        
+        /* Smooth fade-in for content */
+        .main-content > * {
+            opacity: 0;
+            animation: fadeInUp 0.6s ease forwards;
+        }
+        
+        .main-content > *:nth-child(1) { animation-delay: 0.1s; }
+        .main-content > *:nth-child(2) { animation-delay: 0.2s; }
+        .main-content > *:nth-child(3) { animation-delay: 0.3s; }
+        .main-content > *:nth-child(4) { animation-delay: 0.4s; }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+        </div>
+    </div>
+</body>
+</html>

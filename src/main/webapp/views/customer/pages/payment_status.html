@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Payment Status - Ride Motion</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="../css/main.css" />
+    <link rel="stylesheet" href="../css/payment-status.css" />
+</head>
+<body>
+    <div class="container">
+        <!-- Include Sidebar Navigation -->
+        <div class="sidebar">
+            <div class="logo">
+                <img src="../images/logo.png" alt="Ride Machan Logo" class="logo">
+            </div>
+            <div class="nav-menu">
+                <div class="nav-item" data-page="home">
+                    <i class="fas fa-house"></i>
+                    <a href="dashboard.html"><span>Home</span></a>
+                </div>
+                <div class="nav-item" data-page="search">
+                    <i class="fas fa-car"></i>
+                    <a href="search.html"><span>Search</span></a>
+                </div>
+                <div class="nav-item active" data-page="bookings">
+                    <i class="fas fa-calendar-check"></i>
+                    <a href="bookings.html"><span>Bookings</span></a>
+                </div>
+                <div class="nav-item" data-page="settings">
+                    <i class="fas fa-cog"></i>
+                    <a href="settings.html"><span>Settings</span></a>
+                </div>
+                <div class="nav-item" data-page="notifications">
+                    <i class="fas fa-bell"></i>
+                    <a href="notifications.html"><span>Notifications</span></a>
+                </div>
+                <div class="logout" onclick="handleLogout()">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Header Section -->
+        <div class="header">
+            <div class="header-left">
+                <h2>Payment Status</h2>
+                <p>Your payment status and booking confirmation</p>
+            </div>
+            <div class="header-actions">
+                <div class="notification" onclick="showNotifications()">
+                    <i class="fas fa-bell"></i>
+                    <div class="badge" id="notificationCount">3</div>
+                </div>
+                <div class="notification" onclick="showMessages()">
+                    <i class="fas fa-envelope"></i>
+                    <div class="badge" id="messageCount">5</div>
+                </div>
+                <div class="user-profile" onclick="toggleProfileDropdown()">
+                    <div class="profile-img" id="profileInitial">K</div>
+                    <div class="user-info">
+                        <div class="user-name" id="userName">Kamal</div>
+                    </div>
+                    <div class="profile-dropdown" id="profileDropdown">
+                        <a href="profile.html"><i class="fas fa-user"></i> My Profile</a>
+                        <a href="settings.html"><i class="fas fa-cog"></i> Settings</a>
+                        <a href="bookings.html"><i class="fas fa-calendar"></i> My Bookings</a>
+                        <hr>
+                        <a href="#" onclick="handleLogout()"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content Area -->
+        <div class="main-content">
+            <!-- Navigation Breadcrumb -->
+            <div class="breadcrumb-nav">
+                <button class="back-btn" onclick="goBackToBookings()">
+                    <i class="fas fa-arrow-left"></i>
+                    <span>Back to Bookings</span>
+                </button>
+            </div>
+
+            <div class="status-container">
+                <!-- Left Content -->
+                <div class="payment-status-section">
+                    <!-- Success Status -->
+                    <div class="status-card">
+                        <div class="success-icon">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="status-info">
+                            <h3>Payment Successful - Booking Confirmed</h3>
+                            <p>Your MACDM vehicle booking has been confirmed and payment processed</p>
+                        </div>
+                    </div>
+
+                    <!-- Booking Details -->
+                    <div class="booking-details-card">
+                        <div class="detail-row">
+                            <span class="label">Booking ID:</span>
+                            <span class="value">R095 MAC 1096</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="label">Booking Date:</span>
+                            <span class="value">2024-08-13</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="label">Payment Date:</span>
+                            <span class="value">ryder.nova@gmail.com</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="label">Payment Mode:</span>
+                            <span class="value">Via Card Payment</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="label">Payment Status:</span>
+                            <span class="value">
+                                <span class="status-badge success">Successful</span>
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Download Invoice -->
+                    <div class="invoice-section">
+                        <button class="download-btn" onclick="downloadInvoice()">
+                            <i class="fas fa-download"></i>
+                            Download Invoice
+                        </button>
+                    </div>
+
+                    <!-- Vehicle Photo -->
+                    <div class="vehicle-photo">
+                        <div class="vehicle-image-placeholder" onclick="viewVehiclePhoto()">
+                            <i class="fas fa-car"></i>
+                            <p>Vehicle Photo</p>
+                        </div>
+                        <h4>Mercedes C-Class 2023</h4>
+                        <button class="view-vehicle-btn" onclick="viewVehicleDetails()">View Vehicle</button>
+                    </div>
+
+                    <!-- Driver Information -->
+                    <div class="driver-info">
+                        <h4>Driver Information</h4>
+                        <div class="driver-card">
+                            <div class="driver-avatar">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <div class="driver-details">
+                                <h5>Driver: Chaminda Perera</h5>
+                                <p>ID: Driver12345</p>
+                                <p>Contact: +94 11 234 5678</p>
+                                <p>4.9 ⭐ (1024 rides)</p>
+                            </div>
+                        </div>
+                        <div class="driver-actions">
+                            <button class="action-btn" onclick="chatWithDriver()">
+                                <i class="fas fa-phone"></i>
+                                Chat with Driver/Owner
+                            </button>
+                            <button class="action-btn secondary" onclick="viewDriverProfile()">
+                                <i class="fas fa-eye"></i>
+                                View Driver Profile
+                            </button>
+                            <button class="action-btn secondary" onclick="viewDriverLicense()">
+                                <i class="fas fa-id-card"></i>
+                                View Driver License
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Sidebar -->
+                <div class="sidebar-right">
+                    <!-- Quick Actions -->
+                    <div class="quick-actions-card">
+                        <h4>Quick Actions</h4>
+                        <button class="quick-action-btn primary" onclick="goToBookings()">
+                            <i class="fas fa-calendar"></i>
+                            Go to my bookings
+                        </button>
+                        <button class="quick-action-btn secondary" onclick="downloadReceipt()">
+                            <i class="fas fa-download"></i>
+                            Download Receipt
+                        </button>
+                        <button class="quick-action-btn secondary" onclick="contactSupport()">
+                            <i class="fas fa-phone"></i>
+                            Contact Support
+                        </button>
+                    </div>
+
+                    <!-- Booking Summary -->
+                    <div class="booking-summary-card">
+                        <h4>Booking Summary</h4>
+                        <div class="summary-details">
+                            <div class="summary-row">
+                                <span class="label">Mercedes C-Class 2023</span>
+                            </div>
+                            <div class="summary-row">
+                                <span class="label">Driver:</span>
+                                <span class="value">Chaminda Perera</span>
+                            </div>
+                            <div class="summary-row">
+                                <span class="label">Total Amount:</span>
+                                <span class="value amount">LKR 15,500.00</span>
+                            </div>
+                            <div class="summary-row">
+                                <span class="label">Status:</span>
+                                <span class="status-badge confirmed">Confirmed</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Need Help -->
+                    <div class="help-card">
+                        <h4>Need Help?</h4>
+                        <p>Questions about your MACDM booking? Our 24/7 support team is here to help with bookings, drivers, or any concerns.</p>
+                        <div class="help-actions">
+                            <button class="help-btn" onclick="callHelpline()">
+                                <i class="fas fa-phone"></i>
+                                Call 24/7 Help Line: 1177
+                            </button>
+                            <button class="help-btn secondary" onclick="contactSupport()">
+                                <i class="fas fa-comments"></i>
+                                Contact Support
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Navigation functionality
+        function initializeNavbar() {
+            const currentPage = getCurrentPageName();
+            setActiveNavItem(currentPage);
+            setupMobileMenu();
+        }
+
+        function getCurrentPageName() {
+            const path = window.location.pathname;
+            const page = path.substring(path.lastIndexOf('/') + 1);
+            return page.replace('.html', '') || 'home';
+        }
+
+        function setActiveNavItem(pageName) {
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            const activeItem = document.querySelector(`[data-page="${pageName}"]`);
+            if (activeItem) {
+                activeItem.classList.add('active');
+            }
+        }
+
+        function setupMobileMenu() {
+            if (!document.querySelector('.mobile-menu-toggle')) {
+                const toggleBtn = document.createElement('button');
+                toggleBtn.className = 'mobile-menu-toggle';
+                toggleBtn.innerHTML = '<i class="fas fa-bars"></i>';
+                toggleBtn.onclick = toggleSidebar;
+                document.body.appendChild(toggleBtn);
+            }
+        }
+
+        function toggleSidebar() {
+            const sidebar = document.querySelector('.sidebar');
+            sidebar.classList.toggle('active');
+        }
+
+        // Header functionality
+        function initializeHeader() {
+            loadUserData();
+            updateNotificationCounts();
+            
+            document.addEventListener('click', function(event) {
+                const dropdown = document.getElementById('profileDropdown');
+                const profile = document.querySelector('.user-profile');
+                
+                if (!profile.contains(event.target)) {
+                    dropdown.classList.remove('show');
+                }
+            });
+        }
+
+        function loadUserData() {
+            const userData = {
+                name: 'Kamal Silva',
+                email: 'kamal@example.com',
+                phone: '+94 77 123 4567',
+                initial: 'K'
+            };
+            
+            document.getElementById('userName').textContent = userData.name.split(' ')[0];
+            document.getElementById('profileInitial').textContent = userData.initial;
+        }
+
+        function updateNotificationCounts() {
+            const counts = {
+                notifications: 3,
+                messages: 5
+            };
+            
+            document.getElementById('notificationCount').textContent = counts.notifications;
+            document.getElementById('messageCount').textContent = counts.messages;
+            
+            if (counts.notifications === 0) {
+                document.getElementById('notificationCount').style.display = 'none';
+            }
+            if (counts.messages === 0) {
+                document.getElementById('messageCount').style.display = 'none';
+            }
+        }
+
+        function toggleProfileDropdown() {
+            const dropdown = document.getElementById('profileDropdown');
+            dropdown.classList.toggle('show');
+        }
+
+        function showNotifications() {
+            window.location.href = 'notifications.html';
+        }
+
+        function showMessages() {
+            showPopup('Messages', 'Messages feature coming soon!', 'info');
+        }
+
+        function handleLogout() {
+            if (confirm('Are you sure you want to logout?')) {
+                showLogoutMessage();
+                
+                setTimeout(() => {
+                    window.location.href = '../auth/login.html';
+                }, 1500);
+            }
+        }
+
+        function showLogoutMessage() {
+            const notification = document.createElement('div');
+            notification.innerHTML = `
+                <div style="
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    background: var(--success);
+                    color: white;
+                    padding: 15px 20px;
+                    border-radius: var(--radius);
+                    box-shadow: var(--shadow);
+                    z-index: 9999;
+                    animation: slideIn 0.3s ease;
+                ">
+                    <i class="fas fa-check-circle"></i>
+                    Logged out successfully!
+                </div>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 1200);
+        }
+
+        // Back to bookings functionality
+        function goBackToBookings() {
+            // Try to go back to previous page if it's available and likely from bookings
+            if (document.referrer && (document.referrer.includes('bookings') || document.referrer.includes('search'))) {
+                window.history.back();
+            } else {
+                // Default to bookings page
+                window.location.href = 'bookings.html';
+            }
+        }
+
+        // Payment Status specific functions
+        function downloadInvoice() {
+            showPopup('Download Started', 'Your invoice is being prepared and will be downloaded shortly.', 'success');
+            // Simulate download
+            setTimeout(() => {
+                const link = document.createElement('a');
+                link.href = '#';
+                link.download = 'Invoice_R095_MAC_1096.pdf';
+                link.click();
+            }, 1000);
+        }
+
+        function viewVehiclePhoto() {
+            showPopup('Vehicle Photo', 'Vehicle photo gallery coming soon!', 'info');
+        }
+
+        function viewVehicleDetails() {
+            showPopup('Vehicle Details', 'Detailed vehicle information will be displayed here.', 'info');
+        }
+
+        function chatWithDriver() {
+            showPopup('Chat Feature', 'Chat with driver feature will be available soon!', 'info');
+        }
+
+        function viewDriverProfile() {
+            showPopup('Driver Profile', 'Driver profile details coming soon!', 'info');
+        }
+
+        function viewDriverLicense() {
+            showPopup('Driver License', 'Driver license verification details coming soon!', 'info');
+        }
+
+        function goToBookings() {
+            window.location.href = 'bookings.html';
+        }
+
+        function downloadReceipt() {
+            showPopup('Receipt Download', 'Your receipt is being prepared for download.', 'success');
+        }
+
+        function contactSupport() {
+            showPopup('Contact Support', 'Support chat will open soon. For immediate assistance, call 1177.', 'info');
+        }
+
+        function callHelpline() {
+            if (confirm('Do you want to call our 24/7 helpline at 1177?')) {
+                window.location.href = 'tel:1177';
+            }
+        }
+
+        function showPopup(title, message, type = 'info') {
+            const popup = document.createElement('div');
+            popup.className = 'popup-overlay';
+            
+            const iconClass = type === 'success' ? 'fa-check-circle' : 
+                             type === 'error' ? 'fa-exclamation-triangle' : 'fa-info-circle';
+            
+            const color = type === 'success' ? 'var(--success)' : 
+                         type === 'error' ? 'var(--danger)' : 'var(--info)';
+            
+            popup.innerHTML = `
+                <div class="popup-content" style="animation: fadeInUp 0.3s ease;">
+                    <div class="popup-icon" style="color: ${color};">
+                        <i class="fas ${iconClass}"></i>
+                    </div>
+                    <h3>${title}</h3>
+                    <p>${message}</p>
+                    <button onclick="closePopup(this)" class="btn btn-primary">OK</button>
+                </div>
+            `;
+            
+            document.body.appendChild(popup);
+        }
+
+        function closePopup(button) {
+            const popup = button.closest('.popup-overlay');
+            popup.style.animation = 'fadeOut 0.3s ease';
+            setTimeout(() => popup.remove(), 300);
+        }
+
+        // Add click animations
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeNavbar();
+            initializeHeader();
+            
+            // Add ripple effect to buttons
+            document.querySelectorAll('button').forEach(button => {
+                button.addEventListener('click', function(e) {
+                    const ripple = document.createElement('span');
+                    const rect = this.getBoundingClientRect();
+                    const size = Math.max(rect.width, rect.height);
+                    const x = e.clientX - rect.left - size / 2;
+                    const y = e.clientY - rect.top - size / 2;
+                    
+                    ripple.style.width = ripple.style.height = size + 'px';
+                    ripple.style.left = x + 'px';
+                    ripple.style.top = y + 'px';
+                    ripple.classList.add('ripple');
+                    
+                    this.appendChild(ripple);
+                    
+                    setTimeout(() => {
+                        ripple.remove();
+                    }, 600);
+                });
+            });
+
+            // Simulate booking confirmation animation
+            const successIcon = document.querySelector('.success-icon');
+            setTimeout(() => {
+                successIcon.style.animation = 'bounceIn 0.8s ease';
+            }, 500);
+        });
+    </script>
+
+    <style>
+        /* Additional styles for popup and mobile menu */
+        .popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+        }
+
+        .popup-content {
+            background: white;
+            padding: 30px;
+            border-radius: var(--radius);
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .popup-icon {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+
+        .popup-content h3 {
+            margin-bottom: 15px;
+            color: var(--dark);
+        }
+
+        .popup-content p {
+            margin-bottom: 25px;
+            color: var(--text-light);
+            line-height: 1.5;
+        }
+
+        .mobile-menu-toggle {
+            display: none;
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            z-index: 1002;
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        @media (max-width: 992px) {
+            .mobile-menu-toggle {
+                display: block;
+            }
+            
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            
+            .sidebar.active {
+                transform: translateX(0);
+            }
+        }
+
+        /* Profile dropdown styles */
+        .profile-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-lg);
+            min-width: 200px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: var(--transition);
+            z-index: 1000;
+        }
+
+        .profile-dropdown.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .profile-dropdown a {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            color: var(--text);
+            text-decoration: none;
+            transition: var(--transition);
+            font-size: 14px;
+        }
+
+        .profile-dropdown a:hover {
+            background-color: rgba(67, 97, 238, 0.05);
+            color: var(--primary);
+        }
+
+        .profile-dropdown a i {
+            margin-right: 10px;
+            width: 16px;
+            font-size: 14px;
+        }
+
+        .profile-dropdown hr {
+            margin: 8px 0;
+            border: none;
+            border-top: 1px solid var(--border);
+        }
+
+        /* Back button styles - repositioned below header */
+        .breadcrumb-nav {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+        }
+
+        .back-btn {
+            background: rgba(67, 97, 238, 0.08);
+            border: 1px solid rgba(67, 97, 238, 0.15);
+            color: var(--primary);
+            padding: 10px 20px;
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            font-weight: 500;
+            box-shadow: 0 2px 4px rgba(67, 97, 238, 0.1);
+        }
+
+        .back-btn:hover {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+            transform: translateX(-3px);
+            box-shadow: 0 4px 12px rgba(67, 97, 238, 0.25);
+        }
+
+        .back-btn i {
+            margin-right: 10px;
+            font-size: 13px;
+            transition: var(--transition);
+        }
+
+        .back-btn:hover i {
+            transform: translateX(-2px);
+        }
+
+        /* Ripple effect */
+        .ripple {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.6);
+            transform: scale(0);
+            animation: ripple-animation 0.6s linear;
+            pointer-events: none;
+        }
+
+        @keyframes ripple-animation {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeOut {
+            from {
+                opacity: 1;
+            }
+            to {
+                opacity: 0;
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Responsive adjustments for back button */
+        @media (max-width: 768px) {
+            .breadcrumb-nav {
+                margin-bottom: 15px;
+                padding-bottom: 12px;
+            }
+
+            .back-btn {
+                padding: 8px 16px;
+                font-size: 13px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .back-btn span {
+                display: none;
+            }
+
+            .back-btn {
+                width: 40px;
+                height: 40px;
+                padding: 0;
+                justify-content: center;
+                border-radius: 50%;
+            }
+
+            .back-btn i {
+                margin: 0;
+            }
+        }
+    </style>
+</body>
+</html>

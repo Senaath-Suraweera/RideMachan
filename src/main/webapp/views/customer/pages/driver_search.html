@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Find Professional Drivers - Ride Machan</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="../css/main.css" />
+    <link rel="stylesheet" href="../css/driver_search.css" />
+</head>
+<body>
+    <div class="container">
+        <!-- Include Sidebar Navigation -->
+        <div id="navbar-container"></div>
+
+        <!-- Include Header -->
+        <div id="header-container"></div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Search Tabs -->
+            <div class="search-tabs">
+                <button class="tab-btn" onclick="switchTab('vehicles')">
+                    <i class="fas fa-car"></i>
+                    Vehicles
+                </button>
+                <button class="tab-btn active" onclick="switchTab('drivers')">
+                    <i class="fas fa-user"></i>
+                    Drivers
+                </button>
+            </div>
+
+            <!-- Search Section -->
+            <div class="search-section">
+                <h2 class="page-title">Find Professional Drivers</h2>
+                <p class="page-subtitle">Book experienced drivers for your journey across Sri Lanka</p>
+                
+                <div class="search-form">
+                    <div class="form-group">
+                        <label for="pickup">Pick-up Location</label>
+                        <input type="text" id="pickup" placeholder="Enter pickup location">
+                    </div>
+                    <div class="form-group">
+                        <label for="dropoff">Drop-off Location</label>
+                        <input type="text" id="dropoff" placeholder="Enter destination">
+                    </div>
+                    <div class="form-group">
+                        <label for="date">Date & Time</label>
+                        <input type="datetime-local" id="date">
+                    </div>
+                    <div class="form-group">
+                        <label for="duration">Trip Duration</label>
+                        <select id="duration">
+                            <option value="">Select duration</option>
+                            <option value="1-3">1-3 hours</option>
+                            <option value="4-6">4-6 hours</option>
+                            <option value="7-12">7-12 hours</option>
+                            <option value="1day">1 day</option>
+                            <option value="2days">2+ days</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <button class="search-btn" onclick="searchDrivers()">
+                            <i class="fas fa-search"></i>
+                            Search Drivers
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filters Section -->
+            <div class="filters-section">
+                <h3 class="filters-title">Filters</h3>
+                <div class="filters-grid">
+                    <div class="form-group">
+                        <label for="price-range">Price Range (per hour)</label>
+                        <select id="price-range">
+                            <option value="">Select</option>
+                            <option value="1000-2000">LKR 1,000 - 2,000</option>
+                            <option value="2000-3000">LKR 2,000 - 3,000</option>
+                            <option value="3000+">LKR 3,000+</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="experience">Experience</label>
+                        <select id="experience">
+                            <option value="">Select</option>
+                            <option value="1-3">1-3 years</option>
+                            <option value="4-6">4-6 years</option>
+                            <option value="7+">7+ years</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="languages">Languages</label>
+                        <select id="languages">
+                            <option value="">Select</option>
+                            <option value="sinhala">Sinhala</option>
+                            <option value="english">English</option>
+                            <option value="tamil">Tamil</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="rating">Minimum Rating</label>
+                        <select id="rating">
+                            <option value="">Select</option>
+                            <option value="3">3+ stars</option>
+                            <option value="4">4+ stars</option>
+                            <option value="4.5">4.5+ stars</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <div class="filter-checkbox">
+                            <input type="checkbox" id="verified">
+                            <label for="verified">Verified Only</label>
+                        </div>
+                    </div>
+                </div>
+                <button class="apply-filters-btn" onclick="applyFilters()">Apply Filters</button>
+            </div>
+
+            <!-- Results Section -->
+            <div class="results-section">
+                <div class="results-header">
+                    <h3 class="results-title">Available Drivers (4)</h3>
+                    <select class="sort-dropdown">
+                        <option value="rating">Highest Rating</option>
+                        <option value="price-low">Price: Low to High</option>
+                        <option value="price-high">Price: High to Low</option>
+                        <option value="experience">Most Experienced</option>
+                    </select>
+                </div>
+
+                <div class="drivers-list" id="driversList">
+                    <!-- Driver results will be populated by JavaScript -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Load external components
+        function loadComponent(elementId, filePath) {
+            fetch(filePath)
+                .then(response => response.text())
+                .then(data => {
+                    let modifiedData = data;
+                    if (elementId === 'header-container') {
+                        modifiedData = data.replace('{{PAGE_TITLE}}', 'Driver Search');
+                    }
+                    document.getElementById(elementId).innerHTML = modifiedData;
+                    const scripts = document.getElementById(elementId).getElementsByTagName('script');
+                    for (let script of scripts) {
+                        eval(script.innerHTML);
+                    }
+                })
+                .catch(error => console.error('Error loading component:', error));
+        }
+
+        // Load navbar and header on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadComponent('navbar-container', '../components/navbar.html');
+            loadComponent('header-container', '../components/header.html');
+            
+            // Set default datetime value
+            const now = new Date();
+            document.getElementById('date').value = now.toISOString().slice(0, 16);
+            
+            // Load initial driver data
+            renderDrivers(driversData);
+        });
+
+        // Driver data
+        const driversData = [
+            {
+                id: 1,
+                name: "Lasith Perera",
+                initial: "LP",
+                price: 2500,
+                location: "Colombo",
+                experience: 9,
+                rating: 4.9,
+                reviews: 156,
+                languages: ["Sinhala", "English", "Tamil"],
+                specialties: ["Airport transfers", "Long distance", "City tours"],
+                companyId: 1,
+                company: "Ceylon Elite Drivers",
+                phone: "+94 77 123 4567"
+            },
+            {
+                id: 2,
+                name: "Ruwan Silva",
+                initial: "RS",
+                price: 2000,
+                location: "Kandy",
+                experience: 5,
+                rating: 4.7,
+                reviews: 89,
+                languages: ["Sinhala", "English"],
+                specialties: ["Business trips", "Event transportation"],
+                companyId: 2,
+                company: "Hill Country Drivers",
+                phone: "+94 71 456 7890"
+            },
+            {
+                id: 3,
+                name: "Nimal Fernando",
+                initial: "NF",
+                price: 3200,
+                location: "Galle",
+                experience: 12,
+                rating: 4.8,
+                reviews: 203,
+                languages: ["Sinhala", "English"],
+                specialties: ["Tourist guide", "Cultural tours", "Photography tours"],
+                companyId: 3,
+                company: "Southern Coastal Drivers",
+                phone: "+94 91 234 5678"
+            },
+            {
+                id: 4,
+                name: "Asanka Jayawardena",
+                initial: "AJ",
+                price: 2300,
+                location: "Negombo",
+                experience: 6,
+                rating: 4.6,
+                reviews: 124,
+                languages: ["Sinhala", "English"],
+                specialties: ["Airport pickup", "Hotel transfers", "Beach tours"],
+                companyId: 4,
+                company: "West Coast Transport",
+                phone: "+94 31 789 0123"
+            }
+        ];
+
+        function switchTab(tab) {
+            if (tab === 'vehicles') {
+                window.location.href = "search.html";
+            }
+        }
+
+        function renderDrivers(drivers) {
+            const driversContainer = document.getElementById('driversList');
+            driversContainer.innerHTML = '';
+
+            drivers.forEach(driver => {
+                const driverCard = document.createElement('div');
+                driverCard.className = 'driver-card';
+                driverCard.onclick = () => viewDriver(driver.id);
+                
+                driverCard.innerHTML = `
+                    <div class="driver-avatar">${driver.initial}</div>
+                    <div class="driver-info">
+                        <div class="driver-name" onclick="event.stopPropagation(); viewDriver(${driver.id})">
+                            ${driver.name}
+                            <span class="verified-badge">
+                                <i class="fas fa-check-circle"></i>
+                                Verified
+                            </span>
+                        </div>
+                        <div class="driver-details">
+                            <span><i class="fas fa-map-marker-alt"></i> ${driver.location}, Sri Lanka</span>
+                            <span><i class="fas fa-calendar"></i> ${driver.experience} years experience</span>
+                        </div>
+                        <div class="driver-company" onclick="event.stopPropagation(); viewCompany(${driver.companyId})">${driver.company}</div>
+                        <div class="driver-price">LKR ${driver.price.toLocaleString()}/hour</div>
+                        <div class="driver-rating">
+                            <div class="stars">
+                                ${generateStars(driver.rating)}
+                            </div>
+                            <span class="rating-text">${driver.rating} (${driver.reviews} reviews)</span>
+                        </div>
+                        <div class="driver-languages">
+                            ${driver.languages.map(lang => `<span class="language-tag">${lang}</span>`).join('')}
+                        </div>
+                        <div class="driver-specialties">
+                            ${driver.specialties.map(spec => `<span class="specialty-tag">${spec}</span>`).join('')}
+                        </div>
+                    </div>
+                    <div class="driver-actions">
+                        <button class="btn btn-primary" onclick="event.stopPropagation(); bookDriver(${driver.id})">
+                            <i class="fas fa-calendar-plus"></i>
+                            Book Now
+                        </button>
+                        <button class="btn btn-outline" onclick="event.stopPropagation(); messageDriver(${driver.id})">
+                            <i class="fas fa-comment"></i>
+                            Message
+                        </button>
+                    </div>
+                `;
+                
+                driversContainer.appendChild(driverCard);
+            });
+        }
+
+        function generateStars(rating) {
+            let stars = '';
+            for (let i = 1; i <= 5; i++) {
+                if (i <= rating) {
+                    stars += '<i class="fas fa-star"></i>';
+                } else {
+                    stars += '<i class="far fa-star"></i>';
+                }
+            }
+            return stars;
+        }
+
+        function searchDrivers() {
+            const pickup = document.getElementById('pickup').value;
+            const dropoff = document.getElementById('dropoff').value;
+            
+            if (pickup && dropoff) {
+                const searchBtn = document.querySelector('.search-btn');
+                searchBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Searching...';
+                setTimeout(() => {
+                    searchBtn.innerHTML = '<i class="fas fa-search"></i> Search Drivers';
+                    showNotification('Search completed! Found 4 drivers matching your criteria.', 'success');
+                }, 2000);
+            } else {
+                showNotification('Please enter both pickup and drop-off locations', 'warning');
+            }
+        }
+
+        function applyFilters() {
+            const applyBtn = document.querySelector('.apply-filters-btn');
+            applyBtn.innerHTML = 'Applying...';
+            setTimeout(() => {
+                applyBtn.innerHTML = 'Apply Filters';
+                showNotification('Filters applied successfully!', 'success');
+            }, 1000);
+        }
+
+        function viewDriver(driverId) {
+            sessionStorage.setItem('selectedDriverId', driverId);
+            sessionStorage.setItem('previousPage', 'driver_search');
+            window.location.href = "driver-profile.html";
+        }
+
+        function viewCompany(companyId) {
+            sessionStorage.setItem('selectedCompanyId', companyId);
+            sessionStorage.setItem('previousPage', 'driver_search');
+            window.location.href = "company-profile.html";
+        }
+
+        function bookDriver(driverId) {
+            const driver = driversData.find(d => d.id === driverId);
+            if (driver) {
+                showBookingPopup(driver);
+            }
+        }
+
+        function messageDriver(driverId) {
+            const driver = driversData.find(d => d.id === driverId);
+            if (driver) {
+                showMessagePopup(driver);
+            }
+        }
+
+        function showBookingPopup(driver) {
+            const popup = document.createElement('div');
+            popup.className = 'popup-overlay';
+            popup.innerHTML = `
+                <div class="popup-content">
+                    <div class="popup-header">
+                        <h3>Book ${driver.name}</h3>
+                        <button class="close-btn" onclick="closePopup()">&times;</button>
+                    </div>
+                    <div class="popup-body">
+                        <p><strong>Driver:</strong> ${driver.name}</p>
+                        <p><strong>Company:</strong> ${driver.company}</p>
+                        <p><strong>Rate:</strong> LKR ${driver.price.toLocaleString()}/hour</p>
+                        <p><strong>Location:</strong> ${driver.location}</p>
+                        <br>
+                        <p>Confirm your booking details:</p>
+                        <div class="booking-details">
+                            <label>Trip Date:</label>
+                            <input type="datetime-local" id="bookingDate" class="popup-input">
+                            <label>Duration:</label>
+                            <select id="bookingDuration" class="popup-input">
+                                <option value="1-3">1-3 hours</option>
+                                <option value="4-6">4-6 hours</option>
+                                <option value="7-12">7-12 hours</option>
+                                <option value="1day">1 day</option>
+                                <option value="2days">2+ days</option>
+                            </select>
+                            <label>Special Requirements:</label>
+                            <textarea id="specialRequests" class="popup-input" placeholder="Any special requirements..."></textarea>
+                        </div>
+                    </div>
+                    <div class="popup-footer">
+                        <button class="btn btn-primary" onclick="confirmBooking(${driver.id})">Confirm Booking</button>
+                        <button class="btn btn-outline" onclick="closePopup()">Cancel</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(popup);
+        }
+
+        function showMessagePopup(driver) {
+            const popup = document.createElement('div');
+            popup.className = 'popup-overlay';
+            popup.innerHTML = `
+                <div class="popup-content">
+                    <div class="popup-header">
+                        <h3>Send Message to ${driver.name}</h3>
+                        <button class="close-btn" onclick="closePopup()">&times;</button>
+                    </div>
+                    <div class="popup-body">
+                        <p>Send a message to <strong>${driver.name}</strong> from <strong>${driver.company}</strong>:</p>
+                        <textarea class="message-input popup-input" placeholder="Type your message here..." rows="6"></textarea>
+                    </div>
+                    <div class="popup-footer">
+                        <button class="btn btn-primary" onclick="sendMessage(${driver.id})">Send Message</button>
+                        <button class="btn btn-outline" onclick="closePopup()">Cancel</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(popup);
+        }
+
+        function confirmBooking(driverId) {
+            const driver = driversData.find(d => d.id === driverId);
+            const bookingDate = document.getElementById('bookingDate').value;
+            const duration = document.getElementById('bookingDuration').value;
+            
+            if (!bookingDate) {
+                showNotification('Please select a booking date and time', 'warning');
+                return;
+            }
+            
+            closePopup();
+            showNotification(`Booking request sent to ${driver.name}! You will receive a confirmation shortly.`, 'success');
+        }
+
+        function sendMessage(driverId) {
+            const messageInput = document.querySelector('.message-input');
+            const driver = driversData.find(d => d.id === driverId);
+            
+            if (messageInput && messageInput.value.trim()) {
+                closePopup();
+                showNotification(`Message sent to ${driver.name} successfully!`, 'success');
+            } else {
+                showNotification('Please enter a message before sending.', 'warning');
+            }
+        }
+
+        function closePopup() {
+            const popup = document.querySelector('.popup-overlay');
+            if (popup) {
+                popup.remove();
+            }
+        }
+
+        function showNotification(message, type) {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 12px 20px;
+                background: ${type === 'success' ? 'var(--success)' : type === 'warning' ? 'var(--warning)' : 'var(--info)'};
+                color: white;
+                border-radius: var(--radius);
+                box-shadow: var(--shadow);
+                z-index: 10000;
+                font-weight: 500;
+                transform: translateX(400px);
+                transition: transform 0.3s ease;
+                max-width: 300px;
+            `;
+            notification.textContent = message;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.transform = 'translateX(0)';
+            }, 100);
+            
+            setTimeout(() => {
+                notification.style.transform = 'translateX(400px)';
+                setTimeout(() => {
+                    if (document.body.contains(notification)) {
+                        document.body.removeChild(notification);
+                    }
+                }, 300);
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
