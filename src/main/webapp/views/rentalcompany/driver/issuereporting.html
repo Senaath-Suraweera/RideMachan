@@ -23,72 +23,66 @@
     </head>
     <body>
         <div class="container">
-            <!-- =================== -->
-            <!-- Sidebar Navigation -->
-            <!-- =================== -->
-            <div class="sidebar">
-                <div class="logo">
-                    <img src="logo.png" alt="Logo" class="logo">
+            <!-- ===================
+                 Sidebar Navigation
+        =================== -->
+        <div class="sidebar" id="sidebar">
+            <div class="logo">
+                <img src="logo.png" alt="Logo" class="logo">
+            </div>
+            <div class="nav-menu">
+                <div class="nav-item">
+                    <i class="fas fa-house"></i>
+                    <a href="dashboard.html"><span>Home</span></a>
                 </div>
-                <div class="nav-menu">
-                    <div class="nav-item">
-                        <i class="fas fa-house"></i>
-                        <a href="home.html"><span>Home</span></a>
-                    </div>
-                    <div class="nav-item">
-                        <i class="fas fa-user"></i>
-                        <a href="profile.html"><span>Profile</span></a>
-                    </div>
-                    <div class="nav-item">
-                        <i class="fas fa-calendar-alt"></i>
-                        <a href="drivercalview.html"><span>Calendar</span></a>
-                    </div>
-                    <div class="nav-item">
-                        <i class="fas fa-car"></i>
-                        <a href="vehicleview.html"><span>Vehicles</span></a>
-                    </div>
-                    <div class="nav-item">
-                        <i class="fas fa-users"></i>
-                        <a href="customerview.html"><span>Customer</span></a>
-                    </div>
-                    <div class="nav-item active">
-                        <i class="fas fa-exclamation-triangle"></i>
-                        <a href="issuereporting.html"><span>Issue Reports</span></a>
-                    </div>
-                    <div class="logout">
-                        <i class="fas fa-sign-out-alt"></i>
-                        <span>Logout</span>
-                    </div>
+                <div class="nav-item">
+                    <i class="fas fa-calendar-alt"></i>
+                    <a href="drivercalview.html"><span>Calendar</span></a>
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-clock"></i>
+                    <a href="ongoing.html"><span>Ongoing Bookings</span></a>
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-history"></i>
+                    <a href="pastbooking.html"><span>Past Bookings</span></a>
+                </div>
+                <div class="logout">
+                    <i class="fas fa-sign-out"></i>
+                    <span>Logout</span>
                 </div>
             </div>
+        </div>
 
-            <!-- =================== -->
-            <!-- Header Section -->
-            <!-- =================== -->
-            <div class="header">
-                <div class="hi">
-                    <h1>Issue Reporting</h1>
+        <!-- ===================
+                 Header Section
+        =================== -->
+        <div class="header">
+            <div class="header-left">
+                <button class="sidebar-toggle" id="sidebarToggle">
+                </button>
+                <h1>Issue Reporting</h1>
+            </div>
+            <div class="header-actions">
+                <!-- Notifications -->
+                <a href="notification.html"><div class="notification" id="bellNotification" title="Notifications">
+                    <i class="fas fa-bell"></i>
+                    <div class="badge" id="bellBadge">3</div></a>
                 </div>
-                <div class="header-actions">
-                    <!-- Notifications -->
-                    <div class="notification">
-                        <i class="fas fa-bell"></i>
-                        <div class="badge">3</div>
-                    </div>
-                    <div class="notification">
-                        <i class="fas fa-envelope"></i>
-                        <div class="badge">5</div>
-                    </div>
-                    <!-- User Profile -->
-                    <div class="user-profile">
-                        <div class="profile-img">D</div>
-                        <div class="user-info">
-                            <div class="user-name">Driver</div>
-                            <div class="user-role">Active</div>
-                        </div>
+                <a href="messages.html"><div class="notification" id="messageNotification" title="Messages">
+                    <i class="fas fa-envelope"></i>
+                    <div class="badge" id="messageBadge">5</div></a>
+                </div>
+                <!-- User Profile -->
+                <div class="user-profile" id="userProfile">
+                    <a href="profile.html"><div class="profile-img">K</div></a>
+                    <div class="user-info">
+                        <div class="user-name">Kamal</div>
                     </div>
                 </div>
             </div>
+        </div>
+
 
             <!-- =================== -->
             <!-- Main Content -->

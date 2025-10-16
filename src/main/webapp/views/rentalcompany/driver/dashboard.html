@@ -37,24 +37,16 @@
                     <a href="dashboard.html"><span> Home</span></a>
                 </div>
                 <div class="nav-item">
-                    <i class="fas fa-user"></i>
-                    <a href="profile.html"><span>Profile</span></a>
-                </div>
-                <div class="nav-item">
                     <i class="fas fa-calendar-alt"></i>
                     <a href="drivercalview.html"><span>Calendar</span></a>
                 </div>
-                <div class="nav-item">
-                    <i class="fas fa-car"></i>
-                    <a href="vehicleview.html"><span>Vehicles</span></a>
+                <div class="nav-item" data-page="ongoing">
+                    <i class="fas fa-clock"></i>
+                    <a href="ongoing.html"><span>Ongoing Bookings</span></a>
                 </div>
-                <div class="nav-item">
-                    <i class="fas fa-users"></i>
-                    <a href="customerview.html"><span>Customer</span></a>
-                </div>
-                <div class="nav-item">
-                    <i class="fas fa-book"></i>
-                    <a href="issuereporting.html"><span>Reports</span></a>
+                <div class="nav-item" data-page="bookings">
+                    <i class="fas fa-history"></i>
+                    <a href="pastbooking.html"><span>Past Bookings</span></a>
                 </div>
                 <div class="logout">
                     <i class="fas fa-sign-out"></i>
@@ -63,21 +55,32 @@
             </div>
         </div>
         
-        <!-- =================== -->
-        <!-- Header Section -->
-        <!-- =================== -->
+        <!-- ===================
+                 Header Section
+        =================== -->
         <div class="header">
             <div class="header-left">
-                <button class="mobile-menu-toggle" onclick="toggleSidebar()">
+                <button class="sidebar-toggle" id="sidebarToggle">
                     <i class="fas fa-bars"></i>
                 </button>
-                <h1>Hi "John Smith"</h1>
+                <h1>Driver Dashboard</h1>
             </div>
             <div class="header-actions">
-                <span class="driver-photo-label">driver photo</span>
+                <!-- Notifications -->
+                <a href="notification.html"><div class="notification" id="bellNotification" title="Notifications">
+                    <i class="fas fa-bell"></i>
+                    <div class="badge" id="bellBadge">3</div></a>
+                </div>
+                <a href="messages.html"><div class="notification" id="messageNotification" title="Messages">
+                    <i class="fas fa-envelope"></i>
+                    <div class="badge" id="messageBadge">5</div></a>
+                </div>
                 <!-- User Profile -->
-                <div class="user-profile">
-                    <div class="profile-img">J</div>
+                <div class="user-profile" id="userProfile">
+                    <a href="profile.html"><div class="profile-img">K</div></a>
+                    <div class="user-info">
+                        <div class="user-name">Kamal</div>
+                    </div>
                 </div>
             </div>
         </div>

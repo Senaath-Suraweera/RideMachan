@@ -5,10 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Driver Calendar View - Ride Machan</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-  <!-- Changed font from Inter to Poppins to match home page theme -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="drivercalview.css">
-  <style>
+  <!--<style>
     @keyframes slideIn {
       from {
         transform: translateX(100%);
@@ -30,7 +29,7 @@
         opacity: 0;
       }
     }
-  </style>
+  </style> -->
 </head>
 <body>
   <div class="container">
@@ -52,25 +51,17 @@
           <i class="fas fa-house"></i>
           <a href="dashboard.html"><span> Home</span></a>
         </div>
-        <div class="nav-item">
-          <i class="fas fa-user"></i>
-          <a href="profile.html"><span>Profile</span></a>
-        </div>
         <div class="nav-item active">
           <i class="fas fa-calendar-alt"></i>
           <a href="drivercalview.html"><span>Calendar</span></a>
         </div>
-        <div class="nav-item">
-          <i class="fas fa-car"></i>
-          <a href="vehicleview.html"><span>Vehicles</span></a>
+        <div class="nav-item" data-page="ongoing">
+                    <i class="fas fa-clock"></i>
+                    <a href="ongoingbookings.html"><span>Ongoing Bookings</span></a>
         </div>
-        <div class="nav-item">
-          <i class="fas fa-users"></i>
-          <a href="customerview.html"><span>Customer</span></a>
-        </div>
-        <div class="nav-item">
-          <i class="fas fa-book"></i>
-          <a href="issuerepirting.html"><span>Reports</span></a>
+        <div class="nav-item" data-page="bookings">
+                    <i class="fas fa-history"></i>
+                    <a href="pastbookings.html"><span>Past Bookings</span></a>
         </div>
         <div class="logout">
           <i class="fas fa-sign-out"></i>
@@ -88,15 +79,15 @@
         </div>
         <div class="header-actions">
           <div class="notification">
-            <a href="#"><i class="fas fa-bell"></i></a>
+            <a href="notification.html"><i class="fas fa-bell"></i></a>
             <div class="badge">3</div>
           </div>
           <div class="notification">
-            <a href="#"><i class="fas fa-envelope"></i></a>
+            <a href="messages.html"><i class="fas fa-envelope"></i></a>
             <div class="badge">5</div>
           </div>
           <div class="user-profile">
-            <div class="profile-img">K</div>
+            <a href="profile.html"><div class="profile-img">K</div></a> 
             <div class="user-info">
               <div class="user-name">Kamal</div>
             </div>
@@ -104,28 +95,32 @@
         </div>
       </div>
 
-      <!-- Content Grid -->
-      <div class="dashboard-grid">
-        <!-- Left Sidebar with Filters, Calendar and Summary -->
-        <div class="left-sidebar">
-          <!-- Filters Section -->
+      <!-- Content Area -->
+      <div class="content-area">
+        <!-- Top Row - Filters -->
+        <div class="filters-row">
           <div class="filters-card">
             <h3>Filters</h3>
-            <div class="filter-group">
-              <label>Search</label>
-              <input type="text" class="filter-input" placeholder="Search bookings...">
-            </div>
-            <div class="filter-group">
-              <label>Status</label>
-              <div class="filter-buttons">
-                <button class="filter-btn active">All</button>
-                <button class="filter-btn">Upcoming</button>
-                <button class="filter-btn">In Progress</button>
-                <button class="filter-btn">Completed</button>
+            <div class="filters-content">
+              <div class="filter-group">
+                <label>Search</label>
+                <input type="text" class="filter-input" placeholder="Search bookings...">
+              </div>
+              <div class="filter-group">
+                <label>Status</label>
+                <div class="filter-buttons">
+                  <button class="filter-btn active">All</button>
+                  <button class="filter-btn">Upcoming</button>
+                  <button class="filter-btn">In Progress</button>
+                  <button class="filter-btn">Completed</button>
+                </div>
               </div>
             </div>
           </div>
+        </div>
 
+        <!-- Second Row - Calendar Components -->
+        <div class="calendar-row">
           <!-- Mini Calendar -->
           <div class="mini-calendar">
             <div class="calendar-nav">
@@ -183,6 +178,143 @@
             </div>
           </div>
 
+          <!-- Main Calendar Section -->
+          <div class="calendar-section">
+            <div class="calendar-header">
+              <h3>My Calendar</h3>
+            </div>
+
+            <!-- Time Slots -->
+            <div class="time-slots">
+              <div class="time-slot">
+                <div class="time">08:00</div>
+                <div class="slot-content">
+                  <div class="no-booking">No booking scheduled</div>
+                </div>
+              </div>
+
+              <div class="time-slot">
+                <div class="time">09:00</div>
+                <div class="slot-content">
+                  <div class="booking-card">
+                    <div class="booking-header">
+                      <div class="status-badge status-upcoming">Upcoming</div>
+                      <div class="customer-id">Customer ID: #1</div>
+                    </div>
+                    <div class="vehicle-type">Sedan</div>
+                    <div class="customer-name">John Doe</div>
+                    <div class="customer-phone">+1234567890</div>
+                    
+                    <div class="trip-details">
+                      <div class="location pickup">
+                        <i class="fas fa-circle"></i>
+                        <span>Pickup: Downtown Plaza</span>
+                      </div>
+                      <div class="location drop">
+                        <i class="fas fa-circle"></i>
+                        <span>Drop: Airport Terminal 1</span>
+                      </div>
+                    </div>
+                    
+                    <div class="booking-actions">
+                      <button class="action-btn">View Customer</button>
+                      <button class="action-btn">View Company Vehicle</button>
+                      <button class="action-btn">Report Issue</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="time-slot">
+                <div class="time">10:00</div>
+                <div class="slot-content">
+                  <div class="no-booking">No booking scheduled</div>
+                </div>
+              </div>
+
+              <div class="time-slot">
+                <div class="time">11:00</div>
+                <div class="slot-content">
+                  <div class="no-booking">No booking scheduled</div>
+                </div>
+              </div>
+
+              <div class="time-slot">
+                <div class="time">12:00</div>
+                <div class="slot-content">
+                  <div class="no-booking">No booking scheduled</div>
+                </div>
+              </div>
+
+              <div class="time-slot">
+                <div class="time">13:00</div>
+                <div class="slot-content">
+                  <div class="no-booking">No booking scheduled</div>
+                </div>
+              </div>
+
+              <div class="time-slot">
+                <div class="time">14:00</div>
+                <div class="slot-content">
+                  <div class="no-booking">No booking scheduled</div>
+                </div>
+              </div>
+
+              <div class="time-slot">
+                <div class="time">15:00</div>
+                <div class="slot-content">
+                  <div class="no-booking">No booking scheduled</div>
+                </div>
+              </div>
+
+              <div class="time-slot">
+                <div class="time">16:00</div>
+                <div class="slot-content">
+                  <div class="booking-card">
+                    <div class="booking-header">
+                      <div class="status-badge status-completed">Completed</div>
+                      <div class="customer-id">Customer ID: #2</div>
+                    </div>
+                    <div class="vehicle-type">SUV</div>
+                    <div class="customer-name">Sarah Wilson</div>
+                    <div class="customer-phone">+1234567891</div>
+                    
+                    <div class="trip-details">
+                      <div class="location pickup">
+                        <i class="fas fa-circle"></i>
+                        <span>Pickup: Central Mall</span>
+                      </div>
+                      <div class="location drop">
+                        <i class="fas fa-circle"></i>
+                        <span>Drop: Business District</span>
+                      </div>
+                    </div>
+                    
+                    <div class="booking-actions">
+                      <button class="action-btn">View Customer</button>
+                      <button class="action-btn">View Company Vehicle</button>
+                      <button class="action-btn">Report Issue</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="time-slot">
+                <div class="time">17:00</div>
+                <div class="slot-content">
+                  <div class="no-booking">No booking scheduled</div>
+                </div>
+              </div>
+
+              <div class="time-slot">
+                <div class="time">18:00</div>
+                <div class="slot-content">
+                  <div class="no-booking">No booking scheduled</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <!-- Summary Section -->
           <div class="summary-card">
             <h3>Summary</h3>
@@ -201,146 +333,6 @@
             <div class="summary-actions">
               <button class="summary-btn"><i class="fas fa-phone"></i> Contact Admin</button>
               <button class="summary-btn"><i class="fas fa-refresh"></i> Refresh</button>
-            </div>
-          </div>
-        </div>
-
-        <!-- Calendar Section -->
-        <div class="calendar-section">
-          <div class="calendar-header">
-            <h3>My Calendar</h3>
-            <button class="schedule-btn">
-              <i class="fas fa-calendar"></i> Schedule
-            </button>
-          </div>
-
-          <!-- Time Slots -->
-          <div class="time-slots">
-            <div class="time-slot">
-              <div class="time">08:00</div>
-              <div class="slot-content">
-                <div class="no-booking">No booking scheduled</div>
-              </div>
-            </div>
-
-            <div class="time-slot">
-              <div class="time">09:00</div>
-              <div class="slot-content">
-                <div class="booking-card">
-                  <div class="booking-header">
-                    <div class="status-badge status-upcoming">Upcoming</div>
-                    <div class="customer-id">Customer ID: #1</div>
-                  </div>
-                  <div class="vehicle-type">Sedan</div>
-                  <div class="customer-name">John Doe</div>
-                  <div class="customer-phone">+1234567890</div>
-                  
-                  <div class="trip-details">
-                    <div class="location pickup">
-                      <i class="fas fa-circle"></i>
-                      <span>Pickup: Downtown Plaza</span>
-                    </div>
-                    <div class="location drop">
-                      <i class="fas fa-circle"></i>
-                      <span>Drop: Airport Terminal 1</span>
-                    </div>
-                  </div>
-                  
-                  <div class="booking-actions">
-                    <button class="action-btn">View Customer</button>
-                    <button class="action-btn">View Company Vehicle</button>
-                    <button class="action-btn">Report Issue</button>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div class="time-slot">
-              <div class="time">10:00</div>
-              <div class="slot-content">
-                <div class="no-booking">No booking scheduled</div>
-              </div>
-            </div>
-
-            <div class="time-slot">
-              <div class="time">11:00</div>
-              <div class="slot-content">
-                <div class="no-booking">No booking scheduled</div>
-              </div>
-            </div>
-
-            <div class="time-slot">
-              <div class="time">12:00</div>
-              <div class="slot-content">
-                <div class="no-booking">No booking scheduled</div>
-              </div>
-            </div>
-
-            <div class="time-slot">
-              <div class="time">13:00</div>
-              <div class="slot-content">
-                <div class="no-booking">No booking scheduled</div>
-              </div>
-            </div>
-
-            <div class="time-slot">
-              <div class="time">14:00</div>
-              <div class="slot-content">
-                <div class="no-booking">No booking scheduled</div>
-              </div>
-            </div>
-
-            <div class="time-slot">
-              <div class="time">15:00</div>
-              <div class="slot-content">
-                <div class="no-booking">No booking scheduled</div>
-              </div>
-            </div>
-
-            <div class="time-slot">
-              <div class="time">16:00</div>
-              <div class="slot-content">
-                <div class="booking-card">
-                  <div class="booking-header">
-                    <div class="status-badge status-completed">Completed</div>
-                    <div class="customer-id">Customer ID: #2</div>
-                  </div>
-                  <div class="vehicle-type">SUV</div>
-                  <div class="customer-name">Sarah Wilson</div>
-                  <div class="customer-phone">+1234567891</div>
-                  
-                  <div class="trip-details">
-                    <div class="location pickup">
-                      <i class="fas fa-circle"></i>
-                      <span>Pickup: Central Mall</span>
-                    </div>
-                    <div class="location drop">
-                      <i class="fas fa-circle"></i>
-                      <span>Drop: Business District</span>
-                    </div>
-                  </div>
-                  
-                  <div class="booking-actions">
-                    <button class="action-btn">View Customer</button>
-                    <button class="action-btn">View Company Vehicle</button>
-                    <button class="action-btn">Report Issue</button>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div class="time-slot">
-              <div class="time">17:00</div>
-              <div class="slot-content">
-                <div class="no-booking">No booking scheduled</div>
-              </div>
-            </div>
-
-            <div class="time-slot">
-              <div class="time">18:00</div>
-              <div class="slot-content">
-                <div class="no-booking">No booking scheduled</div>
-              </div>
             </div>
           </div>
         </div>
@@ -435,16 +427,6 @@
           }, 1000);
         }
       });
-    });
-
-    document.querySelector('.schedule-btn').addEventListener('click', function() {
-      showLoadingState(this);
-      
-      setTimeout(() => {
-        hideLoadingState(this);
-        showSuccessMessage('Opening schedule manager...');
-        // Here you would open a schedule modal or navigate to schedule page
-      }, 1000);
     });
 
     document.querySelectorAll('.action-btn').forEach(btn => {

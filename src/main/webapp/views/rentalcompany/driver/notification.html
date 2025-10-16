@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Driver Notifications - Ride Machan</title>
+    <link rel="stylesheet" href="notification.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <!-- =================== -->
+        <!-- Sidebar Navigation -->
+        <!-- =================== -->
+        <div class="sidebar" id="sidebar">
+            <div class="logo">
+                <img src="logo.png" alt="Logo" class="logo-img">
+            </div>
+             
+            <div class="nav-menu">
+                <div class="nav-item">
+                    <i class="fas fa-house"></i>
+                    <a href="dashboard.html"><span> Home</span></a>
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-calendar-alt"></i>
+                    <a href="drivercalview.html"><span>Calendar</span></a>
+                </div>
+                <div class="nav-item" data-page="ongoing">
+                    <i class="fas fa-clock"></i>
+                    <a href="ongoing.html"><span>Ongoing Bookings</span></a>
+        </div>
+        <div class="nav-item" data-page="bookings">
+                    <i class="fas fa-history"></i>
+                    <a href="pastbooking.html"><span>Past Bookings</span></a>
+        </div>
+                <div class="logout">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <a href="#"><span>Logout</span></a>
+                </div>
+            </div>
+        </div>
+                 
+        <!-- =================== -->
+        <!-- Main Content -->
+        <!-- =================== -->
+        <div class="main-content">
+            <!-- Header Section -->
+            <div class="header">
+                <div class="header-left">
+                    <button class="sidebar-toggle" id="sidebarToggle">
+                    </button>
+                    <h1>Notifications</h1>
+                </div>
+                <div class="header-actions">
+                    <!-- Notifications -->
+                    <div class="notification" id="bellNotification" title="Notifications">
+                        <i class="fas fa-bell"></i>
+                        <div class="badge" id="bellBadge">6</div>
+                    </div>
+                    <div class="notification" id="messageNotification" title="Messages">
+                        <i class="fas fa-envelope"></i>
+                        <div class="badge" id="messageBadge">2</div>
+                    </div>
+                    <!-- User Profile -->
+                    <div class="user-profile" id="userProfile">
+                        <a href="profile.html"><div class="profile-img">K</div></a>
+                        <div class="user-info">
+                            <div class="user-name">Kamal</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Notifications Content -->
+            <div class="content">
+                <!-- Summary Cards -->
+                <div class="summary-cards">
+                    <div class="summary-card pending">
+                        <div class="summary-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="summary-info">
+                            <h3>6</h3>
+                            <p>Pending</p>
+                        </div>
+                    </div>
+                    <div class="summary-card read">
+                        <div class="summary-icon">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="summary-info">
+                            <h3>8</h3>
+                            <p>Read</p>
+                        </div>
+                    </div>
+                    <div class="summary-card confirmed">
+                        <div class="summary-icon">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <div class="summary-info">
+                            <h3>15</h3>
+                            <p>Confirmed</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Notifications List -->
+                <div class="notifications-list">
+                    <div class="notification-item new">
+                        <div class="notification-icon confirmed">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="notification-content">
+                            <h4>Trip Assignment - BMW X5</h4>
+                            <p>You have been assigned a new trip. Pickup: Colombo Fort to Kandy. Customer: Sarah Fernando | 4.8 ★ Rating</p>
+                        </div>
+                        <div class="notification-time">15 minutes ago</div>
+                        <div class="notification-actions">
+                            <button class="action-btn">
+                                <i class="fas fa-ellipsis-vertical"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="notification-item">
+                        <div class="notification-icon pending">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <div class="notification-content">
+                            <h4>Vehicle Maintenance Due</h4>
+                            <p>Your assigned vehicle (License: ABC-1234) is due for maintenance. Please schedule service within 3 days.</p>
+                        </div>
+                        <div class="notification-time">45 minutes ago</div>
+                        <div class="notification-actions">
+                            <button class="action-btn">
+                                <i class="fas fa-ellipsis-vertical"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="notification-item">
+                        <div class="notification-icon info">
+                            <i class="fas fa-info-circle"></i>
+                        </div>
+                        <div class="notification-content">
+                            <h4>Trip Reminder</h4>
+                            <p>Your next trip starts in 1 hour. Make sure to be at the pickup location 10 minutes early. Location: Galle Face Green</p>
+                        </div>
+                        <div class="notification-time">1 hour ago</div>
+                        <div class="notification-actions">
+                            <button class="action-btn">
+                                <i class="fas fa-ellipsis-vertical"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="notification-item">
+                        <div class="notification-icon success">
+                            <i class="fas fa-money-bill-wave"></i>
+                        </div>
+                        <div class="notification-content">
+                            <h4>Payment Received</h4>
+                            <p>Payment of Rs. 2,500 has been credited to your account for trip completed on Jan 14, 2024. Trip ID: #RM12345</p>
+                        </div>
+                        <div class="notification-time">2 hours ago</div>
+                        <div class="notification-actions">
+                            <button class="action-btn">
+                                <i class="fas fa-ellipsis-vertical"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="notification-item">
+                        <div class="notification-icon info">
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <div class="notification-content">
+                            <h4>New Customer Rating</h4>
+                            <p>You received a 5-star rating from John Silva for yesterday's trip. Great job maintaining excellent service!</p>
+                        </div>
+                        <div class="notification-time">3 hours ago</div>
+                        <div class="notification-actions">
+                            <button class="action-btn">
+                                <i class="fas fa-ellipsis-vertical"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="notification-item read">
+                        <div class="notification-icon pending">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="notification-content">
+                            <h4>Schedule Update</h4>
+                            <p>Your shift schedule has been updated. New working hours: 8:00 AM - 6:00 PM from Monday to Friday.</p>
+                        </div>
+                        <div class="notification-time">1 day ago</div>
+                        <div class="notification-actions">
+                            <button class="action-btn">
+                                <i class="fas fa-ellipsis-vertical"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="notification-item read">
+                        <div class="notification-icon warning">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <div class="notification-content">
+                            <h4>Document Expiry Alert</h4>
+                            <p>Your driving license expires in 30 days. Please renew it and upload the new document to avoid service interruption.</p>
+                        </div>
+                        <div class="notification-time">2 days ago</div>
+                        <div class="notification-actions">
+                            <button class="action-btn">
+                                <i class="fas fa-ellipsis-vertical"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sidebar toggle functionality
+        document.getElementById('sidebarToggle').addEventListener('click', function() {
+            const sidebar = document.getElementById('sidebar');
+            const mainContent = document.querySelector('.main-content');
+            sidebar.classList.toggle('collapsed');
+            mainContent.classList.toggle('expanded');
+        });
+
+        // Mark notification as read when clicked
+        document.querySelectorAll('.notification-item').forEach(item => {
+            item.addEventListener('click', function() {
+                this.classList.add('read');
+                this.classList.remove('new');
+            });
+        });
+    </script>
+</body>
+</html>

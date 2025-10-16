@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- ===================
+             Meta & Stylesheets
+    =================== -->
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Past Bookings - Driver Dashboard</title>
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+    />
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
+    />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet"
+    />
+    <link rel="stylesheet" href="pastbooking.css" />
+</head>
+<body>
+    <div class="container">
+        <!-- ===================
+                 Sidebar Navigation
+        =================== -->
+        <div class="sidebar" id="sidebar">
+            <div class="logo">
+                <img src="logo.png" alt="Logo" class="logo">
+            </div>
+            <div class="nav-menu">
+                <div class="nav-item">
+                    <i class="fas fa-house"></i>
+                    <a href="dashboard.html"><span>Home</span></a>
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-calendar-alt"></i>
+                    <a href="drivercalview.html"><span>Calendar</span></a>
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-clock"></i>
+                    <a href="ongoing.html"><span>Ongoing Bookings</span></a>
+                </div>
+                <div class="nav-item active">
+                    <i class="fas fa-history"></i>
+                    <a href="pastbooking.html"><span>Past Bookings</span></a>
+                </div>
+                <div class="logout">
+                    <i class="fas fa-sign-out"></i>
+                    <span>Logout</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===================
+                 Header Section
+        =================== -->
+        <div class="header">
+            <div class="header-left">
+                <button class="sidebar-toggle" id="sidebarToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h1>Past Bookings</h1>
+            </div>
+            <div class="header-actions">
+                <!-- Notifications -->
+                <a href="notification.html"><div class="notification" id="bellNotification" title="Notifications">
+                    <i class="fas fa-bell"></i>
+                    <div class="badge" id="bellBadge">3</div></a>
+                </div>
+                <a href="messages.html"><div class="notification" id="messageNotification" title="Messages">
+                    <i class="fas fa-envelope"></i>
+                    <div class="badge" id="messageBadge">5</div></a>
+                </div>
+                <!-- User Profile -->
+                <div class="user-profile" id="userProfile">
+                    <a href="profile.html"><div class="profile-img">K</div></a>
+                    <div class="user-info">
+                        <div class="user-name">Kamal</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===================
+                 Main Content
+        =================== -->
+        <div class="main-content">
+
+            <!-- Filter Section -->
+            <div class="filter-section">
+                <div class="filter-header">
+                    <i class="fas fa-filter"></i>
+                    <h3>Filter & Search</h3>
+                </div>
+                <div class="filter-controls">
+                    <div class="filter-group search-box">
+                        <label>Search</label>
+                        <input type="text" id="searchInput" placeholder="Search by customer name, booking ID...">
+                        
+                    </div>
+                    <div class="filter-group">
+                        <label>Date Range</label>
+                        <select id="dateRange">
+                            <option value="all">All Time</option>
+                            <option value="today">Today</option>
+                            <option value="week">This Week</option>
+                            <option value="month" selected>This Month</option>
+                            <option value="quarter">This Quarter</option>
+                            <option value="year">This Year</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Status</label>
+                        <select id="statusFilter">
+                            <option value="all">All Status</option>
+                            <option value="completed">Completed</option>
+                            <option value="cancelled">Cancelled</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Rating</label>
+                        <select id="ratingFilter">
+                            <option value="all">All Ratings</option>
+                            <option value="5">5 Stars</option>
+                            <option value="4">4+ Stars</option>
+                            <option value="3">3+ Stars</option>
+                            <option value="2">2+ Stars</option>
+                            <option value="1">1+ Stars</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="filter-actions">
+                    <button class="btn btn-outline" id="resetFilters">
+                        <i class="fas fa-undo"></i>
+                        Reset
+                    </button>
+                </div>
+            </div>
+
+            <!-- Loading Spinner -->
+            <div class="loading" id="loadingSpinner">
+                <div class="spinner"></div>
+            </div>
+
+            <!-- Bookings Container -->
+            <div class="bookings-container" id="bookingsContainer">
+                <div class="bookings-header">
+                    <h3>
+                        <i class="fas fa-history"></i>
+                        Booking History
+                    </h3>
+                    <div class="bookings-count" id="bookingsCount">132 total bookings</div>
+                </div>
+                
+                <div class="bookings-list" id="bookingsList">
+                    <!-- Booking Card 1 -->
+                    <div class="booking-card" data-booking-id="BK-2024-001">
+                        <div class="booking-header">
+                            <div class="booking-id">
+                                <i class="fas fa-hashtag"></i>
+                                BK-2024-001
+                            </div>
+                            <div class="booking-status completed">Completed</div>
+                        </div>
+                        
+                        <div class="booking-info">
+                            <div class="booking-details">
+                                <div class="detail-item">
+                                    <i class="fas fa-user"></i>
+                                    <span class="detail-label">Customer:</span>
+                                    <span class="detail-value">Sivajani</span>
+                                </div>
+                                <div class="detail-item">
+                                    <i class="fas fa-calendar"></i>
+                                    <span class="detail-label">Date:</span>
+                                    <span class="detail-value">2024-08-15</span>
+                                </div>
+                                <div class="detail-item">
+                                    <i class="fas fa-clock"></i>
+                                    <span class="detail-label">Time:</span>
+                                    <span class="detail-value">10:30 AM</span>
+                                </div>
+                                <div class="detail-item">
+                                    <i class="fas fa-dollar-sign"></i>
+                                    <span class="detail-label">Fare:</span>
+                                    <span class="detail-value">Rs. 2,500</span>
+                                </div>
+                                <div class="detail-item">
+                                    <i class="fas fa-star"></i>
+                                    <span class="detail-label">Rating:</span>
+                                    <span class="detail-value">5.0</span>
+                                </div>
+                            </div>
+                            
+                            <div class="location-info">
+                                <div class="location-item pickup">
+                                    <i class="fas fa-map-marker-alt pickup-icon"></i>
+                                    <span class="location-text">Colombo Fort Railway Station</span>
+                                </div>
+                                <div class="location-item dropoff">
+                                    <i class="fas fa-map-marker-alt dropoff-icon"></i>
+                                    <span class="location-text">Bandaranaike International Airport</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="booking-actions">
+                            <button class="btn btn-outline" onclick="viewBookingDetails('BK-2024-001')">
+                                <i class="fas fa-eye"></i>
+                                View Details
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Booking Card 2 -->
+                    <div class="booking-card" data-booking-id="BK-2024-002">
+                        <div class="booking-header">
+                            <div class="booking-id">
+                                <i class="fas fa-hashtag"></i>
+                                BK-2024-002
+                            </div>
+                            <div class="booking-status completed">Completed</div>
+                        </div>
+                        
+                        <div class="booking-info">
+                            <div class="booking-details">
+                                <div class="detail-item">
+                                    <i class="fas fa-user"></i>
+                                    <span class="detail-label">Customer:</span>
+                                    <span class="detail-value">Ranil Perera</span>
+                                </div>
+                                <div class="detail-item">
+                                    <i class="fas fa-calendar"></i>
+                                    <span class="detail-label">Date:</span>
+                                    <span class="detail-value">2024-08-14</span>
+                                </div>
+                                <div class="detail-item">
+                                    <i class="fas fa-clock"></i>
+                                    <span class="detail-label">Time:</span>
+                                    <span class="detail-value">2:15 PM</span>
+                                </div>
+                                <div class="detail-item">
+                                    <i class="fas fa-dollar-sign"></i>
+                                    <span class="detail-label">Fare:</span>
+                                    <span class="detail-value">Rs. 1,800</span>
+                                </div>
+                                <div class="detail-item">
+                                    <i class="fas fa-star"></i>
+                                    <span class="detail-label">Rating:</span>
+                                    <span class="detail-value">4.5</span>
+                                </div>
+                            </div>
+                            
+                            <div class="location-info">
+                                <div class="location-item pickup">
+                                    <i class="fas fa-map-marker-alt pickup-icon"></i>
+                                    <span class="location-text">Galle Face Hotel</span>
+                                </div>
+                                <div class="location-item dropoff">
+                                    <i class="fas fa-map-marker-alt dropoff-icon"></i>
+                                    <span class="location-text">Colombo Shopping Centre</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="booking-actions">
+                            <button class="btn btn-outline" onclick="viewBookingDetails('BK-2024-002')">
+                                <i class="fas fa-eye"></i>
+                                View Details
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Booking Card 3 - Cancelled -->
+                    <div class="booking-card" data-booking-id="BK-2024-003">
+                        <div class="booking-header">
+                            <div class="booking-id">
+                                <i class="fas fa-hashtag"></i>
+                                BK-2024-003
+                            </div>
+                            <div class="booking-status cancelled">Cancelled</div>
+                        </div>
+                        
+                        <div class="booking-info">
+                            <div class="booking-details">
+                                <div class="detail-item">
+                                    <i class="fas fa-user"></i>
+                                    <span class="detail-label">Customer:</span>
+                                    <span class="detail-value">Nimal Silva</span>
+                                </div>
+                                <div class="detail-item">
+                                    <i class="fas fa-calendar"></i>
+                                    <span class="detail-label">Date:</span>
+                                    <span class="detail-value">2024-08-12</span>
+                                </div>
+                                <div class="detail-item">
+                                    <i class="fas fa-clock"></i>
+                                    <span class="detail-label">Time:</span>
+                                    <span class="detail-value">8:00 AM</span>
+                                </div>
+                                <div class="detail-item">
+                                    <i class="fas fa-ban"></i>
+                                    <span class="detail-label">Reason:</span>
+                                    <span class="detail-value">Customer request</span>
+                                </div>
+                                <div class="detail-item">
+                                    <i class="fas fa-star"></i>
+                                    <span class="detail-label">Rating:</span>
+                                    <span class="detail-value">N/A</span>
+                                </div>
+                            </div>
+                            
+                            <div class="location-info">
+                                <div class="location-item pickup">
+                                    <i class="fas fa-map-marker-alt pickup-icon"></i>
+                                    <span class="location-text">Negombo Beach Hotel</span>
+                                </div>
+                                <div class="location-item dropoff">
+                                    <i class="fas fa-map-marker-alt dropoff-icon"></i>
+                                    <span class="location-text">Katunayake Airport</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="booking-actions">
+                            <button class="btn btn-outline" onclick="viewBookingDetails('BK-2024-003')">
+                                <i class="fas fa-eye"></i>
+                                View Details
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Empty State (hidden by default) -->
+            <div class="empty-state" id="emptyState" style="display: none;">
+                <i class="fas fa-history"></i>
+                <h3>No Past Bookings Found</h3>
+                <p>It looks like there are no bookings matching your current filters. Try adjusting your search criteria or check back later.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Booking Details Modal -->
+    <div id="bookingDetailsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Booking Details</h3>
+                <span class="close" id="closeModal">&times;</span>
+            </div>
+            <div class="modal-body" id="modalBookingDetails">
+                <!-- Content will be populated dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const sidebar = document.getElementById('sidebar');
+        const sidebarToggle = document.getElementById('sidebarToggle');
+        const loadingSpinner = document.getElementById('loadingSpinner');
+        const bookingsList = document.getElementById('bookingsList');
+        const bookingsContainer = document.getElementById('bookingsContainer');
+        const emptyState = document.getElementById('emptyState');
+        const bookingDetailsModal = document.getElementById('bookingDetailsModal');
+        const closeModal = document.getElementById('closeModal');
+        
+        // Filter elements
+        const searchInput = document.getElementById('searchInput');
+        const dateRange = document.getElementById('dateRange');
+        const statusFilter = document.getElementById('statusFilter');
+        const ratingFilter = document.getElementById('ratingFilter');
+        const resetFilters = document.getElementById('resetFilters');
+        const exportData = document.getElementById('exportData');
+
+        // Sample booking data
+        const bookingsData = [
+            {
+                id: 'BK-2024-001',
+                customer: 'Sivajani',
+                date: '2024-08-15',
+                time: '10:30 AM',
+                status: 'completed',
+                fare: 'Rs. 2,500',
+                rating: 5.0,
+                pickup: 'Colombo Fort Railway Station',
+                dropoff: 'Bandaranaike International Airport',
+                vehicle: 'Toyota Camry - ND-4357',
+                duration: '45 minutes',
+                distance: '35 km'
+            },
+            {
+                id: 'BK-2024-002',
+                customer: 'Ranil Perera',
+                date: '2024-08-14',
+                time: '2:15 PM',
+                status: 'completed',
+                fare: 'Rs. 1,800',
+                rating: 4.5,
+                pickup: 'Galle Face Hotel',
+                dropoff: 'Colombo Shopping Centre',
+                vehicle: 'Toyota Camry - ND-4357',
+                duration: '25 minutes',
+                distance: '12 km'
+            },
+            {
+                id: 'BK-2024-003',
+                customer: 'Nimal Silva',
+                date: '2024-08-12',
+                time: '8:00 AM',
+                status: 'cancelled',
+                fare: 'Rs. 0',
+                rating: null,
+                pickup: 'Negombo Beach Hotel',
+                dropoff: 'Katunayake Airport',
+                vehicle: 'Toyota Camry - ND-4357',
+                duration: 'N/A',
+                distance: 'N/A',
+                cancellationReason: 'Customer request'
+            }
+        ];
+
+        // Utility Functions
+        function showLoading() {
+            loadingSpinner.style.display = 'flex';
+            bookingsContainer.style.display = 'none';
+            emptyState.style.display = 'none';
+        }
+
+        function hideLoading() {
+            loadingSpinner.style.display = 'none';
+        }
+
+        function showBookings() {
+            bookingsContainer.style.display = 'block';
+            emptyState.style.display = 'none';
+        }
+
+        function showEmptyState() {
+            bookingsContainer.style.display = 'none';
+            emptyState.style.display = 'block';
+        }
+
+        // Sidebar functionality
+        if (sidebarToggle) {
+            sidebarToggle.addEventListener('click', () => {
+                sidebar.classList.toggle('active');
+            });
+        }
+
+        // Close sidebar when clicking outside (mobile)
+        document.addEventListener('click', (e) => {
+            if (window.innerWidth <= 992 && 
+                sidebar.classList.contains('active') &&
+                !sidebar.contains(e.target) && 
+                (!sidebarToggle || !sidebarToggle.contains(e.target))) {
+                sidebar.classList.remove('active');
+            }
+        });
+
+        // View booking details function
+        function viewBookingDetails(bookingId) {
+            const booking = bookingsData.find(b => b.id === bookingId);
+            if (booking) {
+                const modalContent = document.getElementById('modalBookingDetails');
+                modalContent.innerHTML = `
+                    <div style="display: grid; gap: 20px;">
+                        <!-- Customer Information Section -->
+                        <div style="background: #f8f9fa; padding: 20px; border-radius: 8px;">
+                            <h4 style="color: var(--primary); margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
+                                <i class="fas fa-user-circle"></i> Customer Information
+                            </h4>
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                                <div>
+                                    <div style="font-size: 12px; color: var(--text-light); margin-bottom: 4px;">Name</div>
+                                    <div style="font-weight: 600;">${booking.customer}</div>
+                                </div>
+                                <div>
+                                    <div style="font-size: 12px; color: var(--text-light); margin-bottom: 4px;">Phone</div>
+                                    <div style="font-weight: 600;">+94 77-XXXXXXX</div>
+                                </div>
+                                <div>
+                                    <div style="font-size: 12px; color: var(--text-light); margin-bottom: 4px;">Rating Given</div>
+                                    <div style="font-weight: 600;">${booking.rating ? booking.rating + ' ⭐' : 'N/A'}</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Vehicle Information Section -->
+                        <div style="background: #f8f9fa; padding: 20px; border-radius: 8px;">
+                            <h4 style="color: var(--primary); margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
+                                <i class="fas fa-car"></i> Vehicle Information
+                            </h4>
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                                <div>
+                                    <div style="font-size: 12px; color: var(--text-light); margin-bottom: 4px;">Vehicle</div>
+                                    <div style="font-weight: 600;">${booking.vehicle}</div>
+                                </div>
+                                <div>
+                                    <div style="font-size: 12px; color: var(--text-light); margin-bottom: 4px;">Duration</div>
+                                    <div style="font-weight: 600;">${booking.duration}</div>
+                                </div>
+                                <div>
+                                    <div style="font-size: 12px; color: var(--text-light); margin-bottom: 4px;">Distance</div>
+                                    <div style="font-weight: 600;">${booking.distance}</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Booking Details Section -->
+                        <div style="background: #f8f9fa; padding: 20px; border-radius: 8px;">
+                            <h4 style="color: var(--primary); margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
+                                <i class="fas fa-calendar-check"></i> Booking Details
+                            </h4>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                                <div>
+                                    <div style="margin-bottom: 15px;">
+                                        <div style="font-size: 12px; color: var(--text-light); margin-bottom: 4px;">Booking ID</div>
+                                        <div style="font-weight: 600;">${booking.id}</div>
+                                    </div>
+                                    <div style="margin-bottom: 15px;">
+                                        <div style="font-size: 12px; color: var(--text-light); margin-bottom: 4px;">Date & Time</div>
+                                        <div style="font-weight: 600;">${booking.date} at ${booking.time}</div>
+                                    </div>
+                                    <div style="margin-bottom: 15px;">
+                                        <div style="font-size: 12px; color: var(--text-light); margin-bottom: 4px;">Status</div>
+                                        <div style="font-weight: 600; color: ${booking.status === 'completed' ? '#28a745' : '#dc3545'}; text-transform: capitalize;">${booking.status}</div>
+                                    </div>
+                                    <div>
+                                        <div style="font-size: 12px; color: var(--text-light); margin-bottom: 4px;">Fare</div>
+                                        <div style="font-weight: 600; font-size: 18px; color: var(--primary);">${booking.fare}</div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div style="margin-bottom: 15px;">
+                                        <div style="font-size: 12px; color: var(--text-light); margin-bottom: 8px;">Pickup Location</div>
+                                        <div style="display: flex; align-items: center; gap: 8px; background: rgba(40, 167, 69, 0.05); padding: 10px; border-radius: 6px; border-left: 4px solid #28a745;">
+                                            <i class="fas fa-map-marker-alt" style="color: #28a745;"></i>
+                                            <span style="font-weight: 500;">${booking.pickup}</span>
+                                        </div>
+                                    </div>
+                                    <div style="margin-bottom: 15px;">
+                                        <div style="font-size: 12px; color: var(--text-light); margin-bottom: 8px;">Dropoff Location</div>
+                                        <div style="display: flex; align-items: center; gap: 8px; background: rgba(247, 37, 133, 0.05); padding: 10px; border-radius: 6px; border-left: 4px solid var(--danger);">
+                                            <i class="fas fa-map-marker-alt" style="color: var(--danger);"></i>
+                                            <span style="font-weight: 500;">${booking.dropoff}</span>
+                                        </div>
+                                    </div>
+                                    ${booking.cancellationReason ? `
+                                    <div>
+                                        <div style="font-size: 12px; color: var(--text-light); margin-bottom: 4px;">Cancellation Reason</div>
+                                        <div style="font-weight: 600; color: var(--danger);">${booking.cancellationReason}</div>
+                                    </div>
+                                    ` : ''}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                bookingDetailsModal.style.display = 'block';
+            }
+        }
+
+        // Filter functionality
+        function applyFilters() {
+            showLoading();
+            
+            setTimeout(() => {
+                const searchTerm = searchInput.value.toLowerCase();
+                const statusValue = statusFilter.value;
+                const ratingValue = ratingFilter.value;
+                
+                let filteredBookings = bookingsData;
+                
+                // Apply search filter
+                if (searchTerm) {
+                    filteredBookings = filteredBookings.filter(booking => 
+                        booking.customer.toLowerCase().includes(searchTerm) ||
+                        booking.id.toLowerCase().includes(searchTerm)
+                    );
+                }
+                
+                // Apply status filter
+                if (statusValue !== 'all') {
+                    filteredBookings = filteredBookings.filter(booking => 
+                        booking.status === statusValue
+                    );
+                }
+                
+                // Apply rating filter
+                if (ratingValue !== 'all' && ratingValue) {
+                    const minRating = parseInt(ratingValue);
+                    filteredBookings = filteredBookings.filter(booking => 
+                        booking.rating && booking.rating >= minRating
+                    );
+                }
+                
+                hideLoading();
+                
+                if (filteredBookings.length === 0) {
+                    showEmptyState();
+                } else {
+                    showBookings();
+                    updateBookingsCount(filteredBookings.length);
+                }
+            }, 800);
+        }
+
+        function updateBookingsCount(count) {
+            const bookingsCount = document.getElementById('bookingsCount');
+            bookingsCount.textContent = `${count} total bookings`;
+        }
+
+        // Debounce function
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        // Event listeners for filters
+        searchInput.addEventListener('input', debounce(applyFilters, 500));
+        dateRange.addEventListener('change', applyFilters);

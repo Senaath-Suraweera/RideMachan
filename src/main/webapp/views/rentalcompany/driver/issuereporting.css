@@ -255,6 +255,7 @@ body {
 .header h1 {
   color: rgba(14, 21, 43, 0.94);
   line-height: 70px;
+  font-size: 28px;
 }
 
 .header-actions {
