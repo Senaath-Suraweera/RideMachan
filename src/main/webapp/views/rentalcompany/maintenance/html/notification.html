@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notifications - Ride Machan</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/notification.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+</head>
+<body>
+
+        
+    <div class="dashboard-container">
+
+<!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo-section">
+                <img src="../assets/ridemachan-logo.png" alt="RideMachan Logo" class="logo">
+            </div>
+            
+            <nav class="nav-menu">
+                <ul>
+                    <h3>Main Navigation</h3>
+
+                    <li class="nav-item active">
+                        <a href="dashboard.html" class="nav-link">
+                            <i class="fas fa-tachometer-alt"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a href="inspection.html" class="nav-link">
+                            <i class="fas fa-tools"></i>
+                            <span>Maintenance Logs</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="vehiclerecords.html" class="nav-link">
+                            <i class="fas fa-file"></i> 
+                            <span>Vehicle Records</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="maintenance-calender.html" class="nav-link">
+                            <i class="fas fa-calendar"></i>
+                            <span>Calendar</span>
+                        </a>
+                    </li>
+                   
+
+                </ul>
+            </nav>
+            
+            <div class="logout-section">
+                <a href="#" class="nav-link">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </a>
+            </div>
+        </aside>
+                
+                
+
+            <!-- Main Content -->
+            <div class="main-content main">
+                    <header class="header own">    
+                        <div class="search-bar">
+                            <i class="fas fa-search"></i>
+                            <input type="text" placeholder="Search vehicles, maintenance records..." id="searchInput">
+                        </div>
+
+                        <div class="header-actions">
+                            <div class="notification">
+                                <a href="notification.html" class="notification">
+                                    <i class="fas fa-bell"></i>
+                                    <div class="badge">3</div>
+                                </a>
+                            </div>
+                            <div class="user-profile">
+                                <div class="profile-img">MS</div>
+                                <div class="user-info">
+                                    <div class="user-name">Mr. Sivajan</div>
+                                    <div class="user-role">Maintenance Staff</div>
+                                </div>
+                            </div>
+                        </div>   
+                    </header>  
+
+                    <div class="page-content">
+                        <div class="page-header">
+                            <div class="page-title-section">
+                                <h1 class="page-title">Maintenance Notifications</h1>
+                                <p class="page-subtitle">Stay updated with work assignments, deadlines, and vehicle reports</p>
+                            </div>
+                            <button class="btn-secondary">
+                                <i class="fas fa-check-double"></i>
+                                Mark All as Read
+                            </button>                                                        
+                        </div> 
+
+
+                                <!-- Notifications List -->
+                        <div class="notifications-container">
+                            <div class="notifications-list">
+                                <!-- Work Assignment Notification -->
+                                <div class="notification-card work-assignment unread">
+                                    <div class="notification-avatar">
+                                        <i class="fas fa-clipboard-list"></i>
+                                    </div>
+                                    <div class="notification-content">
+                                        <div class="notification-header">
+                                            <div class="sender-info">
+                                                <span class="sender-name">Supervisor Johnson</span>
+                                                <span class="sender-type">Work Assignment</span>
+                                                <span class="sender-id">#TASK-456</span>
+                                            </div>
+                                            <div class="notification-time">15 minutes ago</div>
+                                        </div>
+                                        <div class="notification-message">
+                                            You have been assigned to repair Vehicle ID: XYZ-456. Engine overheating issue reported. Please inspect cooling system and radiator.
+                                        </div>
+                                        <div class="notification-priority high-priority">
+                                            <i class="fas fa-exclamation-triangle"></i>
+                                            High Priority
+                                        </div>
+                                    </div>
+                                    
+                                </div>
+
+                                <!-- Job Deadline Notification -->
+                                <div class="notification-card job-deadline unread">
+                                    <div class="notification-avatar">
+                                        <i class="fas fa-clock"></i>
+                                    </div>
+                                    <div class="notification-content">
+                                        <div class="notification-header">
+                                            <div class="sender-info">
+                                                <span class="sender-name">System Alert</span>
+                                                <span class="sender-type">Deadline Reminder</span>
+                                                <span class="sender-id">#MAINT005</span>
+                                            </div>
+                                            <div class="notification-time">30 minutes ago</div>
+                                        </div>
+                                        <div class="notification-message">
+                                            Job MAINT005 is due in 2 hours. Brake inspection for Honda Civic DEF-789 must be completed before 4:00 PM today.
+                                        </div>
+                                        <div class="notification-priority medium-priority">
+                                            <i class="fas fa-clock"></i>
+                                            Due Soon
+                                        </div>
+                                    </div>
+                                    <div class="notification-actions">                                        
+                                        <button class="btn-outline">Mark as Read</button>
+                                    </div>
+                                </div>
+
+                                <!-- Vehicle Condition Report -->
+                                <div class="notification-card vehicle-report unread">
+                                    <div class="notification-avatar">
+                                        <i class="fas fa-exclamation-triangle"></i>
+                                    </div>
+                                    <div class="notification-content">
+                                        <div class="notification-header">
+                                            <div class="sender-info">
+                                                <span class="sender-name">Driver Mike Wilson</span>
+                                                <span class="sender-type">Vehicle Report</span>
+                                                <span class="sender-id">#VEH-789</span>
+                                            </div>
+                                            <div class="notification-time">1 hour ago</div>
+                                        </div>
+                                        <div class="notification-message">
+                                            Driver reported engine overheating for Vehicle DEF-789. Temperature gauge showing red. Vehicle currently parked at Downtown Mall.
+                                        </div>
+                                        <div class="notification-priority high-priority">
+                                            <i class="fas fa-exclamation-triangle"></i>
+                                            Critical Alert
+                                        </div>
+                                    </div>
+                                    
+                                </div>
+
+                                <!-- Team Communication -->
+                                <div class="notification-card team-communication">
+                                    <div class="notification-avatar">
+                                        <i class="fas fa-comments"></i>
+                                    </div>
+                                    <div class="notification-content">
+                                        <div class="notification-header">
+                                            <div class="sender-info">
+                                                <span class="sender-name">Supervisor Johnson</span>
+                                                <span class="sender-type">Team Message</span>
+                                                <span class="sender-id">#MSG-123</span>
+                                            </div>
+                                            <div class="notification-time">2 hours ago</div>
+                                        </div>
+                                        <div class="notification-message">
+                                            Shift reminder: Your shift starts at 8:00 AM tomorrow. Please review the priority vehicle list before starting work.
+                                        </div>
+                                        <div class="notification-priority low-priority">
+                                            <i class="fas fa-info-circle"></i>
+                                            Information
+                                        </div>
+                                    </div>
+                                    
+                                </div>
+
+                                <!-- Rescheduled Task Notice -->
+                                <div class="notification-card job-deadline">
+                                    <div class="notification-avatar">
+                                        <i class="fas fa-calendar-alt"></i>
+                                    </div>
+                                    <div class="notification-content">
+                                        <div class="notification-header">
+                                            <div class="sender-info">
+                                                <span class="sender-name">System Update</span>
+                                                <span class="sender-type">Schedule Change</span>
+                                                <span class="sender-id">#TASK-789</span>
+                                            </div>
+                                            <div class="notification-time">3 hours ago</div>
+                                        </div>
+                                        <div class="notification-message">
+                                            Task TASK-789 has been rescheduled from 2:00 PM to 4:00 PM today. Oil change for Toyota Camry ABC-123.
+                                        </div>
+                                        <div class="notification-priority medium-priority">
+                                            <i class="fas fa-calendar-alt"></i>
+                                            Rescheduled
+                                        </div>
+                                    </div>
+                                    
+                                </div>
+
+                                <!-- Vehicle Breakdown Alert -->
+                                <div class="notification-card vehicle-report">
+                                    <div class="notification-avatar">
+                                        <i class="fas fa-car-crash"></i>
+                                    </div>
+                                    <div class="notification-content">
+                                        <div class="notification-header">
+                                            <div class="sender-info">
+                                                <span class="sender-name">Driver Sarah Davis</span>
+                                                <span class="sender-type">Emergency Report</span>
+                                                <span class="sender-id">#EMG-456</span>
+                                            </div>
+                                            <div class="notification-time">4 hours ago</div>
+                                        </div>
+                                        <div class="notification-message">
+                                            Critical: Flat tire reported for Vehicle GHI-456. Driver stranded at Highway 101, Mile Marker 45. Immediate assistance required.
+                                        </div>
+                                        <div class="notification-priority high-priority">
+                                            <i class="fas fa-exclamation-triangle"></i>
+                                            Emergency
+                                        </div>
+                                    </div>
+                                    
+                                </div>
+
+                                <!-- Supervisor Instructions -->
+                                <div class="notification-card team-communication">
+                                    <div class="notification-avatar">
+                                        <i class="fas fa-user-tie"></i>
+                                    </div>
+                                    <div class="notification-content">
+                                        <div class="notification-header">
+                                            <div class="sender-info">
+                                                <span class="sender-name">Supervisor Johnson</span>
+                                                <span class="sender-type">Instructions</span>
+                                                <span class="sender-id">#INST-789</span>
+                                            </div>
+                                            <div class="notification-time">5 hours ago</div>
+                                        </div>
+                                        <div class="notification-message">
+                                            Please prioritize brake inspections for all vehicles scheduled for long-distance trips this week. Use the new brake pad specifications document.
+                                        </div>
+                                        <div class="notification-priority medium-priority">
+                                            <i class="fas fa-clipboard-check"></i>
+                                            Instructions
+                                        </div>
+                                    </div>
+                                    <div class="notification-actions">
+                                        <button class="btn-primary">View Document</button>
+                                        <button class="btn-outline">Mark as Read</button>
+                                    </div>
+                                </div>
+
+                                <!-- Completed Task Update -->
+                                <div class="notification-card work-assignment">
+                                    <div class="notification-avatar">
+                                        <i class="fas fa-check-circle"></i>
+                                    </div>
+                                    <div class="notification-content">
+                                        <div class="notification-header">
+                                            <div class="sender-info">
+                                                <span class="sender-name">You</span>
+                                                <span class="sender-type">Task Complete</span>
+                                                <span class="sender-id">#TASK-321</span>
+                                            </div>
+                                            <div class="notification-time">1 day ago</div>
+                                        </div>
+                                        <div class="notification-message">
+                                            Successfully completed routine maintenance for BMW X5 JKL-321. All systems checked and vehicle ready for deployment.
+                                        </div>
+                                        <div class="notification-priority low-priority">
+                                            <i class="fas fa-check-circle"></i>
+                                            Completed
+                                        </div>
+                                    </div>
+                                    
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    
+                
+            </div>
+    </div>
+
+    <script src="../js/notifications.js"></script>
+             
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

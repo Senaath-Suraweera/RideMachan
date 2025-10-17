@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notifications - Car Rental Management</title>
+    <link rel="stylesheet" href="../css/notification.css">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo-section">
+                <img src="../assets/ridemachan-logo.png" alt="RideMachan Logo" class="logo">
+            </div>
+            
+            <nav class="nav-menu">
+                <ul>
+                    <li class="nav-item active">
+                        <a href="homepage.html" class="nav-link">
+                            <i class="fas fa-home"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <!--<li class="nav-item">
+                        <a href="vehicle-fleet.html" class="nav-link">
+                            <i class="fas fa-building"></i>
+                            <span>Entity Registration</span>
+                        </a>
+                    </li>-->
+                    <li class="nav-item">
+                        <a href="booking-management.html" class="nav-link">
+                            <i class="fas fa-box"></i>
+                            <span>Bookings</span>
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a href="vehicle-fleet.html" class="nav-link">
+                            <i class="fas fa-car"></i>
+                            <span>Vehicle Fleet</span>
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a href="maintenance-staff.html" class="nav-link">
+                            <i class="fas fa-tools"></i>
+                            <span>Maintenance Staff</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="driver-management.html" class="nav-link">
+                            <i class="fas fa-users"></i>
+                            <span>Drivers</span>
+                        </a>
+                    </li>
+                    
+                    
+                    
+                    
+                </ul>
+            </nav>
+            
+            <div class="logout-section">
+                <a href="#" class="nav-link">
+                    <i class="fas fa-sign-out"></i>
+                    <span>Logout</span>
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Header -->
+            <header class="header">
+                <div class="header-left">
+                    <div class="breadcrumb">
+                        <i class="fas fa-th-large"></i>
+                        <span>Company Dashboard</span>
+                    </div>
+                </div>
+                <div class="header-right">
+                    <div class="notification-icon">
+                        <a href="notification.html">
+                            <i class="fas fa-bell"></i>
+                            <span class="notification-badge">1</span>
+                        </a>
+                    </div>
+                    <div class="user-profile">
+                        <div class="user-avatar">A</div>
+                        <span class="user-name">ABC Rentals</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Page Content -->
+            <div class="page-content">
+                <div class="page-header">
+                    <div class="page-title-section">
+                        <h1 class="page-title">Notifications</h1>
+                        <p class="page-subtitle">Stay updated with all system activities and alerts</p>
+                    </div>
+                    <button class="btn-secondary">
+                        <i class="fas fa-check-double"></i>
+                        Mark All as Read
+                    </button>
+                </div>
+
+                <!-- Notifications List -->
+                <div class="notifications-container">
+                    <div class="notifications-list">
+                        <!-- Driver Notification -->
+                        <div class="notification-card driver-notification">
+                            <div class="notification-avatar">
+                                <i class="fas fa-car"></i>
+                            </div>
+                            <div class="notification-content">
+                                <div class="notification-header">
+                                    <div class="sender-info">
+                                        <span class="sender-name">Robert Wilson</span>
+                                        <span class="sender-type">Driver</span>
+                                        <span class="sender-id">#DRV-001</span>
+                                    </div>
+                                    <div class="notification-time">2 hours ago</div>
+                                </div>
+                                <div class="notification-message">
+                                    Driver reported a breakdown for Toyota Prius - ABC-123. Vehicle is currently stranded at Downtown Mall parking lot.
+                                </div>
+                                <div class="notification-priority high-priority">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                    High Priority
+                                </div>
+                            </div>
+                            
+                        </div>
+
+                        <!-- Maintenance Staff Notification -->
+                        <div class="notification-card maintenance-notification">
+                            <div class="notification-avatar">
+                                <i class="fas fa-tools"></i>
+                            </div>
+                            <div class="notification-content">
+                                <div class="notification-header">
+                                    <div class="sender-info">
+                                        <span class="sender-name">Alice Johnson</span>
+                                        <span class="sender-type">Maintenance Staff</span>
+                                        <span class="sender-id">#MNT-003</span>
+                                    </div>
+                                    <div class="notification-time">4 hours ago</div>
+                                </div>
+                                <div class="notification-message">
+                                    Completed scheduled service for Ford Explorer - XYZ-456. Vehicle is ready for deployment.
+                                </div>
+                                <div class="notification-priority medium-priority">
+                                    <i class="fas fa-info-circle"></i>
+                                    Medium Priority
+                                </div>
+                            </div>
+                            <div class="notification-actions">                                
+                                <button class="btn-outline">Mark as Read</button>
+                            </div>
+                        </div>
+
+                        <!-- Customer Notification -->
+                        <div class="notification-card customer-notification">
+                            <div class="notification-avatar">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <div class="notification-content">
+                                <div class="notification-header">
+                                    <div class="sender-info">
+                                        <span class="sender-name">John Smith</span>
+                                        <span class="sender-type">Customer</span>
+                                        <span class="sender-id">#CUST-789</span>
+                                    </div>
+                                    <div class="notification-time">6 hours ago</div>
+                                </div>
+                                <div class="notification-message">
+                                    Customer requested a reschedule for Booking BK003 from 2025-09-15 to 2025-09-17. Awaiting approval.
+                                </div>
+                                <div class="notification-priority low-priority">
+                                    <i class="fas fa-clock"></i>
+                                    Low Priority
+                                </div>
+                            </div>
+                            
+                        </div>
+
+                        <!-- Driver Notification -->
+                        <div class="notification-card driver-notification">
+                            <div class="notification-avatar">
+                                <i class="fas fa-car"></i>
+                            </div>
+                            <div class="notification-content">
+                                <div class="notification-header">
+                                    <div class="sender-info">
+                                        <span class="sender-name">Mike Davis</span>
+                                        <span class="sender-type">Driver</span>
+                                        <span class="sender-id">#DRV-005</span>
+                                    </div>
+                                    <div class="notification-time">1 day ago</div>
+                                </div>
+                                <div class="notification-message">
+                                    Successfully completed trip for Honda Civic - DEF-789. Customer rating: 5 stars.
+                                </div>
+                                <div class="notification-priority low-priority">
+                                    <i class="fas fa-check-circle"></i>
+                                    Completed
+                                </div>
+                            </div>
+                            
+                        </div>
+
+                        <!-- Maintenance Staff Notification -->
+                        <div class="notification-card maintenance-notification">
+                            <div class="notification-avatar">
+                                <i class="fas fa-tools"></i>
+                            </div>
+                            <div class="notification-content">
+                                <div class="notification-header">
+                                    <div class="sender-info">
+                                        <span class="sender-name">Sarah Wilson</span>
+                                        <span class="sender-type">Maintenance Staff</span>
+                                        <span class="sender-id">#MNT-007</span>
+                                    </div>
+                                    <div class="notification-time">1 day ago</div>
+                                </div>
+                                <div class="notification-message">
+                                    Urgent: BMW X5 - GHI-321 requires immediate brake inspection before next booking.
+                                </div>
+                                <div class="notification-priority high-priority">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                    High Priority
+                                </div>
+                            </div>
+                            <div class="notification-actions">
+                                <button class="btn-primary">View Details</button>
+                                <button class="btn-outline">Assign Task</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+

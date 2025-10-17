@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ride Machan - Driver Vehicle View</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="vehicleview.css">
+</head>
+<body>
+    <!-- Report Issue Modal -->
+    <div class="modal-overlay" id="reportModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Report Vehicle Issue</h3>
+                <button class="close-btn" onclick="closeReportModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="issueForm">
+                    <div class="form-group">
+                        <label for="issueType">Issue Type:</label>
+                        <select id="issueType" name="issueType" required>
+                            <option value="">Select issue type</option>
+                            <option value="engine">Engine Problem</option>
+                            <option value="brakes">Brake Issues</option>
+                            <option value="tires">Tire Problems</option>
+                            <option value="electrical">Electrical Issues</option>
+                            <option value="fuel">Fuel System</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="issueDescription">Description:</label>
+                        <textarea id="issueDescription" name="description" rows="4" placeholder="Describe the issue in detail..." required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="issueSeverity">Severity:</label>
+                        <select id="issueSeverity" name="severity" required>
+                            <option value="">Select severity</option>
+                            <option value="low">Low - Can continue driving</option>
+                            <option value="medium">Medium - Needs attention soon</option>
+                            <option value="high">High - Immediate attention required</option>
+                        </select>
+                    </div>
+                    <div class="modal-actions">
+                        <button type="button" class="btn-secondary" onclick="closeReportModal()">Cancel</button>
+                        <button type="submit" class="btn-primary">Submit Report</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Panel -->
+    <div class="notification-panel" id="notificationPanel">
+        <div class="notification-header">
+            <h4>Notifications</h4>
+            <button onclick="closeNotifications()"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="notification-list">
+            <div class="notification-item">
+                <i class="fas fa-wrench"></i>
+                <div class="notification-content">
+                    <div class="notification-title">Service Reminder</div>
+                    <div class="notification-text">Your next service is due in 2 weeks</div>
+                    <div class="notification-time">2 hours ago</div>
+                </div>
+            </div>
+            <div class="notification-item">
+                <i class="fas fa-calendar"></i>
+                <div class="notification-content">
+                    <div class="notification-title">New Booking</div>
+                    <div class="notification-text">You have a new ride request</div>
+                    <div class="notification-time">4 hours ago</div>
+                </div>
+            </div>
+            <div class="notification-item">
+                <i class="fas fa-star"></i>
+                <div class="notification-content">
+                    <div class="notification-title">Rating Received</div>
+                    <div class="notification-text">Customer rated your service 5 stars</div>
+                    <div class="notification-time">1 day ago</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Sidebar Navigation -->
+        <div class="sidebar" id="sidebar">
+            <div class="logo">
+                <img src="logo.png" alt="Logo" class="logo">
+            </div>
+            
+            <div class="nav-menu">
+                <div class="nav-item" onclick="navigateTo('dashboard.html')">
+                    <i class="fas fa-house"></i>
+                    <span>Home</span>
+                </div>
+                <div class="nav-item" onclick="navigateTo('profile.html')">
+                    <i class="fas fa-user"></i>
+                    <span>Profile</span>
+                </div>
+                <div class="nav-item" onclick="navigateTo('drivercalview.html')">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>Calendar</span>
+                </div>
+                <div class="nav-item active">
+                    <i class="fas fa-car"></i>
+                    <span>Vehicles</span>
+                </div>
+                <div class="nav-item" onclick="navigateTo('customerview.html')">
+                    <i class="fas fa-users"></i>
+                    <span>Customer</span>
+                </div>
+                <div class="nav-item" onclick="navigateTo('issuereporting.html')">
+                    <i class="fas fa-book"></i>
+                    <span>Reports</span>
+                </div>
+                <div class="logout" onclick="handleLogout()">
+                    <i class="fas fa-sign-out"></i>
+                    <span>Logout</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Header Section -->
+        <div class="header">
+            <button class="mobile-menu-toggle" onclick="toggleSidebar()">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="hi">
+                <h1>Driver Vehicle View</h1>
+            </div>
+            <div class="header-actions">
+                <!-- Notifications -->
+                <div class="notification" onclick="toggleNotifications()">
+                    <i class="fas fa-bell"></i>
+                    <div class="badge">3</div>
+                </div>
+                <div class="notification" onclick="openMessages()">
+                    <i class="fas fa-envelope"></i>
+                    <div class="badge">5</div>
+                </div>
+                <!-- User Profile -->
+                <div class="user-profile" onclick="toggleUserMenu()">
+                    <div class="profile-img">K</div>
+                    <div class="user-info">
+                        <div class="user-name">Kamal</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="content-grid">
+                <!-- Vehicle Information Card -->
+                <div class="vehicle-info-card">
+                    <div class="card-header">
+                        <i class="fas fa-car"></i>
+                        <div class="card-title">Vehicle Information</div>
+                    </div>
+                    
+                    <div class="vehicle-info-grid">
+                        <div class="vehicle-details">
+                            <div class="info-item">
+                                <i class="fas fa-car-side"></i>
+                                <div class="info-content">
+                                    <div class="info-label">Model:</div>
+                                    <div class="info-value">Toyota Camry</div>
+                                </div>
+                            </div>
+                            
+                            <div class="info-item">
+                                <i class="fas fa-hashtag"></i>
+                                <div class="info-content">
+                                    <div class="info-label">Plate number:</div>
+                                    <div class="info-value">ND - 4357</div>
+                                </div>
+                            </div>
+                            
+                            <div class="info-item">
+                                <i class="fas fa-gas-pump"></i>
+                                <div class="info-content">
+                                    <div class="info-label">Fuel Type:</div>
+                                    <div class="info-value">Petrol</div>
+                                </div>
+                            </div>
+                            
+                            <div class="info-item">
+                                <i class="fas fa-tachometer-alt"></i>
+                                <div class="info-content">
+                                    <div class="info-label">Mileage:</div>
+                                    <div class="info-value">57,000km</div>
+                                </div>
+                            </div>
+                            
+                            <div class="info-item">
+                                <i class="fas fa-info-circle"></i>
+                                <div class="info-content">
+                                    <div class="info-label">Status:</div>
+                                    <div class="status-badge">Assigned</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="vehicle-image" onclick="uploadVehicleImage()">
+                            <i class="fas fa-car"></i>
+                            <div class="vehicle-image-text">Click to upload image</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Service Information and Past Issues -->
+                <div class="service-issues-grid">
+                    <!-- Service Information -->
+                    <div class="service-card">
+                        <div class="card-header">
+                            <i class="fas fa-tools"></i>
+                            <div class="card-title">Service Information</div>
+                        </div>
+                        
+                        <div class="service-item">
+                            <i class="fas fa-calendar"></i>
+                            <div class="service-content">
+                                <div class="service-label">Last Service:</div>
+                                <div class="service-value">2025-06-20</div>
+                            </div>
+                        </div>
+                        
+                        <div class="service-item">
+                            <i class="fas fa-calendar-alt"></i>
+                            <div class="service-content">
+                                <div class="service-label">Next Service:</div>
+                                <div class="service-value">2025-08-20</div>
+                            </div>
+                        </div>
+                        
+                        <button class="service-btn" onclick="scheduleService()">
+                            <i class="fas fa-calendar-plus"></i>
+                            Schedule Service
+                        </button>
+                    </div>
+                    
+                    <!-- Past Issues -->
+                    <div class="issues-card">
+                        <div class="card-header">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <div class="card-title">Past Issues</div>
+                        </div>
+                        
+                        <div class="service-item">
+                            <i class="fas fa-wrench"></i>
+                            <div class="service-content">
+                                <div class="service-label">Engine Issue:</div>
+                                <div class="service-value">2025-05-15</div>
+                            </div>
+                        </div>
+                        
+                        <div class="service-item">
+                            <i class="fas fa-exclamation-circle"></i>
+                            <div class="service-content">
+                                <div class="service-label">Brake Problem:</div>
+                                <div class="service-value">2025-04-10</div>
+                            </div>
+                        </div>
+                        
+                        <button class="service-btn secondary" onclick="viewAllIssues()">
+                            <i class="fas fa-history"></i>
+                            View All Issues
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Notes from Customer -->
+                <div class="notes-card">
+                    <div class="card-header">
+                        <i class="fas fa-sticky-note"></i>
+                        <div class="card-title">Notes from Customer</div>
+                    </div>
+                    
+                    <div class="note-item">
+                        <i class="fas fa-video"></i>
+                        <div class="note-text">Car has dash cam</div>
+                    </div>
+                    
+                    <div class="note-item">
+                        <i class="fas fa-gas-pump"></i>
+                        <div class="note-text">Fuel is full</div>
+                    </div>
+                    
+                    <button class="service-btn" onclick="addNote()">
+                        <i class="fas fa-plus"></i>
+                        Add Note
+                    </button>
+                </div>
+            </div>
+
+            <!-- Report Issue Button -->
+            <button class="report-button" onclick="openReportModal()">
+                <i class="fas fa-exclamation-triangle"></i>
+                Report Issue
+            </button>
+        </div>
+    </div>
+
+    <!-- Hidden file input for image upload -->
+    <input type="file" id="imageUpload" accept="image/*" style="display: none;" onchange="handleImageUpload(event)">
+
+    <script>
+        // Sidebar functionality
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('active');
+        }
+
+        // Navigation functionality
+        function navigateTo(page) {
+            // Add loading animation
+            document.body.style.opacity = '0.7';
+            setTimeout(() => {
+                window.location.href = page;
+            }, 200);
+        }
+
+        // Logout functionality
+        function handleLogout() {
+            if (confirm('Are you sure you want to logout?')) {
+                // Add logout animation
+                document.body.style.opacity = '0.5';
+                setTimeout(() => {
+                    // In a real app, you'd clear session data and redirect to login
+                    alert('Logged out successfully!');
+                    window.location.href = 'login.html';
+                }, 500);
+            }
+        }
+
+        // Report Issue Modal functionality
+        function openReportModal() {
+            document.getElementById('reportModal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeReportModal() {
+            document.getElementById('reportModal').classList.remove('active');
+            document.body.style.overflow = 'auto';
+            document.getElementById('issueForm').reset();
+        }
+
+        // Handle issue form submission
+        document.getElementById('issueForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const issueData = {
+                type: formData.get('issueType'),
+                description: formData.get('description'),
+                severity: formData.get('severity'),
+                timestamp: new Date().toISOString(),
+                vehicleId: 'ND-4357'
+            };
+            
+            // Simulate API call
+            const submitBtn = this.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
+            submitBtn.disabled = true;
+            
+            setTimeout(() => {
+                alert('Issue reported successfully! Our team will review it shortly.');
+                closeReportModal();
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            }, 1500);
+        });
+
+        // Notification functionality
+        function toggleNotifications() {
+            const panel = document.getElementById('notificationPanel');
+            panel.classList.toggle('active');
+        }
+
+        function closeNotifications() {
+            document.getElementById('notificationPanel').classList.remove('active');
+        }
+
+        function openMessages() {
+            alert('Messages feature coming soon!');
+        }
+
+        function toggleUserMenu() {
+            alert('User menu options:\n- Profile Settings\n- Change Password\n- Help & Support');
+        }
+
+        // Vehicle image upload
+        function uploadVehicleImage() {
+            document.getElementById('imageUpload').click();
+        }
+
+        function handleImageUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const vehicleImage = document.querySelector('.vehicle-image');
+                    vehicleImage.innerHTML = `
+                        <img src="${e.target.result}" alt="Vehicle" style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;">
+                    `;
+                    alert('Vehicle image uploaded successfully!');
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // Service scheduling
+        function scheduleService() {
+            const nextServiceDate = prompt('Enter preferred service date (YYYY-MM-DD):', '2025-09-15');
+            if (nextServiceDate) {
+                alert(`Service scheduled for ${nextServiceDate}. You will receive a confirmation shortly.`);
+            }
+        }
+
+        function viewAllIssues() {
+            alert('Redirecting to detailed issue history...');
+            // In a real app, navigate to issues page
+        }
+
+        function addNote() {
+            const note = prompt('Add a note about the vehicle:');
+            if (note && note.trim()) {
+                const notesContainer = document.querySelector('.notes-card');
+                const newNote = document.createElement('div');
+                newNote.className = 'note-item';
+                newNote.innerHTML = `
+                    <i class="fas fa-sticky-note"></i>
+                    <div class="note-text">${note.trim()}</div>
+                `;
+                
+                const addButton = notesContainer.querySelector('.service-btn');
+                notesContainer.insertBefore(newNote, addButton);
+                
+                // Add animation
+                newNote.style.opacity = '0';
+                newNote.style.transform = 'translateX(-20px)';
+                setTimeout(() => {
+                    newNote.style.transition = 'all 0.3s ease';
+                    newNote.style.opacity = '1';
+                    newNote.style.transform = 'translateX(0)';
+                }, 100);
+            }
+        }
+
+        // Close sidebar when clicking outside on mobile
+        document.addEventListener('click', function(event) {
+            const sidebar = document.getElementById('sidebar');
+            const toggle = document.querySelector('.mobile-menu-toggle');
+            const notificationPanel = document.getElementById('notificationPanel');
+            
+            if (window.innerWidth <= 992) {
+                if (!sidebar.contains(event.target) && !toggle.contains(event.target)) {
+                    sidebar.classList.remove('active');
+                }
+            }
+            
+            // Close notification panel when clicking outside
+            if (!notificationPanel.contains(event.target) && !event.target.closest('.notification')) {
+                notificationPanel.classList.remove('active');
+            }
+        });
+
+        // Handle window resize
+        window.addEventListener('resize', function() {
+            const sidebar = document.getElementById('sidebar');
+            if (window.innerWidth > 992) {
+                sidebar.classList.remove('active');
+            }
+        });
+
+        // Close modal with Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeReportModal();
+                closeNotifications();
+            }
+        });
+
+        // Add loading states for better UX
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add smooth scroll behavior
+            document.documentElement.style.scrollBehavior = 'smooth';
+            
+            // Initialize tooltips (if you want to add them)
+            const tooltipElements = document.querySelectorAll('[data-tooltip]');
+            tooltipElements.forEach(element => {
+                element.addEventListener('mouseenter', showTooltip);
+                element.addEventListener('mouseleave', hideTooltip);
+            });
+        });
+
+        function showTooltip(e) {
+            // Tooltip functionality can be added here
+        }
+
+        function hideTooltip(e) {
+            // Tooltip functionality can be added here
+        }
+    </script>
+</body>
+</html>

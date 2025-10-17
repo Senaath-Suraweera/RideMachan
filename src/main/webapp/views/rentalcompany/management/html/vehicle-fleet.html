@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vehicle Fleet - RideMachan</title>
+
+    <link rel="stylesheet" href="../css/vehicle-fleet.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="dashboard-container"> 
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo-section">
+                <img src="../assets/ridemachan-logo.png" alt="RideMachan Logo" class="logo">
+            </div>
+            
+            <nav class="nav-menu">
+                <ul>
+                    <li class="nav-item">
+                        <a href="homepage.html" class="nav-link">
+                            <i class="fas fa-home"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <!--<li class="nav-item">
+                        <a href="vehicle-fleet.html" class="nav-link">
+                            <i class="fas fa-building"></i>
+                            <span>Entity Registration</span>
+                        </a>
+                    </li>-->
+                    <li class="nav-item">
+                        <a href="booking-management.html" class="nav-link">
+                            <i class="fas fa-box"></i>
+                            <span>Bookings</span>
+                        </a>
+                    </li>
+                    <li class="nav-item active">
+                        <a href="vehicle-fleet.html" class="nav-link">
+                            <i class="fas fa-car"></i>
+                            <span>Vehicle Fleet</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="maintenance-staff.html" class="nav-link">
+                            <i class="fas fa-tools"></i>
+                            <span>Maintenance Staff</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="driver-management.html" class="nav-link">
+                            <i class="fas fa-users"></i>
+                            <span>Drivers</span>
+                        </a>
+                    </li>  
+                    
+                    
+                </ul>
+            </nav>
+            
+            <div class="logout-section">
+                <a href="#" class="nav-link">
+                    <i class="fas fa-sign-out"></i>
+                    <span>Logout</span>
+                </a>
+            </div>
+        </aside> 
+ 
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Header -->
+            <header class="header">
+                <div class="header-left">
+                    <div class="breadcrumb">
+                        <a href="profile.html#bottom">
+                            <i class="fas fa-bell"></i>
+                            <span class="notification-badge">1</span>
+                        </a>
+                    </div> 
+                </div>
+                <div class="header-right">
+                    <div class="notification-icon">
+                        <a href="notification.html">
+                            <i class="fas fa-bell"></i>
+                            <span class="notification-badge">1</span>
+                        </a>
+                    </div>
+                    <div class="user-profile">
+                        <div class="user-avatar">A</div>
+                        <span>ABC Rentals</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Page Content -->
+            <div class="page-content">
+                <div class="page-header">
+                    <div class="page-title-section">
+                        <h1 class="page-title">Vehicle Fleet</h1>
+                        <p class="page-subtitle">Manage your vehicle fleet and maintenance</p>
+                    </div>
+                    <button class="btn-primary" id="addVehicleBtn">
+                        <i class="fas fa-plus"></i>
+                        Add Vehicle
+                    </button>
+                </div>
+
+                <!-- Stats Cards -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon total">
+                            <i class="fas fa-car"></i>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-number">12</div>
+                            <div class="stat-label">Total Vehicles</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon available">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-number">8</div>
+                            <div class="stat-label">Available</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon on-trip">
+                            <i class="fas fa-route"></i>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-number">3</div>
+                            <div class="stat-label">On Trip</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon maintenance">
+                            <i class="fas fa-wrench"></i>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-number">1</div>
+                            <div class="stat-label">Maintenance</div>
+                        </div>
+                    </div>
+                </div>
+ 
+                <!-- View Options 
+                <div class="view-options">
+                    <div class="view-tabs">
+                        <a href="vehicle-fleet.html">
+                            <button class="view-tab active" data-view="fleet">
+                                Fleet Overview
+                            </button>
+                        </a>                        
+                    </div>
+                </div>--> 
+
+                <!-- Search and Filter -->
+                <div class="search-filter-section">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" placeholder="Search vehicles by model or plate number..." id="vehicleSearch">
+                    </div>
+                    <div class="filter-dropdown">
+                        <select id="vehicleFilter">
+                            <option value="all">All Vehicles</option>
+                            <option value="available">Available</option>
+                            <option value="on-trip">On Trip</option>
+                            <option value="maintenance">Maintenance</option>
+                        </select>
+                        <i class="fas fa-filter"></i>
+                    </div>
+                </div>
+
+                <!-- Vehicle Grid -->
+                <div class="vehicle-grid" id="vehicleGrid">
+                    <!-- Vehicle cards will be populated by JavaScript -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Vehicle Modal -->
+    <div class="modal-overlay" id="addVehicleModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Add New Vehicle</h3>
+                <button class="modal-close" id="closeAddVehicleModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="addVehicleForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="vehiclePlate">Plate Number</label>
+                            <input type="text" id="vehiclePlate" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="vehicleModel">Model</label>
+                            <input type="text" id="vehicleModel" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="vehicleColour">Colour</label>
+                            <input type="text" id="vehicleColour" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="vehicleSeats">No.of.Seats</label>
+                            <input type="text" id="vehicleSeats" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="vehicleEngineCapacity">Engine Capacity</label>
+                            <input type="text" id="vehicleEngineCapacity" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="vehicleEngineNumber">Engine number</label>
+                            <input type="text" id="vehicleEngineNumber" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="vehicleMaintenanceStaff">Maintenance Staff</label>
+                            <input type="text" id="vehicleMaintenanceStaff" required>
+                        </div>
+                        
+                        
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="vehicleYear">Year</label>
+                            <input type="number" id="vehicleYear" min="2000" max="2024" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="vehicleDescription">Description</label>
+                            <input type="text" id="vehicleDescription" required>
+                        </div>
+                        
+                    </div>
+                    <div class="form-row">
+                        
+                        <div class="form-group">
+                            <label for="vehicleDescription">Description</label>
+                            <textarea id="vehicleDescription" rows="4" required></textarea>
+                        </div>
+                        
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="vehicleType">Vehicle Type</label>
+                            <select id="vehicleType" required>
+                                <option value="">Select Type</option>
+                                <option value="sedan">Sedan</option>
+                                <option value="suv">SUV</option>
+                                <option value="hatchback">Hatchback</option>
+                                <option value="luxury">Luxury</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="vehicleLocation">Location</label>
+                            <select id="vehicleLocation" required>
+                                <option value="">Select Location</option>
+                                <option value="downtown">Downtown Depot</option>
+                                <option value="airport">Airport Depot</option>
+                                <option value="service">Service Center</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn-secondary" id="cancelAddVehicle">Cancel</button>
+                        <button type="submit" class="btn-primary">Add Vehicle</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/vehicle-fleet.js"></script>
+    <script src="../js/sidebar.js"></script>
+</body>
+</html>
