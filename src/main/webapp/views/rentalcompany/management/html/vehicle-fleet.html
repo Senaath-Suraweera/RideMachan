@@ -74,11 +74,9 @@
             <header class="header">
                 <div class="header-left">
                     <div class="breadcrumb">
-                        <a href="profile.html#bottom">
-                            <i class="fas fa-bell"></i>
-                            <span class="notification-badge">1</span>
-                        </a>
-                    </div> 
+                        <i class="fas fa-th-large"></i>
+                        <span>Company Dashboard</span>
+                    </div>
                 </div>
                 <div class="header-right">
                     <div class="notification-icon">
@@ -104,7 +102,7 @@
                     <button class="btn-primary" id="addVehicleBtn">
                         <i class="fas fa-plus"></i>
                         Add Vehicle
-                    </button>
+                    </button> 
                 </div>
 
                 <!-- Stats Cards -->
@@ -218,11 +216,12 @@
                         <div class="form-group">
                             <label for="vehicleEngineNumber">Engine number</label>
                             <input type="text" id="vehicleEngineNumber" required>
-                        </div>
+                        </div>                        
                         <div class="form-group">
                             <label for="vehicleMaintenanceStaff">Maintenance Staff</label>
                             <input type="text" id="vehicleMaintenanceStaff" required>
                         </div>
+                        
                         
                         
                     </div>
@@ -231,10 +230,7 @@
                             <label for="vehicleYear">Year</label>
                             <input type="number" id="vehicleYear" min="2000" max="2024" required>
                         </div>
-                        <div class="form-group">
-                            <label for="vehicleDescription">Description</label>
-                            <input type="text" id="vehicleDescription" required>
-                        </div>
+                       
                         
                     </div>
                     <div class="form-row">
@@ -265,10 +261,14 @@
                                 <option value="service">Service Center</option>
                             </select>
                         </div>
+                        <div class="form-group">
+                            <label>Vehicle image Upload</label>
+                            <input type="file" name="vehicleImage" id="vehicleImage" accept=".jpg,.jpeg,.png,.pdf" />
+                        </div>
                     </div>
                     <div class="form-actions">
-                        <button type="button" class="btn-secondary" id="cancelAddVehicle">Cancel</button>
-                        <button type="submit" class="btn-primary">Add Vehicle</button>
+                        <button type="button" class="btn-secondary" id="addAddVehicle">Add Vehicle</button>
+                        
                     </div>
                 </form>
             </div>

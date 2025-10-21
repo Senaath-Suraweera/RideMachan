@@ -5,9 +5,9 @@ class DriverManager {
     this.drivers = [
       { 
         id: "DL2345678",
-        name: "John Smith",
-        initials: "JS",
-        phone: "+1-555-0101",
+        name: "Nimesh Perera",
+        initials: "NP",
+        phone: "+94-555-0101",
         license: "ABC123456",
         area: "Downtown",
         expiry: "2025-06-15",
@@ -25,7 +25,7 @@ class DriverManager {
         id: "DL8765432",
         name: "Sarah Wilson",
         initials: "SW",
-        phone: "+1-555-0102",
+        phone: "+94-555-0102",
         license: "XYZ789012",
         area: "Airport",
         expiry: "2024-12-20",

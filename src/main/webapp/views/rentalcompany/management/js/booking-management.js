@@ -752,15 +752,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
       // Form fields
       const formFields = [
-        { label: "Customer Name", type: "text", id: "customerName" },
-        { label: "Customer Contact", type: "text", id: "customerContact" },
-        { label: "Customer Email", type: "email", id: "customerEmail" },
+        
         { label: "Vehicle", type: "text", id: "vehicle" },
         { label: "Driver", type: "text", id: "driver" },
         { label: "Trip Date", type: "date", id: "tripDate" },
         { label: "Start Time", type: "time", id: "startTime" },
         { label: "End Time", type: "time", id: "endTime" },
-        { label: "Status", type: "select", id: "status", options: ["active","pending","completed","cancelled"] }
+        { label: "Status", type: "select", id: "status", options: ["active","Picked up", "On going","completed","cancelled"] }
       ];
 
       formFields.forEach(f => {

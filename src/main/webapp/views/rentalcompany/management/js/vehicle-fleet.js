@@ -98,7 +98,7 @@ const vehicleFilter = document.getElementById("vehicleFilter")
 const addVehicleBtn = document.getElementById("addVehicleBtn")
 const addVehicleModal = document.getElementById("addVehicleModal")
 const closeAddVehicleModal = document.getElementById("closeAddVehicleModal")
-const cancelAddVehicle = document.getElementById("cancelAddVehicle")
+const addVehiclebtn = document.getElementById("addAddVehicle")
 const addVehicleForm = document.getElementById("addVehicleForm")
 
 // Initialize the page
@@ -121,6 +121,7 @@ function renderVehicles() {
 function createVehicleCard(vehicle) {
   const card = document.createElement("div")
   card.className = "vehicle-card"
+  
 
   const statusClass = vehicle.status.replace("-", "-")
   const conditionClass = vehicle.condition.replace(" ", "-")
@@ -196,6 +197,10 @@ function createVehicleCard(vehicle) {
                     <i class="fas fa-wrench"></i>
                     Maintenance
                 </button>
+                <button class="action-btn secondary" onclick="removeVehicle(${vehicle.id})">
+                    <i class="fa fa-trash"></i>
+                    Remove
+                </button>
                 
             </div>
         </div>
@@ -260,9 +265,43 @@ function setupEventListeners() {
     addVehicleModal.classList.remove("active")
   })
 
-  cancelAddVehicle.addEventListener("click", () => {
-    addVehicleModal.classList.remove("active")
-  })
+addVehiclebtn.addEventListener("click", () => {
+    // Check if all required fields are filled
+    const requiredFields = [
+        "vehiclePlate",
+        "vehicleModel",
+        "vehicleColour",
+        "vehicleSeats",
+        "vehicleEngineCapacity",
+        "vehicleEngineNumber",
+        "vehicleMaintenanceStaff",
+        "vehicleYear",
+        "vehicleDescription",
+        "vehicleType",
+        "vehicleLocation",
+        "vehicleImage"
+    ];
+
+    let allFilled = true;
+
+    requiredFields.forEach(id => {
+        const field = document.getElementById(id);
+        if (!field.value) {
+            allFilled = false;
+            field.style.border = "2px solid red"; // highlight missing fields
+        } else {
+            field.style.border = ""; // reset border if filled
+        }
+    });
+
+    if (!allFilled) {
+        alert("Please fill all required fields before adding the vehicle.");
+        return; // Do not close modal
+    }
+
+    // If all fields are filled, submit the form
+    handleAddVehicle();
+});
 
   // Close modal when clicking outside
   addVehicleModal.addEventListener("click", (e) => {
@@ -344,6 +383,12 @@ function viewVehicleDetails(vehicleId) {
   alert(`Viewing details for ${vehicle.make} ${vehicle.model} (${vehicle.plate})`)
 }
 
+function removeVehicle(vehicleId) {
+  const vehicle = vehicleData.find((v) => v.id === vehicleId)
+  console.log("[v0] Removing vehicle:", vehicle)
+  alert(`Removing vehicle ${vehicle.make} ${vehicle.model} (${vehicle.plate})`)
+}
+ 
 function scheduleVehicle(vehicleId) {
     const vehicle = vehicleData.find(v => v.id === vehicleId);
     if (!vehicle) return;
@@ -541,5 +586,41 @@ function viewVehicleDetails(vehicleId) {
   const vehicle = vehicleData.find(v => v.id === vehicleId)
   if (vehicle) {
     window.location.href = `fleet-calender.html?plate=${encodeURIComponent(vehicle.plate)}`
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Remove vehicle by ID and update grid
+function removeVehicle(vehicleId) {
+  // Confirm deletion
+  const confirmDelete = confirm("Are you sure you want to remove this vehicle?");
+  if (!confirmDelete) return;
+
+  // Remove from vehicleData array
+  const index = vehicleData.findIndex(v => v.id === vehicleId);
+  if (index !== -1) {
+    vehicleData.splice(index, 1);
+  }
+
+  // Also remove from filteredVehicles to keep search/filter consistent
+  filteredVehicles = filteredVehicles.filter(v => v.id !== vehicleId);
+
+  // Remove the card from DOM
+  const vehicleCard = document.querySelector(`.vehicle-card[data-id='${vehicleId}']`);
+  if (vehicleCard) {
+    vehicleCard.remove(); // Removes the card element
   }
 }

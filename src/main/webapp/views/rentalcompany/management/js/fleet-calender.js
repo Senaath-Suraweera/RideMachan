@@ -108,7 +108,7 @@ function updateDailyStats() {
     statCards[1].textContent = stats.maintenance
     statCards[2].textContent = stats.drivers
   }
-} 
+}  
 
 // Action functions
 function addToMaintenance() {
@@ -190,3 +190,65 @@ setInterval(() => {
   loadVehicleSchedule()
 }, 300000)
  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Initialize date picker with current date
+document.addEventListener("DOMContentLoaded", () => {
+    const dateInput = document.getElementById("calendarDate");
+    if (dateInput) {
+        const todayStr = currentDate.toISOString().split("T")[0]; // yyyy-mm-dd
+        dateInput.value = todayStr;
+    }
+    updateDateDisplay()
+    loadVehicleSchedule()
+});
+
+// Go to selected date
+function goToSelectedDate() {
+    const dateInput = document.getElementById("calendarDate");
+    if (dateInput && dateInput.value) {
+        currentDate.setTime(new Date(dateInput.value).getTime());
+        updateDateDisplay();
+        loadVehicleSchedule();
+    }
+}
+
+// Update date display for "current-date" and "Today"
+function updateDateDisplay() {
+    const monthNames = [
+        "January","February","March","April","May","June",
+        "July","August","September","October","November","December"
+    ];
+
+    const currentDateElement = document.querySelector(".current-date");
+    const todayInfo = document.getElementById("todayInfo");
+    const dateStr = `${monthNames[currentDate.getMonth()]} ${currentDate.getDate()}, ${currentDate.getFullYear()}`;
+
+    if (currentDateElement) currentDateElement.textContent = dateStr;
+    if (todayInfo) todayInfo.textContent = `Today: ${dateStr}`;
+
+    // Update the date picker input value to match
+    const dateInput = document.getElementById("calendarDate");
+    if (dateInput) dateInput.value = currentDate.toISOString().split("T")[0];
+}

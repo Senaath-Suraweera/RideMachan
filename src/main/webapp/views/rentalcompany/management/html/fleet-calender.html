@@ -15,7 +15,7 @@
         <aside class="sidebar">
             <div class="logo-section">
                 <img src="../assets/ridemachan-logo.png" alt="RideMachan Logo" class="logo">
-            </div>
+            </div> 
             
             <nav class="nav-menu">
                 <ul>
@@ -112,26 +112,16 @@
 
                 <!-- Calendar Controls -->
                 <div class="calendar-controls">
-                    <div class="date-navigation">
-                        <button class="nav-btn" onclick="previousMonth()">
-                            <i class="fas fa-chevron-left"></i>
-                        </button>
-                        <span class="current-date">December 2023</span>
-                        <button class="nav-btn" onclick="nextMonth()">
-                            <i class="fas fa-chevron-right"></i>
-                        </button>
+                    <div class="date-selection">
+                        <label for="calendarDate">Select Date:</label>
+                        <input type="date" id="calendarDate" value="2023-12-20">                        
                     </div>
-                    <div class="view-selector">
-                        <select id="viewType" onchange="changeView()">
-                            <option value="daily">Daily</option>
-                            <option value="weekly">Weekly</option>
-                            <option value="monthly">Monthly</option>
-                        </select>
-                    </div>
+                    
                     <div class="date-info">
-                        <span>Today: December 20, 2023</span>
+                        <span id="todayInfo">Today: August 30, 2025</span>
                     </div>
                 </div>
+
 
                 <!-- Vehicle Selector 
                 <div class="vehicle-selector">

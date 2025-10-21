@@ -60,7 +60,7 @@
 
 .btn-secondary {
   background: linear-gradient(135deg, #3a0ca3, #4361ee);
-  color: var(--secondary-foreground, #374151);
+  color: white;
 }
 
 .btn-secondary:hover {

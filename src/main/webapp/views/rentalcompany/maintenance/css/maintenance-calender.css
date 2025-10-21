@@ -35,7 +35,7 @@
 
 .btn-primary {
   background: linear-gradient(135deg, #3a0ca3, #4361ee);
-  color: var(--primary-foreground);
+  color: white;
 }
 
 .btn-primary:hover {
@@ -581,3 +581,43 @@
   color: #155724;
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+.btn-umaintenance button {
+    background: linear-gradient(135deg, #3a0ca3, #4361ee); /* Orange gradient */
+    color: #fff;
+    font-weight: 600;
+    padding: 10px 20px;
+    margin-top: 10px;
+    margin-left: 20px;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 1em;
+    display: flex;
+    align-items: center;
+    gap: 8px; /* space between icon and text */
+    box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+    transition: all 0.3s ease;
+}
+
+.btn-umaintenance button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+    background-color: #08b154; /* slightly darker on hover */
+}
+
+.btn-umaintenance button:active {
+    transform: translateY(0);
+    box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+}

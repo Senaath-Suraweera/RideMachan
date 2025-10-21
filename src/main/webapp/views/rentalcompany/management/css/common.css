@@ -8,7 +8,7 @@
 
 body {
   font-family: "Poppins", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background-color: white;
   color: #334155;
   min-height: 100vh;
 }
@@ -202,8 +202,8 @@ body {
 .breadcrumb {
   display: flex;
   align-items: center;
-  color: rgba(255, 255, 255, 0.9);
-  font-size: 14px;
+  color: rgba(0, 0, 0, 0.9);
+  font-size: 16px;
   font-weight: 500;
 }
 
@@ -224,7 +224,10 @@ body {
   transition: transform 0.3s ease;
 }
 
-.notification-icon:hover {
+.notification-icon a a i{
+  background-color: #718096;  
+}
+.notification-icon:hover a a i{
   transform: scale(1.1);
 }
 
@@ -274,3 +277,28 @@ body {
   
 }
  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+@media (max-width: 968px) {
+  .main-content{
+    margin-left: -1px;
+    border: 1px solid red;
+  }
+  .sidebar{
+    display: none;
+  }
+}

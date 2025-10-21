@@ -218,3 +218,204 @@ document.addEventListener("DOMContentLoaded", () => {
 
     scheduleBtn.addEventListener("click", openPopup);
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+document.addEventListener("DOMContentLoaded", () => {
+    const vehicleReport = document.getElementById("vehicleReportAlert");
+    if (!vehicleReport) return;
+
+    vehicleReport.addEventListener("click", () => {
+        openVehiclePopup();
+    });
+
+    function openVehiclePopup() {
+        // Overlay
+        const overlay = document.createElement("div");
+        overlay.style.cssText = `
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            display: flex; align-items: center; justify-content: center;
+            z-index: 3000;
+        `;
+
+        // Popup box
+        const popup = document.createElement("div");
+        popup.style.cssText = `
+            background: #fff; padding: 30px;
+            border-radius: 12px; width: 450px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            font-family: 'Poppins', sans-serif;
+            position: relative;
+            animation: fadeIn 0.3s ease-in-out;
+        `;
+
+        // Close button (×)
+        const closeBtn = document.createElement("span");
+        closeBtn.innerHTML = "&times;";
+        closeBtn.style.cssText = `
+            position: absolute; top: 12px; right: 18px;
+            font-size: 26px; color: #666; cursor: pointer;
+            transition: 0.2s;
+        `;
+        closeBtn.onmouseover = () => (closeBtn.style.color = "#000");
+        closeBtn.onmouseout = () => (closeBtn.style.color = "#666");
+        closeBtn.onclick = () => document.body.removeChild(overlay);
+
+        // Title
+        const title = document.createElement("h2");
+        title.textContent = "Vehicle DEF-789 Condition Report";
+        title.style.cssText = `
+            margin-bottom: 20px; color: #333;
+            font-size: 1.4em; text-align: center;
+        `;
+
+        // Input section
+        const fields = [
+            { label: "Category of Issue", value: "Engine Overheating" },
+            { label: "Location of Issue", value: "Downtown Mall" },
+            { label: "Related Booking ID", value: "#BK-2345" },
+            { label: "Vehicle Plate Number", value: "DEF-789" },
+        ];
+
+        const formContainer = document.createElement("div");
+        formContainer.style.cssText = `
+            display: flex; flex-direction: column; gap: 15px;
+            margin-bottom: 20px;
+        `;
+
+        fields.forEach(f => {
+            const wrapper = document.createElement("div");
+            wrapper.style.cssText = "display: flex; flex-direction: column;";
+
+            const label = document.createElement("label");
+            label.textContent = f.label;
+            label.style.cssText = "font-weight: 500; color: #444; margin-bottom: 5px;";
+
+            const input = document.createElement("input");
+            input.value = f.value;
+            input.readOnly = true;
+            input.style.cssText = `
+                padding: 8px 10px; border: 1px solid #ccc;
+                border-radius: 6px; background: #f9f9f9; color: #333;
+            `;
+
+            wrapper.appendChild(label);
+            wrapper.appendChild(input);
+            formContainer.appendChild(wrapper);
+        });
+
+        // Description (textarea)
+        const descWrapper = document.createElement("div");
+        const descLabel = document.createElement("label");
+        descLabel.textContent = "Description";
+        descLabel.style.cssText = "font-weight: 500; color: #444; margin-bottom: 5px;";
+        const descArea = document.createElement("textarea");
+        descArea.readOnly = true;
+        descArea.value = "Driver reported engine overheating with temperature gauge in red. Vehicle parked at Downtown Mall awaiting inspection.";
+        descArea.style.cssText = `
+            width: 100%; height: 80px; resize: none;
+            padding: 8px 10px; border: 1px solid #ccc;
+            border-radius: 6px; background: #f9f9f9; color: #333;
+        `;
+        descWrapper.appendChild(descLabel);
+        descWrapper.appendChild(descArea);
+
+        formContainer.appendChild(descWrapper);
+
+        // Download Image Button
+        const downloadBtn = document.createElement("button");
+        downloadBtn.textContent = "Download Issue Image";
+        downloadBtn.style.cssText = `
+            background: #2196F3; color: #fff; border: none;
+            padding: 10px 16px; border-radius: 6px;
+            cursor: pointer; font-size: 0.95em;
+            width: 100%; margin-bottom: 20px;
+        `;
+        downloadBtn.onclick = () => {
+            const link = document.createElement("a");
+            link.href = "images/engine-issue.jpg"; // <-- replace with your image path
+            link.download = "vehicle-DEF-789-issue.jpg";
+            link.click();
+        };
+
+        // Buttons container
+        const btnContainer = document.createElement("div");
+        btnContainer.style.cssText = "display: flex; justify-content: center; gap: 10px;";
+
+        // View Calendar
+        const viewBtn = document.createElement("button");
+        viewBtn.textContent = "Go to Maintenance Calendar";
+        viewBtn.style.cssText = `
+            background: #4CAF50; color: #fff;
+            border: none; padding: 10px 20px;
+            border-radius: 6px; cursor: pointer;
+            font-size: 0.95em;
+        `;
+        viewBtn.onclick = () => window.open("../html/maintenance-calender - ABC-1234.html", "_blank");
+
+        // Cancel
+        const cancelBtn = document.createElement("button");
+        cancelBtn.textContent = "Close";
+        cancelBtn.style.cssText = `
+            background: #f44336; color: #fff;
+            border: none; padding: 10px 20px;
+            border-radius: 6px; cursor: pointer;
+            font-size: 0.95em;
+        `;
+        cancelBtn.onclick = () => document.body.removeChild(overlay);
+
+        btnContainer.appendChild(viewBtn);
+        btnContainer.appendChild(cancelBtn);
+
+        // Combine everything
+        popup.appendChild(closeBtn);
+        popup.appendChild(title);
+        popup.appendChild(formContainer);
+        popup.appendChild(downloadBtn);
+        popup.appendChild(btnContainer);
+
+        overlay.appendChild(popup);
+        document.body.appendChild(overlay);
+
+        // Close when clicking outside
+        overlay.addEventListener("click", (e) => {
+            if (e.target === overlay) document.body.removeChild(overlay);
+        });
+    }
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+const btn = document.getElementsByClassName('btn-secondary')[0];
+btn.onclick = () => alert('All marked as read!');
+
