@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maintenance Logs - Car Rental System</title>
+
+    <link rel="stylesheet" href="../css/maintenance-fleet.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="dashboard-container">
+             <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo-section">
+                <img src="../assets/ridemachan-logo.png" alt="RideMachan Logo" class="logo">
+            </div>
+            
+            <nav class="nav-menu">
+                <ul>
+                    <li class="nav-item">
+                        <a href="homepage.html" class="nav-link">
+                            <i class="fas fa-home"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <!--<li class="nav-item">
+                        <a href="vehicle-fleet.html" class="nav-link">
+                            <i class="fas fa-building"></i>
+                            <span>Entity Registration</span>
+                        </a>
+                    </li>-->
+                    <li class="nav-item">
+                        <a href="booking-management.html" class="nav-link">
+                            <i class="fas fa-box"></i>
+                            <span>Bookings</span>
+                        </a>
+                    </li>
+                    <li class="nav-item active">
+                        <a href="vehicle-fleet.html" class="nav-link">
+                            <i class="fas fa-car"></i>
+                            <span>Vehicle Fleet</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="maintenance-staff.html" class="nav-link">
+                            <i class="fas fa-tools"></i>
+                            <span>Maintenance Staff</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="driver-management.html" class="nav-link">
+                            <i class="fas fa-users"></i>
+                            <span>Drivers</span>
+                        </a>
+                    </li>                                                      
+                                         
+                </ul>
+            </nav>
+            
+            <div class="logout-section">
+                <a href="#" class="nav-link">
+                    <i class="fas fa-sign-out"></i>
+                    <span>Logout</span>
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            
+            <!-- Header -->
+            <header class="header">
+                <div class="header-left">
+                    <div class="breadcrumb">
+                        <i class="fas fa-th-large"></i>
+                        <span>Company Dashboard</span>
+                    </div>
+                </div>
+                <div class="header-right">
+                    <div class="notification-icon">
+                        <a href="notification.html">
+                            <i class="fas fa-bell"></i>
+                            <span class="notification-badge">1</span>
+                        </a>
+                    </div>
+                    <div class="user-profile">
+                        <div class="user-avatar">A</div>
+                        <span class="user-name">ABC Rentals</span>
+                    </div>
+                </div>
+            </header> 
+
+            <div class="page-header">
+                    <div class="page-title-section">
+                        <button class="back-btn" onclick="history.back()">
+                            <i class="fas fa-arrow-left"></i>
+                        </button>
+                        <div class="page-title-content">
+                            <h1>Maintenance Logs</h1>
+                            <p>ABC (pvt) Ltd - Vehicle maintenance history</p>
+                        </div>
+                    </div>
+                    <!--<div class="page-actions">
+                        <button class="btn-secondary" onclick="addToMaintenance()">
+                            <i class="fas fa-plus"></i>
+                            View Legal Documents
+                        </button>
+                     </div>-->
+            </div>
+
+            <!-- Vehicle Selection 
+            <div class="vehicle-selection">
+                <div class="vehicle-selector">
+                    <select id="vehicleSelect" class="form-select">
+                        <option value="WP CAB 2156">WP CAB 2156</option>
+                        <option value="ABC 123">ABC 123</option>
+                        <option value="XYZ 789">XYZ 789</option>
+                    </select>
+                </div>
+                <div class="selection-actions">
+                    <select class="form-select filter-select">
+                        <option value="all">All</option>
+                        <option value="completed">Completed</option>
+                        <option value="pending">Pending</option>
+                        <option value="overdue">Overdue</option>
+                    </select>
+                    <button class="btn btn-primary search-btn">
+                        <i class="fas fa-search"></i>
+                        Search vehicle
+                    </button>
+                </div>
+            </div>-->
+
+            <!-- Content Grid -->
+            <div class="content-grid">
+                <!-- Vehicle Details Card -->
+                <div class="vehicle-details-card">
+                    <div class="vehicle-image">
+                        <i class="fas fa-car vehicle-icon"></i>
+                    </div>
+                    <div class="vehicle-info">
+                        <h3>Toyota Prius 2020</h3>
+                        <div class="status-badge status-under-service">Under Service</div>
+                        
+                        <div class="vehicle-stats">
+                            <div class="stat-item">
+                                <span class="stat-label">Status:</span>
+                                <span class="stat-value status-maintenance">undermaintenance/NA</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Last Service:</span>
+                                <span class="stat-value">2023-12-15</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Next Service:</span>
+                                <span class="stat-value">2024-03-15</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Insurance Expiry:</span>
+                                <span class="stat-value">2024-05-11</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">EmissionTest:</span>
+                                <span class="stat-value status-passed">overdue/passed</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Model:</span>
+                                <span class="stat-value">Toyota Prius 2020</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Maintenance Records -->
+                <div class="maintenance-records">
+                    <div class="section-header">
+                        <i class="fas fa-wrench"></i>
+                        <h3>Previous maintenance Records</h3>
+                    </div>
+                    
+                    <div class="records-table">
+                        <div class="table-header">
+                            <div class="col-date">Date</div>
+                            <div class="col-service">Service</div>
+                            <div class="col-description">Description</div>
+                            <div class="col-action">Action</div>
+                        </div>
+                        
+                        <div class="table-body">
+                            <div class="table-row">
+                                <div class="col-date">
+                                    <div class="date">2023-12-15</div>
+                                    <div class="id">ID: MR001</div>
+                                </div>
+                                <div class="col-service">
+                                    <div class="service-name">Oil change</div>
+                                    <div class="service-cost">$95</div>
+                                </div>
+                                <div class="col-description">
+                                    <div class="description">Regular oil change and filter replacement</div>
+                                    <div class="mileage">Mileage: 45,230 km</div>
+                                </div>
+                                <div class="col-action">
+                                    <span class="status-badge status-completed">Completed</span>
+                                </div>
+                            </div>
+                            
+                            <div class="table-row">
+                                <div class="col-date">
+                                    <div class="date">2023-11-20</div>
+                                    <div class="id">ID: MR002</div>
+                                </div>
+                                <div class="col-service">
+                                    <div class="service-name">Brake check</div>
+                                    <div class="service-cost">$180</div>
+                                </div>
+                                <div class="col-description">
+                                    <div class="description">Brake inspection and pad replacement</div>
+                                    <div class="mileage">Mileage: 44,800 km</div>
+                                </div>
+                                <div class="col-action">
+                                    <span class="status-badge status-completed">Completed</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Access -->
+            <div class="quick-access-section">
+                <div class="section-header">
+                    <i class="fas fa-file-alt"></i>
+                    <h3>Quick Access</h3>
+                </div>
+                
+                <div class="quick-access-grid">
+                    <div class="access-card">
+                        <div class="access-icon">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <div class="access-info">
+                            <h4>Insurance Documents</h4>
+                            <p>Valid till 2024-05-11</p>
+                        </div>
+                    </div>
+                    
+                    <div class="access-card">
+                        <div class="access-icon">
+                            <i class="fas fa-certificate"></i>
+                        </div>
+                        <div class="access-info">
+                            <h4>Emission Certificate</h4>
+                            <p>Valid till 2025-06-15</p>
+                        </div>
+                    </div>
+                    
+                    <div class="access-card">
+                        <div class="access-icon">
+                            <i class="fas fa-id-card"></i>
+                        </div>
+                        <div class="access-info">
+                            <h4>Registration Certificate</h4>
+                            <p>Valid till 2025-09-11</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Vehicle Information 
+            <div class="vehicle-info-section">
+                <div class="warning-icon">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <h3>Vehicle Information</h3>
+                <p>If we enter no of vehicle and the vehicle is not found on the system under this company, then this should be there instead of 1st one</p>
+                
+                <div class="search-form">
+                    <input type="text" placeholder="Enter Vehicle Registration no:" class="form-input">
+                    <select class="form-select">
+                        <option>Type</option>
+                        <option>Car</option>
+                        <option>Van</option>
+                        <option>Truck</option>
+                    </select>
+                    <button class="btn btn-primary">
+                        <i class="fas fa-search"></i>
+                        Search vehicle
+                    </button>
+                </div>
+                
+                <div class="error-message">
+                    <i class="fas fa-times-circle"></i>
+                    Vehicle not found in fleet or no legal documents available.
+                </div>
+                
+                <button class="btn btn-outline go-back-btn">Go to Back</button>
+            </div>-->
+        </main>
+    </div>
+
+    <script src="../js/maintenance-fleet.js"></script>
+    <script src="../js/sidebar.js"></script>
+</body>
+</html>

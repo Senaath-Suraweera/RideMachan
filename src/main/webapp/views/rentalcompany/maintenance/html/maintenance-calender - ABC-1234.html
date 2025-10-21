@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maintenance Calendar - Ride Machan</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/maintenance-calender.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+</head>
+<body>
+
+ 
+
+
+
+    <div class="dashboard-container">
+
+<!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo-section">
+                <img src="../assets/ridemachan-logo.png" alt="RideMachan Logo" class="logo">
+            </div>
+            
+            <nav class="nav-menu">
+                <ul>
+                    <h3>Main Navigation</h3>
+
+                    <li class="nav-item">
+                        <a href="dashboard.html" class="nav-link">
+                            <i class="fas fa-tachometer-alt"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a href="inspection.html" class="nav-link">
+                            <i class="fas fa-tools"></i>
+                            <span>Maintenance Logs</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="vehiclerecords.html" class="nav-link">
+                            <i class="fas fa-file"></i> 
+                            <span>Vehicle Records</span>
+                        </a>
+                    </li>
+                    <li class="nav-item active">
+                        <a href="maintenance-calender.html" class="nav-link">
+                            <i class="fas fa-calendar"></i>
+                            <span>Calendar</span>
+                        </a>
+                    </li>
+                    
+
+                </ul>
+            </nav>
+            
+            <div class="logout-section">
+                <a href="#" class="nav-link">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </a>
+            </div>
+        </aside>
+            
+               
+
+        <!-- Main Content -->
+        <div class="main-content main">
+            <!-- Header -->
+            <header class="header own">
+                    <div class="search-bar">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Search vehicles, maintenance records..." id="searchInput">
+                </div>
+
+                <div class="header-actions">
+                    <div class="notification">
+                        <a href="notification.html" class="notification">
+                            <i class="fas fa-bell"></i>
+                            <div class="badge">3</div>
+                        </a>
+                    </div>
+                    <div class="user-profile" onclick="toggleUserMenu()">
+                        <div class="profile-img">MS</div>
+                        <div class="user-info">
+                            <div class="user-name">Mr. Sivajan</div>
+                            <div class="user-role">Maintenance Staff</div>
+                        </div>
+                    </div>
+                </div>
+            </header>  
+ 
+            <!-- Page Content -->
+            <div class="page-content">                
+                <div class="page-header">
+                    <h1>Maintenance Calendar</h1>
+                    <div class="page-actions">
+                        <button id="openScheduleBtn" class="btn btn-primary">
+                            <i class="fas fa-plus"></i> Schedule Maintenance
+                        </button>
+                    </div>                 
+                </div> 
+                
+                <div class="calendar-container" >
+                    <!-- Left Side - Calendar -->
+                    <div class="calendar-section">
+                        <div class="calendar-card">
+                            <div class="calendar-header">
+                                <h2>Maintenance Schedule</h2>
+                                <p>View and manage your maintenance appointments</p>
+                            </div>
+                            
+                            <div class="calendar-widget">
+                                <div class="calendar-nav">
+                                    <button class="nav-btn">‹</button>
+                                    <h3 class="current-month">July 2025</h3>
+                                    <button class="nav-btn">›</button>
+                                </div>
+                                
+                                <div class="calendar-grid">
+                                    <div class="calendar-days-header">
+                                        <div class="day-header">Su</div>
+                                        <div class="day-header">Mo</div>
+                                        <div class="day-header">Tu</div>
+                                        <div class="day-header">We</div>
+                                        <div class="day-header">Th</div>
+                                        <div class="day-header">Fr</div>
+                                        <div class="day-header">Sa</div>
+                                    </div>
+                                    
+                                    <div class="calendar-dates">
+                                        <div class="date-cell prev-month">29</div>
+                                        <div class="date-cell prev-month">30</div>
+                                        <div class="date-cell">1</div>
+                                        <div class="date-cell">2</div>
+                                        <div class="date-cell">3</div>
+                                        <div class="date-cell">4</div>
+                                        <div class="date-cell">5</div>
+                                        <div class="date-cell">6</div>
+                                        <div class="date-cell">7</div>
+                                        <div class="date-cell">8</div>
+                                        <div class="date-cell">9</div>
+                                        <div class="date-cell">10</div>
+                                        <div class="date-cell">11</div>
+                                        <div class="date-cell">12</div>
+                                        <div class="date-cell">13</div>
+                                        <div class="date-cell">14</div>
+                                        <div class="date-cell">15</div>
+                                        <div class="date-cell">16</div>
+                                        <div class="date-cell">17</div>
+                                        <div class="date-cell">18</div>
+                                        <div class="date-cell">19</div>
+                                        <div class="date-cell">20</div>
+                                        <div class="date-cell">21</div>
+                                        <div class="date-cell">22</div>
+                                        <div class="date-cell">23</div>
+                                        <div class="date-cell">24</div>
+                                        <div class="date-cell">25</div>
+                                        <div class="date-cell">26</div>
+                                        <div class="date-cell">27</div>
+                                        <div class="date-cell">28</div>
+                                        <div class="date-cell">29</div>
+                                        <div class="date-cell current-day">30</div>
+                                        <div class="date-cell">31</div>
+                                        <div class="date-cell next-month">1</div>
+                                        <div class="date-cell next-month">2</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Scheduled Appointments -->
+                        <div class="scheduled-section">
+                            <h3>Bookings Times for July 30, 2025</h3>                            
+                            
+                            <div class="appointment-list">
+                                <div class="appointment-item">
+                                    <div class="appointment-time">
+                                        <span class="time">09:00am-11.00am</span>
+                                    </div>
+                                    <div class="appointment-details">
+                                        <div class="vehicle-info">
+                                            <span class="vehicle-icon">🚗</span>
+                                            <span class="vehicle-id">ABC-1234</span>
+                                        </div>                                        
+                                    </div>
+                                    <div class="appointment-actions">
+                                        <span class="status-badge scheduled">Scheduled</span>                                                                           
+                                    </div>
+                                </div>
+                                
+                                <div class="appointment-item">
+                                    <div class="appointment-time">
+                                        <span class="time">14:00-15.00</span>                                        
+                                    </div>
+                                    <div class="appointment-details">
+                                        <div class="vehicle-info">
+                                            <span class="vehicle-icon">🚗</span>
+                                            <span class="vehicle-id">ABC-1234</span>
+                                        </div>                                        
+                                    </div>
+                                    <div class="appointment-actions">
+                                        <span class="status-badge scheduled">Scheduled</span>   
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- Right Side - Today's Overview+veh info -->
+
+                    <!-- Vehicle Info -->
+                    <div class="vehicle-infor">
+                        <div class="vehicle-card">
+                            <div class="vehicle-image">
+                            <i class="fas fa-car"></i>
+                            </div>
+                            <div class="vehicle-details">
+                            <h3>Toyota Prius 2020</h3>
+                            <h5>ABC-123</h5>
+                            <div class="vehicle-status">
+                                <span class="status-label">Current Status:</span>
+                                <span class="status-badge available">Active</span>
+                            </div>
+                            <div onclick="markUndermaintenace()" class="btn-umaintenance">
+                                <button id="undermaintenanceBtn">Mark as Under Maintenance</button>
+                            </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="overview-section">
+                        <div class="overview-card" id="todayOverview">
+                            <h2>Today's Overview</h2>
+                            <p>Your maintenance schedule for today</p>
+                            
+                            <div class="stats-grid">
+                                <div class="stat-item">
+                                    <span class="stat-number">3</span>
+                                    <span class="stat-label">Scheduled</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-number">1</span>
+                                    <span class="stat-label">In Progress</span>
+                                </div>
+                            </div> 
+                            
+                            <div class="next-appointment">
+                                <h4>Next Appointment</h4>
+                                <div class="appointment-preview">
+                                    <div class="appointment-time-preview">
+                                        <span class="time-icon">🕘</span>
+                                        <span class="time-text">09:00 AM</span>
+                                        <span class="status-badge scheduled">Scheduled</span>
+                                    </div>
+                                    <div class="appointment-info">
+                                        <span class="vehicle-text">ABC-1234 - Oil Change</span>
+                                        <span class="bay-text">Bay 1</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+
+            </div>
+        </div>
+    </div>
+
+   
+
+
+
+<script src="../js/maintenance-calender-ABC-1234.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,143 @@
+@import url("common.css");
+
+.page-content{
+    padding-left: 20px;
+    padding-right: 20px;
+}
+
+
+/* Added maintenance staff specific styling */
+/* Staff Information Section */
+.staff-info-section {
+  margin-bottom: 40px;
+}
+
+.staff-card {
+  background: white;
+  border-radius: 16px;
+  padding: 32px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e2e8f0;
+  display: flex;
+  gap: 32px;
+}
+
+.staff-avatar-large {
+  width: 120px;
+  height: 120px;
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 36px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.staff-details {
+  flex: 1;
+}
+
+.staff-main {
+  margin-bottom: 24px;
+}
+
+.staff-main h3 {
+  font-size: 28px;
+  font-weight: 700;
+  color: #0f172a;
+  margin-bottom: 4px;
+}
+
+.staff-id {
+  color: #64748b;
+  font-size: 14px;
+  margin-bottom: 12px;
+  display: block;
+}
+
+.staff-department {
+  display: flex;
+  gap: 8px;
+}
+
+.staff-department .badge {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+/* Added job performance and equipment sections */
+.job-performance {
+  margin-top: 32px;
+  padding: 24px;
+  background: #f8fafc;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+}
+
+.job-performance h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #0f172a;
+  margin-bottom: 16px;
+}
+
+.job-performance p {
+  font-size: 14px;
+  color: #475569;
+  margin-bottom: 8px;
+}
+
+.job-performance p strong {
+  color: #0f172a;
+  font-weight: 600;
+}
+
+.equipment-section {
+  margin-top: 24px;
+  padding: 24px;
+  background: #f0fdf4;
+  border-radius: 12px;
+  border: 1px solid #dcfce7;
+}
+
+.equipment-section h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #0f172a;
+  margin-bottom: 16px;
+}
+
+.equipment-section ul {
+  list-style: none;
+  padding: 0;
+}
+
+.equipment-section li {
+  font-size: 14px;
+  color: #475569;
+  margin-bottom: 8px;
+  padding: 8px 12px;
+  background: white;
+  border-radius: 6px;
+  border: 1px solid #e2e8f0;
+}
+
+/* Updated header styles for maintenance staff */
+.page-header {
+  margin-bottom: 32px;
+}
+
+.page-title-section h1 {
+  font-size: 32px;
+  font-weight: 700;
+  color: #0f172a;
+  margin-bottom: 4px;
+}
+
+.page-subtitle {
+  color: #64748b;
+  font-size: 16px;
+}
