@@ -14,7 +14,16 @@
 
     <main class="main-content">
       <header class="page-header">
-        <h1 class="page-title">Individual Renter</h1>
+        <div
+          class="header-actions"
+          style="display: flex; align-items: center; gap: 12px"
+        >
+          <h1 class="page-title" style="flex: 1">Individual Renter</h1>
+          <button id="backToRentersBtn" class="btn btn-secondary">
+            ← Back to Individual Renters
+          </button>
+          <button id="banUserBtn" class="btn btn-danger">Ban User</button>
+        </div>
       </header>
 
       <section id="renterProfile" class="card"></section>

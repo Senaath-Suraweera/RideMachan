@@ -297,5 +297,11 @@
       closeVehicleModal();
       if (v) openVehicleForm("edit", v);
     });
+
+    document
+      .getElementById("backToRentersBtn")
+      ?.addEventListener("click", () => {
+        window.location.href = "individual-renters.html";
+      });
   });
 })();

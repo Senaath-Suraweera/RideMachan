@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ride Machan - Vehicle Records</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/dashboard.css">
+</head>
+<body> 
+    <div class="container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo-section">
+                <img src="../assets/ridemachan-logo.png" alt="RideMachan Logo" class="logo">
+            </div>
+             
+            <nav class="nav-menu">
+                <ul>
+                    <h3>Main Navigation</h3>
+
+                    <li class="nav-item active">
+                        <a href="dashboard.html" class="nav-link">
+                            <i class="fas fa-tachometer-alt"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a href="inspection.html" class="nav-link">
+                            <i class="fas fa-tools"></i>
+                            <span>Maintenance Logs</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="vehiclerecords.html" class="nav-link">
+                            <i class="fas fa-file"></i> 
+                            <span>Vehicle Records</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="maintenance-calender.html" class="nav-link">
+                            <i class="fas fa-calendar"></i>
+                            <span>Calendar</span>
+                        </a>
+                    </li>
+                    
+
+                </ul>
+            </nav>
+            
+            <div class="logout-section">
+                <a href="#" class="nav-link">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </a>
+            </div>
+        </aside>
+
+        <!-- Header -->
+        <div class="header">
+            <div class="search-bar">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="Search vehicles, maintenance records..." id="searchInput">
+            </div>
+
+            <div class="header-actions">
+                <a href="notification.html" class="notification">
+                    <i class="fas fa-bell"></i>
+                    <div class="badge">3</div>
+                </a>
+                <div class="user-profile" onclick="toggleUserMenu()">
+                    <div class="profile-img">MS</div>
+                    <div class="user-info">
+                        <div class="user-name">Mr. Sivajan</div>
+                        <div class="user-role">Maintenance Staff</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===================
+                 Main Content Area
+        =================== -->
+        <div class="main-content">
+            
+            <!-- Page Title & Actions -->
+            <div class="page-title">
+                <div class="title">Dashboard</div>
+            </div>
+
+            <!-- Stats Cards -->
+            <div class="stats-cards">
+                <!-- Total Vehicles Serviced Card -->
+                <div class="stat-card">
+                    <div class="card-header">
+                        <div>
+                            <div class="card-value">87</div>
+                            <div class="card-label">Total Vehicles Serviced</div>
+                        </div>
+                        <div class="card-icon purple">
+                            <i class="fas fa-car"></i>
+                        </div>
+                    </div>
+                    <div class="card-change positive">
+                        <i class="fas fa-arrow-up"></i>
+                        <span>+23% from last month</span>
+                    </div>
+                </div>
+
+                <!-- Last Week Jobs Card -->
+                <div class="stat-card">
+                    <div class="card-header">
+                        <div>
+                            <div class="card-value">5</div>
+                            <div class="card-label">Last Week Jobs</div>
+                        </div>
+                        <div class="card-icon blue">
+                            <i class="fas fa-calendar-check"></i>
+                        </div>
+                    </div>
+                    <div class="card-change positive">
+                        <span>Jobs completed</span>
+                    </div>
+                </div>
+
+                <!-- Linked Vehicles Card -->
+                <div class="stat-card">
+                    <div class="card-header">
+                        <div>
+                            <div class="card-value">6</div>
+                            <div class="card-label">Linked Vehicles</div>
+                        </div>
+                        <div class="card-icon green">
+                            <i class="fas fa-car-side"></i>
+                        </div>
+                    </div>
+                    <div class="card-change">
+                        <span>Under management</span>
+                    </div>
+                </div>
+
+                <!-- Pending Maintenance Card -->
+                <div class="stat-card">
+                    <div class="card-header">
+                        <div>
+                            <div class="card-value">2</div>
+                            <div class="card-label">Pending Maintenance</div>
+                        </div>
+                        <div class="card-icon orange">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                    </div>
+                    <div class="card-change">
+                        <span>Require attention</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Maintenance Types Distribution -->
+                <div class="content-card distribution-card">
+                    <div class="card-header">
+                        <h3 class="card-title">Maintenance Types Distribution</h3>
+                        <p class="card-subtitle">Breakdown of maintenance activities</p>
+                    </div>
+                    <div class="distribution-list">
+                        <div class="distribution-item">
+                            <div class="distribution-info">
+                                <span class="distribution-label">Oil Changes</span>
+                                <span class="distribution-percentage">35%</span>
+                            </div>
+                            <div class="distribution-bar">
+                                <div class="distribution-fill" data-type="oil" style="width: 35%"></div>
+                            </div>
+                        </div>
+                        <div class="distribution-item">
+                            <div class="distribution-info">
+                                <span class="distribution-label">Brake Services</span>
+                                <span class="distribution-percentage">28%</span>
+                            </div>
+                            <div class="distribution-bar">
+                                <div class="distribution-fill" data-type="brake" style="width: 28%"></div>
+                            </div>
+                        </div>
+                        <div class="distribution-item">
+                            <div class="distribution-info">
+                                <span class="distribution-label">Tire Services</span>
+                                <span class="distribution-percentage">22%</span>
+                            </div>
+                            <div class="distribution-bar">
+                                <div class="distribution-fill" data-type="tire" style="width: 22%"></div>
+                            </div>
+                        </div>
+                        <div class="distribution-item">
+                            <div class="distribution-info">
+                                <span class="distribution-label">Engine Services</span>
+                                <span class="distribution-percentage">15%</span>
+                            </div>
+                            <div class="distribution-bar">
+                                <div class="distribution-fill" data-type="engine" style="width: 15%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+
+
+            <!-- ===================
+                     Recent Activity Section
+            =================== -->
+            <div class="task-sections">
+                <div class="recent-activity">
+                    <h3>Recent Maintenance</h3>
+                    <div class="activity-list">
+                        <div class="activity-item">
+                            <div class="activity-icon success"></div>
+                            <div class="activity-content">
+                                <div class="activity-title">Oil Change - Vehicle ABC-1234</div>
+                                <div class="activity-description">Completed 2 hours ago</div>
+                            </div>
+                            <div class="activity-time">Completed</div>
+                        </div>
+
+                        <div class="activity-item">
+                            <div class="activity-icon success"></div>
+                            <div class="activity-content">
+                                <div class="activity-title">Brake Check - Vehicle XYZ-5678</div>
+                                <div class="activity-description">Completed yesterday</div>
+                            </div>
+                            <div class="activity-time">Completed</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="recent-activity">
+                    <h3>Upcoming Tasks</h3>
+                    <div class="activity-list">
+                        <div class="activity-item">
+                            <div class="activity-icon warning"></div>
+                            <div class="activity-content">
+                                <div class="activity-title">Tire Rotation - Vehicle DEF-9012</div>
+                                <div class="activity-description">Due tomorrow</div>
+                            </div>
+                            <div class="activity-time">Pending</div>
+                        </div>
+
+                        <div class="activity-item">
+                            <div class="activity-icon info"></div>
+                            <div class="activity-content">
+                                <div class="activity-title">Engine Service - Vehicle GHI-3456</div>
+                                <div class="activity-description">Due in 3 days</div>
+                            </div>
+                            <div class="activity-time">Scheduled</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+           <!-- Fleet Health Status -->
+            <div class="content-card">
+                <div class="card-header">
+                    <h3 class="card-title">Fleet Health Status</h3>
+                    <p class="card-subtitle">Overall condition of your vehicle fleet</p>
+                </div>
+                <div class="card-content">
+                    <div class="health-item">
+                        <div class="health-info">
+                            <div class="health-indicator excellent"></div>
+                            <span class="health-label">Excellent Condition</span>
+                        </div>
+                        <div class="health-progress">
+                            <div class="progress-bar">
+                                <div class="progress-fill excellent" style="width: 63%"></div>
+                            </div>
+                            <span class="health-count">156 vehicles</span>
+                        </div>
+                    </div>
+
+                    <div class="health-item">
+                        <div class="health-info">
+                            <div class="health-indicator good"></div>
+                            <span class="health-label">Good Condition</span>
+                        </div>
+                        <div class="health-progress">
+                            <div class="progress-bar">
+                                <div class="progress-fill good" style="width: 32%"></div>
+                            </div>
+                            <span class="health-count">79 vehicles</span>
+                        </div>
+                    </div>
+
+                    <div class="health-item">
+                        <div class="health-info">
+                            <div class="health-indicator warning"></div>
+                            <span class="health-label">Needs Attention</span>
+                        </div>
+                        <div class="health-progress">
+                            <div class="progress-bar">
+                                <div class="progress-fill warning" style="width: 3%"></div>
+                            </div>
+                            <span class="health-count">8 vehicles</span>
+                        </div>
+                    </div>
+
+                    <div class="health-item">
+                        <div class="health-info">
+                            <div class="health-indicator critical"></div>
+                            <span class="health-label">Critical</span>
+                        </div>
+                        <div class="health-progress">
+                            <div class="progress-bar">
+                                <div class="progress-fill critical" style="width: 2%"></div>
+                            </div>
+                            <span class="health-count">5 vehicles</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+</body>
+
+
+<script src="../js/dashboard.js"></script>  
+
+
+
+
+</html>

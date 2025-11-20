@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Email Verification - OTP</title>
+    <style>
+      body {
+        font-family: "Segoe UI", sans-serif;
+        background: linear-gradient(135deg, #4f46e5, #3b82f6);
+        color: #fff;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin: 0;
+      }
+
+      .otp-container {
+        background: rgba(255, 255, 255, 0.1);
+        padding: 40px 30px;
+        border-radius: 16px;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        text-align: center;
+        width: 320px;
+        backdrop-filter: blur(10px);
+      }
+
+      h2 {
+        margin-bottom: 10px;
+        font-weight: 600;
+      }
+
+      p {
+        font-size: 14px;
+        color: #e0e0e0;
+        margin-bottom: 25px;
+      }
+
+      input {
+        width: 100%;
+        padding: 10px;
+        border-radius: 8px;
+        border: none;
+        outline: none;
+        margin-bottom: 20px;
+        font-size: 16px;
+        text-align: center;
+      }
+
+      button {
+        width: 100%;
+        padding: 10px;
+        border: none;
+        background: #22c55e;
+        color: #fff;
+        border-radius: 8px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: background 0.3s ease;
+      }
+
+      button:hover {
+        background: #16a34a;
+      }
+
+      .resend {
+        margin-top: 15px;
+        font-size: 13px;
+        color: #cbd5e1;
+      }
+
+      .resend a {
+        color: #60a5fa;
+        text-decoration: none;
+        font-weight: 600;
+      }
+
+      .resend a:hover {
+        text-decoration: underline;
+      }
+
+      .loading {
+        display: none;
+        font-size: 13px;
+        margin-bottom: 10px;
+        color: #a5b4fc;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="otp-container">
+      <h2>Verify Your Email</h2>
+      <p>We’ve sent a 6-digit code to your registered email address.</p>
+
+      <div class="loading" id="loading">Sending OTP...</div>
+
+      <form id="otpForm">
+        <input
+          type="text"
+          name="code"
+          placeholder="Enter OTP"
+          maxlength="6"
+          required
+        />
+        <button type="submit">Verify</button>
+      </form>
+
+      <div class="resend">
+        Didn’t receive the code? <a href="#" id="resend-link">Resend OTP</a>
+      </div>
+    </div>
+
+    <script>
+      // Send OTP on page load
+      const loadingText = document.getElementById("loading");
+      loadingText.style.display = "block";
+
+      fetch("http://localhost:8080/verify", {
+        method: "POST",
+        credentials: "include",
+      })
+        .then(() => {
+          loadingText.textContent = "OTP sent successfully!";
+          setTimeout(() => (loadingText.style.display = "none"), 3000);
+        })
+        .catch(() => {
+          loadingText.textContent = "Failed to send OTP. Please try again.";
+        });
+
+      otpForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const code = document.querySelector("input[name='code']").value;
+
+        try {
+          const response = await fetch("http://localhost:8080/code", {
+            method: "POST",
+            credentials: "include",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: new URLSearchParams({ code }),
+          });
+
+          const result = await response.json();
+
+          if (result.status === "success") {
+            window.location.href = "/views/customer/pages/home.html";
+          } else {
+            alert(result.message || "Invalid OTP");
+          }
+        } catch (error) {
+          alert("Server error verifying OTP");
+        }
+      });
+
+      // Resend OTP
+      document
+        .getElementById("resend-link")
+        .addEventListener("click", function (e) {
+          e.preventDefault();
+          loadingText.style.display = "block";
+          loadingText.textContent = "Resending OTP...";
+
+          fetch("http://localhost:8080/verify", { method: "POST" })
+            .then(() => {
+              loadingText.textContent = "OTP resent successfully!";
+              setTimeout(() => (loadingText.style.display = "none"), 3000);
+            })
+            .catch(() => {
+              loadingText.textContent = "Error resending OTP.";
+            });
+        });
+    </script>
+  </body>
+</html>

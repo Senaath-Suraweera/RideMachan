@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notifications - Car Rental Management</title>
+    <link rel="stylesheet" href="../css/notification.css">
+
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo-section">
+                <img src="../assets/ridemachan-logo.png" alt="RideMachan Logo" class="logo">
+            </div>
+            
+            <nav class="nav-menu">
+                <ul>
+                    <li class="nav-item active">
+                        <a href="homepage.html" class="nav-link">
+                            <i class="fas fa-home"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <!--<li class="nav-item">
+                        <a href="vehicle-fleet.html" class="nav-link">
+                            <i class="fas fa-building"></i>
+                            <span>Entity Registration</span>
+                        </a>
+                    </li>-->
+                    <li class="nav-item">
+                        <a href="booking-management.html" class="nav-link">
+                            <i class="fas fa-box"></i>
+                            <span>Bookings</span>
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a href="vehicle-fleet.html" class="nav-link">
+                            <i class="fas fa-car"></i>
+                            <span>Vehicle Fleet</span>
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a href="maintenance-staff.html" class="nav-link">
+                            <i class="fas fa-tools"></i>
+                            <span>Maintenance Staff</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="driver-management.html" class="nav-link">
+                            <i class="fas fa-users"></i>
+                            <span>Drivers</span>
+                        </a>
+                    </li>
+                    
+                    
+                    
+                    
+                </ul>
+            </nav>
+            
+            <div class="logout-section">
+                <a href="#" class="nav-link">
+                    <i class="fas fa-sign-out"></i>
+                    <span>Logout</span>
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Header -->
+            <header class="header">
+                <div class="header-left">
+                    <div class="breadcrumb">
+                        <i class="fas fa-th-large"></i>
+                        <span>Company Dashboard</span>
+                    </div>
+                </div>
+                <div class="header-right">
+                    <div class="notification-icon">
+                        <a href="notification.html">
+                            <i class="fas fa-bell"></i>
+                            <span class="notification-badge">1</span>
+                        </a>
+                    </div>
+                    <div class="user-profile">
+                        <div class="user-avatar">A</div>
+                        <span class="user-name">ABC Rentals</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Page Content -->
+            <div class="page-content">
+                <div class="page-header">
+                    <div class="page-title-section">
+                        <h1 class="page-title">Notifications</h1>
+                        <p class="page-subtitle">Stay updated with all system activities and alerts</p>
+                    </div>
+                    <!--<button class="btn-secondary">
+                        <i class="fas fa-check-double"></i>
+                        Mark All as Read
+                    </button>-->
+                </div>
+
+                <!-- Notifications List -->
+                <div class="notifications-container">
+                    <div class="notifications-list">
+                        <!-- Driver Notification -->
+                        <div class="notification-card driver-notification">
+                            <div class="notification-avatar">
+                                <i class="fas fa-car"></i>
+                            </div>
+                            <div class="notification-content">
+                                <div class="notification-header">
+                                    <div class="sender-info">
+                                        <span class="sender-name">Robert Wilson</span>
+                                        <span class="sender-type">Driver</span>
+                                        <span class="sender-id">#DRV-001</span>
+                                    </div>
+                                    <div class="notification-time">2 hours ago</div>
+                                </div>
+                                <div class="notification-message">
+                                    Driver reported a breakdown for Toyota Prius - ABC-123. Vehicle is currently stranded at Downtown Mall parking lot.
+                                </div>
+                                <div class="notification-priority high-priority">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                    High Priority
+                                </div>
+                            </div>
+                            
+                        </div>
+
+                        <!--individual vehicle provider notification-->
+                        <div class="notification-card driver-notification">
+                            <div class="notification-avatar" style="background-color: yellow;">
+                                <i class="fas fa-car"></i>
+                            </div>
+                            <div class="notification-content">
+                                <div class="notification-header">
+                                    <div class="sender-info">
+                                        <span class="sender-name">alice</span>
+                                        <span class="sender-type">Individual vehicle provider</span>
+                                        <span class="sender-id">#IVP-001</span>
+                                    </div>
+                                    <div class="notification-time">3 hours ago</div>
+                                </div>
+                                <div class="notification-message">
+                                    Alice has submitted a request to provide her vehicle Toyota Prius - XYZ-345 for ABC-Rentals service fleet.
+                                    Please review and decide whether to approve or reject this request.
+                                </div>
+                                <div class="notification-priority medium-priority">
+                                    <i class="fas fa-info-circle"></i>
+                                    Medium Priority
+                                </div>
+                            </div>
+                            <div class="notification-actions">                                
+                                <button class="btn-outline">View</button>
+                            </div>
+                            
+                        </div>
+
+                        <!-- Maintenance Staff Notification -->
+                        <div class="notification-card maintenance-notification">
+                            <div class="notification-avatar">
+                                <i class="fas fa-tools"></i>
+                            </div>
+                            <div class="notification-content">
+                                <div class="notification-header">
+                                    <div class="sender-info">
+                                        <span class="sender-name">Alice Johnson</span>
+                                        <span class="sender-type">Maintenance Staff</span>
+                                        <span class="sender-id">#MNT-003</span>
+                                    </div>
+                                    <div class="notification-time">4 hours ago</div>
+                                </div>
+                                <div class="notification-message">
+                                    Completed scheduled service for Ford Explorer - XYZ-456. Vehicle is ready for deployment.
+                                </div>
+                                <div class="notification-priority medium-priority">
+                                    <i class="fas fa-info-circle"></i>
+                                    Medium Priority
+                                </div>
+                            </div>
+                            <div class="notification-actions">                                
+                                <button class="btn-outline">Mark as Read</button>
+                            </div>
+                        </div>
+
+                        <!-- Customer Notification -->
+                        <div class="notification-card customer-notification">
+                            <div class="notification-avatar">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <div class="notification-content">
+                                <div class="notification-header">
+                                    <div class="sender-info">
+                                        <span class="sender-name">John Smith</span>
+                                        <span class="sender-type">Customer</span>
+                                        <span class="sender-id">#CUST-789</span>
+                                    </div>
+                                    <div class="notification-time">6 hours ago</div>
+                                </div>
+                                <div class="notification-message">
+                                    Customer requested a reschedule for Booking BK003 from 2025-09-15 to 2025-09-17. Awaiting approval.
+                                </div>
+                                <div class="notification-priority low-priority">
+                                    <i class="fas fa-clock"></i>
+                                    Low Priority
+                                </div>
+                            </div>
+                            
+                        </div>
+
+                        <!-- Driver Notification -->
+                        <div class="notification-card driver-notification">
+                            <div class="notification-avatar">
+                                <i class="fas fa-car"></i>
+                            </div>
+                            <div class="notification-content">
+                                <div class="notification-header">
+                                    <div class="sender-info">
+                                        <span class="sender-name">Mike Davis</span>
+                                        <span class="sender-type">Driver</span>
+                                        <span class="sender-id">#DRV-005</span>
+                                    </div>
+                                    <div class="notification-time">1 day ago</div>
+                                </div>
+                                <div class="notification-message">
+                                    Successfully completed trip for Honda Civic - DEF-789. Customer rating: 5 stars.
+                                </div>
+                                <div class="notification-priority low-priority">
+                                    <i class="fas fa-check-circle"></i>
+                                    Completed
+                                </div>
+                            </div>
+                            
+                        </div>
+
+                        <!-- Maintenance Staff Notification -->
+                        <div class="notification-card maintenance-notification">
+                            <div class="notification-avatar">
+                                <i class="fas fa-tools"></i>
+                            </div>
+                            <div class="notification-content">
+                                <div class="notification-header">
+                                    <div class="sender-info">
+                                        <span class="sender-name">Sarah Wilson</span>
+                                        <span class="sender-type">Maintenance Staff</span>
+                                        <span class="sender-id">#MNT-007</span>
+                                    </div>
+                                    <div class="notification-time">1 day ago</div>
+                                </div>
+                                <div class="notification-message">
+                                    Urgent: BMW X5 - GHI-321 requires immediate brake inspection before next booking.
+                                </div>
+                                <div class="notification-priority high-priority">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                    High Priority
+                                </div>
+                            </div>
+                            <div class="notification-actions">
+                                <button class="btn-primary">View Details</button>
+                                <button class="btn-outline">Assign Task</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+
+const ivpVehicle = {
+  plateNumber: "XYZ-345",
+  model: "Toyota Prius",
+  color: "White",
+  seats: 4,
+  engineCapacity: "1800cc",
+  engineNumber: "ENG-34567",
+  year: 2020,
+  description: "Clean hybrid vehicle.",
+  legalDocImg: "../assets/legal_doc.jpg"
+};
+
+// === Function to create and show popup ===
+function showIVPVehiclePopup(vehicle) {
+  const oldPopup = document.getElementById("ivpPopup");
+  if (oldPopup) oldPopup.remove();
+
+  const popup = document.createElement("div");
+  popup.id = "ivpPopup";
+  Object.assign(popup.style, {
+    position: "fixed",
+    top: 0,
+    left: 0,
+    width: "100%",
+    height: "100%",
+    background: "rgba(0, 0, 0, 0.6)",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    zIndex: "9999",
+    transition: "opacity 0.3s ease"
+  });
+
+  const box = document.createElement("div");
+  Object.assign(box.style, {
+    background: "#ffffff",
+    padding: "30px",
+    borderRadius: "16px",
+    width: "480px",
+    maxHeight: "90vh",
+    overflowY: "auto",
+    boxShadow: "0 10px 25px rgba(0, 0, 0, 0.3)",
+    fontFamily: "'DM Sans', sans-serif",
+    color: "#111827",
+    lineHeight: "1.7"
+  });
+
+  // Title
+  const title = document.createElement("h2");
+  title.textContent = "Individual Vehicle Provider - Vehicle Details";
+  Object.assign(title.style, {
+    marginTop: "0",
+    marginBottom: "25px",
+    textAlign: "center",
+    fontWeight: "700",
+    color: "#0E152B",
+    fontSize: "20px",
+    borderBottom: "2px solid #e0e0e0",
+    paddingBottom: "10px"
+  });
+  box.appendChild(title);
+
+  // Vehicle details
+  const fields = [
+    ["Plate Number", vehicle.plateNumber],
+    ["Model", vehicle.model],
+    ["Color", vehicle.color],
+    ["No. of Seats", vehicle.seats],
+    ["Engine Capacity", vehicle.engineCapacity],
+    ["Engine Number", vehicle.engineNumber],
+    ["Year", vehicle.year],
+    ["Description", vehicle.description]
+  ];
+
+  fields.forEach(([label, value]) => {
+    const row = document.createElement("p");
+    row.innerHTML = `<strong style="display:inline-block;width:160px;color:#374151;">${label}:</strong> <span style="color:#111827;">${value}</span>`;
+    row.style.marginBottom = "15px";
+    row.style.fontSize = "15px";
+    box.appendChild(row);
+  });
+
+  // Legal document image
+  const imgLabel = document.createElement("p");
+  imgLabel.textContent = "Legal Document:";
+  imgLabel.style.fontWeight = "600";
+  imgLabel.style.marginBottom = "8px";
+  box.appendChild(imgLabel);
+
+  const downloadBtn = document.createElement("button");
+downloadBtn.textContent = "Download Document";
+Object.assign(downloadBtn.style, {
+  padding: "10px 20px",
+  background: "#fff",
+  color: "#15ff00",
+  border: "1px solid #15ff00",
+  borderRadius: "8px",
+  cursor: "pointer",
+  fontWeight: "600",
+  marginBottom: "25px",
+  transition: "transform 0.2s ease, box-shadow 0.2s ease"
+});
+
+// Hover effect
+downloadBtn.addEventListener("mouseenter", () => {
+  downloadBtn.style.transform = "scale(1.05)";
+  downloadBtn.style.boxShadow = "0 4px 10px rgba(67, 97, 238, 0.4)";
+});
+downloadBtn.addEventListener("mouseleave", () => {
+  downloadBtn.style.transform = "scale(1)";
+  downloadBtn.style.boxShadow = "none";
+});
+
+// Trigger download
+downloadBtn.onclick = () => {
+  const link = document.createElement("a");
+  link.href = vehicle.legalDocImg; // path to file
+  link.download = vehicle.legalDocImg.split("/").pop(); // extract filename
+  link.click();
+};
+
+box.appendChild(downloadBtn);
+
+
+
+
+// Vehicle image download
+const vehicleImgLabel = document.createElement("p");
+vehicleImgLabel.textContent = "Vehicle Image:";
+vehicleImgLabel.style.fontWeight = "600";
+vehicleImgLabel.style.marginBottom = "8px";
+box.appendChild(vehicleImgLabel);
+
+const vehicleDownloadBtn = document.createElement("button");
+vehicleDownloadBtn.textContent = "Download Vehicle Image";
+Object.assign(vehicleDownloadBtn.style, {
+  padding: "10px 20px",
+  background: "#fff",
+  color: "#fd9c00",
+  border: "1px solid #fd9c00",
+  borderRadius: "8px",
+  cursor: "pointer",
+  fontWeight: "600",
+  marginBottom: "25px",
+  transition: "transform 0.2s ease, box-shadow 0.2s ease"
+});
+
+// Hover effect
+vehicleDownloadBtn.addEventListener("mouseenter", () => {
+  vehicleDownloadBtn.style.transform = "scale(1.05)";
+  vehicleDownloadBtn.style.boxShadow = "0 4px 10px rgba(67, 97, 238, 0.4)";
+});
+vehicleDownloadBtn.addEventListener("mouseleave", () => {
+  vehicleDownloadBtn.style.transform = "scale(1)";
+  vehicleDownloadBtn.style.boxShadow = "none";
+});
+
+// Trigger download
+vehicleDownloadBtn.onclick = () => {
+  const link = document.createElement("a");
+  link.href = vehicle.vehicleImg; // make sure you have vehicleImg property in ivpVehicle object
+  link.download = vehicle.vehicleImg.split("/").pop();
+  link.click();
+};
+
+box.appendChild(vehicleDownloadBtn);
+
+
+  // Button container
+  const btnContainer = document.createElement("div");
+  Object.assign(btnContainer.style, {
+    display: "flex",
+    justifyContent: "center",
+    gap: "15px",
+    marginTop: "15px"
+  });
+
+  // Add Vehicle button
+  const addBtn = document.createElement("button");
+  addBtn.textContent = "Add Vehicle";
+  Object.assign(addBtn.style, {
+    padding: "12px 22px",
+    background: "linear-gradient(135deg, #3a0ca3, #4361ee)",
+    color: "#fff",
+    border: "none",
+    borderRadius: "8px",
+    cursor: "pointer",
+    fontSize: "15px",
+    fontWeight: "600",
+    transition: "background 0.3s"
+  });
+  addBtn.onmouseenter = () => addBtn.style.background = "#2563EB";
+  addBtn.onmouseleave = () => addBtn.style.background = "#3B82F6";
+  addBtn.onclick = () => window.open("vehicle-fleet.html", "_blank");
+
+  // Close button
+  const closeBtn = document.createElement("button");
+  closeBtn.textContent = "Reject";
+  Object.assign(closeBtn.style, {
+    padding: "12px 22px",
+    background: "#00f7ff",
+    color: "#fff",
+    border: "none",
+    borderRadius: "8px",
+    cursor: "pointer",
+    fontSize: "15px",
+    fontWeight: "600",
+    transition: "background 0.3s"
+  });
+  closeBtn.onmouseenter = () => closeBtn.style.background = "#DC2626";
+  closeBtn.onmouseleave = () => closeBtn.style.background = "#DC2626";
+  closeBtn.onclick = () => popup.remove();
+
+  btnContainer.appendChild(addBtn);
+  btnContainer.appendChild(closeBtn);
+  box.appendChild(btnContainer);
+  popup.appendChild(box);
+  document.body.appendChild(popup);
+}
+
+// === Attach popup to IVP View button ===
+document.addEventListener("DOMContentLoaded", () => {
+  const viewButtons = document.querySelectorAll(".notification-card .btn-outline");
+  viewButtons.forEach((btn) => {
+    const parent = btn.closest(".notification-card");
+    const senderType = parent.querySelector(".sender-type")?.textContent.trim();
+
+    if (senderType === "Individual vehicle provider") {
+      btn.addEventListener("click", () => showIVPVehiclePopup(ivpVehicle));
+    }
+  });
+});
+</script>
+
+
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+

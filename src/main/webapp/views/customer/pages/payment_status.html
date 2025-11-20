@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Payment Status - Ride Motion</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="../css/main.css" />
+    <link rel="stylesheet" href="../css/payment-status.css" />
+</head>
+<body>
+    <div class="container">
+        <!-- Include Sidebar Navigation -->
+        <div id="navbar-container"></div>
+
+        <!-- Include Header -->
+        <div id="header-container"></div>
+
+        <!-- Main Content Area -->
+        <div class="main-content">
+            <!-- Navigation Breadcrumb -->
+            <div class="breadcrumb-nav">
+                <button class="back-btn" onclick="goBack()">
+                    <i class="fas fa-arrow-left"></i>
+                    <span>Back</span>
+                </button>
+            </div>
+
+            <div class="status-container">
+                <!-- Left Content -->
+                <div class="payment-status-section">
+                    <!-- Success Status -->
+                    <div class="status-card">
+                        <div class="success-icon">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="status-info">
+                            <h3>Payment Successful - Booking Confirmed</h3>
+                            <p>Your vehicle booking has been confirmed and payment processed</p>
+                        </div>
+                    </div>
+
+                    <!-- Booking Details -->
+                    <div class="booking-details-card">
+                        <div class="detail-row">
+                            <span class="label">Booking ID:</span>
+                            <span class="value">R095 MAC 1096</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="label">Booking Date:</span>
+                            <span class="value">2024-08-13</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="label">Payment Date:</span>
+                            <span class="value">ryder.nova@gmail.com</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="label">Payment Mode:</span>
+                            <span class="value">Via Card Payment</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="label">Payment Status:</span>
+                            <span class="value">
+                                <span class="status-badge success">Successful</span>
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Download Invoice -->
+                    <div class="invoice-section">
+                        <button class="download-btn" onclick="downloadInvoice()">
+                            <i class="fas fa-download"></i>
+                            Download Invoice
+                        </button>
+                    </div>
+
+                    <!-- Vehicle Photo -->
+                    <div class="vehicle-photo">
+                        <div class="vehicle-image-placeholder" onclick="viewVehiclePhoto()">
+                            <i class="fas fa-car"></i>
+                            <p>Vehicle Photo</p>
+                        </div>
+                        <h4>Mercedes C-Class 2023</h4>
+                    </div>
+                </div>
+
+                <!-- Right Sidebar -->
+                <div class="sidebar-right">
+                    <!-- Booking Summary -->
+                    <div class="booking-summary-card">
+                        <h4>Booking Summary</h4>
+                        <div class="summary-details">
+                            <div class="summary-row">
+                                <span class="label">Mercedes C-Class 2023</span>
+                            </div>
+                            <div class="summary-row">
+                                <span class="label">Driver:</span>
+                                <span class="value">Chaminda Perera</span>
+                            </div>
+                            <div class="summary-row">
+                                <span class="label">Total Amount:</span>
+                                <span class="value amount">LKR 15,500.00</span>
+                            </div>
+                            <div class="summary-row">
+                                <span class="label">Status:</span>
+                                <span class="status-badge confirmed">Confirmed</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Need Help -->
+                    <div class="help-card">
+                        <h4>Need Help?</h4>
+                        <p>Questions about your booking? Our 24/7 support team is here to help with bookings, drivers, or any concerns.</p>
+                        <div class="help-actions">
+                            <button class="help-btn" onclick="callHelpline()">
+                                <i class="fas fa-phone"></i>
+                                Call 24/7 Help Line: 1177
+                            </button>
+                            <button class="help-btn secondary" onclick="contactSupport()">
+                                <i class="fas fa-comments"></i>
+                                Contact Support
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Load navbar and header components
+        async function loadComponents() {
+            try {
+                // Load navbar
+                const navbarResponse = await fetch('../components/navbar.html');
+                const navbarHtml = await navbarResponse.text();
+                document.getElementById('navbar-container').innerHTML = navbarHtml;
+
+                // Load header
+                const headerResponse = await fetch('../components/header.html');
+                const headerHtml = await headerResponse.text();
+                const customizedHeader = headerHtml.replace('{{PAGE_TITLE}}', 'Invoice');
+                document.getElementById('header-container').innerHTML = customizedHeader;
+                
+                // Execute scripts from loaded components
+                executeComponentScripts();
+                
+                // Initialize navbar after loading
+                initializeNavbar();
+            } catch (error) {
+                console.error('Error loading components:', error);
+            }
+        }
+
+        // Execute any scripts that were in the loaded components
+        function executeComponentScripts() {
+            // Execute navbar scripts if any
+            const navbarScripts = document.getElementById('navbar-container').querySelectorAll('script');
+            navbarScripts.forEach(script => {
+                const newScript = document.createElement('script');
+                newScript.textContent = script.textContent;
+                document.body.appendChild(newScript);
+            });
+
+            // Execute header scripts if any
+            const headerScripts = document.getElementById('header-container').querySelectorAll('script');
+            headerScripts.forEach(script => {
+                const newScript = document.createElement('script');
+                newScript.textContent = script.textContent;
+                document.body.appendChild(newScript);
+            });
+        }
+
+        // Initialize navbar (if needed)
+        function initializeNavbar() {
+            const currentPage = 'bookings';
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => {
+                if (item.getAttribute('data-page') === currentPage) {
+                    item.classList.add('active');
+                }
+            });
+        }
+
+        // Back button functionality
+        function goBack() {
+            window.history.back();
+        }
+
+        // Payment Status specific functions
+        function downloadInvoice() {
+            showPopup('Download Started', 'Your invoice is being prepared and will be downloaded shortly.', 'success');
+            // Simulate download
+            setTimeout(() => {
+                const link = document.createElement('a');
+                link.href = '#';
+                link.download = 'Invoice_R095_MAC_1096.pdf';
+                link.click();
+            }, 1000);
+        }
+
+        function viewVehiclePhoto() {
+            showPopup('Vehicle Photo', 'Vehicle photo gallery coming soon!', 'info');
+        }
+
+        function downloadReceipt() {
+            showPopup('Receipt Download', 'Your receipt is being prepared for download.', 'success');
+        }
+
+        function contactSupport() {
+            showPopup('Contact Support', 'Support chat will open soon. For immediate assistance, call 1177.', 'info');
+        }
+
+        function callHelpline() {
+            if (confirm('Do you want to call our 24/7 helpline at 1177?')) {
+                window.location.href = 'tel:1177';
+            }
+        }
+
+        function showPopup(title, message, type = 'info') {
+            const popup = document.createElement('div');
+            popup.className = 'popup-overlay';
+            
+            const iconClass = type === 'success' ? 'fa-check-circle' : 
+                             type === 'error' ? 'fa-exclamation-triangle' : 'fa-info-circle';
+            
+            const color = type === 'success' ? 'var(--success)' : 
+                         type === 'error' ? 'var(--danger)' : 'var(--info)';
+            
+            popup.innerHTML = `
+                <div class="popup-content" style="animation: fadeInUp 0.3s ease;">
+                    <div class="popup-icon" style="color: ${color};">
+                        <i class="fas ${iconClass}"></i>
+                    </div>
+                    <h3>${title}</h3>
+                    <p>${message}</p>
+                    <button onclick="closePopup(this)" class="btn btn-primary">OK</button>
+                </div>
+            `;
+            
+            document.body.appendChild(popup);
+        }
+
+        function closePopup(button) {
+            const popup = button.closest('.popup-overlay');
+            popup.style.animation = 'fadeOut 0.3s ease';
+            setTimeout(() => popup.remove(), 300);
+        }
+
+        // Add ripple effect to buttons
+        document.addEventListener('DOMContentLoaded', function() {
+            // Load components first
+            loadComponents();
+            
+            // Add ripple effect
+            document.addEventListener('click', function(e) {
+                if (e.target.tagName === 'BUTTON' || e.target.closest('button')) {
+                    const button = e.target.tagName === 'BUTTON' ? e.target : e.target.closest('button');
+                    const ripple = document.createElement('span');
+                    const rect = button.getBoundingClientRect();
+                    const size = Math.max(rect.width, rect.height);
+                    const x = e.clientX - rect.left - size / 2;
+                    const y = e.clientY - rect.top - size / 2;
+                    
+                    ripple.style.width = ripple.style.height = size + 'px';
+                    ripple.style.left = x + 'px';
+                    ripple.style.top = y + 'px';
+                    ripple.classList.add('ripple');
+                    
+                    button.appendChild(ripple);
+                    
+                    setTimeout(() => {
+                        ripple.remove();
+                    }, 600);
+                }
+            });
+
+            // Animate success icon
+            setTimeout(() => {
+                const successIcon = document.querySelector('.success-icon');
+                if (successIcon) {
+                    successIcon.style.animation = 'bounceIn 0.8s ease';
+                }
+            }, 500);
+        });
+    </script>
+
+    <style>
+        /* Additional styles for popup and components */
+        .popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+        }
+
+        .popup-content {
+            background: white;
+            padding: 30px;
+            border-radius: var(--radius);
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .popup-icon {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+
+        .popup-content h3 {
+            margin-bottom: 15px;
+            color: var(--dark);
+        }
+
+        .popup-content p {
+            margin-bottom: 25px;
+            color: var(--text-light);
+            line-height: 1.5;
+        }
+
+        /* Back button styles */
+        .breadcrumb-nav {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+        }
+
+        .back-btn {
+            background: rgba(67, 97, 238, 0.08);
+            border: 1px solid rgba(67, 97, 238, 0.15);
+            color: var(--primary);
+            padding: 10px 20px;
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            font-weight: 500;
+            box-shadow: 0 2px 4px rgba(67, 97, 238, 0.1);
+        }
+
+        .back-btn:hover {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+            transform: translateX(-3px);
+            box-shadow: 0 4px 12px rgba(67, 97, 238, 0.25);
+        }
+
+        .back-btn i {
+            margin-right: 10px;
+            font-size: 13px;
+            transition: var(--transition);
+        }
+
+        .back-btn:hover i {
+            transform: translateX(-2px);
+        }
+
+        /* Ripple effect */
+        .ripple {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.6);
+            transform: scale(0);
+            animation: ripple-animation 0.6s linear;
+            pointer-events: none;
+        }
+
+        @keyframes ripple-animation {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+
+        @keyframes fadeOut {
+            from {
+                opacity: 1;
+            }
+            to {
+                opacity: 0;
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Responsive adjustments for back button */
+        @media (max-width: 768px) {
+            .breadcrumb-nav {
+                margin-bottom: 15px;
+                padding-bottom: 12px;
+            }
+
+            .back-btn {
+                padding: 8px 16px;
+                font-size: 13px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .back-btn span {
+                display: none;
+            }
+
+            .back-btn {
+                width: 40px;
+                height: 40px;
+                padding: 0;
+                justify-content: center;
+                border-radius: 50%;
+            }
+
+            .back-btn i {
+                margin: 0;
+            }
+        }
+    </style>
+</body>
+</html>

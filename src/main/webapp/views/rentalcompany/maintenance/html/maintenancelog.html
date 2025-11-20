@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ride Machan - Maintenance Logs</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/maintenancelog.css">
+</head>
+<body>
+    <div class="container">
+     <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo-section">
+                <img src="../assets/ridemachan-logo.png" alt="RideMachan Logo" class="logo">
+            </div>
+            
+            <nav class="nav-menu">
+                <ul>
+                    <h3>Main Navigation</h3>
+
+                    <li class="nav-item">
+                        <a href="dashboard.html" class="nav-link">
+                            <i class="fas fa-tachometer-alt"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    
+                    <li class="nav-item active">
+                        <a href="inspection.html" class="nav-link">
+                            <i class="fas fa-tools"></i>
+                            <span>Maintenance Logs</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="vehiclerecords.html" class="nav-link">
+                            <i class="fas fa-file"></i> 
+                            <span>Vehicle Records</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="maintenance-calender.html" class="nav-link">
+                            <i class="fas fa-calendar"></i>
+                            <span>Calendar</span>
+                        </a>
+                    </li>
+                   
+
+                </ul>
+            </nav>
+            
+            <div class="logout-section">
+                <a href="#" class="nav-link">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </a>
+            </div>
+        </aside>
+
+        <!-- Header -->
+        <div class="header">
+            <div class="search-bar">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="Search vehicles, maintenance records..." id="searchInput">
+            </div>
+
+            <div class="header-actions">
+                <div class="notification">
+                    <a href="notification.html" class="notification">
+                            <i class="fas fa-bell"></i>
+                            <div class="badge">3</div>
+                    </a>
+                </div>
+                <div class="user-profile"> 
+                    <div class="profile-img">MS</div>
+                    <div class="user-info">
+                        <div class="user-name">Mr. Sivajan</div>
+                        <div class="user-role">Maintenance Staff</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Page Header with Tabs -->
+            <div class="page-title">
+                <div class="title">Maintenance Logs</div>                
+            </div>
+
+            <!-- Filters Section -->
+            <div class="search-filters">
+                <div class="filter-controls">
+                    <h4>Choose Vehicle</h4>
+                    <select class="filter-select" id="vehicleFilter">
+                        <option value="ABC-1234">ABC-1234</option>
+                        <option value="XYZ-5678">XYZ-5678</option>
+                        <option value="DEF-9012">DEF-9012</option>
+                        <option value="GHI-3456">GHI-3456</option>
+                        <option value="GHI-3456">GHI-3456</option>
+                        <option value="JKL-7890">JKL-7890</option>
+                        <option value="MNO-1234">MNO-1234</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Tabs Navigation -->
+            <div class="tabs-container">
+                <div class="tabs">
+                    <div class="tab">
+                        <a href="inspection.html">Detailed Inspection</a>
+                    </div>
+                    <div class="tab active">
+                        <a href="maintenancelog.html">Maintenance Log</a>
+                    </div>
+                    
+                </div>
+            </div>
+
+            <div id="vehicle">
+                <!-- Content Section -->
+                <div class="content-section">
+                    <div class="section-header">
+                        <h2>Maintenance Work Orders</h2>
+                        <p class="section-subtitle">Track and manage maintenance tasks</p>
+                    </div>
+
+                    <!-- Table Container -->
+                    <div class="table-container">
+                        <table class="maintenance-table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Service Type</th>
+                                    <th>Priority</th>
+                                    <th>Status</th>
+                                    <th>Next Service</th>
+                                    
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>2024-01-15</td>
+                                    <!--<td>XYZ-5676</td>-->
+                                    <td>Brake System Repair</td>
+                                    <td><span class="priority-badge high">High</span></td>
+                                    <td><span class="status-badge pending">Pending</span></td>
+                                    <td>-</td>                                    
+                                </tr>
+                                <tr>
+                                    <td>2024-01-14</td>   
+                                    <td>Pre-Rental Inspection</td>
+                                    <td><span class="priority-badge normal">Normal</span></td>
+                                    <td><span class="status-badge completed">Completed</span></td>
+                                    <td>2024-04-14</td>                                    
+                                </tr>
+                                <tr>
+                                    <td>2024-01-13</td>
+                                    <td>Oil Change Service</td>
+                                    <td><span class="priority-badge normal">Normal</span></td>
+                                    <td><span class="status-badge completed">Completed</span></td>
+                                    <td>2024-04-13</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                
+
+            </div>
+
+
+            <!-- Vehicle Info -->
+                    <div class="vehicle-info">
+                        <div class="vehicle-card">
+                            <div class="vehicle-image">
+                                <i class="fas fa-car"></i>
+                            </div>
+                            <div class="vehicle-details">
+                                <h3>Toyota Prius 2020</h3>
+                                <h5>ABC-123</h5>
+                                <div class="vehicle-status">
+                                    <span class="status-label">Current Status:</span>
+                                    <span class="status-badge available">Under Maintenance</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    
+            </div> 
+
+
+            
+                <div class="compliance-grid">
+                        <!-- Safety & Environmental Section -->
+                        <div class="compliance-section">
+                            <h3 class="section-title">
+                                Safety & Environmental
+                            </h3>
+                
+                            <div class="compliance-item" onclick="viewComplianceDetails('emission')">
+                                <div class="compliance-info">
+                                    <div class="compliance-icon success">
+                                    </div>
+                                    <div class="compliance-details">
+                                        <h4>Emission Standards</h4>
+                                        <p>Euro 6 Compliance</p>
+                                        <small class="due-date">Valid until: Dec 2025</small>
+                                    </div>
+                                </div>
+                                <span class="status-badge valid">Valid</span>
+                            </div>
+                            <div class="compliance-item" onclick="viewComplianceDetails('safety')">
+                                <div class="compliance-info">
+                                    <div class="compliance-icon warning">
+                                    </div>
+                                    <div class="compliance-details">
+                                        <h4>Safety Inspection</h4>
+                                        <p>Annual check</p>
+                                        <small class="due-date">Due: Sep 15, 2025</small>
+                                    </div>
+                                </div>
+                                <span class="status-badge due-soon">Due Soon</span>
+                            </div>
+                        </div>
+
+                        <!-- Communication Log Card -->
+                <div class="report-card">
+                    <div class="card-header">
+                        <div>
+                            <h3>Communication Log</h3>
+                            <p>Recent system communications</p>
+                        </div>
+                    </div>
+                    
+                    <div class="communication-list">
+                        <div class="communication-item">
+                            <div class="comm-icon driver">
+                            </div>
+                            <div class="comm-content">
+                                <div class="comm-title">Driver ABC-1234</div>
+                                <div class="comm-message">Vehicle ready for pickup - maintenance completed</div>
+                                <div class="comm-time">15 minutes ago</div>
+                            </div>
+                        </div>
+
+                        <div class="communication-item">
+                            <div class="comm-icon admin">
+                            </div>
+                            <div class="comm-content">
+                                <div class="comm-title">System Alert</div>
+                                <div class="comm-message">Urgent maintenance required for Vehicle XYZ-5678</div>
+                                <div class="comm-time">1 hour ago</div>
+                            </div>
+                        </div>
+
+                        <div class="communication-item">
+                            <div class="comm-icon driver">
+                            </div>
+                            <div class="comm-content">
+                                <div class="comm-title">Inspection Complete</div>
+                                <div class="comm-message">Monthly inspection passed for Vehicle DEF-9876</div>
+                                <div class="comm-time">3 hours ago</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!--<div class="card-footer">
+                        <button class="btn-link">
+                            Open Communication Panel
+                        </button>
+                    </div>-->
+                </div>
+
+
+                        
+
+
+                <div class="sidebar-card">                        
+
+                        <div class="compliance-item valid">
+                            <div class="compliance-info">
+                                <h4>Emission Test</h4>
+                                <p>Valid until May 2024</p>
+                            </div>
+                            <i class="fas fa-check-circle compliance-status valid"></i>
+                        </div>
+
+                        <div class="compliance-item warning">
+                            <div class="compliance-info">
+                                <h4>Insurance</h4>
+                                <p>Expires in 30 days</p>
+                            </div>
+                            <i class="fas fa-exclamation-triangle compliance-status warning"></i>
+                        </div>
+
+                        <div class="compliance-item valid">
+                            <div class="compliance-info">
+                                <h4>Safety Permit</h4>
+                                <p>Up to date</p>
+                            </div>
+                            <i class="fas fa-check-circle compliance-status valid"></i>
+                        </div>
+
+                        <button class="view-all-btn" onclick="viewAllDocuments()">
+                            <i class="fas fa-external-link-alt"></i>
+                            View All Documents
+                        </button>
+                </div>
+            
+        </div>
+    </div>
+
+    <script src="../js/maintenancelog.js"></script>
+</body>
+</html>

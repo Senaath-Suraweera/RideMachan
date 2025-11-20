@@ -1,0 +1,930 @@
+/* =========================
+  Driver Profile Specific Styles
+  ========================= */
+
+.main-content {
+    grid-column: 2;
+    padding: 30px;
+    overflow-y: auto;
+}
+
+.content-wrapper {
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.breadcrumb {
+    color: var(--text-light);
+    font-size: 14px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+}
+
+.back-btn {
+    background: none;
+    border: none;
+    color: var(--primary);
+    cursor: pointer;
+    padding: 8px 12px;
+    border-radius: var(--radius-sm);
+    transition: var(--transition);
+    margin-right: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 500;
+}
+
+.back-btn:hover {
+    background-color: rgba(67, 97, 238, 0.1);
+    transform: translateX(-2px);
+}
+
+.driver-profile-container {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+/* Driver Profile Card - ALIGNED WITH BOOKING DETAILS */
+.driver-profile-card {
+    background: white;
+    border-radius: var(--radius);
+    padding: 25px;
+    box-shadow: var(--shadow-sm);
+    transition: var(--transition);
+}
+
+.driver-profile-card:hover {
+    box-shadow: var(--shadow);
+}
+
+.driver-header {
+    display: grid;
+    grid-template-columns: 120px 1fr;
+    gap: 25px;
+    padding: 20px;
+    background: var(--light);
+    border-radius: var(--radius);
+    margin-bottom: 20px;
+    align-items: center;
+}
+
+.driver-avatar {
+    width: 120px;
+    height: 120px;
+}
+
+.driver-avatar-img {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--secondary), var(--primary));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 48px;
+    font-weight: 700;
+    border: 4px solid white;
+    box-shadow: var(--shadow);
+    transition: var(--transition);
+}
+
+.driver-avatar-img:hover {
+    transform: scale(1.05);
+}
+
+.driver-info h2 {
+    color: var(--text);
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.driver-name {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.verified-badge {
+    color: var(--success);
+    font-size: 14px;
+    font-weight: 500;
+    margin-left: 10px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.verified-badge i {
+    font-size: 16px;
+}
+
+.driver-price {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--primary);
+    margin-top: 8px;
+}
+
+.driver-stats {
+    display: flex;
+    gap: 20px;
+    padding: 20px;
+    background: var(--light);
+    border-radius: var(--radius);
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.stat-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--text-light);
+    font-size: 13px;
+    font-weight: 500;
+    transition: var(--transition);
+}
+
+.stat-item:hover {
+    color: var(--primary);
+}
+
+.stat-item i {
+    color: var(--primary);
+    font-size: 14px;
+    width: 16px;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+.driver-details-sections {
+    margin-bottom: 25px;
+}
+
+.detail-section {
+    margin-bottom: 20px;
+}
+
+.detail-section h3 {
+    color: var(--text);
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+.tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.tag {
+    background: var(--light);
+    color: var(--text);
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 13px;
+    border: 1px solid var(--border);
+    transition: var(--transition);
+}
+
+.tag:hover {
+    background: rgba(67, 97, 238, 0.1);
+    border-color: var(--primary-light);
+    color: var(--primary);
+}
+
+/* Reviews & Ratings Card - ALIGNED WITH BOOKING DETAILS */
+.reviews-ratings-card {
+    background: white;
+    border-radius: var(--radius);
+    padding: 25px;
+    box-shadow: var(--shadow-sm);
+    transition: var(--transition);
+}
+
+.reviews-ratings-card:hover {
+    box-shadow: var(--shadow);
+}
+
+.card-header {
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    padding: 20px 25px;
+    border-bottom: 2px solid var(--light);
+    background: linear-gradient(135deg, rgba(58, 12, 163, 0.03), rgba(67, 97, 238, 0.03));
+    margin: -25px -25px 25px -25px;
+}
+
+.card-header h3 {
+    color: var(--text);
+    font-size: 18px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0;
+}
+
+.card-header h3 i {
+    color: var(--primary);
+    font-size: 20px;
+}
+
+/* Overall Rating Section */
+.overall-rating-section {
+    margin-bottom: 25px;
+    padding: 25px;
+    background: var(--light);
+    border-radius: var(--radius);
+}
+
+.overall-rating {
+    display: flex;
+    align-items: center;
+    gap: 25px;
+    margin-bottom: 25px;
+}
+
+.rating-number {
+    font-size: 64px;
+    font-weight: 700;
+    color: var(--primary);
+    line-height: 1;
+}
+
+.rating-details {
+    flex: 1;
+}
+
+.stars {
+    margin-bottom: 10px;
+}
+
+.stars i {
+    color: #ffd700;
+    font-size: 20px;
+    margin-right: 4px;
+    transition: var(--transition);
+}
+
+.total-reviews {
+    color: var(--text-light);
+    font-size: 15px;
+    font-weight: 500;
+}
+
+/* Rating Breakdown */
+.rating-breakdown {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.rating-bar-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.rating-label {
+    min-width: 50px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.rating-label i {
+    color: #ffd700;
+    font-size: 12px;
+}
+
+.rating-bar {
+    flex: 1;
+    height: 10px;
+    background: white;
+    border-radius: 10px;
+    overflow: hidden;
+    position: relative;
+    border: 1px solid var(--border);
+}
+
+.rating-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary), var(--primary-light));
+    border-radius: 10px;
+    transition: width 0.6s ease;
+}
+
+.rating-count {
+    min-width: 40px;
+    text-align: right;
+    font-size: 14px;
+    color: var(--text-light);
+    font-weight: 500;
+}
+
+/* Add Review Section */
+.add-review-section {
+    margin-bottom: 25px;
+    padding: 25px;
+    background: var(--light);
+    border-radius: var(--radius);
+}
+
+.add-review-section h4 {
+    color: var(--text);
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.add-review-section h4 i {
+    color: var(--primary);
+}
+
+.rating-input {
+    margin-bottom: 20px;
+}
+
+.rating-input label {
+    display: block;
+    color: var(--text);
+    font-weight: 500;
+    margin-bottom: 10px;
+    font-size: 14px;
+}
+
+.star-rating-input {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.star-rating-input i {
+    font-size: 36px;
+    color: #ddd;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.star-rating-input i:hover,
+.star-rating-input i.fas {
+    color: #ffd700;
+    transform: scale(1.15);
+}
+
+.selected-rating {
+    display: block;
+    color: var(--text-light);
+    font-size: 14px;
+    font-style: italic;
+    font-weight: 500;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    color: var(--text);
+    font-weight: 500;
+    margin-bottom: 8px;
+    font-size: 14px;
+}
+
+.form-control {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    transition: var(--transition);
+    background: white;
+    font-family: 'Poppins', sans-serif;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: var(--primary-light);
+    box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+}
+
+textarea.form-control {
+    resize: vertical;
+    min-height: 80px;
+}
+
+.btn-submit-rating {
+    width: 100%;
+}
+
+/* Reviews List Section */
+.reviews-list-section {
+    padding: 25px;
+    background: var(--light);
+    border-radius: var(--radius);
+}
+
+.reviews-list-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.reviews-list-header h4 {
+    color: var(--text);
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.reviews-list-header h4 i {
+    color: var(--primary);
+}
+
+.btn-toggle-reviews {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 500;
+    font-size: 14px;
+}
+
+.btn-toggle-reviews:hover {
+    background: var(--primary-light);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(67, 97, 238, 0.3);
+}
+
+.btn-toggle-reviews i {
+    transition: var(--transition);
+}
+
+.reviews-list, .all-reviews-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.all-reviews-list {
+    margin-top: 15px;
+    animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        max-height: 0;
+    }
+    to {
+        opacity: 1;
+        max-height: 2000px;
+    }
+}
+
+.review-item {
+    padding: 20px;
+    margin-bottom: 15px;
+    background: white;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    transition: var(--transition);
+}
+
+.review-item:hover {
+    border-color: var(--primary-light);
+    box-shadow: 0 4px 12px rgba(67, 97, 238, 0.1);
+    transform: translateX(5px);
+}
+
+.review-item:last-child {
+    margin-bottom: 0;
+}
+
+.review-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.reviewer-name {
+    font-weight: 600;
+    color: var(--text);
+    font-size: 15px;
+}
+
+.review-date {
+    font-size: 13px;
+    color: var(--text-light);
+}
+
+.review-stars {
+    margin-bottom: 10px;
+}
+
+.review-stars i {
+    color: #ffd700;
+    font-size: 14px;
+    margin-right: 2px;
+}
+
+.review-text {
+    color: var(--text);
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+/* =========================
+  Modal/Popup Styles
+  ========================= */
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(4px);
+}
+
+.modal-overlay.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+.modal-content {
+    background: white;
+    border-radius: var(--radius);
+    padding: 0;
+    max-width: 500px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: var(--shadow-lg);
+    transform: scale(0.9) translateY(-20px);
+    transition: all 0.3s ease;
+}
+
+.modal-overlay.show .modal-content {
+    transform: scale(1) translateY(0);
+}
+
+.modal-header {
+    padding: 25px;
+    border-bottom: 2px solid var(--light);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.modal-header h3 {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--text);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.modal-header h3 i {
+    color: var(--primary);
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    font-size: 24px;
+    color: var(--text-light);
+    cursor: pointer;
+    width: 35px;
+    height: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: var(--transition);
+}
+
+.modal-close:hover {
+    background: rgba(247, 37, 133, 0.1);
+    color: var(--danger);
+    transform: rotate(90deg);
+}
+
+.modal-body {
+    padding: 25px;
+}
+
+.modal-footer {
+    padding: 20px 25px;
+    border-top: 2px solid var(--light);
+    display: flex;
+    gap: 15px;
+    justify-content: flex-end;
+}
+
+/* Call Modal Specific Styles */
+.call-info {
+    text-align: center;
+    padding: 20px 0;
+}
+
+.call-avatar {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--secondary), var(--primary));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 40px;
+    font-weight: 700;
+    margin: 0 auto 20px;
+    box-shadow: var(--shadow);
+}
+
+.call-driver-name {
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 10px;
+}
+
+.call-phone {
+    font-size: 20px;
+    font-weight: 500;
+    color: var(--primary);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.call-phone i {
+    font-size: 18px;
+}
+
+.call-note {
+    background: var(--light);
+    padding: 15px;
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    color: var(--text-light);
+    margin-top: 20px;
+    display: flex;
+    align-items: start;
+    gap: 10px;
+}
+
+.call-note i {
+    color: var(--info);
+    margin-top: 2px;
+}
+
+/* Message Modal Specific Styles */
+.message-to {
+    background: var(--light);
+    padding: 15px;
+    border-radius: var(--radius-sm);
+    margin-bottom: 20px;
+    font-size: 14px;
+    color: var(--text);
+}
+
+.message-to strong {
+    color: var(--primary);
+    font-weight: 600;
+}
+
+/* Notification Styles */
+.notification-toast {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 15px 20px;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-lg);
+    z-index: 10002;
+    font-weight: 500;
+    transform: translateX(400px);
+    transition: transform 0.3s ease;
+    max-width: 350px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: white;
+    border-left: 4px solid var(--info);
+}
+
+.notification-toast.show {
+    transform: translateX(0);
+}
+
+.notification-toast.success {
+    border-left-color: #10b981;
+}
+
+.notification-toast.success i {
+    color: #10b981;
+}
+
+.notification-toast.info {
+    border-left-color: var(--info);
+}
+
+.notification-toast.info i {
+    color: var(--info);
+}
+
+.notification-toast.warning {
+    border-left-color: var(--warning);
+}
+
+.notification-toast.warning i {
+    color: var(--warning);
+}
+
+.notification-toast.error {
+    border-left-color: var(--danger);
+}
+
+.notification-toast.error i {
+    color: var(--danger);
+}
+
+.notification-toast i {
+    font-size: 18px;
+}
+
+/* Responsive Design */
+@media (max-width: 992px) {
+    .main-content {
+        padding: 20px;
+    }
+
+    .driver-header {
+        grid-template-columns: 1fr;
+        text-align: center;
+        justify-items: center;
+    }
+
+    .driver-stats {
+        justify-content: center;
+    }
+
+    .action-buttons {
+        flex-direction: column;
+    }
+}
+
+@media (max-width: 768px) {
+    .driver-header {
+        padding: 15px;
+    }
+
+    .driver-stats {
+        flex-direction: column;
+        gap: 15px;
+        align-items: center;
+    }
+
+    .overall-rating {
+        flex-direction: column;
+        text-align: center;
+        gap: 15px;
+    }
+
+    .rating-number {
+        font-size: 54px;
+    }
+
+    .reviews-list-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .btn-toggle-reviews {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .modal-content {
+        width: 95%;
+    }
+
+    .modal-footer {
+        flex-direction: column;
+    }
+
+    .modal-footer .btn {
+        width: 100%;
+    }
+}
+
+@media (max-width: 576px) {
+    .main-content {
+        padding: 15px;
+    }
+    
+    .driver-profile-card {
+        padding: 20px;
+    }
+    
+    .reviews-ratings-card {
+        padding: 20px;
+    }
+
+    .card-header {
+        margin: -20px -20px 20px -20px;
+        padding: 15px 20px;
+    }
+
+    .overall-rating-section {
+        padding: 20px;
+    }
+
+    .add-review-section {
+        padding: 20px;
+    }
+
+    .reviews-list-section {
+        padding: 20px;
+    }
+
+    .star-rating-input {
+        gap: 6px;
+    }
+
+    .star-rating-input i {
+        font-size: 30px;
+    }
+
+    .card-header h3 {
+        font-size: 16px;
+    }
+
+    .rating-number {
+        font-size: 48px;
+    }
+
+    .notification-toast {
+        right: 10px;
+        left: 10px;
+        max-width: none;
+    }
+
+    .modal-header h3 {
+        font-size: 18px;
+    }
+
+    .call-driver-name {
+        font-size: 20px;
+    }
+
+    .call-phone {
+        font-size: 18px;
+    }
+}

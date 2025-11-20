@@ -1,312 +1,208 @@
-// My Vehicles JavaScript
-document.addEventListener("DOMContentLoaded", function () {
-  initializeFilters();
-  initializeSearch();
-  initializeSort();
-  initializeVehicleCards();
-});
+const BASE_URL = "http://localhost:8080";
+const providerId = 5; // fallback for testing
+// const providerId = localStorage.getItem("provider_id");
 
-// Initialize filter functionality
-function initializeFilters() {
-  const vehicleTypeFilter = document.getElementById("vehicleTypeFilter");
-  const locationFilter = document.getElementById("locationFilter");
-  const fromDate = document.getElementById("fromDate");
-  const toDate = document.getElementById("toDate");
-  const statusRadios = document.querySelectorAll('input[name="vehicleStatus"]');
+document.addEventListener("DOMContentLoaded", loadVehicles);
 
-  // Add event listeners for filters
-  vehicleTypeFilter.addEventListener("change", applyFilters);
-  locationFilter.addEventListener("change", applyFilters);
-  fromDate.addEventListener("change", applyFilters);
-  toDate.addEventListener("change", applyFilters);
-
-  statusRadios.forEach((radio) => {
-    radio.addEventListener("change", applyFilters);
-  });
-}
-
-// Initialize search functionality
-function initializeSearch() {
-  const searchInput = document.getElementById("searchInput");
-  let searchTimeout;
-
-  searchInput.addEventListener("input", function () {
-    clearTimeout(searchTimeout);
-    searchTimeout = setTimeout(() => {
-      applyFilters();
-    }, 300);
-  });
-}
-
-// Initialize sort functionality
-function initializeSort() {
-  const sortSelect = document.getElementById("sortSelect");
-  sortSelect.addEventListener("change", applySorting);
-}
-
-// Initialize vehicle card interactions
-function initializeVehicleCards() {
-  const vehicleCards = document.querySelectorAll(".vehicle-card");
-
-  vehicleCards.forEach((card) => {
-    card.addEventListener("click", function () {
-      // Navigate to vehicle details (could be implemented)
-      console.log(
-        "Navigate to vehicle details for:",
-        card.querySelector(".vehicle-name").textContent
-      );
-    });
-  });
-}
-
-// Apply all filters
-function applyFilters() {
-  const vehicleTypeFilter = document.getElementById("vehicleTypeFilter").value;
-  const locationFilter = document.getElementById("locationFilter").value;
-  const searchTerm = document.getElementById("searchInput").value.toLowerCase();
-  const selectedStatus = document.querySelector(
-    'input[name="vehicleStatus"]:checked'
-  ).value;
-
-  const vehicleCards = document.querySelectorAll(".vehicle-card");
-
-  vehicleCards.forEach((card) => {
-    let shouldShow = true;
-
-    // Vehicle type filter
-    if (vehicleTypeFilter !== "All Types") {
-      const cardType = card.dataset.type;
-      const vehicleCategory = card
-        .querySelector(".vehicle-category")
-        .textContent.toLowerCase();
-
-      if (
-        vehicleTypeFilter === "Sedan" &&
-        !vehicleCategory.includes("city car")
-      )
-        shouldShow = false;
-      if (vehicleTypeFilter === "SUV" && !vehicleCategory.includes("suv"))
-        shouldShow = false;
-      if (
-        vehicleTypeFilter === "Hatchback" &&
-        !vehicleCategory.includes("hatchback")
-      )
-        shouldShow = false;
-      if (vehicleTypeFilter === "Budget Cars" && cardType !== "budget")
-        shouldShow = false;
-      if (vehicleTypeFilter === "Luxury Rides" && cardType !== "luxury")
-        shouldShow = false;
-      if (vehicleTypeFilter === "Eco Rentals" && cardType !== "eco")
-        shouldShow = false;
-    }
-
-    // Location filter
-    if (locationFilter !== "All Locations") {
-      const cardLocation = card.dataset.location;
-      if (cardLocation !== locationFilter.toLowerCase()) shouldShow = false;
-    }
-
-    // Search filter
-    if (searchTerm) {
-      const vehicleName = card
-        .querySelector(".vehicle-name")
-        .textContent.toLowerCase();
-      const vehicleCategory = card
-        .querySelector(".vehicle-category")
-        .textContent.toLowerCase();
-      const vehicleLocation = card
-        .querySelector(".vehicle-location")
-        .textContent.toLowerCase();
-
-      if (
-        !vehicleName.includes(searchTerm) &&
-        !vehicleCategory.includes(searchTerm) &&
-        !vehicleLocation.includes(searchTerm)
-      ) {
-        shouldShow = false;
-      }
-    }
-
-    // Status filter
-    const vehicleStatus = card
-      .querySelector(".vehicle-status")
-      .textContent.toLowerCase();
-    if (selectedStatus === "registered" && vehicleStatus === "booked")
-      shouldShow = false;
-    if (selectedStatus === "booked" && vehicleStatus === "available")
-      shouldShow = false;
-
-    // Apply filter with animation
-    if (shouldShow) {
-      card.style.display = "block";
-      card.classList.remove("filtered-out");
-      card.classList.add("filtered-in");
-    } else {
-      card.classList.remove("filtered-in");
-      card.classList.add("filtered-out");
-      setTimeout(() => {
-        if (card.classList.contains("filtered-out")) {
-          card.style.display = "none";
-        }
-      }, 300);
-    }
-  });
-
-  updateResultsCount();
-}
-
-// Apply sorting
-function applySorting() {
-  const sortValue = document.getElementById("sortSelect").value;
+// ================= LOAD VEHICLES =================
+async function loadVehicles() {
   const vehiclesGrid = document.getElementById("vehiclesGrid");
-  const vehicleCards = Array.from(
-    (vehicleCards = vehiclesGrid.querySelectorAll(".vehicle-card"))
-  );
+  vehiclesGrid.innerHTML = `<p>Loading vehicles...</p>`;
 
-  vehicleCards.sort((a, b) => {
-    switch (sortValue) {
-      case "Name (A-Z)":
-        return a
-          .querySelector(".vehicle-name")
-          .textContent.localeCompare(
-            b.querySelector(".vehicle-name").textContent
-          );
-      case "Name (Z-A)":
-        return b
-          .querySelector(".vehicle-name")
-          .textContent.localeCompare(
-            a.querySelector(".vehicle-name").textContent
-          );
-      case "Price (Low to High)":
-        const priceA = parseInt(
-          a.querySelector(".vehicle-price").textContent.replace(/[^\d]/g, "")
-        );
-        const priceB = parseInt(
-          b.querySelector(".vehicle-price").textContent.replace(/[^\d]/g, "")
-        );
-        return priceA - priceB;
-      case "Price (High to Low)":
-        const priceA2 = parseInt(
-          a.querySelector(".vehicle-price").textContent.replace(/[^\d]/g, "")
-        );
-        const priceB2 = parseInt(
-          b.querySelector(".vehicle-price").textContent.replace(/[^\d]/g, "")
-        );
-        return priceB2 - priceA2;
-      case "Rating (High to Low)":
-        const ratingA = a.querySelectorAll(".star:not(.empty)").length;
-        const ratingB = b.querySelectorAll(".star:not(.empty)").length;
-        return ratingB - ratingA;
-      default:
-        return 0;
+  try {
+    const response = await fetch(
+      `${BASE_URL}/vehicle/list?provider_id=${providerId}`
+    );
+    if (!response.ok) throw new Error("Failed to fetch vehicles");
+    const vehicles = await response.json();
+
+    console.log("Loaded vehicles:", vehicles); // Debug log
+
+    vehiclesGrid.innerHTML = "";
+
+    if (!vehicles || vehicles.length === 0) {
+      vehiclesGrid.innerHTML = `<p>No vehicles registered yet.</p>`;
+      return;
+    }
+
+    vehicles.forEach((v) => {
+      // Use vehicleId (camelCase) - this is how Gson serializes it
+      const vehicleId = v.vehicleId;
+      const imageUrl = `${BASE_URL}/vehicle/image?vehicleid=${vehicleId}`;
+
+      const card = document.createElement("div");
+      card.className = "vehicle-card";
+      card.innerHTML = `
+        <div class="vehicle-image"><img src="${imageUrl}" alt="${
+        v.vehicleBrand
+      } ${v.vehicleModel}">
+        </div>
+        <div class="vehicle-info">
+          <h3>${v.vehicleBrand} ${v.vehicleModel}</h3>
+          <p><b>Plate:</b> ${v.numberPlateNumber}</p>
+          <p><b>Color:</b> ${v.color}</p>
+          <p><b>Engine:</b> ${v.engineCapacity} cc</p>
+          <p><b>Passengers:</b> ${v.numberOfPassengers}</p>
+          <p><b>Milage:</b> ${v.milage || "N/A"}</p>
+          <div class="vehicle-buttons">
+            <button class="btn btn-primary" onclick="openUpdateModal(${vehicleId})">Update</button>
+            <button class="btn btn-danger" onclick="deleteVehicle(${vehicleId})">Delete</button>
+          </div>
+        </div>
+      `;
+      vehiclesGrid.appendChild(card);
+    });
+  } catch (err) {
+    vehiclesGrid.innerHTML = `<p>Error loading vehicles.</p>`;
+    console.error("Error loading vehicles:", err);
+  }
+}
+
+// ================= REGISTER VEHICLE =================
+document
+  .getElementById("registerVehicleForm")
+  .addEventListener("submit", async function (e) {
+    e.preventDefault();
+    const formData = new FormData(this);
+    formData.append("provider_id", providerId);
+
+    try {
+      const response = await fetch(`${BASE_URL}/vehicle/add`, {
+        method: "POST",
+        body: formData,
+      });
+      if (!response.ok) throw new Error("Failed to add vehicle");
+
+      alert("✅ Vehicle registered successfully!");
+      closeRegisterModal();
+      this.reset();
+      loadVehicles();
+    } catch (err) {
+      console.error("Error registering vehicle:", err);
+      alert("❌ Failed to register vehicle.");
     }
   });
 
-  // Re-append sorted cards
-  vehicleCards.forEach((card) => vehiclesGrid.appendChild(card));
-}
-
-// Update results count
-function updateResultsCount() {
-  const visibleCards = document.querySelectorAll(
-    '.vehicle-card:not([style*="display: none"])'
-  ).length;
-  const totalCards = document.querySelectorAll(".vehicle-card").length;
-
-  // You could add a results counter here if needed
-  console.log(`Showing ${visibleCards} of ${totalCards} vehicles`);
-}
-
-// Modal functions
-function openAddVehicleModal() {
-  const modal = document.getElementById("addVehicleModal");
-  modal.classList.add("active");
+function openRegisterModal() {
+  document.getElementById("registerVehicleModal").classList.add("active");
   document.body.style.overflow = "hidden";
 }
 
-function closeAddVehicleModal() {
-  const modal = document.getElementById("addVehicleModal");
-  modal.classList.remove("active");
+function closeRegisterModal() {
+  document.getElementById("registerVehicleModal").classList.remove("active");
   document.body.style.overflow = "";
-
-  // Reset form
-  document.getElementById("addVehicleForm").reset();
 }
 
-// Handle form submission
+// ================= UPDATE VEHICLE =================
+async function openUpdateModal(vehicleId) {
+  console.log("Opening update modal for vehicle ID:", vehicleId); // Debug log
+
+  if (!vehicleId || vehicleId === undefined || vehicleId === "undefined") {
+    alert("Invalid vehicle ID");
+    return;
+  }
+
+  const modal = document.getElementById("updateVehicleModal");
+  modal.classList.add("active");
+  document.body.style.overflow = "hidden";
+
+  try {
+    const response = await fetch(
+      `${BASE_URL}/vehicle/list?vehicleid=${vehicleId}`
+    );
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    console.log("Fetched vehicle data:", data); // Debug log
+
+    if (!data || data.length === 0) {
+      throw new Error("Vehicle not found");
+    }
+
+    const v = data[0];
+
+    // Populate fields - use camelCase property names
+    document.getElementById("updateVehicleId").value = v.vehicleId || "";
+    document.getElementById("updateBrand").value = v.vehicleBrand || "";
+    document.getElementById("updateModel").value = v.vehicleModel || "";
+    document.getElementById("updatePlate").value = v.numberPlateNumber || "";
+    document.getElementById("updateColor").value = v.color || "";
+    document.getElementById("updateTareWeight").value = v.tareWeight || "";
+    document.getElementById("updateEngineCapacity").value =
+      v.engineCapacity || "";
+    document.getElementById("updatePassengers").value =
+      v.numberOfPassengers || "";
+    document.getElementById("updateMilage").value = v.milage || "";
+    document.getElementById("updateEngineNumber").value = v.engineNumber || "";
+    document.getElementById("updateChasisNumber").value = v.chasisNumber || "";
+    document.getElementById("updateDescription").value = v.description || "";
+  } catch (err) {
+    console.error("Error fetching vehicle data:", err);
+    alert("Failed to load vehicle details for update. Error: " + err.message);
+    closeUpdateModal();
+  }
+}
+
+function closeUpdateModal() {
+  document.getElementById("updateVehicleModal").classList.remove("active");
+  document.body.style.overflow = "";
+}
+
 document
-  .getElementById("addVehicleForm")
-  .addEventListener("submit", function (e) {
+  .getElementById("updateVehicleForm")
+  .addEventListener("submit", async function (e) {
     e.preventDefault();
 
-    // Get form data
     const formData = new FormData(this);
-    const vehicleData = Object.fromEntries(formData);
+    formData.append("provider_id", providerId);
 
-    // Get selected features
-    const features = [];
-    this.querySelectorAll('input[type="checkbox"]:checked').forEach(
-      (checkbox) => {
-        features.push(checkbox.parentElement.textContent.trim());
-      }
-    );
-    vehicleData.features = features;
+    try {
+      const response = await fetch(`${BASE_URL}/vehicle/update`, {
+        method: "POST",
+        body: formData,
+      });
 
-    // Simulate vehicle registration
-    console.log("Registering vehicle:", vehicleData);
+      if (!response.ok) throw new Error("Update failed");
 
-    // Show success message
-    alert("Vehicle registered successfully!");
-
-    // Close modal
-    closeAddVehicleModal();
-
-    // In a real app, you would refresh the vehicles list here
-    // refreshVehiclesList();
+      alert("✅ Vehicle updated successfully!");
+      closeUpdateModal();
+      loadVehicles();
+    } catch (err) {
+      console.error("Error updating vehicle:", err);
+      alert("❌ Failed to update vehicle.");
+    }
   });
 
-// Load more vehicles function
-function loadMoreVehicles() {
-  const button = event.target;
-  button.textContent = "Loading...";
-  button.disabled = true;
+// ================= DELETE VEHICLE =================
+async function deleteVehicle(vehicleId) {
+  console.log("Deleting vehicle ID:", vehicleId); // Debug log
 
-  // Simulate loading more vehicles
-  setTimeout(() => {
-    // In a real app, you would fetch more vehicles from the server
-    // and append them to the grid
+  if (!vehicleId || vehicleId === undefined || vehicleId === "undefined") {
+    alert("Invalid vehicle ID");
+    return;
+  }
 
-    button.textContent = "Load More Vehicles";
-    button.disabled = false;
+  if (!confirm("Are you sure you want to delete this vehicle?")) return;
 
-    // For demo purposes, just show a message
-    alert("No more vehicles to load");
-  }, 2000);
+  try {
+    const response = await fetch(`${BASE_URL}/vehicle/delete`, {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: `vehicleid=${encodeURIComponent(vehicleId)}`,
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || "Delete failed");
+    }
+
+    alert("🗑️ Vehicle deleted successfully!");
+    loadVehicles();
+  } catch (err) {
+    console.error("Error deleting vehicle:", err);
+    alert("❌ Failed to delete vehicle: " + err.message);
+  }
 }
-
-// Close modal when clicking outside
-document.addEventListener("click", function (e) {
-  const modal = document.getElementById("addVehicleModal");
-  if (e.target === modal) {
-    closeAddVehicleModal();
-  }
-});
-
-// Close modal with escape key
-document.addEventListener("keydown", function (e) {
-  if (e.key === "Escape") {
-    closeAddVehicleModal();
-  }
-});
-
-// Initialize date inputs with current date
-document.addEventListener("DOMContentLoaded", function () {
-  const today = new Date().toISOString().split("T")[0];
-  document.getElementById("fromDate").value = today;
-
-  const tomorrow = new Date();
-  tomorrow.setDate(tomorrow.getDate() + 1);
-  document.getElementById("toDate").value = tomorrow
-    .toISOString()
-    .split("T")[0];
-});

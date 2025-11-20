@@ -3,344 +3,355 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>My Vehicles - RideMachan</title>
+    <title>My Vehicles | RideMachan</title>
+
+    <!-- Shared styles -->
     <link rel="stylesheet" href="../css/styles.css" />
     <link rel="stylesheet" href="../css/sidebar.css" />
     <link rel="stylesheet" href="../css/my-vehicles.css" />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+      rel="stylesheet"
+    />
   </head>
   <body>
+    <!-- Sidebar -->
+    <div id="sidebar-container"></div>
+
+    <!-- Page container -->
     <div class="container">
       <div class="main-content">
         <div class="page-header">
           <h1>My Vehicles</h1>
-          <button class="btn btn-primary" onclick="openAddVehicleModal()">
-            + Register a vehicle
+          <button class="btn btn-primary" onclick="openRegisterModal()">
+            <i class="fas fa-plus"></i> Register Vehicle
           </button>
         </div>
-        <p class="page-subtitle">
-          Manage your vehicle fleet and track bookings
-        </p>
 
-        <!-- Filter Section -->
-        <div class="search-filter-section">
-          <div class="filter-row">
-            <div class="form-group">
-              <label class="form-label">Vehicle type</label>
-              <select class="form-select" id="vehicleTypeFilter">
-                <option>All Types</option>
-                <option>Sedan</option>
-                <option>SUV</option>
-                <option>Hatchback</option>
-                <option>Budget Cars</option>
-                <option>Luxury Rides</option>
-                <option>Eco Rentals</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label class="form-label">Location</label>
-              <select class="form-select" id="locationFilter">
-                <option>All Locations</option>
-                <option>Colombo</option>
-                <option>Kandy</option>
-                <option>Galle</option>
-                <option>Negombo</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label class="form-label">From</label>
-              <input type="date" class="form-control" id="fromDate" />
-            </div>
-            <div class="form-group">
-              <label class="form-label">To</label>
-              <input type="date" class="form-control" id="toDate" />
-            </div>
-          </div>
-          <div class="filter-options">
-            <label class="checkbox-label">
-              <input
-                type="radio"
-                name="vehicleStatus"
-                value="registered"
-                checked
-              />
-              Registered to company
-            </label>
-            <label class="checkbox-label">
-              <input type="radio" name="vehicleStatus" value="booked" />
-              Booked
-            </label>
-          </div>
-          <div class="search-sort-row">
-            <div class="search-box">
-              <input
-                type="text"
-                placeholder="Search vehicles..."
-                class="form-control"
-                id="searchInput"
-              />
-            </div>
-            <select class="form-select" id="sortSelect">
-              <option>Name (A-Z)</option>
-              <option>Name (Z-A)</option>
-              <option>Price (Low to High)</option>
-              <option>Price (High to Low)</option>
-              <option>Rating (High to Low)</option>
-            </select>
-          </div>
-        </div>
-
-        <!-- Vehicles Grid -->
-        <div class="vehicles-grid" id="vehiclesGrid">
-          <!-- Vehicle Card 1 -->
-          <div class="vehicle-card" data-type="luxury" data-location="colombo">
-            <div class="vehicle-image">
-              <div class="no-image">No image available</div>
-              <div class="vehicle-status available">Available</div>
-            </div>
-            <div class="vehicle-info">
-              <h3 class="vehicle-name">BMW X3</h3>
-              <div class="vehicle-price">₹8500/day</div>
-              <div class="vehicle-category">🏢 Luxury Rides</div>
-              <div class="vehicle-location">📍 Colombo</div>
-              <div class="vehicle-features">
-                <span class="feature">AC</span>
-                <span class="feature">Automatic</span>
-                <span class="feature">Leather Seats</span>
-                <span class="feature">Sunroof</span>
-                <span class="feature">Premium Sound</span>
-              </div>
-              <div class="vehicle-rating">
-                <div class="rating">
-                  <span class="star">★</span>
-                  <span class="star">★</span>
-                  <span class="star">★</span>
-                  <span class="star">★</span>
-                  <span class="star">★</span>
-                  <span class="rating-text">42 reviews</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Vehicle Card 2 -->
-          <div class="vehicle-card" data-type="eco" data-location="colombo">
-            <div class="vehicle-image">
-              <div class="no-image">No image available</div>
-              <div class="vehicle-status available">Available</div>
-            </div>
-            <div class="vehicle-info">
-              <h3 class="vehicle-name">Nissan Leaf</h3>
-              <div class="vehicle-price">₹6500/day</div>
-              <div class="vehicle-category">🌱 Eco Rentals</div>
-              <div class="vehicle-location">📍 Colombo</div>
-              <div class="vehicle-features">
-                <span class="feature">Electric</span>
-                <span class="feature">Silent</span>
-                <span class="feature">GPS</span>
-                <span class="feature">AC</span>
-                <span class="feature">Eco-friendly</span>
-              </div>
-              <div class="vehicle-rating">
-                <div class="rating">
-                  <span class="star">★</span>
-                  <span class="star">★</span>
-                  <span class="star">★</span>
-                  <span class="star">★</span>
-                  <span class="star empty">★</span>
-                  <span class="rating-text">15 reviews</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Vehicle Card 3 -->
-          <div class="vehicle-card" data-type="budget" data-location="galle">
-            <div class="vehicle-image">
-              <div class="no-image">No image available</div>
-              <div class="vehicle-status available">Available</div>
-            </div>
-            <div class="vehicle-info">
-              <h3 class="vehicle-name">Suzuki Alto</h3>
-              <div class="vehicle-price">₹2800/day</div>
-              <div class="vehicle-category">💰 Budget Cars</div>
-              <div class="vehicle-location">📍 Galle</div>
-              <div class="vehicle-features">
-                <span class="feature">AC</span>
-                <span class="feature">Manual</span>
-                <span class="feature">Fuel Efficient</span>
-              </div>
-              <div class="vehicle-rating">
-                <div class="rating">
-                  <span class="star">★</span>
-                  <span class="star">★</span>
-                  <span class="star">★</span>
-                  <span class="star empty">★</span>
-                  <span class="star empty">★</span>
-                  <span class="rating-text">12 reviews</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Vehicle Card 4 -->
-          <div class="vehicle-card" data-type="sedan" data-location="colombo">
-            <div class="vehicle-image">
-              <div class="no-image">No image available</div>
-              <div class="vehicle-status booked">Booked</div>
-            </div>
-            <div class="vehicle-info">
-              <h3 class="vehicle-name">Toyota Corolla</h3>
-              <div class="vehicle-price">₹3500/day</div>
-              <div class="vehicle-category">🚗 City Car Rentals</div>
-              <div class="vehicle-location">📍 Colombo</div>
-              <div class="vehicle-features">
-                <span class="feature">AC</span>
-                <span class="feature">Automatic</span>
-                <span class="feature">GPS</span>
-                <span class="feature">Bluetooth</span>
-              </div>
-              <div class="vehicle-rating">
-                <div class="rating">
-                  <span class="star">★</span>
-                  <span class="star">★</span>
-                  <span class="star">★</span>
-                  <span class="star">★</span>
-                  <span class="star empty">★</span>
-                  <span class="rating-text">25 reviews</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Load More Button -->
-        <div class="load-more-section">
-          <button class="btn btn-secondary" onclick="loadMoreVehicles()">
-            Load More Vehicles
-          </button>
+        <!-- Vehicles grid -->
+        <div id="vehiclesGrid" class="vehicles-grid">
+          <p>Loading vehicles...</p>
         </div>
       </div>
     </div>
 
-    <!-- Add Vehicle Modal -->
-    <div class="modal-overlay" id="addVehicleModal">
+    <!-- Register Vehicle Modal -->
+    <div class="modal-overlay" id="registerVehicleModal">
       <div class="modal">
         <div class="modal-header">
-          <h2>Register New Vehicle</h2>
-          <button class="modal-close" onclick="closeAddVehicleModal()">
-            ×
-          </button>
+          <h2>Register a Vehicle</h2>
+          <button class="modal-close" onclick="closeRegisterModal()">×</button>
         </div>
         <div class="modal-body">
-          <form id="addVehicleForm">
+          <form id="registerVehicleForm" enctype="multipart/form-data">
             <div class="form-row">
               <div class="form-group">
-                <label class="form-label">Vehicle Type</label>
-                <select class="form-select" required>
-                  <option value="">Select vehicle type</option>
-                  <option>Sedan</option>
-                  <option>SUV</option>
-                  <option>Hatchback</option>
-                  <option>Luxury</option>
-                </select>
-              </div>
-              <div class="form-group">
-                <label class="form-label">Brand</label>
+                <label class="form-label">Vehicle Brand</label>
                 <input
                   type="text"
+                  name="vehiclebrand"
                   class="form-control"
-                  placeholder="Enter brand"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Vehicle Model</label>
+                <input
+                  type="text"
+                  name="vehiclemodel"
+                  class="form-control"
                   required
                 />
               </div>
             </div>
+
             <div class="form-row">
               <div class="form-group">
-                <label class="form-label">Model</label>
+                <label class="form-label">Number Plate</label>
                 <input
                   type="text"
+                  name="numberplatenumber"
                   class="form-control"
-                  placeholder="Enter model"
                   required
                 />
               </div>
               <div class="form-group">
-                <label class="form-label">Year</label>
+                <label class="form-label">Color</label>
+                <input type="text" name="color" class="form-control" required />
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Tare Weight (kg)</label>
                 <input
                   type="number"
+                  name="tareweight"
                   class="form-control"
-                  placeholder="Enter year"
-                  min="2000"
-                  max="2025"
-                  required
-                />
-              </div>
-            </div>
-            <div class="form-row">
-              <div class="form-group">
-                <label class="form-label">License Plate</label>
-                <input
-                  type="text"
-                  class="form-control"
-                  placeholder="Enter license plate"
                   required
                 />
               </div>
               <div class="form-group">
-                <label class="form-label">Daily Rate (Rs)</label>
+                <label class="form-label">Engine Capacity (cc)</label>
                 <input
                   type="number"
+                  name="enginecapacity"
                   class="form-control"
-                  placeholder="Enter daily rate"
                   required
                 />
               </div>
             </div>
-            <div class="form-group">
-              <label class="form-label">Location</label>
-              <select class="form-select" required>
-                <option value="">Select location</option>
-                <option>Colombo</option>
-                <option>Kandy</option>
-                <option>Galle</option>
-                <option>Negombo</option>
-              </select>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Passengers</label>
+                <input
+                  type="number"
+                  name="numberofpassengers"
+                  class="form-control"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Milage</label>
+                <input type="text" name="milage" class="form-control" />
+              </div>
             </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Engine Number</label>
+                <input
+                  type="text"
+                  name="enginenumber"
+                  class="form-control"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Chasis Number</label>
+                <input
+                  type="text"
+                  name="chasisnumber"
+                  class="form-control"
+                  required
+                />
+              </div>
+            </div>
+
             <div class="form-group">
-              <label class="form-label">Features</label>
-              <div class="features-grid">
-                <label class="checkbox-label">
-                  <input type="checkbox" /> AC
-                </label>
-                <label class="checkbox-label">
-                  <input type="checkbox" /> Automatic
-                </label>
-                <label class="checkbox-label">
-                  <input type="checkbox" /> GPS
-                </label>
-                <label class="checkbox-label">
-                  <input type="checkbox" /> Bluetooth
-                </label>
-                <label class="checkbox-label">
-                  <input type="checkbox" /> Leather Seats
-                </label>
-                <label class="checkbox-label">
-                  <input type="checkbox" /> Sunroof
-                </label>
+              <label class="form-label">Description</label>
+              <textarea name="description" class="form-control"></textarea>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Registration Document (PDF)</label>
+                <input
+                  type="file"
+                  name="registrationdocumentation"
+                  class="form-control"
+                  accept=".pdf"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Vehicle Image</label>
+                <input
+                  type="file"
+                  name="vehicleimages"
+                  class="form-control"
+                  accept="image/*"
+                  required
+                />
               </div>
             </div>
           </form>
         </div>
         <div class="modal-footer">
-          <button
-            type="button"
-            class="btn btn-secondary"
-            onclick="closeAddVehicleModal()"
-          >
+          <button class="btn btn-secondary" onclick="closeRegisterModal()">
             Cancel
           </button>
-          <button type="submit" form="addVehicleForm" class="btn btn-primary">
-            Register Vehicle
+          <button
+            type="submit"
+            form="registerVehicleForm"
+            class="btn btn-primary"
+          >
+            Register
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Update Vehicle Modal -->
+    <!-- Update Vehicle Modal -->
+    <div class="modal-overlay" id="updateVehicleModal">
+      <div class="modal">
+        <div class="modal-header">
+          <h2>Update Vehicle</h2>
+          <button class="modal-close" onclick="closeUpdateModal()">×</button>
+        </div>
+        <div class="modal-body">
+          <form id="updateVehicleForm" enctype="multipart/form-data">
+            <input type="hidden" id="updateVehicleId" name="vehicleid" />
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Vehicle Brand</label>
+                <input
+                  type="text"
+                  id="updateBrand"
+                  name="vehiclebrand"
+                  class="form-control"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Vehicle Model</label>
+                <input
+                  type="text"
+                  id="updateModel"
+                  name="vehiclemodel"
+                  class="form-control"
+                  required
+                />
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Number Plate</label>
+                <input
+                  type="text"
+                  id="updatePlate"
+                  name="numberplatenumber"
+                  class="form-control"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Color</label>
+                <input
+                  type="text"
+                  id="updateColor"
+                  name="color"
+                  class="form-control"
+                  required
+                />
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Tare Weight (kg)</label>
+                <input
+                  type="number"
+                  id="updateTareWeight"
+                  name="tareweight"
+                  class="form-control"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Engine Capacity (cc)</label>
+                <input
+                  type="number"
+                  id="updateEngineCapacity"
+                  name="enginecapacity"
+                  class="form-control"
+                  required
+                />
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Passengers</label>
+                <input
+                  type="number"
+                  id="updatePassengers"
+                  name="numberofpassengers"
+                  class="form-control"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Milage</label>
+                <input
+                  type="text"
+                  id="updateMilage"
+                  name="milage"
+                  class="form-control"
+                />
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Engine Number</label>
+                <input
+                  type="text"
+                  id="updateEngineNumber"
+                  name="enginenumber"
+                  class="form-control"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Chasis Number</label>
+                <input
+                  type="text"
+                  id="updateChasisNumber"
+                  name="chasisnumber"
+                  class="form-control"
+                  required
+                />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Description</label>
+              <textarea
+                id="updateDescription"
+                name="description"
+                class="form-control"
+              ></textarea>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Registration Document (PDF)</label>
+                <input
+                  type="file"
+                  id="updateRegDoc"
+                  name="registrationdocumentation"
+                  class="form-control"
+                  accept=".pdf"
+                />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Vehicle Image</label>
+                <input
+                  type="file"
+                  id="updateImage"
+                  name="vehicleimages"
+                  class="form-control"
+                  accept="image/*"
+                />
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" onclick="closeUpdateModal()">
+            Cancel
+          </button>
+          <button
+            type="submit"
+            form="updateVehicleForm"
+            class="btn btn-primary"
+          >
+            Update
           </button>
         </div>
       </div>

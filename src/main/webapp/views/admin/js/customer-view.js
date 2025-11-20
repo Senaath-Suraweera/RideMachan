@@ -171,5 +171,12 @@
     }
     render(customer);
     wireTabs();
+
+    // --- Back Button ---
+    document
+      .getElementById("backToCustomersBtn")
+      ?.addEventListener("click", () => {
+        window.location.href = "customers.html";
+      });
   });
 })();

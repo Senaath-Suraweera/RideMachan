@@ -12,13 +12,12 @@
     <div class="main-content">
       <nav class="topbar">
         <a class="back-link" href="drivers.html">← Back to Drivers</a>
-        <button
-          class="btn btn-primary"
-          id="btnOpenEditDriver"
-          style="float: right"
-        >
-          Edit Driver
-        </button>
+        <div style="display: flex; gap: 10px">
+          <button class="btn btn-danger" id="banDriverBtn">Ban Driver</button>
+          <button class="btn btn-primary" id="btnOpenEditDriver">
+            Edit Driver
+          </button>
+        </div>
       </nav>
 
       <main class="driver-view" id="driverView">

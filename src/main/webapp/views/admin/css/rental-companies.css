@@ -219,8 +219,8 @@ body {
   transform: translateY(-1px);
 }
 .rating-stars .star.active {
-  background: var(--brand-600);
-  border-color: var(--brand-600);
+  /* background: var(--brand-600);
+  border-color: var(--brand-600); */
   color: #fff;
 }
 
@@ -264,15 +264,18 @@ body {
 }
 
 .company-avatar {
-  width: 60px;
-  height: 60px;
+  width: 64px;
+  height: 64px;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--brand-600), #34a853);
+  background: linear-gradient(135deg, #4285f4, #34a853);
   display: flex;
   align-items: center;
   justify-content: center;
+  text-align: center;
   flex-shrink: 0;
+  margin: auto 0; /* ensures proper vertical centering */
 }
+
 .company-avatar .avatar-text {
   color: #fff;
   font-size: 18px;

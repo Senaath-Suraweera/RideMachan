@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Messages - Ride Machan</title>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Main CSS -->
+    <link rel="stylesheet" href="../css/main.css">
+    
+    <!-- Messages CSS -->
+    <link rel="stylesheet" href="../css/messages.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Include Navbar Component -->
+        <div id="navbar-container"></div>
+
+        <!-- Include Header Component -->
+        <div id="header-container"></div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Page Title -->
+            <div class="page-title-row">
+                <button class="icon-btn back-btn" onclick="history.back()" aria-label="Go back" title="Back">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+            </div>
+
+            <!-- Messages Layout -->
+            <div class="messages-layout">
+                <!-- Conversations Panel -->
+                <div class="conversations-panel">
+                    <div class="panel-header">
+                        <h3>Conversations</h3>
+                        <div class="search-box">
+                            <i class="fas fa-search"></i>
+                            <input type="text" placeholder="Search conversations..." id="searchConversations">
+                        </div>
+                    </div>
+
+                    <div class="filter-tabs">
+                        <button class="filter-tab active" data-filter="all">
+                            <i class="fas fa-inbox"></i>
+                            All
+                        </button>
+                        <button class="filter-tab" data-filter="company">
+                            <i class="fas fa-building"></i>
+                            Company
+                        </button>
+                        <button class="filter-tab" data-filter="driver">
+                            <i class="fas fa-user"></i>
+                            Drivers
+                        </button>
+                    </div>
+
+                    <div class="conversations-list" id="conversationsList">
+                        <!-- Conversation items will be loaded here -->
+                    </div>
+                </div>
+
+                <!-- Messages Panel -->
+                <div class="messages-panel">
+                    <div class="no-conversation-selected" id="noConversation">
+                        <i class="fas fa-comments"></i>
+                        <h3>Select a conversation</h3>
+                        <p>Choose a conversation from the list to view messages</p>
+                    </div>
+
+                    <div class="conversation-view" id="conversationView" style="display: none;">
+                        <!-- Conversation Header -->
+                        <div class="conversation-header">
+                            <div class="conversation-info">
+                                <div class="avatar">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                <div class="info">
+                                    <h3 id="conversationTitle">Driver Name</h3>
+                                    <p id="conversationSubtitle">Booking #12345</p>
+                                </div>
+                            </div>
+                            <div class="conversation-actions">
+                                <button class="icon-btn" title="Booking Details">
+                                    <i class="fas fa-info-circle"></i>
+                                </button>
+                                <button class="icon-btn" title="More Options">
+                                    <i class="fas fa-ellipsis-v"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Messages Area -->
+                        <div class="messages-area" id="messagesArea">
+                            <!-- Messages will be loaded here -->
+                        </div>
+
+                        <!-- Message Input -->
+                        <div class="message-input-container">
+                            <div class="input-wrapper">
+                                <button class="icon-btn" title="Attach File">
+                                    <i class="fas fa-paperclip"></i>
+                                </button>
+                                <textarea 
+                                    id="messageInput" 
+                                    placeholder="Type your message..."
+                                    rows="1"
+                                ></textarea>
+                                <button class="icon-btn send-btn" onclick="sendMessage()">
+                                    <i class="fas fa-paper-plane"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sample messages data
+        const messagesData = [
+            {
+                id: 1,
+                bookingId: "BK-2024-001",
+                type: "driver",
+                name: "John Silva",
+                avatar: "JS",
+                lastMessage: "I'm on my way to the pickup location. ETA 10 minutes.",
+                timestamp: "2024-10-18T10:30:00",
+                unread: true,
+                messages: [
+                    {
+                        id: 1,
+                        sender: "driver",
+                        text: "Hello! I've been assigned to your booking. I'll be there shortly.",
+                        timestamp: "2024-10-18T09:45:00",
+                        status: "read"
+                    },
+                    {
+                        id: 2,
+                        sender: "customer",
+                        text: "Great! How long will it take?",
+                        timestamp: "2024-10-18T09:47:00",
+                        status: "read"
+                    },
+                    {
+                        id: 3,
+                        sender: "driver",
+                        text: "I'm about 15 minutes away from your location.",
+                        timestamp: "2024-10-18T09:48:00",
+                        status: "read"
+                    },
+                    {
+                        id: 4,
+                        sender: "system",
+                        text: "Driver has started the trip",
+                        timestamp: "2024-10-18T10:15:00"
+                    },
+                    {
+                        id: 5,
+                        sender: "driver",
+                        text: "I'm on my way to the pickup location. ETA 10 minutes.",
+                        timestamp: "2024-10-18T10:30:00",
+                        status: "delivered"
+                    }
+                ]
+            },
+            {
+                id: 2,
+                bookingId: "BK-2024-002",
+                type: "company",
+                name: "Support Team",
+                avatar: "ST",
+                lastMessage: "Your booking has been confirmed. Driver details will be shared soon.",
+                timestamp: "2024-10-18T08:15:00",
+                unread: false,
+                messages: [
+                    {
+                        id: 1,
+                        sender: "customer",
+                        text: "I need to change my pickup time for tomorrow's booking.",
+                        timestamp: "2024-10-18T08:00:00",
+                        status: "read"
+                    },
+                    {
+                        id: 2,
+                        sender: "company",
+                        text: "Sure! What time would you prefer?",
+                        timestamp: "2024-10-18T08:05:00",
+                        status: "read"
+                    },
+                    {
+                        id: 3,
+                        sender: "customer",
+                        text: "Can we make it 9:00 AM instead of 7:00 AM?",
+                        timestamp: "2024-10-18T08:07:00",
+                        status: "read"
+                    },
+                    {
+                        id: 4,
+                        sender: "company",
+                        text: "Your booking has been updated to 9:00 AM. Driver details will be shared soon.",
+                        timestamp: "2024-10-18T08:15:00",
+                        status: "read"
+                    }
+                ]
+            },
+            {
+                id: 3,
+                bookingId: "BK-2024-003",
+                type: "driver",
+                name: "Mike Fernando",
+                avatar: "MF",
+                lastMessage: "Thank you for choosing our service! Have a great day!",
+                timestamp: "2024-10-17T16:45:00",
+                unread: false,
+                messages: [
+                    {
+                        id: 1,
+                        sender: "driver",
+                        text: "Good afternoon! I'm your driver for today's trip.",
+                        timestamp: "2024-10-17T14:00:00",
+                        status: "read"
+                    },
+                    {
+                        id: 2,
+                        sender: "customer",
+                        text: "Hi! Will we make it on time? My flight is at 6 PM.",
+                        timestamp: "2024-10-17T14:02:00",
+                        status: "read"
+                    },
+                    {
+                        id: 3,
+                        sender: "driver",
+                        text: "Don't worry! We have plenty of time. Traffic looks good today.",
+                        timestamp: "2024-10-17T14:03:00",
+                        status: "read"
+                    },
+                    {
+                        id: 4,
+                        sender: "system",
+                        text: "Trip completed successfully",
+                        timestamp: "2024-10-17T16:30:00"
+                    },
+                    {
+                        id: 5,
+                        sender: "driver",
+                        text: "Thank you for choosing our service! Have a great day!",
+                        timestamp: "2024-10-17T16:45:00",
+                        status: "read"
+                    }
+                ]
+            },
+            {
+                id: 4,
+                bookingId: "BK-2024-004",
+                type: "company",
+                name: "Billing Department",
+                avatar: "BD",
+                lastMessage: "Your invoice for booking BK-2024-004 is ready.",
+                timestamp: "2024-10-16T11:20:00",
+                unread: false,
+                messages: [
+                    {
+                        id: 1,
+                        sender: "company",
+                        text: "Hello! Your invoice for booking BK-2024-004 is ready.",
+                        timestamp: "2024-10-16T11:20:00",
+                        status: "read"
+                    },
+                    {
+                        id: 2,
+                        sender: "customer",
+                        text: "Can I get a breakdown of the charges?",
+                        timestamp: "2024-10-16T11:25:00",
+                        status: "read"
+                    },
+                    {
+                        id: 3,
+                        sender: "company",
+                        text: "Of course! Base fare: Rs. 2,500, Distance charge: Rs. 1,800, Waiting time: Rs. 300. Total: Rs. 4,600",
+                        timestamp: "2024-10-16T11:30:00",
+                        status: "read"
+                    }
+                ]
+            },
+            {
+                id: 5,
+                bookingId: "BK-2024-005",
+                type: "driver",
+                name: "David Perera",
+                avatar: "DP",
+                lastMessage: "Arrived at pickup location.",
+                timestamp: "2024-10-15T07:30:00",
+                unread: false,
+                messages: [
+                    {
+                        id: 1,
+                        sender: "driver",
+                        text: "Good morning! I'm 5 minutes away.",
+                        timestamp: "2024-10-15T07:20:00",
+                        status: "read"
+                    },
+                    {
+                        id: 2,
+                        sender: "customer",
+                        text: "Perfect timing! I'm ready.",
+                        timestamp: "2024-10-15T07:22:00",
+                        status: "read"
+                    },
+                    {
+                        id: 3,
+                        sender: "driver",
+                        text: "Arrived at pickup location.",
+                        timestamp: "2024-10-15T07:30:00",
+                        status: "read"
+                    }
+                ]
+            }
+        ];
+
+        let activeConversation = null;
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            loadComponents();
+            loadConversations();
+            setupEventListeners();
+            setupMessageInput();
+        });
+
+        // Load navbar and header components
+        async function loadComponents() {
+            try {
+                const navbarResponse = await fetch('../components/navbar.html');
+                const navbarHtml = await navbarResponse.text();
+                document.getElementById('navbar-container').innerHTML = navbarHtml;
+
+                const headerResponse = await fetch('../components/header.html');
+                const headerHtml = await headerResponse.text();
+                const customizedHeader = headerHtml.replace('{{PAGE_TITLE}}', 'MESSAGES');
+                document.getElementById('header-container').innerHTML = customizedHeader;
+
+                executeComponentScripts();
+            } catch (error) {
+                console.error('Error loading components:', error);
+            }
+        }
+
+        function executeComponentScripts() {
+            const scripts = document.querySelectorAll('#navbar-container script, #header-container script');
+            scripts.forEach(script => {
+                const newScript = document.createElement('script');
+                newScript.textContent = script.textContent;
+                document.body.appendChild(newScript);
+            });
+        }
+
+        // Load conversations list
+        function loadConversations(filter = 'all') {
+            const conversationsList = document.getElementById('conversationsList');
+            conversationsList.innerHTML = '';
+
+            let filteredData = messagesData;
+            
+            if (filter !== 'all') {
+                filteredData = messagesData.filter(conv => conv.type === filter);
+            }
+
+            filteredData.forEach(conversation => {
+                const conversationItem = createConversationItem(conversation);
+                conversationsList.appendChild(conversationItem);
+            });
+        }
+
+        // Create conversation item element
+        function createConversationItem(conversation) {
+            const item = document.createElement('div');
+            item.className = `conversation-item ${conversation.unread ? 'unread' : ''}`;
+            item.dataset.conversationId = conversation.id;
+            
+            const time = formatTime(conversation.timestamp);
+            
+            item.innerHTML = `
+                <div class="conversation-top">
+                    <div class="conversation-avatar ${conversation.type}">
+                        ${conversation.avatar}
+                        ${conversation.type === 'driver' ? '<span class="status-indicator"></span>' : ''}
+                    </div>
+                    <div class="conversation-details">
+                        <div class="conversation-name">
+                            ${conversation.name}
+                            <span class="badge">${conversation.type === 'company' ? 'Support' : 'Driver'}</span>
+                        </div>
+                        <div class="conversation-booking">Booking #${conversation.bookingId}</div>
+                    </div>
+                    <div class="conversation-time">${time}</div>
+                </div>
+                <div class="conversation-bottom">
+                    <div class="conversation-preview">${conversation.lastMessage}</div>
+                </div>
+            `;
+            
+            item.addEventListener('click', () => openConversation(conversation.id));
+            
+            return item;
+        }
+
+        // Open conversation
+        function openConversation(conversationId) {
+            const conversation = messagesData.find(c => c.id === conversationId);
+            if (!conversation) return;
+            
+            activeConversation = conversation;
+            conversation.unread = false;
+            
+            document.querySelectorAll('.conversation-item').forEach(item => {
+                item.classList.remove('active');
+                if (item.dataset.conversationId == conversationId) {
+                    item.classList.add('active');
+                    item.classList.remove('unread');
+                }
+            });
+            
+            document.getElementById('noConversation').style.display = 'none';
+            document.getElementById('conversationView').style.display = 'flex';
+            
+            document.getElementById('conversationTitle').textContent = conversation.name;
+            document.getElementById('conversationSubtitle').textContent = `Booking #${conversation.bookingId}`;
+            
+            loadMessages(conversation);
+        }
+
+        // Load messages for conversation
+        function loadMessages(conversation) {
+            const messagesArea = document.getElementById('messagesArea');
+            messagesArea.innerHTML = '';
+            
+            let currentDate = null;
+            
+            conversation.messages.forEach(message => {
+                const messageDate = new Date(message.timestamp).toDateString();
+                
+                if (messageDate !== currentDate) {
+                    currentDate = messageDate;
+                    const divider = createDateDivider(message.timestamp);
+                    messagesArea.appendChild(divider);
+                }
+                
+                const messageElement = createMessageElement(message);
+                messagesArea.appendChild(messageElement);
+            });
+            
+            messagesArea.scrollTop = messagesArea.scrollHeight;
+        }
+
+        // Create date divider
+        function createDateDivider(timestamp) {
+            const divider = document.createElement('div');
+            divider.className = 'message-date-divider';
+            
+            const date = new Date(timestamp);
+            const today = new Date();
+            const yesterday = new Date(today);
+            yesterday.setDate(yesterday.getDate() - 1);
+            
+            let dateText;
+            if (date.toDateString() === today.toDateString()) {
+                dateText = 'Today';
+            } else if (date.toDateString() === yesterday.toDateString()) {
+                dateText = 'Yesterday';
+            } else {
+                dateText = date.toLocaleDateString('en-US', { 
+                    month: 'long', 
+                    day: 'numeric', 
+                    year: 'numeric' 
+                });
+            }
+            
+            divider.innerHTML = `<span>${dateText}</span>`;
+            return divider;
+        }
+
+        // Create message element
+        function createMessageElement(message) {
+            const messageDiv = document.createElement('div');
+            
+            if (message.sender === 'system') {
+                messageDiv.className = 'message system';
+                messageDiv.innerHTML = `
+                    <div class="message-content">
+                        <div class="message-bubble">
+                            <p class="message-text">${message.text}</p>
+                        </div>
+                    </div>
+                `;
+            } else {
+                const isSent = message.sender === 'customer';
+                messageDiv.className = `message ${isSent ? 'sent' : 'received'}`;
+                
+                const time = new Date(message.timestamp).toLocaleTimeString('en-US', {
+                    hour: 'numeric',
+                    minute: '2-digit',
+                    hour12: true
+                });
+                
+                messageDiv.innerHTML = `
+                    <div class="message-avatar">${isSent ? 'ME' : activeConversation.avatar}</div>
+                    <div class="message-content">
+                        <div class="message-bubble">
+                            <p class="message-text">${message.text}</p>
+                        </div>
+                        <div class="message-meta">
+                            <span class="message-time">${time}</span>
+                            ${isSent ? `
+                                <span class="message-status ${message.status === 'read' ? 'read' : ''}">
+                                    <i class="fas ${message.status === 'read' ? 'fa-check-double' : 'fa-check'}"></i>
+                                    ${message.status === 'read' ? 'Read' : 'Delivered'}
+                                </span>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+            }
+            
+            return messageDiv;
+        }
+
+        // Send message
+        function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const messageText = input.value.trim();
+            
+            if (!messageText || !activeConversation) return;
+            
+            const newMessage = {
+                id: activeConversation.messages.length + 1,
+                sender: 'customer',
+                text: messageText,
+                timestamp: new Date().toISOString(),
+                status: 'delivered'
+            };
+            
+            activeConversation.messages.push(newMessage);
+            activeConversation.lastMessage = messageText;
+            activeConversation.timestamp = newMessage.timestamp;
+            
+            const messageElement = createMessageElement(newMessage);
+            const messagesArea = document.getElementById('messagesArea');
+            messagesArea.appendChild(messageElement);
+            
+            messagesArea.scrollTop = messagesArea.scrollHeight;
+            
+            input.value = '';
+            input.style.height = 'auto';
+            
+            loadConversations();
+            
+            setTimeout(() => {
+                document.querySelectorAll('.conversation-item').forEach(item => {
+                    if (item.dataset.conversationId == activeConversation.id) {
+                        item.classList.add('active');
+                    }
+                });
+            }, 100);
+            
+            setTimeout(() => simulateResponse(), 2000);
+        }
+
+        // Simulate response
+        function simulateResponse() {
+            if (!activeConversation) return;
+            
+            const responses = [
+                "Got it! Thanks for letting me know.",
+                "I'll take care of that right away.",
+                "Perfect! See you soon.",
+                "Understood. I'm on my way.",
+                "No problem at all!"
+            ];
+            
+            const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+            
+            const responseMessage = {
+                id: activeConversation.messages.length + 1,
+                sender: activeConversation.type === 'company' ? 'company' : 'driver',
+                text: randomResponse,
+                timestamp: new Date().toISOString(),
+                status: 'delivered'
+            };
+            
+            activeConversation.messages.push(responseMessage);
+            activeConversation.lastMessage = randomResponse;
+            activeConversation.timestamp = responseMessage.timestamp;
+            
+            const messageElement = createMessageElement(responseMessage);
+            const messagesArea = document.getElementById('messagesArea');
+            messagesArea.appendChild(messageElement);
+            
+            messagesArea.scrollTop = messagesArea.scrollHeight;
+            
+            loadConversations();
+            
+            setTimeout(() => {
+                document.querySelectorAll('.conversation-item').forEach(item => {
+                    if (item.dataset.conversationId == activeConversation.id) {
+                        item.classList.add('active');
+                    }
+                });
+            }, 100);
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            document.querySelectorAll('.filter-tab').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    const filter = this.dataset.filter;
+                    loadConversations(filter);
+                });
+            });
+            
+            document.getElementById('searchConversations').addEventListener('input', function(e) {
+                const searchTerm = e.target.value.toLowerCase();
+                const conversations = document.querySelectorAll('.conversation-item');
+                
+                conversations.forEach(conv => {
+                    const name = conv.querySelector('.conversation-name').textContent.toLowerCase();
+                    const preview = conv.querySelector('.conversation-preview').textContent.toLowerCase();
+                    const booking = conv.querySelector('.conversation-booking').textContent.toLowerCase();
+                    
+                    if (name.includes(searchTerm) || preview.includes(searchTerm) || booking.includes(searchTerm)) {
+                        conv.style.display = 'block';
+                    } else {
+                        conv.style.display = 'none';
+                    }
+                });
+            });
+            
+            document.getElementById('messageInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    sendMessage();
+                }
+            });
+        }
+
+        // Setup message input auto-resize
+        function setupMessageInput() {
+            const textarea = document.getElementById('messageInput');
+            
+            textarea.addEventListener('input', function() {
+                this.style.height = 'auto';
+                this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+            });
+        }
+
+        // Compose new message
+        function composeNewMessage() {
+            alert('Compose new message feature - This would open a modal to select a booking and start a new conversation.');
+        }
+
+        // Format time helper
+        function formatTime(timestamp) {
+            const date = new Date(timestamp);
+            const now = new Date();
+            const diffMs = now - date;
+            const diffMins = Math.floor(diffMs / 60000);
+            const diffHours = Math.floor(diffMs / 3600000);
+            const diffDays = Math.floor(diffMs / 86400000);
+            
+            if (diffMins < 1) {
+                return 'Just now';
+            } else if (diffMins < 60) {
+                return `${diffMins}m ago`;
+            } else if (diffHours < 24) {
+                return `${diffHours}h ago`;
+            } else if (diffDays === 1) {
+                return 'Yesterday';
+            } else if (diffDays < 7) {
+                return `${diffDays}d ago`;
+            } else {
+                return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+            }
+        }
+    </script>
+</body>
+</html>

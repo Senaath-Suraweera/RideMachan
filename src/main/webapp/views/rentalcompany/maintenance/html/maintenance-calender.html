@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Maintenance Calendar - Ride Machan</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../css/maintenance-calender.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+    />
+  </head>
+  <body>
+    <div class="dashboard-container">
+      <!-- Sidebar -->
+      <aside class="sidebar">
+        <div class="logo-section">
+          <img
+            src="../assets/ridemachan-logo.png"
+            alt="RideMachan Logo"
+            class="logo"
+          />
+        </div>
+
+        <nav class="nav-menu">
+          <ul>
+            <h3>Main Navigation</h3>
+            <li class="nav-item">
+              <a href="dashboard.html" class="nav-link">
+                <i class="fas fa-tachometer-alt"></i>
+                <span>Dashboard</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="inspection.html" class="nav-link">
+                <i class="fas fa-tools"></i>
+                <span>Maintenance Logs</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="vehiclerecords.html" class="nav-link">
+                <i class="fas fa-file"></i>
+                <span>Vehicle Records</span>
+              </a>
+            </li>
+            <li class="nav-item active">
+              <a href="maintenance-calendar.html" class="nav-link">
+                <i class="fas fa-calendar"></i>
+                <span>Calendar</span>
+              </a>
+            </li>
+          </ul>
+        </nav>
+
+        <div class="logout-section">
+          <a href="#" class="nav-link">
+            <i class="fas fa-sign-out-alt"></i>
+            <span>Logout</span>
+          </a>
+        </div>
+      </aside>
+
+      <!-- Main Content -->
+      <div class="main-content main">
+        <!-- Header -->
+        <header class="header own">
+          <div class="search-bar">
+            <i class="fas fa-search"></i>
+            <input
+              type="text"
+              placeholder="Search vehicles, maintenance records..."
+              id="searchInput"
+            />
+          </div>
+          <div class="header-actions">
+            <div class="notification">
+              <a href="notification.html" class="notification">
+                <i class="fas fa-bell"></i>
+                <div class="badge">3</div>
+              </a>
+            </div>
+            <div class="user-profile" onclick="toggleUserMenu()">
+              <div class="profile-img">MS</div>
+              <div class="user-info">
+                <div class="user-name">Mr. Sivajan</div>
+                <div class="user-role">Maintenance Staff</div>
+              </div>
+            </div>
+          </div>
+        </header>
+
+        <!-- Page Content -->
+        <div class="page-content">
+          <div class="page-header">
+            <h1>Maintenance Calendar</h1>
+            <button class="btn btn-primary" id="addEventBtn">
+              <i class="fas fa-plus"></i>
+              Add Appointment
+            </button>
+          </div>
+
+          <!-- Today's Tasks Summary -->
+          <div class="today-tasks-section">
+            <div class="tasks-header">
+              <h2>Today's Schedule - <span id="todayDate"></span></h2>
+              <div class="task-stats">
+                <div class="stat-badge scheduled-stat">
+                  <span class="count" id="scheduledCount">0</span>
+                  <span class="label">Scheduled</span>
+                </div>
+                <div class="stat-badge progress-stat">
+                  <span class="count" id="progressCount">0</span>
+                  <span class="label">In Progress</span>
+                </div>
+                <div class="stat-badge completed-stat">
+                  <span class="count" id="completedCount">0</span>
+                  <span class="label">Completed</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="tasks-list" id="todayTasksList">
+              <!-- Tasks will be populated by JavaScript -->
+            </div>
+          </div>
+
+          <div class="calendar-main-section">
+            <!-- Calendar -->
+            <div class="calendar-wrapper">
+              <div class="calendar-card">
+                <div class="calendar-header">
+                  <h2>Monthly Schedule</h2>
+                  <p>Click on a date to view appointments</p>
+                </div>
+
+                <div class="calendar-widget">
+                  <div class="calendar-nav">
+                    <button class="nav-btn" id="prevMonth">
+                      <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <h3 class="current-month" id="currentMonth">July 2025</h3>
+                    <button class="nav-btn" id="nextMonth">
+                      <i class="fas fa-chevron-right"></i>
+                    </button>
+                  </div>
+
+                  <div class="calendar-grid">
+                    <div class="calendar-days-header">
+                      <div class="day-header">Sun</div>
+                      <div class="day-header">Mon</div>
+                      <div class="day-header">Tue</div>
+                      <div class="day-header">Wed</div>
+                      <div class="day-header">Thu</div>
+                      <div class="day-header">Fri</div>
+                      <div class="day-header">Sat</div>
+                    </div>
+
+                    <div class="calendar-dates" id="calendarDates">
+                      <!-- Dates will be populated by JavaScript -->
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Legend -->
+                <div class="calendar-legend">
+                  <div class="legend-item">
+                    <span class="legend-dot scheduled"></span>
+                    <span>Scheduled</span>
+                  </div>
+                  <div class="legend-item">
+                    <span class="legend-dot in-progress"></span>
+                    <span>In Progress</span>
+                  </div>
+                  <div class="legend-item">
+                    <span class="legend-dot completed"></span>
+                    <span>Completed</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Vehicle Details Panel -->
+            <div class="vehicle-details-panel" id="vehicleDetailsPanel">
+              <div class="panel-header">
+                <h3>Vehicle Details</h3>
+                <button class="close-panel" id="closePanel">
+                  <i class="fas fa-times"></i>
+                </button>
+              </div>
+
+              <div class="panel-content" id="panelContent">
+                <div class="empty-state">
+                  <i class="fas fa-car"></i>
+                  <p>Select an appointment to view vehicle details</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Add Event Modal -->
+    <div class="modal" id="addEventModal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>
+            <i class="fas fa-calendar-plus"></i>
+            Add New Appointment
+          </h2>
+          <button class="close-modal" id="closeModal">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+
+        <form id="addEventForm">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="eventDate">
+                <i class="fas fa-calendar"></i>
+                Date *
+              </label>
+              <input
+                type="date"
+                id="eventDate"
+                name="eventDate"
+                required
+                class="form-control"
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="eventTime">
+                <i class="fas fa-clock"></i>
+                Time *
+              </label>
+              <input
+                type="time"
+                id="eventTime"
+                name="eventTime"
+                required
+                class="form-control"
+              />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="vehicleId">
+                <i class="fas fa-car"></i>
+                Vehicle ID *
+              </label>
+              <input
+                type="text"
+                id="vehicleId"
+                name="vehicleId"
+                placeholder="e.g., ABC-1234"
+                required
+                class="form-control"
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="vehicleModel">
+                <i class="fas fa-info-circle"></i>
+                Vehicle Model *
+              </label>
+              <input
+                type="text"
+                id="vehicleModel"
+                name="vehicleModel"
+                placeholder="e.g., Toyota Corolla 2020"
+                required
+                class="form-control"
+              />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="serviceBay">
+                <i class="fas fa-warehouse"></i>
+                Service Bay *
+              </label>
+              <select
+                id="serviceBay"
+                name="serviceBay"
+                required
+                class="form-control"
+              >
+                <option value="">Select Bay</option>
+                <option value="Bay 1">Bay 1</option>
+                <option value="Bay 2">Bay 2</option>
+                <option value="Bay 3">Bay 3</option>
+                <option value="Bay 4">Bay 4</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="estimatedDuration">
+                <i class="fas fa-hourglass-half"></i>
+                Duration *
+              </label>
+              <input
+                type="text"
+                id="estimatedDuration"
+                name="estimatedDuration"
+                placeholder="e.g., 2 hours"
+                required
+                class="form-control"
+              />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="serviceType">
+              <i class="fas fa-wrench"></i>
+              Service Type *
+            </label>
+            <input
+              type="text"
+              id="serviceType"
+              name="serviceType"
+              placeholder="e.g., Oil Change & Filter Replacement"
+              required
+              class="form-control"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="technician">
+              <i class="fas fa-user"></i>
+              Assigned Technician *
+            </label>
+            <select
+              id="technician"
+              name="technician"
+              required
+              class="form-control"
+            >
+              <option value="">Select Technician</option>
+              <option value="John Smith">John Smith</option>
+              <option value="Mike Johnson">Mike Johnson</option>
+              <option value="Sarah Williams">Sarah Williams</option>
+              <option value="David Brown">David Brown</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="description">
+              <i class="fas fa-clipboard"></i>
+              Description *
+            </label>
+            <textarea
+              id="description"
+              name="description"
+              rows="4"
+              placeholder="Enter detailed description of the service..."
+              required
+              class="form-control"
+            ></textarea>
+          </div>
+
+          <div class="form-actions">
+            <button type="button" class="btn btn-secondary" id="cancelBtn">
+              <i class="fas fa-times"></i>
+              Cancel
+            </button>
+            <button type="submit" class="btn btn-success">
+              <i class="fas fa-check"></i>
+              Add Appointment
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <script src="../js/maintenance-calender.js"></script>
+  </body>
+</html>

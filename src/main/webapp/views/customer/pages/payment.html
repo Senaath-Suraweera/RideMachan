@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Payment - Vehicle Booking</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="../css/main.css" />
+    <link rel="stylesheet" href="../css/payment.css" />
+</head>
+<body>
+    <div class="container">
+        <!-- Navbar Container -->
+        <div id="navbar-container"></div>
+
+        <!-- Header Container -->
+        <header class="header">
+            <!-- Back Button -->
+            <div class="back-to-booking" onclick="goBackToBooking()">
+                <i class="fas fa-arrow-left"></i>
+                <span>Back to Booking</span>
+            </div>
+
+            <!-- Header Actions -->
+            <div class="header-actions">
+                <div class="notification" onclick="showNotifications()">
+                    <i class="fas fa-bell"></i>
+                    <span class="badge">3</span>
+                </div>
+
+                <div class="notification" onclick="showMessages()">
+                    <i class="fas fa-envelope"></i>
+                    <span class="badge">5</span>
+                </div>
+
+                <div class="user-profile" onclick="toggleProfileDropdown()">
+                    <div class="profile-img">JD</div>
+                    <div class="user-info">
+                        <span class="user-name">John Doe</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content Area -->
+        <div class="main-content">
+            <div class="payment-container">
+                <!-- Booking Summary Section -->
+                <div class="booking-summary">
+                    <div class="section-header">
+                        <i class="fas fa-list"></i>
+                        <h3>Booking Summary</h3>
+                    </div>
+                    
+                    <div class="vehicle-info">
+                        <div class="vehicle-icon">
+                            <i class="fas fa-car"></i>
+                        </div>
+                        <div class="vehicle-details">
+                            <h4 id="summaryVehicleName">Honda Vezel</h4>
+                            <p id="summaryMode">Self Drive</p>
+                            <span class="company" id="summaryCompany">Company: Premium Rentals Colombo</span>
+                        </div>
+                    </div>
+
+                    <div class="schedule-details">
+                        <h4>Schedule Details</h4>
+                        <div class="detail-row">
+                            <span class="label">Pickup:</span>
+                            <span class="value" id="summaryPickup">-</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="label">Return:</span>
+                            <span class="value" id="summaryReturn">-</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="label">Duration:</span>
+                            <span class="value" id="summaryDuration">-</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="label">Pickup Location:</span>
+                            <span class="value" id="summaryLocation">-</span>
+                        </div>
+                    </div>
+
+                    <div class="pricing-details">
+                        <h4>Pricing Details</h4>
+                        <div class="price-row">
+                            <span class="label">Hourly Rate:</span>
+                            <span class="value" id="summaryRate">LKR 2700/hour</span>
+                        </div>
+                        <div class="price-row">
+                            <span class="label">Duration:</span>
+                            <span class="value" id="summaryHours">0 hours</span>
+                        </div>
+                        <div class="price-row">
+                            <span class="label">Subtotal:</span>
+                            <span class="value" id="summarySubtotal">LKR 0</span>
+                        </div>
+                        <div class="price-row">
+                            <span class="label">Service Fee:</span>
+                            <span class="value" id="summaryServiceFee">LKR 500</span>
+                        </div>
+                        <div class="price-row total">
+                            <span class="label">Total Amount:</span>
+                            <span class="value" id="summaryTotal">LKR 500</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Payment Information Section -->
+                <div class="payment-information">
+                    <div class="section-header">
+                        <i class="fas fa-credit-card"></i>
+                        <h3>Payment Information</h3>
+                    </div>
+                    <p class="section-subtitle">Complete your payment to confirm your booking</p>
+
+                    <form class="payment-form" onsubmit="processPayment(event)">
+                        <div class="form-group">
+                            <label for="payment-method">Payment Method</label>
+                            <select id="payment-method" name="payment-method">
+                                <option value="credit-debit">Credit/Debit Card</option>
+                                <option value="paypal">PayPal</option>
+                                <option value="bank-transfer">Bank Transfer</option>
+                            </select>
+                        </div>
+
+                        <div class="card-details-section">
+                            <h4><i class="fas fa-credit-card"></i> Card Details</h4>
+                            
+                            <div class="form-group">
+                                <label for="card-number">Card Number</label>
+                                <input type="text" id="card-number" name="card-number" placeholder="1234 5678 9012 3456" maxlength="19" required />
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="expiry-date">Expiry Date</label>
+                                    <input type="text" id="expiry-date" name="expiry-date" placeholder="MM/YY" maxlength="5" required />
+                                </div>
+                                <div class="form-group">
+                                    <label for="cvv">CVV</label>
+                                    <input type="text" id="cvv" name="cvv" placeholder="123" maxlength="3" required />
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="cardholder-name">Cardholder Name</label>
+                                <input type="text" id="cardholder-name" name="cardholder-name" placeholder="John Doe" required />
+                            </div>
+                        </div>
+
+                        <div class="contact-information">
+                            <h4>Contact Information</h4>
+                            
+                            <div class="form-group">
+                                <label for="email">Email Address</label>
+                                <input type="email" id="email" name="email" placeholder="john@example.com" required />
+                            </div>
+
+                            <div class="form-group">
+                                <label for="phone">Phone Number</label>
+                                <input type="tel" id="phone" name="phone" placeholder="+94 77 123 4567" required />
+                            </div>
+                        </div>
+
+                        <div class="security-notice">
+                            <div class="security-icon">
+                                <i class="fas fa-shield-alt"></i>
+                            </div>
+                            <div class="security-text">
+                                <h5>Secure Payment</h5>
+                                <p>Your payment information is encrypted and secure. We never store your card details.</p>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="pay-button" id="payButton">
+                            <i class="fas fa-lock"></i>
+                            <span id="payButtonText">Pay LKR 500</span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Load Components Function
+        async function loadComponents() {
+            try {
+                // Load navbar
+                const navbarResponse = await fetch('../components/navbar.html');
+                const navbarHtml = await navbarResponse.text();
+                document.getElementById('navbar-container').innerHTML = navbarHtml;
+                
+                // Execute scripts from loaded components
+                executeComponentScripts();
+            } catch (error) {
+                console.error('Error loading components:', error);
+            }
+        }
+
+        // Execute scripts from loaded components
+        function executeComponentScripts() {
+            const scripts = document.querySelectorAll('#navbar-container script');
+            scripts.forEach(script => {
+                const newScript = document.createElement('script');
+                if (script.src) {
+                    newScript.src = script.src;
+                } else {
+                    newScript.textContent = script.textContent;
+                }
+                document.body.appendChild(newScript);
+            });
+        }
+
+        // Load components when page loads
+        document.addEventListener('DOMContentLoaded', loadComponents);
+    </script>
+    <script src="../js/payment.js"></script>
+</body>
+</html>

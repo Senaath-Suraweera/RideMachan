@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maintenance Staff Profile - Ride Machan</title>
+    <link rel="stylesheet" href="../css/maintenance-staffprofile1.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="logo-section">
+            <img src="../assets/ridemachan-logo.png" alt="RideMachan Logo" class="logo">
+        </div>
+        
+        <nav class="nav-menu">
+            <ul>
+                <li class="nav-item">
+                    <a href="homepage.html" class="nav-link">
+                        <i class="fas fa-home"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="booking-management.html" class="nav-link">
+                        <i class="fas fa-box"></i>
+                        <span>Bookings</span>
+                    </a>
+                </li>                    
+                <li class="nav-item">
+                    <a href="vehicle-fleet.html" class="nav-link">
+                        <i class="fas fa-car"></i>
+                        <span>Vehicle Fleet</span>
+                    </a>
+                </li>
+                <li class="nav-item active">
+                    <a href="maintenance-staff.html" class="nav-link">
+                        <i class="fas fa-tools"></i>
+                        <span>Maintenance Staff</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="driver-management.html" class="nav-link">
+                        <i class="fas fa-users"></i>
+                        <span>Drivers</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+        
+        <div class="logout-section">
+            <a href="#" class="nav-link">
+                <i class="fas fa-sign-out"></i>
+                <span>Logout</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-left">
+                <div class="breadcrumb">
+                    <i class="fas fa-th-large"></i>
+                    <span>Company Dashboard</span>
+                </div>
+            </div>
+            <div class="header-right">
+                <div class="notification-icon">
+                    <a href="notification.html">
+                            <i class="fas fa-bell"></i>
+                            <span class="notification-badge">1</span>
+                    </a>
+                </div>
+                <div class="user-profile">
+                    <div class="user-avatar">A</div>
+                    <span class="user-name">ABC Rentals</span>
+                </div>  
+            </div>
+        </header>
+
+        <!-- Page Content -->
+        <div class="page-content">
+            <div class="page-header">
+                <div class="page-title-section">
+                    <h1 class="page-title">Maintenance Staff Profile</h1>
+                    <p class="page-subtitle">View and manage staff details</p>
+                </div>
+            </div>
+
+            <!-- Maintenance Staff Section -->
+            <section class="staff-info-section">
+                <div class="staff-card">
+                    <div class="staff-avatar-large">RW</div>
+                    <div class="staff-details">
+                        <div class="staff-main">
+                            <h3>Robert Wilson</h3>
+                            <span class="staff-id">Staff ID: MAINT001</span>
+                            <div class="staff-department">
+                                <span class="badge">Engine & Transmission</span>
+                            </div>
+                        </div>
+
+                        <div class="contact-grid">
+                            <div class="contact-item">
+                                <span class="contact-label">Email</span>
+                                <span class="contact-value">-</span>
+                            </div>
+                            <div class="contact-item">
+                                <span class="contact-label">DOB / Age</span>
+                                <span class="contact-value">-</span>
+                            </div>
+                            <div class="contact-item">
+                                <span class="contact-label">Gender</span>
+                                <span class="contact-value">-</span>
+                            </div>
+                            <div class="contact-item">
+                                <span class="contact-label">Address</span>
+                                <span class="contact-value">-</span>
+                            </div>
+                            <div class="contact-item">
+                                <span class="contact-label">Joining Date</span>
+                                <span class="contact-value">-</span>
+                            </div>
+                            <div class="contact-item">
+                                <span class="contact-label">Shift / Hours</span>
+                                <span class="contact-value">-</span>
+                            </div>
+                            <div class="contact-item">
+                                <span class="contact-label">Department / Team</span>
+                                <span class="contact-value">Engine & Transmission</span>
+                            </div>
+                            <div class="contact-item">
+                                <span class="contact-label">Supervisor</span>
+                                <span class="contact-value">-</span>
+                            </div>
+                            <div class="contact-item">
+                                <span class="contact-label">Skills</span>
+                                <span class="contact-value">-</span>
+                            </div>
+                            <div class="contact-item">
+                                <span class="contact-label">Certifications</span>
+                                <span class="contact-value">ASE Certified, Hybrid Specialist</span>
+                            </div>
+                        </div>
+
+                        <div class="job-performance">
+                            <h3>Job Performance</h3>
+                            <p><strong>Completed Jobs:</strong> 89</p>
+                            <p><strong>Pending Jobs:</strong> 0</p>
+                        </div>
+
+                        <div class="equipment-section">
+                            <h3>Vehicles / Equipment</h3>
+                            <ul>
+                                <li>2020 Toyota Prius - ABC-123</li>
+                                <li>2019 Honda Civic - XYZ-456</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <script src="../js/sidebar.js"></script>
+</body>
+</html>

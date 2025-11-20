@@ -225,3 +225,17 @@
 #renterProfile .profile-header {
   gap: 24px;
 }
+
+.btn-danger {
+  background: #dc2626;
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+.btn-danger:hover {
+  background: #b91c1c;
+}

@@ -470,3 +470,177 @@
     max-height: 150px;
   }
 }
+
+/* =========================
+   RENTAL COMPANY DETAIL VIEW
+   ========================= */
+.company-detail-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.55);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 3000;
+  backdrop-filter: blur(4px);
+  transition: opacity 0.3s ease;
+}
+
+.company-detail-overlay.active {
+  display: flex;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.company-detail-card {
+  background: #fff;
+  width: 100%;
+  max-width: 850px;
+  border-radius: 14px;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.25);
+  overflow: hidden;
+  animation: popIn 0.3s ease;
+}
+
+@keyframes popIn {
+  from {
+    transform: translateY(15px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.company-detail-header {
+  background: #1abc9c;
+  color: #fff;
+  padding: 24px 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.company-detail-header h2 {
+  font-size: 22px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.company-detail-close {
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-size: 26px;
+  cursor: pointer;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+.company-detail-close:hover {
+  transform: scale(1.1);
+  opacity: 0.85;
+}
+
+.company-detail-body {
+  padding: 30px;
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 24px;
+}
+
+.company-detail-info {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.company-detail-info h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #202124;
+  margin: 0 0 8px;
+}
+
+.company-detail-info p {
+  font-size: 14px;
+  color: #5f6368;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.company-detail-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: #f8f9fa;
+  padding: 18px;
+  border-radius: 10px;
+  border: 1px solid #e8eaed;
+}
+
+.company-detail-stats .stat-item {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  color: #202124;
+}
+
+.company-detail-stats .stat-item span {
+  font-weight: 600;
+  color: #1abc9c;
+}
+
+.company-detail-footer {
+  display: flex;
+  justify-content: flex-end;
+  padding: 20px 30px;
+  border-top: 1px solid #e8eaed;
+  background: #fff;
+  gap: 12px;
+}
+
+.company-detail-footer .btn {
+  padding: 10px 18px;
+  font-weight: 500;
+  border-radius: 6px;
+  font-size: 14px;
+  transition: background 0.25s ease, transform 0.2s ease;
+}
+
+.company-detail-footer .btn-primary {
+  background: #1abc9c;
+  color: white;
+}
+.company-detail-footer .btn-primary:hover {
+  background: #16a085;
+  transform: translateY(-2px);
+}
+
+.company-detail-footer .btn-secondary {
+  background: #f1f3f4;
+  color: #333;
+}
+.company-detail-footer .btn-secondary:hover {
+  background: #e2e6ea;
+  transform: translateY(-2px);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .company-detail-body {
+    grid-template-columns: 1fr;
+  }
+}

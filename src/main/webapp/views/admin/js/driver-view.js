@@ -193,7 +193,7 @@
 
       <section class="profile-details">
         <div class="detail-section">
-          <h3>📋 Driver Information</h3>
+          <h3> Driver Information</h3>
           <div class="detail-item"><span class="detail-label">Driver Name</span><span class="detail-value">${esc(
             drv.name
           )}</span></div>
@@ -218,7 +218,7 @@
         </div>
 
         <div class="detail-section">
-          <h3>📊 Driver Statistics</h3>
+          <h3> Driver Statistics</h3>
           <div class="detail-item"><span class="detail-label">Total Rides</span><span class="detail-value">${fmt(
             drv.totalRides
           )}</span></div>
@@ -240,10 +240,10 @@
         </div>
 
         <div class="detail-section document-section">
-          <h3>📄 Documents & Verification</h3>
+          <h3> Documents & Verification</h3>
           <div class="documents-grid">
             <div class="document-card">
-              <div class="document-icon">🆔</div>
+              <div class="document-icon"></div>
               <div class="document-title">NIC Document</div>
               <div class="document-status verified">Verified</div>
               <div class="document-id">ID: ${esc(drv.nicNumber)}</div>
@@ -253,7 +253,7 @@
               </div>
             </div>
             <div class="document-card">
-              <div class="document-icon">🚗</div>
+              <div class="document-icon"></div>
               <div class="document-title">Driving License</div>
               <div class="document-status verified">Verified</div>
               <div class="document-id">License: ${esc(drv.licenseNumber)}</div>

@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vehicle Fleet - RideMachan</title>
+
+    <link rel="stylesheet" href="../css/vehicle-fleet.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+  </head>
+  <body>
+    <div class="dashboard-container">
+      <!-- Sidebar -->
+      <aside class="sidebar">
+        <div class="logo-section">
+          <img
+            src="../assets/ridemachan-logo.png"
+            alt="RideMachan Logo"
+            class="logo"
+          />
+        </div>
+
+        <nav class="nav-menu">
+          <ul>
+            <li class="nav-item">
+              <a href="homepage.html" class="nav-link">
+                <i class="fas fa-home"></i>
+                <span>Dashboard</span>
+              </a>
+            </li>
+            <!--<li class="nav-item">
+                        <a href="vehicle-fleet.html" class="nav-link">
+                            <i class="fas fa-building"></i>
+                            <span>Entity Registration</span>
+                        </a>
+                    </li>-->
+            <li class="nav-item">
+              <a href="booking-management.html" class="nav-link">
+                <i class="fas fa-box"></i>
+                <span>Bookings</span>
+              </a>
+            </li>
+            <li class="nav-item active">
+              <a href="vehicle-fleet.html" class="nav-link">
+                <i class="fas fa-car"></i>
+                <span>Vehicle Fleet</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="maintenance-staff.html" class="nav-link">
+                <i class="fas fa-tools"></i>
+                <span>Maintenance Staff</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="driver-management.html" class="nav-link">
+                <i class="fas fa-users"></i>
+                <span>Drivers</span>
+              </a>
+            </li>
+          </ul>
+        </nav>
+
+        <div class="logout-section">
+          <a href="#" class="nav-link">
+            <i class="fas fa-sign-out"></i>
+            <span>Logout</span>
+          </a>
+        </div>
+      </aside>
+
+      <!-- Main Content -->
+      <div class="main-content">
+        <!-- Header -->
+        <header class="header">
+          <div class="header-left">
+            <div class="breadcrumb">
+              <i class="fas fa-th-large"></i>
+              <span>Company Dashboard</span>
+            </div>
+          </div>
+          <div class="header-right">
+            <div class="notification-icon">
+              <a href="notification.html">
+                <i class="fas fa-bell"></i>
+                <span class="notification-badge">1</span>
+              </a>
+            </div>
+            <div class="user-profile">
+              <div class="user-avatar">A</div>
+              <span>ABC Rentals</span>
+            </div>
+          </div>
+        </header>
+
+        <!-- Page Content -->
+        <div class="page-content">
+          <div class="page-header">
+            <div class="page-title-section">
+              <h1 class="page-title">Vehicle Fleet</h1>
+              <p class="page-subtitle">
+                Manage your vehicle fleet and maintenance
+              </p>
+            </div>
+            <button class="btn-primary" id="addVehicleBtn">
+              <i class="fas fa-plus"></i>
+              Add Vehicle
+            </button>
+          </div>
+
+          <!-- Stats Cards -->
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-icon total">
+                <i class="fas fa-car"></i>
+              </div>
+              <div class="stat-content">
+                <div class="stat-number">12</div>
+                <div class="stat-label">Total Vehicles</div>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon available">
+                <i class="fas fa-check-circle"></i>
+              </div>
+              <div class="stat-content">
+                <div class="stat-number">8</div>
+                <div class="stat-label">Available</div>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon on-trip">
+                <i class="fas fa-route"></i>
+              </div>
+              <div class="stat-content">
+                <div class="stat-number">3</div>
+                <div class="stat-label">On Trip</div>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon maintenance">
+                <i class="fas fa-wrench"></i>
+              </div>
+              <div class="stat-content">
+                <div class="stat-number">1</div>
+                <div class="stat-label">Maintenance</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- View Options 
+                <div class="view-options">
+                    <div class="view-tabs">
+                        <a href="vehicle-fleet.html">
+                            <button class="view-tab active" data-view="fleet">
+                                Fleet Overview
+                            </button>
+                        </a>                        
+                    </div>
+                </div>-->
+
+          <!-- Search and Filter -->
+          <div class="search-filter-section">
+            <div class="search-box">
+              <i class="fas fa-search"></i>
+              <input
+                type="text"
+                placeholder="Search vehicles by model or plate number..."
+                id="vehicleSearch"
+              />
+            </div>
+            <div class="filter-dropdown">
+              <select id="vehicleFilter">
+                <option value="all">All Vehicles</option>
+                <option value="available">Available</option>
+                <option value="on-trip">On Trip</option>
+                <option value="maintenance">Maintenance</option>
+              </select>
+              <i class="fas fa-filter"></i>
+            </div>
+          </div>
+
+          <!-- Vehicle Grid -->
+          <div class="vehicle-grid" id="vehicleGrid">
+            <!-- Vehicle cards will be populated by JavaScript -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Add Vehicle Modal -->
+    <div class="modal-overlay" id="addVehicleModal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>Add New Vehicle</h3>
+          <button class="modal-close" id="closeAddVehicleModal">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+
+        <div class="modal-body">
+          <form id="addVehicleForm" enctype="multipart/form-data">
+            <div class="form-row">
+              <div class="form-group">
+                <label for="vehiclebrand">Brand</label>
+                <input
+                  type="text"
+                  id="vehiclebrand"
+                  name="vehiclebrand"
+                  required
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="vehiclemodel">Model</label>
+                <input
+                  type="text"
+                  id="vehiclemodel"
+                  name="vehiclemodel"
+                  required
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="numberplatenumber">Plate Number</label>
+                <input
+                  type="text"
+                  id="numberplatenumber"
+                  name="numberplatenumber"
+                  required
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="tareweight">Tare Weight (kg)</label>
+                <input
+                  type="number"
+                  id="tareweight"
+                  name="tareweight"
+                  required
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="color">Color</label>
+                <input type="text" id="color" name="color" required />
+              </div>
+
+              <div class="form-group">
+                <label for="numberofpassengers">No. of Passengers</label>
+                <input
+                  type="number"
+                  id="numberofpassengers"
+                  name="numberofpassengers"
+                  min="1"
+                  required
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="enginecapacity">Engine Capacity (cc)</label>
+                <input
+                  type="number"
+                  id="enginecapacity"
+                  name="enginecapacity"
+                  required
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="enginenumber">Engine Number</label>
+                <input
+                  type="text"
+                  id="enginenumber"
+                  name="enginenumber"
+                  required
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="chasisnumber">Chassis Number</label>
+                <input
+                  type="text"
+                  id="chasisnumber"
+                  name="chasisnumber"
+                  required
+                />
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="description">Description</label>
+                <textarea
+                  id="description"
+                  name="description"
+                  rows="3"
+                  required
+                ></textarea>
+              </div>
+
+              <div class="form-group">
+                <label for="milage">Mileage (km)</label>
+                <input type="text" id="milage" name="milage" required />
+              </div>
+            </div>
+
+            <!-- Registration Document -->
+            <div class="form-row">
+              <div class="form-group">
+                <label for="registrationdocumentation"
+                  >Registration Document (PDF)</label
+                >
+                <input
+                  type="file"
+                  id="registrationdocumentation"
+                  name="registrationdocumentation"
+                  accept=".pdf"
+                  required
+                />
+              </div>
+            </div>
+
+            <!-- Vehicle Image (now in a new row below) -->
+            <div class="form-row">
+              <div class="form-group">
+                <label for="vehicleimages">Vehicle Image</label>
+                <input
+                  type="file"
+                  id="vehicleimages"
+                  name="vehicleimages"
+                  accept=".jpg,.jpeg,.png"
+                  required
+                />
+              </div>
+            </div>
+
+            <div class="form-actions">
+              <button type="submit" class="btn-add-vehicle" id="addAddVehicle">
+                Add Vehicle
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Edit Vehicle Modal -->
+    <!-- Edit Vehicle Modal -->
+    <div class="modal-overlay" id="editVehicleModal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>Edit Vehicle</h3>
+          <button class="modal-close" id="closeEditVehicleModal">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form id="editVehicleForm" enctype="multipart/form-data">
+            <input type="hidden" id="editVehicleId" name="vehicleid" />
+
+            <div class="form-row">
+              <div class="form-group">
+                <label>Vehicle Brand</label>
+                <input
+                  type="text"
+                  id="editBrand"
+                  name="vehiclebrand"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label>Vehicle Model</label>
+                <input
+                  type="text"
+                  id="editModel"
+                  name="vehiclemodel"
+                  required
+                />
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label>Number Plate</label>
+                <input
+                  type="text"
+                  id="editPlate"
+                  name="numberplatenumber"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label>Color</label>
+                <input type="text" id="editColor" name="color" required />
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label>Tare Weight (kg)</label>
+                <input
+                  type="number"
+                  id="editTareWeight"
+                  name="tareweight"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label>Engine Capacity (cc)</label>
+                <input
+                  type="number"
+                  id="editEngineCapacity"
+                  name="enginecapacity"
+                  required
+                />
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label>Passengers</label>
+                <input
+                  type="number"
+                  id="editPassengers"
+                  name="numberofpassengers"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label>Milage</label>
+                <input type="text" id="editMilage" name="milage" />
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label>Engine Number</label>
+                <input
+                  type="text"
+                  id="editEngineNumber"
+                  name="enginenumber"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label>Chasis Number</label>
+                <input
+                  type="text"
+                  id="editChasisNumber"
+                  name="chasisnumber"
+                  required
+                />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Description</label>
+              <textarea
+                id="editDescription"
+                name="description"
+                rows="3"
+              ></textarea>
+            </div>
+
+            <!-- Registration Document -->
+            <div class="form-row">
+              <div class="form-group">
+                <label>Registration Document (PDF)</label>
+                <input
+                  type="file"
+                  id="editRegDoc"
+                  name="registrationdocumentation"
+                  accept=".pdf"
+                />
+              </div>
+            </div>
+
+            <!-- Vehicle Image (new row) -->
+            <div class="form-row">
+              <div class="form-group">
+                <label>Vehicle Image</label>
+                <input
+                  type="file"
+                  id="editImage"
+                  name="vehicleimages"
+                  accept="image/*"
+                />
+              </div>
+            </div>
+
+            <div class="form-actions">
+              <button type="submit" class="btn-primary">Save Changes</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <script src="../js/vehicle-fleet.js"></script>
+    <!-- <script src="../js/sidebar.js"></script> -->
+  </body>
+</html>

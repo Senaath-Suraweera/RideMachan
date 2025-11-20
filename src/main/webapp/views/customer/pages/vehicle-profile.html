@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vehicle Details - Ride Machan</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="../css/main.css" />
+    <link rel="stylesheet" href="../css/vehicle-profile.css" />
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar Navigation - Load from navbar.html -->
+        <div id="navbar-container"></div>
+
+        <!-- Header - Load from header.html -->
+        <div id="header-container"></div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="back-to-search">
+                <i class="fas fa-arrow-left"></i>
+                <span onclick="goBack()">Back to Search</span>
+            </div>
+
+            <div class="vehicle-details-container">
+                <!-- Left Section -->
+                <div class="left-section">
+                    <!-- Vehicle Info -->
+                    <div class="vehicle-info">
+                        <div class="vehicle-header">
+                            <div class="vehicle-image-large">
+                                <i class="fas fa-car"></i>
+                            </div>
+                            <div class="vehicle-basic-info">
+                                <h2 id="vehicleName">Honda Vezel</h2>
+                                <div class="vehicle-company" id="vehicleCompany" onclick="viewCompany()">Premium Rentals Colombo</div>
+                                <div class="vehicle-location" id="vehicleLocation">Colombo 03, Sri Lanka</div>
+                                <div class="vehicle-rating">
+                                    <div class="stars" id="vehicleStars">
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="far fa-star"></i>
+                                    </div>
+                                    <span class="rating-text" id="ratingText">47 reviews</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="vehicle-meta" id="vehicleMeta">
+                            <div class="meta-item">
+                                <span class="meta-label">Year:</span>
+                                <span class="meta-value">2022</span>
+                            </div>
+                            <div class="meta-item">
+                                <span class="meta-label">Mileage:</span>
+                                <span class="meta-value">16 km/L</span>
+                            </div>
+                            <div class="meta-item">
+                                <span class="meta-label">Engine:</span>
+                                <span class="meta-value">1.5L Hybrid</span>
+                            </div>
+                            <div class="meta-item">
+                                <span class="meta-label">Color:</span>
+                                <span class="meta-value">Pearl White</span>
+                            </div>
+                        </div>
+
+                        <!-- Key Features -->
+                        <div class="key-features">
+                            <h3>Key Features</h3>
+                            <div class="features-list">
+                                <div class="feature-item">
+                                    <div class="feature-icon transmission">
+                                        <i class="fas fa-cogs"></i>
+                                    </div>
+                                    <div class="feature-content">
+                                        <div class="feature-title">Transmission</div>
+                                        <div class="feature-subtitle">CVT Automatic</div>
+                                    </div>
+                                </div>
+                                <div class="feature-item">
+                                    <div class="feature-icon fuel">
+                                        <i class="fas fa-gas-pump"></i>
+                                    </div>
+                                    <div class="feature-content">
+                                        <div class="feature-title">Fuel Type</div>
+                                        <div class="feature-subtitle">Hybrid Petrol</div>
+                                    </div>
+                                </div>
+                                <div class="feature-item">
+                                    <div class="feature-icon seating">
+                                        <i class="fas fa-users"></i>
+                                    </div>
+                                    <div class="feature-content">
+                                        <div class="feature-title">Seating Capacity</div>
+                                        <div class="feature-subtitle">5 Passengers</div>
+                                    </div>
+                                </div>
+                                <div class="feature-item">
+                                    <div class="feature-icon ac">
+                                        <i class="fas fa-snowflake"></i>
+                                    </div>
+                                    <div class="feature-content">
+                                        <div class="feature-title">Air Conditioning</div>
+                                        <div class="feature-subtitle">Dual Zone AC</div>
+                                    </div>
+                                </div>
+                                <div class="feature-item">
+                                    <div class="feature-icon luggage">
+                                        <i class="fas fa-suitcase"></i>
+                                    </div>
+                                    <div class="feature-content">
+                                        <div class="feature-title">Luggage Capacity</div>
+                                        <div class="feature-subtitle">3-4 Large Bags</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Rating and Reviews -->
+                    <div class="rating-reviews">
+                        <h3>Rating and Reviews</h3>
+                        <div class="overall-rating">
+                            <div class="rating-score" id="overallRating">4.7</div>
+                            <div class="rating-breakdown">
+                                <div class="rating-stars">
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="far fa-star"></i>
+                                </div>
+                                <div class="rating-summary" id="ratingSummary">Based on 47 customer reviews</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Section -->
+                <div class="right-section">
+                    <!-- Booking Card -->
+                    <div class="booking-card">
+                        <h3>Book This Vehicle</h3>
+                        <div class="rate-info">
+                            <div class="rate-label">Starting from</div>
+                            <div class="price" id="vehiclePrice">LKR 270<span class="price-period">/hour</span></div>
+                        </div>
+                        
+                        <div class="availability-status available">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Available Now</span>
+                        </div>
+                        
+                        <div class="availability-text">
+                            Next available: Immediately
+                        </div>
+                        
+                        <button class="btn btn-primary" onclick="bookVehicle()">
+                            <i class="fas fa-calendar-plus"></i>
+                            Book Now
+                        </button>
+                        
+                        <button class="btn btn-outline" onclick="messageOwner()">
+                            <i class="fas fa-comment"></i>
+                            Message Owner
+                        </button>
+                        
+                        <button class="btn btn-outline" id="wishlistBtn" onclick="toggleWishlist()">
+                            <i class="far fa-heart"></i>
+                            Add to Wishlist
+                        </button>
+                    </div>
+
+                    <!-- License Requirements -->
+                    <div class="booking-card">
+                        <h3>License Requirements</h3>
+                        <div class="license-info">
+                            <div class="license-item">
+                                <i class="fas fa-id-card text-success"></i>
+                                <div class="license-content">
+                                    <div class="license-title">Valid Driver's License</div>
+                                    <div class="license-subtitle">Required for all drivers</div>
+                                </div>
+                            </div>
+                            <div class="license-item">
+                                <i class="fas fa-globe text-primary"></i>
+                                <div class="license-content">
+                                    <div class="license-title">International Driving Permit</div>
+                                    <div class="license-subtitle">For non-local licenses</div>
+                                </div>
+                            </div>
+                            <div class="license-item">
+                                <i class="fas fa-calendar text-muted"></i>
+                                <div class="license-content">
+                                    <div class="license-title">Minimum 2 Years Experience</div>
+                                    <div class="license-subtitle">Valid driving experience required</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Load components function
+        async function loadComponents() {
+            try {
+                // Load navbar
+                const navbarResponse = await fetch('../components/navbar.html');
+                const navbarHtml = await navbarResponse.text();
+                document.getElementById('navbar-container').innerHTML = navbarHtml;
+                
+                // Load header
+                const headerResponse = await fetch('../components/header.html');
+                const headerHtml = await headerResponse.text();
+                const customizedHeader = headerHtml.replace('{{PAGE_TITLE}}', 'Vehicle Profile');
+                document.getElementById('header-container').innerHTML = customizedHeader;
+            } catch (error) {
+                console.error('Error loading components:', error);
+            }
+        }
+
+        // Load components when DOM is ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', loadComponents);
+        } else {
+            loadComponents();
+        }
+    </script>
+    <script src="../js/vehicle-profile.js"></script>
+</body>
+</html>
