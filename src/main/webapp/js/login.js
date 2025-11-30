@@ -24,4 +24,4 @@ loginForm.addEventListener("submit", async (e) => {
   } catch (err) {
     errorMsg.style.display = "block";
   }
-});
+}); 
