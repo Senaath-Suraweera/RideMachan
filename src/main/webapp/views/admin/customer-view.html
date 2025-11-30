@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Customer | RideMachan Admin</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- Shared theme + customers look & feel -->
+    <link rel="stylesheet" href="css/styles.css" />
+    <link rel="stylesheet" href="css/sidebar.css" />
+    <link rel="stylesheet" href="css/customers.css" />
+    <link rel="stylesheet" href="css/customer-view.css" />
+  </head>
+  <body>
+    <!-- Sidebar auto-injects -->
+    <script src="js/sidebar.js"></script>
+
+    <main class="main-content">
+      <header class="page-header">
+        <div
+          class="header-actions"
+          style="display: flex; align-items: center; gap: 12px"
+        >
+          <h1 class="page-title" style="flex: 1">Customer</h1>
+          <button id="backToCustomersBtn" class="btn btn-secondary">
+            ← Back to Customers
+          </button>
+          <button id="banCustomerBtn" class="btn btn-danger">
+            Ban Customer
+          </button>
+        </div>
+      </header>
+
+      <section id="customerView" class="card">
+        <!-- Filled by customer-view.js -->
+      </section>
+
+      <section class="card">
+        <div class="tabs">
+          <button class="tab active" data-tab="ongoing">
+            Ongoing Bookings
+          </button>
+          <button class="tab" data-tab="past">Past Bookings</button>
+        </div>
+        <div class="tab-panels">
+          <div class="tab-panel active" id="panel-ongoing">
+            <iframe
+              id="ongoingFrame"
+              class="embed-frame"
+              title="Ongoing Bookings"
+            ></iframe>
+          </div>
+          <div class="tab-panel" id="panel-past">
+            <iframe
+              id="pastFrame"
+              class="embed-frame"
+              title="Past Bookings"
+            ></iframe>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script src="js/customer-view.js"></script>
+  </body>
+</html>

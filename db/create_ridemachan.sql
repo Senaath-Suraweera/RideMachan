@@ -117,8 +117,4 @@ CREATE TABLE IF NOT EXISTS `Vehicle` (
         REFERENCES `VehicleProvider` (`providerid`)
         ON DELETE CASCADE
         ON UPDATE CASCADE
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
-
-
-	
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;	

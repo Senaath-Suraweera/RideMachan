@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Customers - Ride Machan</title>
+    <link rel="stylesheet" href="css/styles.css" />
+    <link rel="stylesheet" href="css/sidebar.css" />
+    <link rel="stylesheet" href="css/customers.css" />
+  </head>
+  <body>
+    <div class="container">
+      <main class="main-content">
+        <header class="page-header">
+          <div class="header-content">
+            <h1 class="page-title">Customer</h1>
+            <div class="header-actions">
+              <button class="btn btn-primary" onclick="openRegisterModal()">
+                + Register Customer
+              </button>
+            </div>
+          </div>
+        </header>
+
+        <!-- Search and Filter Section -->
+        <div class="search-filter-section" role="search">
+          <h3 class="section-title">Search & Filter Customers</h3>
+
+          <div class="filter-row">
+            <div class="form-group">
+              <label class="form-label" for="customerNameFilter"
+                >Customer Name</label
+              >
+              <input
+                type="text"
+                class="form-control"
+                id="customerNameFilter"
+                placeholder="Enter name"
+                autocomplete="off"
+              />
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="nicFilter">NIC Number</label>
+              <input
+                type="text"
+                class="form-control"
+                id="nicFilter"
+                placeholder="Enter NIC"
+                autocomplete="off"
+              />
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="locationFilter">Location</label>
+              <select class="form-select" id="locationFilter">
+                <option value="">All</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="statusFilter">Status</label>
+              <select class="form-select" id="statusFilter">
+                <option value="">All</option>
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Minimum Rating</label>
+              <div
+                class="rating-stars"
+                id="ratingFilter"
+                aria-label="Minimum rating"
+              >
+                <span class="star" data-value="1">⭐</span>
+                <span class="star" data-value="2">⭐</span>
+                <span class="star" data-value="3">⭐</span>
+                <span class="star" data-value="4">⭐</span>
+                <span class="star" data-value="5">⭐</span>
+              </div>
+              <small class="rating-text"
+                >Click a star to set the minimum rating</small
+              >
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="joinFrom">Joined From</label>
+              <input type="date" class="form-control" id="joinFrom" />
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="joinTo">Joined To</label>
+              <input type="date" class="form-control" id="joinTo" />
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="bookingsMin">Min Bookings</label>
+              <input
+                type="number"
+                class="form-control"
+                id="bookingsMin"
+                min="0"
+                placeholder="e.g., 5"
+              />
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="bookingsMax">Max Bookings</label>
+              <input
+                type="number"
+                class="form-control"
+                id="bookingsMax"
+                min="0"
+                placeholder="e.g., 25"
+              />
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="sortOrder">Sort</label>
+              <select class="form-select" id="sortOrder">
+                <option value="ascending">Name: A → Z</option>
+                <option value="descending">Name: Z → A</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="search-actions">
+            <button class="btn btn-primary" onclick="searchCustomers()">
+              Search
+            </button>
+            <button class="btn btn-secondary" onclick="clearFilters()">
+              Clear Filters
+            </button>
+          </div>
+        </div>
+
+        <!-- Customer List -->
+        <div class="customers-section">
+          <div class="section-header">
+            <h3 class="section-title">Customer List (3)</h3>
+          </div>
+
+          <div class="customers-grid">
+            <!-- Customer 1 -->
+            <div class="customer-card" data-customer-id="1">
+              <div class="customer-avatar">
+                <span class="avatar-text">JD</span>
+              </div>
+              <div class="customer-info">
+                <h4 class="customer-name">John Doe</h4>
+                <div class="customer-details">
+                  <div class="detail-item">
+                    <span class="detail-icon">📅</span>
+                    <span class="detail-text">Joined 1/15/2023</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="detail-icon">🚗</span>
+                    <span class="detail-text">25 Bookings</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="detail-icon">📍</span>
+                    <span class="detail-text">Colombo</span>
+                  </div>
+                </div>
+                <div class="customer-description">
+                  <p>Frequent customer with excellent payment history</p>
+                </div>
+                <div class="customer-rating">
+                  <div class="rating-stars">
+                    <span class="star active">⭐</span>
+                    <span class="star active">⭐</span>
+                    <span class="star active">⭐</span>
+                    <span class="star active">⭐</span>
+                    <span class="star">⭐</span>
+                  </div>
+                  <span class="rating-value">4.8</span>
+                  <span class="review-count">18 reviews</span>
+                </div>
+              </div>
+              <div class="customer-actions">
+                <div class="contact-info">
+                  <div class="contact-item">
+                    <span class="contact-icon">📞</span>
+                    <span class="contact-text">+94 77 123 4567</span>
+                  </div>
+                  <div class="contact-item">
+                    <span class="contact-icon">📧</span>
+                    <span class="contact-text">john.doe@email.com</span>
+                  </div>
+                </div>
+                <div class="status-badge status-active">Active</div>
+              </div>
+            </div>
+
+            <!-- Customer 2 -->
+            <div class="customer-card" data-customer-id="2">
+              <div class="customer-avatar">
+                <span class="avatar-text">MC</span>
+              </div>
+              <div class="customer-info">
+                <h4 class="customer-name">Michael Chen</h4>
+                <div class="customer-details">
+                  <div class="detail-item">
+                    <span class="detail-icon">📅</span>
+                    <span class="detail-text">Joined 11/10/2023</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="detail-icon">🚗</span>
+                    <span class="detail-text">8 Bookings</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="detail-icon">📍</span>
+                    <span class="detail-text">Galle</span>
+                  </div>
+                </div>
+                <div class="customer-description">
+                  <p>New customer showing promising booking patterns</p>
+                </div>
+                <div class="customer-rating">
+                  <div class="rating-stars">
+                    <span class="star active">⭐</span>
+                    <span class="star active">⭐</span>
+                    <span class="star active">⭐</span>
+                    <span class="star active">⭐</span>
+                    <span class="star">⭐</span>
+                  </div>
+                  <span class="rating-value">4.2</span>
+                  <span class="review-count">5 reviews</span>
+                </div>
+              </div>
+              <div class="customer-actions">
+                <div class="contact-info">
+                  <div class="contact-item">
+                    <span class="contact-icon">📞</span>
+                    <span class="contact-text">+94 71 555 0123</span>
+                  </div>
+                  <div class="contact-item">
+                    <span class="contact-icon">📧</span>
+                    <span class="contact-text">m.chen@email.com</span>
+                  </div>
+                </div>
+                <div class="status-badge status-active">Active</div>
+              </div>
+            </div>
+
+            <!-- Customer 3 -->
+            <div class="customer-card" data-customer-id="3">
+              <div class="customer-avatar">
+                <span class="avatar-text">SJ</span>
+              </div>
+              <div class="customer-info">
+                <h4 class="customer-name">Sarah Johnson</h4>
+                <div class="customer-details">
+                  <div class="detail-item">
+                    <span class="detail-icon">📅</span>
+                    <span class="detail-text">Joined 9/22/2023</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="detail-icon">🚗</span>
+                    <span class="detail-text">12 Bookings</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="detail-icon">📍</span>
+                    <span class="detail-text">Kandy</span>
+                  </div>
+                </div>
+                <div class="customer-description">
+                  <p>Reliable customer, always on time for pickups</p>
+                </div>
+                <div class="customer-rating">
+                  <div class="rating-stars">
+                    <span class="star active">⭐</span>
+                    <span class="star active">⭐</span>
+                    <span class="star active">⭐</span>
+                    <span class="star active">⭐</span>
+                    <span class="star">⭐</span>
+                  </div>
+                  <span class="rating-value">4.6</span>
+                  <span class="review-count">8 reviews</span>
+                </div>
+              </div>
+              <div class="customer-actions">
+                <div class="contact-info">
+                  <div class="contact-item">
+                    <span class="contact-icon">📞</span>
+                    <span class="contact-text">+94 76 987 6543</span>
+                  </div>
+                  <div class="contact-item">
+                    <span class="contact-icon">📧</span>
+                    <span class="contact-text">sarah.j@email.com</span>
+                  </div>
+                </div>
+                <div class="status-badge status-active">Active</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <!-- Register Customer Modal -->
+    <div class="modal" id="registerModal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>Register New Customer</h3>
+          <button class="modal-close" onclick="closeRegisterModal()">
+            &times;
+          </button>
+        </div>
+        <div class="modal-body">
+          <form id="registerForm">
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Full Name *</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  name="fullName"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label class="form-label">NIC Number *</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  name="nicNumber"
+                  required
+                />
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Email Address *</label>
+                <input
+                  type="email"
+                  class="form-control"
+                  name="email"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Phone Number *</label>
+                <input type="tel" class="form-control" name="phone" required />
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Address</label>
+              <textarea class="form-control" name="address" rows="3"></textarea>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">City</label>
+                <input type="text" class="form-control" name="city" />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Emergency Contact</label>
+                <input
+                  type="tel"
+                  class="form-control"
+                  name="emergencyContact"
+                />
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" onclick="closeRegisterModal()">
+            Cancel
+          </button>
+          <button class="btn btn-primary" onclick="registerCustomer()">
+            Register Customer
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script src="js/sidebar.js"></script>
+    <script src="js/customers.js"></script>
+  </body>
+</html>

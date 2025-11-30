@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Earnings - RideMachan</title>
+    <link rel="stylesheet" href="css/styles.css" />
+    <link rel="stylesheet" href="css/sidebar.css" />
+    <link rel="stylesheet" href="css/earnings.css" />
+  </head>
+  <body>
+    <div class="container">
+      <div class="main-content">
+        <div class="page-header">
+          <h1>Earnings</h1>
+        </div>
+        <p class="page-subtitle">
+          Track your vehicle rental income and performance
+        </p>
+
+        <!-- Stats Cards -->
+        <div class="stats-grid">
+          <div class="stat-card income">
+            <div class="stat-icon"></div>
+            <div class="stat-content">
+              <div class="stat-value">Rs 342,500</div>
+              <div class="stat-label">Total Income</div>
+              <div class="stat-change positive">+ 19.2% from last month</div>
+            </div>
+          </div>
+          <div class="stat-card bookings">
+            <div class="stat-icon"></div>
+            <div class="stat-content">
+              <div class="stat-value">156</div>
+              <div class="stat-label">Total Bookings</div>
+              <div class="stat-change positive">+ 8 from last month</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Chart Section -->
+        <div class="chart-section">
+          <div class="chart-card">
+            <div class="chart-header">
+              <h2>Monthly Income Graph</h2>
+              <p>Your earnings over the past 12 months</p>
+              <div class="chart-controls">
+                <select class="form-select" id="chartPeriod">
+                  <option>Last 12 months</option>
+                  <option>Last 6 months</option>
+                  <option>Last 3 months</option>
+                  <option>This year</option>
+                </select>
+              </div>
+            </div>
+            <div class="chart-container">
+              <canvas id="earningsChart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- Vehicle Performance and Bookings -->
+        <div class="earnings-grid">
+          <div class="vehicle-earnings-section">
+            <div class="card">
+              <div class="card-header">
+                <h2>Vehicle Earnings</h2>
+                <div class="sort-control">
+                  <select class="form-select" id="vehicleSortSelect">
+                    <option>Sort</option>
+                    <option>Earnings (High to Low)</option>
+                    <option>Earnings (Low to High)</option>
+                    <option>Bookings (Most to Least)</option>
+                    <option>Name (A-Z)</option>
+                  </select>
+                </div>
+              </div>
+              <div class="vehicle-earnings-list">
+                <div class="vehicle-earning-item">
+                  <div class="ranking">#1</div>
+                  <div class="vehicle-info">
+                    <div class="vehicle-name">Toyota Corolla</div>
+                  </div>
+                  <div class="earnings-amount">
+                    Rs 15,500 <span class="trend up">↗</span>
+                  </div>
+                </div>
+                <div class="vehicle-earning-item">
+                  <div class="ranking">#2</div>
+                  <div class="vehicle-info">
+                    <div class="vehicle-name">Honda Civic</div>
+                  </div>
+                  <div class="earnings-amount">
+                    Rs 12,800 <span class="trend up">↗</span>
+                  </div>
+                </div>
+                <div class="vehicle-earning-item">
+                  <div class="ranking">#3</div>
+                  <div class="vehicle-info">
+                    <div class="vehicle-name">Nissan Sunny</div>
+                  </div>
+                  <div class="earnings-amount">
+                    Rs 9,200 <span class="trend down">↘</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="recent-bookings-section">
+            <div class="card">
+              <div class="card-header">
+                <h2>Recent Bookings</h2>
+              </div>
+              <div class="bookings-list">
+                <!-- Completed Booking -->
+                <div class="booking-item completed">
+                  <div class="booking-info">
+                    <div class="booking-header">
+                      <span class="vehicle-id">Vehicle VH001</span>
+                      <span class="booking-status completed">completed</span>
+                    </div>
+                    <div class="booking-details">
+                      <div class="booking-id">Booking ID: BK2024001</div>
+                      <div class="rental-company">
+                        Rental Company: CityRide Rentals
+                      </div>
+                      <div class="customer">Customer: Arun Perera</div>
+                      <div class="duration">⏱️ Duration: 3 days</div>
+                    </div>
+                  </div>
+                  <div class="booking-progress">
+                    <div class="progress-step completed">● Accepted</div>
+                    <div class="progress-step completed">● Paid</div>
+                    <div class="progress-step completed">● Pick-up</div>
+                    <div class="progress-step completed">● Drop-off</div>
+                  </div>
+                  <div class="booking-earnings">
+                    <div class="fare-breakdown">
+                      <div class="fare-item">
+                        <span>Fare Amount</span>
+                        <span>Rs 18,500</span>
+                      </div>
+                      <div class="fare-item platform-fee">
+                        <span>Platform Fee</span>
+                        <span>-Rs 925</span>
+                      </div>
+                      <div class="fare-item company-fee">
+                        <span>Company Fee</span>
+                        <span>-Rs 1,850</span>
+                      </div>
+                      <div class="fare-item net-earnings">
+                        <span>Net Earnings</span>
+                        <span>Rs 15,725</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Ongoing Booking -->
+                <div class="booking-item ongoing">
+                  <div class="booking-info">
+                    <div class="booking-header">
+                      <span class="vehicle-id">Vehicle VH002</span>
+                      <span class="booking-status ongoing">ongoing</span>
+                    </div>
+                    <div class="booking-details">
+                      <div class="booking-id">Booking ID: BK2024002</div>
+                      <div class="rental-company">
+                        Rental Company: Metro Car Hire
+                      </div>
+                      <div class="customer">Customer: Saman Silva</div>
+                      <div class="duration">⏱️ Duration: 5 days</div>
+                    </div>
+                  </div>
+                  <div class="booking-progress">
+                    <div class="progress-step completed">● Accepted</div>
+                    <div class="progress-step completed">● Paid</div>
+                    <div class="progress-step completed">● Pick-up</div>
+                    <div class="progress-step pending">Drop-off</div>
+                  </div>
+                  <div class="booking-earnings">
+                    <div class="fare-breakdown">
+                      <div class="fare-item">
+                        <span>Fare Amount</span>
+                        <span>Rs 28,000</span>
+                      </div>
+                      <div class="fare-item platform-fee">
+                        <span>Platform Fee</span>
+                        <span>-Rs 1,400</span>
+                      </div>
+                      <div class="fare-item company-fee">
+                        <span>Company Fee</span>
+                        <span>-Rs 2,800</span>
+                      </div>
+                      <div class="fare-item net-earnings">
+                        <span>Net Earnings</span>
+                        <span>Rs 23,800</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="js/sidebar.js"></script>
+    <script src="js/earnings.js"></script>
+  </body>
+</html>
