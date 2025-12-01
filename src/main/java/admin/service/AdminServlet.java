@@ -10,12 +10,14 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
 
 @WebServlet(name = "Admin" , urlPatterns = "/admin/signup")
 public class AdminServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        System.out.println("AdminServlet");
         request.setCharacterEncoding("UTF-8");
         String ct = request.getContentType();
         String username, email, password, phoneNumber;
@@ -36,19 +38,40 @@ public class AdminServlet extends HttpServlet {
             phoneNumber = request.getParameter("phoneNumber");
         }
 
-        boolean isTrue;
+        HttpSession session = request.getSession();
 
-        isTrue = AdminController.insertData(username, email, password, phoneNumber);
+        try {
+            session.setAttribute("username", username);
+            session.setAttribute("email", email);
+            session.setAttribute("password", password);
+            session.setAttribute("phoneNumber", phoneNumber);
+            session.setAttribute("role", "admin");
 
-        if (isTrue) {
-            String message = "Data inserted successfully.";
             response.setContentType("application/json");
             response.getWriter().write("{\"status\":\"success\"}");
-        }
-        else{
+
+        } catch (Exception e) {
+            e.printStackTrace();
             response.setContentType("application/json");
-            response.getWriter().write("{\"status\":\"error\",\"message\":\"Failed to insert data\"}");
+            response.getWriter().write("{\"status\":\"error\", \"message\":\"Session failed\"}");
         }
+
+
+
+
+//        boolean isTrue;
+//
+//        isTrue = AdminController.insertData(username, email, password, phoneNumber);
+//
+//        if (isTrue) {
+//            String message = "Data inserted successfully.";
+//            response.setContentType("application/json");
+//            response.getWriter().write("{\"status\":\"success\"}");
+//        }
+//        else{
+//            response.setContentType("application/json");
+//            response.getWriter().write("{\"status\":\"error\",\"message\":\"Failed to insert data\"}");
+//        }
 
     }
 

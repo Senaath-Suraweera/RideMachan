@@ -288,37 +288,29 @@ class RentalCompaniesApp {
     const initials = this.getInitials(company.name);
     const stars = this.renderStars(company.rating);
     return `
-      <div class="company-card" data-company-id="${company.id}">
-        <div class="company-avatar"><span class="avatar-text">${initials}</span></div>
-        <div class="company-info">
-          <h3 class="company-name">${this.escapeHtml(company.name)}</h3>
-          <div class="company-meta">
-            <div class="meta-item">📍 ${this.escapeHtml(company.location)}</div>
-            <div class="meta-item">👨‍✈️ ${
-              company.offersDriver ? "Driver available" : "Self-drive only"
-            }</div>
-            <div class="meta-item">🚗 ${company.fleets} vehicles</div>
-          </div>
-          <p class="company-desc">${this.escapeHtml(
-            company.description || ""
-          )}</p>
-          <div class="company-rating">
-            <div class="rating-stars">${stars}</div>
-            <span class="rating-value">${Number(company.rating).toFixed(
-              1
-            )}</span>
-            <span class="review-count">(${company.reviews})</span>
-          </div>
+    <div class="company-card" data-company-id="${
+      company.id
+    }" onclick="app.viewCompany(${company.id})">
+      <div class="company-avatar"><span class="avatar-text">${initials}</span></div>
+      <div class="company-info">
+        <h3 class="company-name">${this.escapeHtml(company.name)}</h3>
+        <div class="company-meta">
+          <div class="meta-item">📍 ${this.escapeHtml(company.location)}</div>
+          <div class="meta-item">👨‍✈️ ${
+            company.offersDriver ? "Driver available" : "Self-drive only"
+          }</div>
+          <div class="meta-item">🚗 ${company.fleets} vehicles</div>
         </div>
-        <div class="company-actions">
-          <button class="btn btn-secondary btn-sm" onclick="app.viewCompany(${
-            company.id
-          })">View</button>
-          <button class="btn btn-primary btn-sm" onclick="app.messageCompany(${
-            company.id
-          })">Message</button>
+        <p class="company-desc">${this.escapeHtml(
+          company.description || ""
+        )}</p>
+        <div class="company-rating">
+          <div class="rating-stars">${stars}</div>
+          <span class="rating-value">${Number(company.rating).toFixed(1)}</span>
+          <span class="review-count">(${company.reviews})</span>
         </div>
-      </div>`;
+      </div>
+    </div>`;
   }
 
   updateCount() {

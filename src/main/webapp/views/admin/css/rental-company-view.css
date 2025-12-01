@@ -1,32 +1,143 @@
-/* Borrowed from your modal profile styles to keep the same look */ /* :contentReference[oaicite:3]{index=3} */
+/* Rental Company View Specific Styles - Aligned with Customer Home Theme */
+
+/* === Topbar === */
 .topbar {
-  padding: 12px 16px;
-  background: #f9fafb;
-  border: 1px solid #eef2f7;
-  border-radius: 10px;
-  margin-bottom: 16px;
+  padding: 16px 20px;
+  background: white;
+  border: 1px solid rgba(0, 0, 0, 0.03);
+  border-radius: var(--radius, 10px);
+  margin-bottom: 25px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: var(--shadow-sm, 0 4px 6px -1px rgba(0, 0, 0, 0.1));
+  animation: fadeIn 0.5s ease;
 }
+
 .back-link {
   text-decoration: none;
   font-weight: 600;
-  color: #4285f4;
+  color: var(--primary, #3a0ca3);
+  transition: var(--transition, all 0.3s ease);
 }
 
+.back-link:hover {
+  color: var(--primary-light, #4361ee);
+}
+
+/* === Buttons === */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border-radius: var(--radius, 10px);
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  outline: none;
+  font-size: 14px;
+  letter-spacing: 0.3px;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.08);
+}
+
+.btn::after {
+  content: "";
+  position: absolute;
+  inset: 0 0 0 -100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
+  transition: 0.5s;
+}
+
+.btn:hover::after {
+  left: 100%;
+}
+
+.btn-primary {
+  background: linear-gradient(
+    135deg,
+    var(--primary, #3a0ca3),
+    var(--primary-light, #4361ee)
+  );
+  color: #fff;
+}
+
+.btn-primary:hover {
+  background: linear-gradient(
+    135deg,
+    var(--secondary, #7209b7),
+    var(--primary, #3a0ca3)
+  );
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(58, 12, 163, 0.2);
+}
+
+.btn-secondary {
+  background: transparent;
+  border: 2px solid var(--primary-light, #4361ee);
+  color: var(--primary, #3a0ca3);
+}
+
+.btn-secondary:hover {
+  background: var(--primary, #3a0ca3);
+  color: #fff;
+  border-color: var(--primary, #3a0ca3);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(58, 12, 163, 0.2);
+}
+
+.btn-danger {
+  background: linear-gradient(135deg, var(--danger, #f72585), #db2777);
+  color: #fff;
+}
+
+.btn-danger:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(247, 37, 133, 0.3);
+}
+
+.btn-sm {
+  padding: 8px 14px;
+  font-size: 13px;
+  border-radius: var(--radius-sm, 6px);
+}
+
+/* === Company Profile Content === */
 .company-profile-content {
   display: grid;
-  gap: 24px;
+  gap: 25px;
+  animation: fadeInUp 0.6s ease;
 }
 
-/* Header */
+/* === Profile Header === */
 .profile-header {
   display: flex;
   align-items: center;
   gap: 24px;
-  padding: 24px;
-  background: linear-gradient(135deg, #4285f4 0%, #1976d2 100%);
-  border-radius: 12px;
+  padding: 30px;
+  background: linear-gradient(
+    135deg,
+    var(--primary, #3a0ca3),
+    var(--primary-light, #4361ee)
+  );
+  border-radius: var(--radius, 10px);
   color: #fff;
+  box-shadow: var(
+    --shadow-lg,
+    0 20px 25px -5px rgba(0, 0, 0, 0.1),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04)
+  );
 }
+
 .profile-logo {
   width: 100px;
   height: 100px;
@@ -37,299 +148,527 @@
   font-size: 36px;
   font-weight: 700;
   flex-shrink: 0;
+  backdrop-filter: blur(10px);
 }
+
 .profile-info h2 {
   margin: 0 0 8px 0;
   font-size: 28px;
-  font-weight: 600;
+  font-weight: 700;
 }
+
 .profile-license {
-  font-size: 16px;
+  font-size: 14px;
   opacity: 0.9;
   margin-bottom: 16px;
   font-family: monospace;
-}
-.profile-description {
-  font-size: 14px;
-  line-height: 1.5;
-  opacity: 0.9;
+  background: rgba(255, 255, 255, 0.15);
+  padding: 4px 10px;
+  border-radius: 50px;
+  display: inline-block;
 }
 
-/* Info sections */
+.profile-description {
+  font-size: 14px;
+  line-height: 1.6;
+  opacity: 0.95;
+}
+
+/* === Info Sections === */
 .business-info {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 24px;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
 }
+
 .info-section {
-  background: #f8f9fa;
-  border-radius: 12px;
+  background: white;
+  border-radius: var(--radius, 10px);
   padding: 20px;
-  border-left: 4px solid #4285f4;
+  border: 1px solid rgba(0, 0, 0, 0.03);
+  box-shadow: var(--shadow-sm, 0 4px 6px -1px rgba(0, 0, 0, 0.1));
+  position: relative;
+  overflow: hidden;
+  transition: all 0.4s ease;
 }
+
+.info-section::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: linear-gradient(
+    to bottom,
+    var(--primary, #3a0ca3),
+    var(--primary-light, #4361ee)
+  );
+}
+
+.info-section:hover {
+  box-shadow: var(
+    --shadow-lg,
+    0 20px 25px -5px rgba(0, 0, 0, 0.1),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04)
+  );
+  transform: translateY(-3px);
+}
+
 .info-section h3 {
   margin: 0 0 16px;
   font-size: 16px;
   font-weight: 600;
-  color: #212529;
+  color: var(--dark, #1a1a2e);
 }
 
 .info-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 8px 0;
-  border-bottom: 1px solid #dee2e6;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
 }
+
 .info-item:last-child {
   border-bottom: none;
 }
+
 .info-label {
-  font-size: 14px;
-  color: #6c757d;
+  font-size: 13px;
+  color: var(--text-light, #6c757d);
   font-weight: 500;
 }
+
 .info-value {
-  font-size: 14px;
-  color: #212529;
+  font-size: 13px;
+  color: var(--dark, #1a1a2e);
   font-weight: 600;
   text-align: right;
 }
 
-/* Vehicles */
+/* === Section Headers === */
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border, #e9ecef);
+}
+
+.section-header h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--dark, #1a1a2e);
+}
+
+/* === Vehicles Section === */
 .vehicles-section {
   grid-column: span 2;
 }
+
 .vehicles-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
   gap: 16px;
   margin-top: 16px;
 }
+
 .vehicle-card {
-  background: #fff;
-  border: 1px solid #dee2e6;
-  border-radius: 8px;
-  padding: 16px;
-  transition: all 0.2s;
+  background: rgba(67, 97, 238, 0.02);
+  border: 1px solid rgba(0, 0, 0, 0.03);
+  border-radius: var(--radius, 10px);
+  padding: 20px;
+  transition: all 0.4s ease;
+  position: relative;
+  overflow: hidden;
 }
+
+.vehicle-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: linear-gradient(
+    to bottom,
+    var(--primary, #3a0ca3),
+    var(--primary-light, #4361ee)
+  );
+  opacity: 0;
+  transition: var(--transition, all 0.3s ease);
+}
+
 .vehicle-card:hover {
-  border-color: #4285f4;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: var(
+    --shadow-lg,
+    0 20px 25px -5px rgba(0, 0, 0, 0.1),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04)
+  );
+  transform: translateY(-5px);
 }
+
+.vehicle-card:hover::before {
+  opacity: 0.8;
+}
+
 .vehicle-name {
   font-size: 16px;
   font-weight: 600;
-  color: #212529;
+  color: var(--dark, #1a1a2e);
   margin-bottom: 8px;
 }
+
 .vehicle-price {
   font-size: 14px;
-  color: #4285f4;
-  font-weight: 600;
+  color: var(--primary, #3a0ca3);
+  font-weight: 700;
   margin-bottom: 8px;
 }
+
 .vehicle-company {
   font-size: 12px;
-  color: #6c757d;
+  color: var(--text-light, #6c757d);
   margin-bottom: 12px;
 }
+
 .vehicle-features {
   display: flex;
   flex-wrap: wrap;
-  gap: 4px;
+  gap: 6px;
   margin-bottom: 12px;
 }
+
 .feature-tag {
-  padding: 2px 8px;
-  background: #e3f2fd;
-  color: #1976d2;
-  border-radius: 8px;
-  font-size: 10px;
-  font-weight: 500;
+  padding: 4px 10px;
+  background: rgba(67, 97, 238, 0.1);
+  color: var(--primary, #3a0ca3);
+  border-radius: 50px;
+  font-size: 11px;
+  font-weight: 600;
 }
+
 .vehicle-rating {
   display: flex;
   align-items: center;
   justify-content: space-between;
   font-size: 12px;
+  color: var(--text-light, #6c757d);
+  padding-top: 12px;
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
 }
 
-/* Drivers */
+/* === Drivers Section === */
 .drivers-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: 16px;
   margin-top: 16px;
 }
+
 .driver-card {
-  background: #fff;
-  border: 1px solid #dee2e6;
-  border-radius: 8px;
-  padding: 16px;
+  background: rgba(67, 97, 238, 0.02);
+  border: 1px solid rgba(0, 0, 0, 0.03);
+  border-radius: var(--radius, 10px);
+  padding: 20px;
   text-align: center;
-  transition: all 0.2s;
+  transition: all 0.4s ease;
 }
+
 .driver-card:hover {
-  border-color: #4285f4;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: var(
+    --shadow-lg,
+    0 20px 25px -5px rgba(0, 0, 0, 0.1),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04)
+  );
+  transform: translateY(-5px);
 }
+
 .driver-avatar {
-  width: 50px;
-  height: 50px;
+  width: 56px;
+  height: 56px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(
+    135deg,
+    var(--primary, #3a0ca3),
+    var(--secondary, #7209b7)
+  );
   color: #fff;
   display: grid;
   place-items: center;
   margin: 0 auto 12px;
   font-weight: 700;
+  font-size: 16px;
+  box-shadow: 0 6px 15px rgba(67, 97, 238, 0.3);
 }
 
-/* Reviews + terms + contact */
+.driver-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--dark, #1a1a2e);
+  margin-bottom: 8px;
+}
+
+.driver-stats {
+  font-size: 12px;
+  color: var(--text-light, #6c757d);
+}
+
+/* === Reviews Section === */
 .reviews-section {
   grid-column: span 2;
-  background: #f8f9fa;
-  border-radius: 12px;
-  padding: 20px;
+  background: white;
+  border-radius: var(--radius, 10px);
+  padding: 25px;
+  border: 1px solid rgba(0, 0, 0, 0.03);
+  box-shadow: var(--shadow-sm, 0 4px 6px -1px rgba(0, 0, 0, 0.1));
 }
+
 .reviews-summary {
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: 24px;
   margin-bottom: 20px;
   padding-bottom: 20px;
-  border-bottom: 1px solid #dee2e6;
+  border-bottom: 1px solid var(--border, #e9ecef);
 }
+
 .overall-rating {
   text-align: center;
 }
+
 .rating-number {
-  font-size: 36px;
+  font-size: 42px;
   font-weight: 700;
-  color: #212529;
-}
-.rating-text {
-  font-size: 14px;
-  color: #6c757d;
+  color: var(--dark, #1a1a2e);
+  line-height: 1;
 }
 
-.terms-section,
-.contact-section {
-  grid-column: span 2;
-  background: #f8f9fa;
-  border-radius: 12px;
-  padding: 20px;
-  text-align: center;
+.rating-text {
+  font-size: 13px;
+  color: var(--text-light, #6c757d);
+  margin-top: 4px;
 }
-.content-placeholder {
-  color: #6c757d;
+
+.reviews-placeholder {
+  text-align: center;
+  color: var(--text-light, #6c757d);
   font-style: italic;
   padding: 20px;
 }
 
-/* Responsive */
+/* === Terms & Contact Sections === */
+.terms-section,
+.contact-section {
+  grid-column: span 2;
+  background: white;
+  border-radius: var(--radius, 10px);
+  padding: 25px;
+  border: 1px solid rgba(0, 0, 0, 0.03);
+  box-shadow: var(--shadow-sm, 0 4px 6px -1px rgba(0, 0, 0, 0.1));
+}
+
+.terms-section h3,
+.contact-section h3 {
+  margin: 0 0 16px;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--dark, #1a1a2e);
+}
+
+.content-placeholder {
+  color: var(--text, #2d3748);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* === Modals === */
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  z-index: 1100;
+  backdrop-filter: blur(4px);
+}
+
+.modal.show {
+  display: flex;
+}
+
+.modal-content {
+  background: #fff;
+  border-radius: var(--radius, 10px);
+  width: min(820px, 94vw);
+  max-height: 90vh;
+  overflow: auto;
+  box-shadow: var(
+    --shadow-lg,
+    0 20px 25px -5px rgba(0, 0, 0, 0.1),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04)
+  );
+  animation: fadeInUp 0.3s ease;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 20px 24px;
+  background: #f8f9fa;
+  border-bottom: 1px solid var(--border, #e9ecef);
+}
+
+.modal-header h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--dark, #1a1a2e);
+  margin: 0;
+}
+
+.modal-body {
+  padding: 24px;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 16px 24px;
+  background: #f8f9fa;
+  border-top: 1px solid var(--border, #e9ecef);
+}
+
+.modal-close {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 24px;
+  color: var(--text-light, #6c757d);
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm, 6px);
+  transition: var(--transition, all 0.3s ease);
+}
+
+.modal-close:hover {
+  background: rgba(0, 0, 0, 0.05);
+  color: var(--dark, #1a1a2e);
+}
+
+/* Form inside modal */
+.form-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-label {
+  font-size: 12px;
+  color: var(--text-light, #6c757d);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.form-control {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid var(--border, #e9ecef);
+  border-radius: var(--radius, 10px);
+  background: #fff;
+  color: var(--text, #2d3748);
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form-control:focus {
+  border-color: var(--primary-light, #4361ee);
+  box-shadow: 0 0 0 4px rgba(67, 97, 238, 0.12);
+}
+
+/* === Animations === */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* === Responsive Design === */
 @media (max-width: 768px) {
   .profile-header {
     flex-direction: column;
     text-align: center;
   }
+
   .profile-logo {
     width: 80px;
     height: 80px;
     font-size: 28px;
   }
+
   .vehicles-section,
   .reviews-section,
   .terms-section,
   .contact-section {
     grid-column: span 1;
   }
+
+  .topbar {
+    flex-direction: column;
+    gap: 12px;
+    text-align: center;
+  }
 }
 
-/* Section headers with actions (for Vehicles/Drivers headings) */
-.section-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 12px;
-  padding-bottom: 8px;
-  border-bottom: 1px solid #e6e6e6;
-}
-.section-header h3 {
-  margin: 0;
-}
+@media (max-width: 576px) {
+  .info-section,
+  .reviews-section,
+  .terms-section,
+  .contact-section {
+    padding: 16px;
+  }
 
-/* Reuse the same modal styling from list page for consistency */
-.modal {
-  position: fixed;
-  inset: 0;
-  background: rgba(17, 24, 39, 0.45);
-  display: none;
-  align-items: center;
-  justify-content: center;
-  padding: 24px;
-  z-index: 1100;
-}
-.modal.show {
-  display: flex;
-}
-.modal-content {
-  background: #fff;
-  border: 1px solid #e6e8ec;
-  border-radius: 12px;
-  width: min(820px, 94vw);
-  max-height: 90vh;
-  overflow: auto;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.18);
-}
-.modal-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 18px 20px 0;
-}
-.modal-body {
-  padding: 12px 20px 20px;
-}
-.modal-footer {
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-  padding: 14px 20px 20px;
-  border-top: 1px solid #e6e8ec;
-}
-.modal-close {
-  background: none;
-  border: 0;
-  cursor: pointer;
-  font-size: 24px;
-  width: 34px;
-  height: 34px;
-  border-radius: 8px;
-  color: #6b7280;
-}
-.modal-close:hover {
-  background: #f3f4f6;
-}
-.form-row {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 12px 16px;
-}
+  .modal-header,
+  .modal-body,
+  .modal-footer {
+    padding: 16px;
+  }
 
-.btn-danger {
-  background: #dc2626;
-  color: white;
-  border: none;
-  padding: 8px 14px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: 600;
-  transition: all 0.2s ease;
-}
-.btn-danger:hover {
-  background: #b91c1c;
+  .vehicles-grid,
+  .drivers-grid {
+    grid-template-columns: 1fr;
+  }
 }

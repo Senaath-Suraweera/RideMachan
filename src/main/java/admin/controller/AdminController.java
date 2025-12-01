@@ -135,5 +135,51 @@ public class AdminController {
         return PasswordServices.verifyPassword(password, salt, hashedPassword);
     }
 
+    public boolean makeActive(String email)
+    {
+        try (Connection conn = DBConnection.getConnection()) {
+            String sql = "UPDATE Admin SET active=? WHERE email=?";
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setString(1, "1");
+            ps.setString(2, email);
+
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean makeInactive(String email)
+    {
+        try (Connection conn = DBConnection.getConnection()) {
+            String sql = "UPDATE Admin SET active=? WHERE email=?";
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setString(1, "0");
+            ps.setString(2, email);
+
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public static boolean setVerified(String email)
+    {
+        try (Connection conn = DBConnection.getConnection()) {
+            String sql = "UPDATE Admin SET verified=? WHERE email=?";
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setString(1, "1");
+            ps.setString(2, email);
+
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+
 
 }

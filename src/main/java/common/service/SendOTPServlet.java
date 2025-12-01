@@ -18,6 +18,8 @@ public class SendOTPServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
 
+        System.out.println("sendOTPServlet");
+
         req.setCharacterEncoding("UTF-8");
         resp.setContentType("application/json;charset=UTF-8");
         HttpSession session = req.getSession();

@@ -145,6 +145,39 @@
       </div>
     </div>
 
+    <!-- OTP Modal -->
+    <div class="modal" id="otpModal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>Verify Email</h3>
+          <button class="modal-close" onclick="closeOtpModal()">&times;</button>
+        </div>
+
+        <div class="modal-body">
+          <p>An OTP has been sent to the email you provided.</p>
+
+          <div class="form-group">
+            <label class="form-label">Enter OTP</label>
+            <input
+              type="text"
+              id="otpInput"
+              class="form-control"
+              maxlength="6"
+            />
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn btn-secondary" onclick="closeOtpModal()">
+            Cancel
+          </button>
+          <button class="btn btn-primary" onclick="submitOtpCode()">
+            Verify
+          </button>
+        </div>
+      </div>
+    </div>
+
     <!-- Edit Admin Modal (optional, can keep for future) -->
     <div class="modal" id="editAdminModal">
       <div class="modal-content">

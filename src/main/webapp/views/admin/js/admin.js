@@ -3,6 +3,7 @@ class AdminsManager {
   constructor() {
     this.admins = []; // will load from backend
     this.filteredAdmins = [];
+    this.tempSignupData = null;
     this.init();
   }
 
@@ -48,7 +49,7 @@ class AdminsManager {
     this.filteredAdmins.forEach((admin) => {
       const card = this.createAdminCard(admin);
 
-      // 🔗 attach delete event here
+      // Attach delete event
       const deleteBtn = card.querySelector('[data-action="delete"]');
       if (deleteBtn) {
         deleteBtn.addEventListener("click", () => {
@@ -63,8 +64,6 @@ class AdminsManager {
       list.appendChild(card);
     });
   }
-
-  // In AdminsManager class
 
   createAdminCard(admin) {
     const card = document.createElement("div");
@@ -164,23 +163,39 @@ class AdminsManager {
   openRegisterAdminModal() {
     const modal = document.getElementById("registerAdminModal");
     modal.classList.add("show");
-    modal.style.display = "flex";
     document.body.style.overflow = "hidden";
   }
 
   closeRegisterAdminModal() {
     const modal = document.getElementById("registerAdminModal");
     modal.classList.remove("show");
-    modal.style.display = "none";
     document.body.style.overflow = "";
     document.getElementById("registerAdminForm")?.reset();
   }
 
   openEditAdminModal() {
-    document.getElementById("editAdminModal").classList.add("show");
+    const modal = document.getElementById("editAdminModal");
+    modal.classList.add("show");
+    document.body.style.overflow = "hidden";
   }
+
   closeEditAdminModal() {
-    document.getElementById("editAdminModal").classList.remove("show");
+    const modal = document.getElementById("editAdminModal");
+    modal.classList.remove("show");
+    document.body.style.overflow = "";
+  }
+
+  openOtpModal() {
+    const modal = document.getElementById("otpModal");
+    modal.classList.add("show");
+    document.body.style.overflow = "hidden";
+  }
+
+  closeOtpModal() {
+    const modal = document.getElementById("otpModal");
+    modal.classList.remove("show");
+    document.body.style.overflow = "";
+    document.getElementById("otpInput").value = "";
   }
 
   // ---------- Register Admin ----------
@@ -206,23 +221,54 @@ class AdminsManager {
     };
 
     try {
-      const res = await fetch("/admin/signup", {
+      console.log("Step 1: Calling /admin/signup...");
+
+      // STEP 1: SIGNUP REQUEST
+      const signupRes = await fetch("/admin/signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-      const result = await res.json();
 
-      if (result.status === "success") {
+      const signupResult = await signupRes.json();
+      console.log("Signup result:", signupResult);
+
+      if (signupResult.status === "success") {
+        // Store signup data for later reference
+        this.tempSignupData = payload;
+
+        // Close signup modal
         this.closeRegisterAdminModal();
-        this.toast("Admin registered successfully");
-        await this.loadAdmins();
+
+        console.log("Step 2: Calling /verify to send OTP...");
+
+        // STEP 2: Request OTP to be sent
+        const otpRes = await fetch("/verify", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+        });
+
+        console.log("OTP response status:", otpRes.status);
+
+        const otpResult = await otpRes.json();
+        console.log("OTP result:", otpResult);
+
+        if (otpResult.status === "success") {
+          // Open OTP modal after successfully sending OTP
+          this.openOtpModal();
+          this.toast("OTP sent to email. Please check your inbox.");
+        } else {
+          this.toast(
+            "Failed to send OTP: " + (otpResult.message || "Unknown error")
+          );
+          console.error("OTP send failed:", otpResult);
+        }
       } else {
-        this.toast("Error: " + (result.message || "Signup failed"));
+        this.toast("Error: " + (signupResult.message || "Signup failed"));
       }
     } catch (err) {
-      console.error("Signup failed:", err);
-      this.toast("Server error");
+      console.error("Registration process failed:", err);
+      this.toast("Server error during registration");
     }
   }
 
@@ -262,7 +308,7 @@ class AdminsManager {
       z-index: 1200;
     `;
     document.body.appendChild(el);
-    setTimeout(() => el.remove(), 2200);
+    setTimeout(() => el.remove(), 3000);
   }
 
   escape(s) {
@@ -283,15 +329,67 @@ window.addEventListener("DOMContentLoaded", () => {
 function searchAdmins() {
   window.adminsManager?.applyFilters();
 }
+
 function openRegisterAdminModal() {
   window.adminsManager?.openRegisterAdminModal();
 }
+
 function closeRegisterAdminModal() {
   window.adminsManager?.closeRegisterAdminModal();
 }
+
 function closeEditAdminModal() {
   window.adminsManager?.closeEditAdminModal();
 }
+
 function updateAdmin() {
   window.adminsManager?.updateAdmin();
+}
+
+function openOtpModal() {
+  window.adminsManager?.openOtpModal();
+}
+
+function closeOtpModal() {
+  window.adminsManager?.closeOtpModal();
+}
+
+// --- Submit OTP to /code ---
+async function submitOtpCode() {
+  const otp = document.getElementById("otpInput").value.trim();
+  if (otp.length === 0) {
+    window.adminsManager.toast("Please enter the OTP");
+    return;
+  }
+
+  console.log("Submitting OTP:", otp);
+
+  try {
+    const res = await fetch("/code", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: `code=${encodeURIComponent(otp)}`,
+    });
+
+    console.log("OTP verification response status:", res.status);
+
+    const result = await res.json();
+    console.log("OTP verification result:", result);
+
+    if (result.status === "success") {
+      closeOtpModal();
+      window.adminsManager.toast("Admin verified & registered successfully!");
+      // Wait a bit before reloading to show the success message
+      setTimeout(async () => {
+        await window.adminsManager.loadAdmins();
+      }, 1000);
+    } else {
+      window.adminsManager.toast(
+        "Invalid OTP: " + (result.message || "Please try again")
+      );
+    }
+  } catch (err) {
+    console.error("OTP verify error:", err);
+    window.adminsManager.toast("Server error during verification");
+  }
 }

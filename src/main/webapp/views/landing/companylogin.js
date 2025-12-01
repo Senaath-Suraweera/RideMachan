@@ -20,7 +20,6 @@ loginForm.addEventListener("submit", async (e) => {
     const result = await response.json();
 
     if (result.status === "success") {
-      // ✅ Redirect to company home page
       alert("Login successful!");
       window.location.href = "../rentalcompany/management/html/homepage.html";
     } else {
