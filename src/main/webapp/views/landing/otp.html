@@ -203,9 +203,10 @@
               loadingText.style.display = "block";
               loadingText.style.color = "#34d399";
 
+              const redirectURl = result.redirectUrl;
               // Redirect to customer home page
               setTimeout(() => {
-                window.location.href = "/views/customer/pages/home.html";
+                window.location.href = redirectURl || "/";
               }, 1000);
             } else {
               showError(result.message || "Invalid OTP. Please try again.");

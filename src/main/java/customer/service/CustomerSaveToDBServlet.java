@@ -72,7 +72,8 @@ public class CustomerSaveToDBServlet extends HttpServlet {
                 if (customerId > 0) {
                     CustomerDAO.setVerified(session.getAttribute("email").toString());
                     response.setContentType("application/json");
-                    response.getWriter().write("{\"status\":\"success\"}");
+                    String redirectUrl = request.getContextPath() + "/views/customer/pages/home.html";
+                    response.getWriter().write("{\"status\":\"success\",\"redirectUrl\":\"" + redirectUrl + "\"}");
                 } else {
                     response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Signup failed");
                 }
