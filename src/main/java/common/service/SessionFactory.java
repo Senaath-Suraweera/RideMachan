@@ -22,9 +22,9 @@ public class SessionFactory {
             resp.getWriter().write("{\"status\":\"error\",\"message\":\"No role in session\"}");
             return;
         }
-
         if (role.equalsIgnoreCase("customer")) {
-            resp.sendRedirect(req.getContextPath() + "/views/customer/pages/home.html");
+            RequestDispatcher rd = req.getRequestDispatcher("/customer/save");
+            rd.forward(req, resp);
         }
         else if (role.equalsIgnoreCase("admin")) {
             // Remove context path from RequestDispatcher

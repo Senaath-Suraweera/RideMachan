@@ -64,6 +64,11 @@
         background: #16a34a;
       }
 
+      button:disabled {
+        background: #6b7280;
+        cursor: not-allowed;
+      }
+
       .resend {
         margin-top: 15px;
         font-size: 13px;
@@ -74,6 +79,7 @@
         color: #60a5fa;
         text-decoration: none;
         font-weight: 600;
+        cursor: pointer;
       }
 
       .resend a:hover {
@@ -86,90 +92,170 @@
         margin-bottom: 10px;
         color: #a5b4fc;
       }
+
+      .error-message {
+        color: #fca5a5;
+        background: rgba(239, 68, 68, 0.2);
+        padding: 10px;
+        border-radius: 8px;
+        margin-bottom: 15px;
+        display: none;
+        font-size: 13px;
+      }
     </style>
   </head>
   <body>
     <div class="otp-container">
       <h2>Verify Your Email</h2>
-      <p>We’ve sent a 6-digit code to your registered email address.</p>
+      <p>We've sent a 6-digit code to your registered email address.</p>
 
       <div class="loading" id="loading">Sending OTP...</div>
+      <div class="error-message" id="errorMessage"></div>
 
       <form id="otpForm">
         <input
           type="text"
           name="code"
+          id="otpInput"
           placeholder="Enter OTP"
           maxlength="6"
+          pattern="[0-9]{6}"
           required
         />
-        <button type="submit">Verify</button>
+        <button type="submit" id="verifyBtn">Verify</button>
       </form>
 
       <div class="resend">
-        Didn’t receive the code? <a href="#" id="resend-link">Resend OTP</a>
+        Didn't receive the code? <a id="resend-link">Resend OTP</a>
       </div>
     </div>
 
     <script>
-      // Send OTP on page load
       const loadingText = document.getElementById("loading");
+      const errorMessage = document.getElementById("errorMessage");
+      const verifyBtn = document.getElementById("verifyBtn");
+      const otpInput = document.getElementById("otpInput");
+
+      // Function to show error
+      function showError(message) {
+        errorMessage.textContent = message;
+        errorMessage.style.display = "block";
+        setTimeout(() => {
+          errorMessage.style.display = "none";
+        }, 5000);
+      }
+
+      // Send OTP on page load
       loadingText.style.display = "block";
 
-      fetch("http://localhost:8080/verify", {
+      fetch("/verify", {
         method: "POST",
-        credentials: "include",
+        credentials: "include", // CRITICAL: Include session cookies
       })
-        .then(() => {
-          loadingText.textContent = "OTP sent successfully!";
-          setTimeout(() => (loadingText.style.display = "none"), 3000);
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.status === "success") {
+            loadingText.textContent = "OTP sent successfully!";
+            setTimeout(() => (loadingText.style.display = "none"), 3000);
+          } else {
+            loadingText.textContent = "Failed to send OTP.";
+            showError(data.message || "Failed to send OTP. Please try again.");
+          }
         })
-        .catch(() => {
-          loadingText.textContent = "Failed to send OTP. Please try again.";
+        .catch((error) => {
+          console.error("Error sending OTP:", error);
+          loadingText.textContent = "Failed to send OTP.";
+          showError("Failed to send OTP. Please try again.");
         });
 
-      otpForm.addEventListener("submit", async (e) => {
-        e.preventDefault();
+      // Handle OTP verification
+      document
+        .getElementById("otpForm")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
 
-        const code = document.querySelector("input[name='code']").value;
+          const code = otpInput.value.trim();
 
-        try {
-          const response = await fetch("http://localhost:8080/code", {
-            method: "POST",
-            credentials: "include",
-            headers: { "Content-Type": "application/x-www-form-urlencoded" },
-            body: new URLSearchParams({ code }),
-          });
-
-          const result = await response.json();
-
-          if (result.status === "success") {
-            window.location.href = "/views/customer/pages/home.html";
-          } else {
-            alert(result.message || "Invalid OTP");
+          if (!code || code.length !== 6) {
+            showError("Please enter a valid 6-digit code");
+            return;
           }
-        } catch (error) {
-          alert("Server error verifying OTP");
-        }
-      });
+
+          // Disable button during verification
+          verifyBtn.disabled = true;
+          verifyBtn.textContent = "Verifying...";
+
+          try {
+            const response = await fetch("/code", {
+              method: "POST",
+              credentials: "include", // CRITICAL: Include session cookies
+              headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+              },
+              body: new URLSearchParams({ code }),
+            });
+
+            const result = await response.json();
+
+            if (result.status === "success") {
+              loadingText.textContent =
+                "Verification successful! Redirecting...";
+              loadingText.style.display = "block";
+              loadingText.style.color = "#34d399";
+
+              // Redirect to customer home page
+              setTimeout(() => {
+                window.location.href = "/views/customer/pages/home.html";
+              }, 1000);
+            } else {
+              showError(result.message || "Invalid OTP. Please try again.");
+              verifyBtn.disabled = false;
+              verifyBtn.textContent = "Verify";
+              otpInput.value = "";
+              otpInput.focus();
+            }
+          } catch (error) {
+            console.error("Error verifying OTP:", error);
+            showError("Server error verifying OTP. Please try again.");
+            verifyBtn.disabled = false;
+            verifyBtn.textContent = "Verify";
+          }
+        });
 
       // Resend OTP
       document
         .getElementById("resend-link")
         .addEventListener("click", function (e) {
           e.preventDefault();
+
           loadingText.style.display = "block";
           loadingText.textContent = "Resending OTP...";
+          loadingText.style.color = "#a5b4fc";
 
-          fetch("http://localhost:8080/verify", { method: "POST" })
-            .then(() => {
-              loadingText.textContent = "OTP resent successfully!";
-              setTimeout(() => (loadingText.style.display = "none"), 3000);
+          fetch("/verify", {
+            method: "POST",
+            credentials: "include", // CRITICAL: Include session cookies
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              if (data.status === "success") {
+                loadingText.textContent = "OTP resent successfully!";
+                loadingText.style.color = "#34d399";
+                setTimeout(() => (loadingText.style.display = "none"), 3000);
+              } else {
+                showError(data.message || "Error resending OTP.");
+              }
             })
-            .catch(() => {
-              loadingText.textContent = "Error resending OTP.";
+            .catch((error) => {
+              console.error("Error resending OTP:", error);
+              showError("Error resending OTP. Please try again.");
             });
         });
+
+      // Allow only numbers in OTP input
+      otpInput.addEventListener("input", function (e) {
+        this.value = this.value.replace(/[^0-9]/g, "");
+      });
     </script>
   </body>
 </html>

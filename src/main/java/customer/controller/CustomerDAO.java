@@ -1,5 +1,6 @@
 package customer.controller;
 
+import common.util.DBConnection;
 import customer.model.Customer;
 
 import java.sql.*;
@@ -45,12 +46,23 @@ public class CustomerDAO {
                 ps.setNull(i++, Types.VARCHAR); // passport_number
                 ps.setNull(i++, Types.VARCHAR); // international license
             } else {
-                ps.setNull(i++, Types.VARCHAR); // nic_number
-                ps.setNull(i++, Types.BLOB);    // nic_image
-                ps.setNull(i++, Types.VARCHAR); // drivers_license_number
-                ps.setNull(i++, Types.BLOB);    // drivers_license_image
-                ps.setString(i++, c.getPassportNumber());
-                ps.setString(i++, c.getInternationalDriversLicenseNumber());
+
+
+                ps.setNull(i++, Types.VARCHAR);
+                if (c.getNicImage() != null) ps.setBytes(i++, c.getNicImage()); else ps.setNull(i++, Types.BLOB);
+                ps.setNull(i++, Types.VARCHAR);
+                if (c.getDriversLicenseImage() != null) ps.setBytes(i++, c.getDriversLicenseImage()); else ps.setNull(i++, Types.BLOB);
+                ps.setString(i++, c.getPassportNumber()); // passport_number
+                ps.setString(i++, c.getInternationalDriversLicenseNumber()); // international license
+
+
+
+//                ps.setNull(i++, Types.VARCHAR); // nic_number
+//                ps.setNull(i++, Types.BLOB);    // nic_image
+//                ps.setNull(i++, Types.VARCHAR); // drivers_license_number
+//                ps.setNull(i++, Types.BLOB);    // drivers_license_image
+//                ps.setString(i++, c.getPassportNumber());
+//                ps.setString(i++, c.getInternationalDriversLicenseNumber());
             }
 
             ps.executeUpdate();
@@ -166,5 +178,51 @@ public class CustomerDAO {
         c.setInternationalDriversLicenseNumber(rs.getString("international_drivers_license_number"));
         c.setVerified(rs.getBoolean("verified"));
         return c;
+    }
+
+
+    public static boolean setVerified(String email)
+    {
+        try (Connection conn = DBConnection.getConnection()) {
+            String sql = "UPDATE Customer SET verified=? WHERE email=?";
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setString(1, "1");
+            ps.setString(2, email);
+
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public static boolean setActive(String email)
+    {
+        try (Connection conn = DBConnection.getConnection()) {
+            String sql = "UPDATE Customer SET active=? WHERE email=?";
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setString(1, "1");
+            ps.setString(2, email);
+
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public static boolean setInactive(String email)
+    {
+        try (Connection conn = DBConnection.getConnection()) {
+            String sql = "UPDATE Customer SET active=? WHERE email=?";
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setString(1, "0");
+            ps.setString(2, email);
+
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 }

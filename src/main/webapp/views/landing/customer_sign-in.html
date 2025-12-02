@@ -55,12 +55,35 @@
       button:hover {
         background-color: #0056b3;
       }
+      button:disabled {
+        background-color: #ccc;
+        cursor: not-allowed;
+      }
+      .error-message {
+        color: #dc3545;
+        background: #f8d7da;
+        padding: 10px;
+        border-radius: 5px;
+        margin-bottom: 15px;
+        display: none;
+      }
+      .success-message {
+        color: #155724;
+        background: #d4edda;
+        padding: 10px;
+        border-radius: 5px;
+        margin-bottom: 15px;
+        display: none;
+      }
     </style>
   </head>
 
   <body>
     <div class="container">
       <h2>Customer Sign Up</h2>
+
+      <div id="errorMessage" class="error-message"></div>
+      <div id="successMessage" class="success-message"></div>
 
       <form id="registrationForm" enctype="multipart/form-data">
         <label>Username</label>
@@ -127,17 +150,17 @@
           <label>NIC Number</label>
           <input type="text" name="nicNumber" placeholder="Enter NIC number" />
 
-          <label>Driver’s License Number</label>
+          <label>Driver's License Number</label>
           <input
             type="text"
             name="driversLicenseNumber"
-            placeholder="Enter driver’s license number"
+            placeholder="Enter driver's license number"
           />
 
           <label>NIC Image</label>
           <input type="file" name="nicImage" accept="image/*" />
 
-          <label>Driver’s License Image</label>
+          <label>Driver's License Image</label>
           <input type="file" name="driversLicenseImage" accept="image/*" />
         </div>
 
@@ -150,15 +173,18 @@
             placeholder="Enter passport number"
           />
 
-          <label>International Driver’s License Number</label>
+          <label>International Driver's License Number</label>
           <input
             type="text"
             name="internationalDriversLicenseNumber"
             placeholder="Enter international license number"
           />
 
-          <label>Driver’s License Image</label>
+          <label>Driver's License Image</label>
           <input type="file" name="driversLicenseImage" accept="image/*" />
+
+          <label>Passport Image</label>
+          <input type="file" name="passportImage" accept="image/*" />
         </div>
 
         <h3 style="margin-top: 20px">Address</h3>
@@ -184,7 +210,7 @@
         <label>Country</label>
         <input type="text" name="country" placeholder="Country" required />
 
-        <button type="submit">Register</button>
+        <button type="submit" id="submitBtn">Register</button>
       </form>
     </div>
 
@@ -199,9 +225,46 @@
         if (type === "LOCAL") {
           localFields.classList.remove("hidden");
           foreignFields.classList.add("hidden");
+          // Make local fields required
+          document.querySelector('input[name="nicNumber"]').required = true;
+          document.querySelector(
+            'input[name="driversLicenseNumber"]'
+          ).required = true;
+          document.querySelector('input[name="nicImage"]').required = true;
+          document.querySelectorAll(
+            '#localFields input[type="file"]'
+          )[1].required = true;
+          // Remove foreign field requirements
+          document.querySelector(
+            'input[name="passportNumber"]'
+          ).required = false;
+          document.querySelector(
+            'input[name="internationalDriversLicenseNumber"]'
+          ).required = false;
+          document
+            .querySelectorAll('#foreignFields input[type="file"]')
+            .forEach((f) => (f.required = false));
         } else if (type === "FOREIGN") {
           foreignFields.classList.remove("hidden");
           localFields.classList.add("hidden");
+          // Make foreign fields required
+          document.querySelector(
+            'input[name="passportNumber"]'
+          ).required = true;
+          document.querySelector(
+            'input[name="internationalDriversLicenseNumber"]'
+          ).required = true;
+          document
+            .querySelectorAll('#foreignFields input[type="file"]')
+            .forEach((f) => (f.required = true));
+          // Remove local field requirements
+          document.querySelector('input[name="nicNumber"]').required = false;
+          document.querySelector(
+            'input[name="driversLicenseNumber"]'
+          ).required = false;
+          document
+            .querySelectorAll('#localFields input[type="file"]')
+            .forEach((f) => (f.required = false));
         } else {
           localFields.classList.add("hidden");
           foreignFields.classList.add("hidden");
@@ -214,37 +277,62 @@
         .addEventListener("submit", async (e) => {
           e.preventDefault();
 
+          const errorMessage = document.getElementById("errorMessage");
+          const successMessage = document.getElementById("successMessage");
+          const submitBtn = document.getElementById("submitBtn");
+
+          // Hide previous messages
+          errorMessage.style.display = "none";
+          successMessage.style.display = "none";
+
           const password = document.getElementById("password").value;
           const confirmPassword =
             document.getElementById("confirmPassword").value;
+
           if (password !== confirmPassword) {
-            alert("Passwords do not match!");
+            errorMessage.textContent = "Passwords do not match!";
+            errorMessage.style.display = "block";
             return;
           }
 
           const formData = new FormData(e.target);
 
-          try {
-            const response = await fetch(
-              "http://localhost:8080/customer/signup",
-              {
-                method: "POST",
-                body: formData,
-              }
-            );
+          // Disable submit button
+          submitBtn.disabled = true;
+          submitBtn.textContent = "Registering...";
 
-            if (response.redirected) {
-              window.location.href = response.url;
-            } else if (response.ok) {
-              alert("Signup successful!");
-              window.location.href = "../../customer/pages/home.html";
+          try {
+            const response = await fetch("/customer/signup", {
+              method: "POST",
+              body: formData,
+              credentials: "include", // Important for session management
+            });
+
+            const result = await response.json();
+
+            if (result.status === "success") {
+              successMessage.textContent =
+                "Registration successful! Redirecting to OTP verification...";
+              successMessage.style.display = "block";
+
+              // Redirect to OTP page after 1 second
+              setTimeout(() => {
+                window.location.href = "otp.html";
+              }, 1000);
             } else {
-              const text = await response.text();
-              alert("Signup failed: " + text);
+              errorMessage.textContent =
+                "Signup failed: " + (result.message || "Unknown error");
+              errorMessage.style.display = "block";
+              submitBtn.disabled = false;
+              submitBtn.textContent = "Register";
             }
           } catch (error) {
             console.error(error);
-            alert("Server connection failed. Please try again.");
+            errorMessage.textContent =
+              "Server connection failed. Please try again.";
+            errorMessage.style.display = "block";
+            submitBtn.disabled = false;
+            submitBtn.textContent = "Register";
           }
         });
     </script>
