@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Customer Sign Up | RideMachan</title>
+    <link rel="stylesheet" href="styles.css" />
+    <style>
+      .hidden {
+        display: none;
+      }
+      body {
+        font-family: "Poppins", sans-serif;
+        background-color: #f7f7f7;
+        color: #333;
+        margin: 0;
+        padding: 0;
+      }
+      .container {
+        max-width: 700px;
+        margin: 50px auto;
+        background: #fff;
+        border-radius: 12px;
+        padding: 30px 40px;
+        box-shadow: 0 5px 10px rgba(0, 0, 0, 0.15);
+      }
+      h2 {
+        text-align: center;
+        color: #222;
+        margin-bottom: 25px;
+      }
+      label {
+        display: block;
+        margin: 10px 0 5px;
+        font-weight: 600;
+      }
+      input,
+      select {
+        width: 100%;
+        padding: 10px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+        font-size: 15px;
+      }
+      button {
+        background-color: #007bff;
+        color: white;
+        font-size: 16px;
+        border: none;
+        border-radius: 5px;
+        padding: 10px 20px;
+        cursor: pointer;
+        margin-top: 15px;
+      }
+      button:hover {
+        background-color: #0056b3;
+      }
+      button:disabled {
+        background-color: #ccc;
+        cursor: not-allowed;
+      }
+      .error-message {
+        color: #dc3545;
+        background: #f8d7da;
+        padding: 10px;
+        border-radius: 5px;
+        margin-bottom: 15px;
+        display: none;
+      }
+      .success-message {
+        color: #155724;
+        background: #d4edda;
+        padding: 10px;
+        border-radius: 5px;
+        margin-bottom: 15px;
+        display: none;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="container">
+      <h2>Customer Sign Up</h2>
+
+      <div id="errorMessage" class="error-message"></div>
+      <div id="successMessage" class="success-message"></div>
+
+      <form id="registrationForm" enctype="multipart/form-data">
+        <label>Username</label>
+        <input
+          type="text"
+          name="username"
+          placeholder="Enter username"
+          required
+        />
+
+        <label>First Name</label>
+        <input
+          type="text"
+          name="firstname"
+          placeholder="Enter first name"
+          required
+        />
+
+        <label>Last Name</label>
+        <input
+          type="text"
+          name="lastname"
+          placeholder="Enter last name"
+          required
+        />
+
+        <label>Email</label>
+        <input type="email" name="email" placeholder="Enter email" required />
+
+        <label>Mobile Number</label>
+        <input
+          type="text"
+          name="mobileNumber"
+          placeholder="Enter mobile number"
+          required
+        />
+
+        <label>Password</label>
+        <input
+          type="password"
+          id="password"
+          name="password"
+          placeholder="Enter password"
+          required
+        />
+
+        <label>Confirm Password</label>
+        <input
+          type="password"
+          id="confirmPassword"
+          placeholder="Re-enter password"
+          required
+        />
+
+        <label>Customer Type</label>
+        <select id="customerType" name="customerType" required>
+          <option value="">-- Select Type --</option>
+          <option value="LOCAL">Local</option>
+          <option value="FOREIGN">Foreign</option>
+        </select>
+
+        <!-- Local Fields -->
+        <div id="localFields" class="hidden">
+          <label>NIC Number</label>
+          <input type="text" name="nicNumber" placeholder="Enter NIC number" />
+
+          <label>Driver's License Number</label>
+          <input
+            type="text"
+            name="driversLicenseNumber"
+            placeholder="Enter driver's license number"
+          />
+
+          <label>NIC Image</label>
+          <input type="file" name="nicImage" accept="image/*" />
+
+          <label>Driver's License Image</label>
+          <input type="file" name="driversLicenseImage" accept="image/*" />
+        </div>
+
+        <!-- Foreign Fields -->
+        <div id="foreignFields" class="hidden">
+          <label>Passport Number</label>
+          <input
+            type="text"
+            name="passportNumber"
+            placeholder="Enter passport number"
+          />
+
+          <label>International Driver's License Number</label>
+          <input
+            type="text"
+            name="internationalDriversLicenseNumber"
+            placeholder="Enter international license number"
+          />
+
+          <label>Driver's License Image</label>
+          <input type="file" name="driversLicenseImage" accept="image/*" />
+
+          <label>Passport Image</label>
+          <input type="file" name="passportImage" accept="image/*" />
+        </div>
+
+        <h3 style="margin-top: 20px">Address</h3>
+        <label>Street</label>
+        <input
+          type="text"
+          name="street"
+          placeholder="Street address"
+          required
+        />
+
+        <label>City</label>
+        <input type="text" name="city" placeholder="City" required />
+
+        <label>ZIP Code</label>
+        <input
+          type="text"
+          name="zipCode"
+          placeholder="ZIP / Postal Code"
+          required
+        />
+
+        <label>Country</label>
+        <input type="text" name="country" placeholder="Country" required />
+
+        <button type="submit" id="submitBtn">Register</button>
+      </form>
+    </div>
+
+    <script>
+      // Show/hide fields based on customer type
+      const customerType = document.getElementById("customerType");
+      const localFields = document.getElementById("localFields");
+      const foreignFields = document.getElementById("foreignFields");
+
+      customerType.addEventListener("change", () => {
+        const type = customerType.value;
+        if (type === "LOCAL") {
+          localFields.classList.remove("hidden");
+          foreignFields.classList.add("hidden");
+          // Make local fields required
+          document.querySelector('input[name="nicNumber"]').required = true;
+          document.querySelector(
+            'input[name="driversLicenseNumber"]'
+          ).required = true;
+          document.querySelector('input[name="nicImage"]').required = true;
+          document.querySelectorAll(
+            '#localFields input[type="file"]'
+          )[1].required = true;
+          // Remove foreign field requirements
+          document.querySelector(
+            'input[name="passportNumber"]'
+          ).required = false;
+          document.querySelector(
+            'input[name="internationalDriversLicenseNumber"]'
+          ).required = false;
+          document
+            .querySelectorAll('#foreignFields input[type="file"]')
+            .forEach((f) => (f.required = false));
+        } else if (type === "FOREIGN") {
+          foreignFields.classList.remove("hidden");
+          localFields.classList.add("hidden");
+          // Make foreign fields required
+          document.querySelector(
+            'input[name="passportNumber"]'
+          ).required = true;
+          document.querySelector(
+            'input[name="internationalDriversLicenseNumber"]'
+          ).required = true;
+          document
+            .querySelectorAll('#foreignFields input[type="file"]')
+            .forEach((f) => (f.required = true));
+          // Remove local field requirements
+          document.querySelector('input[name="nicNumber"]').required = false;
+          document.querySelector(
+            'input[name="driversLicenseNumber"]'
+          ).required = false;
+          document
+            .querySelectorAll('#localFields input[type="file"]')
+            .forEach((f) => (f.required = false));
+        } else {
+          localFields.classList.add("hidden");
+          foreignFields.classList.add("hidden");
+        }
+      });
+
+      // Handle form submission
+      document
+        .getElementById("registrationForm")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+
+          const errorMessage = document.getElementById("errorMessage");
+          const successMessage = document.getElementById("successMessage");
+          const submitBtn = document.getElementById("submitBtn");
+
+          // Hide previous messages
+          errorMessage.style.display = "none";
+          successMessage.style.display = "none";
+
+          const password = document.getElementById("password").value;
+          const confirmPassword =
+            document.getElementById("confirmPassword").value;
+
+          if (password !== confirmPassword) {
+            errorMessage.textContent = "Passwords do not match!";
+            errorMessage.style.display = "block";
+            return;
+          }
+
+          const formData = new FormData(e.target);
+
+          // Disable submit button
+          submitBtn.disabled = true;
+          submitBtn.textContent = "Registering...";
+
+          try {
+            const response = await fetch("/customer/signup", {
+              method: "POST",
+              body: formData,
+              credentials: "include", // Important for session management
+            });
+
+            const result = await response.json();
+
+            if (result.status === "success") {
+              successMessage.textContent =
+                "Registration successful! Redirecting to OTP verification...";
+              successMessage.style.display = "block";
+
+              // Redirect to OTP page after 1 second
+              setTimeout(() => {
+                window.location.href = "otp.html";
+              }, 1000);
+            } else {
+              errorMessage.textContent =
+                "Signup failed: " + (result.message || "Unknown error");
+              errorMessage.style.display = "block";
+              submitBtn.disabled = false;
+              submitBtn.textContent = "Register";
+            }
+          } catch (error) {
+            console.error(error);
+            errorMessage.textContent =
+              "Server connection failed. Please try again.";
+            errorMessage.style.display = "block";
+            submitBtn.disabled = false;
+            submitBtn.textContent = "Register";
+          }
+        });
+    </script>
+  </body>
+</html>

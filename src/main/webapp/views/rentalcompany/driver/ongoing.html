@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ongoing Bookings - Driver Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="ongoing.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar Navigation -->
+        <div class="sidebar" id="sidebar">
+            <div class="logo">
+                <img src="logo.png" alt="Logo" class="logo">
+            </div>
+            <div class="nav-menu">
+                <div class="nav-item">
+                    <i class="fas fa-house"></i>
+                    <a href="dashboard.html"><span>Home</span></a>
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-calendar-alt"></i>
+                    <a href="drivercalview.html"><span>Calendar</span></a>
+                </div>
+                <div class="nav-item active">
+                    <i class="fas fa-clock"></i>
+                    <a href="ongoing.html"><span>Ongoing Bookings</span></a>
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-history"></i>
+                    <a href="pastbooking.html"><span>Past Bookings</span></a>
+                </div>
+                <div class="logout">
+                    <i class="fas fa-sign-out"></i>
+                    <span>Logout</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Header Section -->
+        <div class="header">
+            <div class="header-left">
+                <button class="sidebar-toggle" id="sidebarToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h1>Ongoing Bookings</h1>
+            </div>
+            <div class="header-actions">
+                <a href="notification.html" class="notification" id="bellNotification" title="Notifications">
+                    <i class="fas fa-bell"></i>
+                    <div class="badge" id="bellBadge">3</div>
+                </a>
+                <a href="messages.html" class="notification" id="messageNotification" title="Messages">
+                    <i class="fas fa-envelope"></i>
+                    <div class="badge" id="messageBadge">5</div>
+                </a>
+                <div class="user-profile" id="userProfile">
+                    <a href="profile.html"><div class="profile-img">K</div></a>
+                    <div class="user-info">
+                        <div class="user-name">Kamal</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Page Title & Stats -->
+            <div class="page-title">
+                <div class="title">Active Bookings</div>
+                <div class="booking-stats">
+                    <div class="stat-item">
+                        <span class="stat-number">4</span>
+                        <span class="stat-label">Total Active</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">2</span>
+                        <span class="stat-label">In Progress</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">2</span>
+                        <span class="stat-label">Upcoming</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filter Section -->
+            <div class="filter-section">
+                <div class="filter-group">
+                    <button class="filter-btn active" data-filter="all">All Bookings</button>
+                    <button class="filter-btn" data-filter="in-progress">In Progress</button>
+                    <button class="filter-btn" data-filter="upcoming">Upcoming</button>
+                    <button class="filter-btn vehicle-issues-btn" onclick="navigateToIssueReporting()">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        Vehicle Issues
+                    </button>
+                </div>
+                <div class="sort-dropdown">
+                    <select id="sortBookings">
+                        <option value="time-asc">Time (Earliest First)</option>
+                        <option value="time-desc">Time (Latest First)</option>
+                        <option value="status">Status</option>
+                        <option value="fare">Fare Amount</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Bookings Grid -->
+            <div class="bookings-grid" id="bookingsGrid">
+                <!-- Booking Card 1 - In Progress -->
+                <div class="booking-card in-progress" data-status="in-progress" data-time="10:30">
+                    <div class="booking-header">
+                        <div class="booking-id">#RID-2024-001</div>
+                        <div class="status-badge in-progress">
+                            <i class="fas fa-road"></i>
+                            In Progress
+                        </div>
+                    </div>
+                    <div class="booking-time">
+                        <div class="date">Today, Sep 19</div>
+                        <div class="time">10:30 AM</div>
+                    </div>
+                    <div class="booking-route">
+                        <div class="route-item pickup">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span>Colombo Fort Railway Station</span>
+                        </div>
+                        <div class="route-divider">
+                            <i class="fas fa-arrow-down"></i>
+                        </div>
+                        <div class="route-item dropoff">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span>Bandaranaike International Airport</span>
+                        </div>
+                    </div>
+                    <div class="booking-info">
+                        <div class="info-item">
+                            <i class="fas fa-user"></i>
+                            <span>Sivajani Perera</span>
+                        </div>
+                        <div class="info-item">
+                            <i class="fas fa-car"></i>
+                            <span>Toyota Camry - ND-4357</span>
+                        </div>
+                        <div class="info-item">
+                            <i class="fas fa-clock"></i>
+                            <span>45 mins</span>
+                        </div>
+                        <div class="info-item">
+                            <i class="fas fa-dollar-sign"></i>
+                            <span>LKR 2,500</span>
+                        </div>
+                    </div>
+                    <div class="booking-actions">
+                        <button class="btn btn-outline" onclick="showBookingDetails('RID-2024-001')">
+                            <i class="fas fa-info-circle"></i>
+                            Details
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Booking Card 2 - In Progress -->
+                <div class="booking-card in-progress" data-status="in-progress" data-time="11:45">
+                    <div class="booking-header">
+                        <div class="booking-id">#RID-2024-005</div>
+                        <div class="status-badge in-progress">
+                            <i class="fas fa-road"></i>
+                            In Progress
+                        </div>
+                    </div>
+                    <div class="booking-time">
+                        <div class="date">Today, Sep 19</div>
+                        <div class="time">11:45 AM</div>
+                    </div>
+                    <div class="booking-route">
+                        <div class="route-item pickup">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span>Kandy City Center</span>
+                        </div>
+                        <div class="route-divider">
+                            <i class="fas fa-arrow-down"></i>
+                        </div>
+                        <div class="route-item dropoff">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span>Temple of the Tooth</span>
+                        </div>
+                    </div>
+                    <div class="booking-info">
+                        <div class="info-item">
+                            <i class="fas fa-user"></i>
+                            <span>Michael Thompson</span>
+                        </div>
+                        <div class="info-item">
+                            <i class="fas fa-car"></i>
+                            <span>Toyota Camry - ND-4357</span>
+                        </div>
+                        <div class="info-item">
+                            <i class="fas fa-clock"></i>
+                            <span>25 mins</span>
+                        </div>
+                        <div class="info-item">
+                            <i class="fas fa-dollar-sign"></i>
+                            <span>LKR 1,200</span>
+                        </div>
+                    </div>
+                    <div class="booking-actions">
+                        <button class="btn btn-outline" onclick="showBookingDetails('RID-2024-005')">
+                            <i class="fas fa-info-circle"></i>
+                            Details
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Booking Card 3 - Upcoming -->
+                <div class="booking-card upcoming" data-status="upcoming" data-time="14:15">
+                    <div class="booking-header">
+                        <div class="booking-id">#RID-2024-002</div>
+                        <div class="status-badge upcoming">
+                            <i class="fas fa-clock"></i>
+                            Upcoming
+                        </div>
+                    </div>
+                    <div class="booking-time">
+                        <div class="date">Today, Sep 19</div>
+                        <div class="time">2:15 PM</div>
+                    </div>
+                    <div class="booking-route">
+                        <div class="route-item pickup">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span>Galle Face Green</span>
+                        </div>
+                        <div class="route-divider">
+                            <i class="fas fa-arrow-down"></i>
+                        </div>
+                        <div class="route-item dropoff">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span>Colombo City Centre</span>
+                        </div>
+                    </div>
+                    <div class="booking-info">
+                        <div class="info-item">
+                            <i class="fas fa-user"></i>
+                            <span>Rajesh Kumar</span>
+                        </div>
+                        <div class="info-item">
+                            <i class="fas fa-car"></i>
+                            <span>Toyota Camry - ND-4357</span>
+                        </div>
+                        <div class="info-item">
+                            <i class="fas fa-clock"></i>
+                            <span>20 mins</span>
+                        </div>
+                        <div class="info-item">
+                            <i class="fas fa-dollar-sign"></i>
+                            <span>LKR 800</span>
+                        </div>
+                    </div>
+                    <div class="booking-actions">
+                        <button class="btn btn-outline" onclick="showBookingDetails('RID-2024-002')">
+                            <i class="fas fa-info-circle"></i>
+                            Details
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Booking Card 4 - Upcoming -->
+                <div class="booking-card upcoming" data-status="upcoming" data-time="15:30">
+                    <div class="booking-header">
+                        <div class="booking-id">#RID-2024-004</div>
+                        <div class="status-badge upcoming">
+                            <i class="fas fa-clock"></i>
+                            Upcoming
+                        </div>
+                    </div>
+                    <div class="booking-time">
+                        <div class="date">Today, Sep 19</div>
+                        <div class="time">3:30 PM</div>
+                    </div>
+                    <div class="booking-route">
+                        <div class="route-item pickup">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span>Independence Square</span>
+                        </div>
+                        <div class="route-divider">
+                            <i class="fas fa-arrow-down"></i>
+                        </div>
+                        <div class="route-item dropoff">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span>National Museum of Colombo</span>
+                        </div>
+                    </div>
+                    <div class="booking-info">
+                        <div class="info-item">
+                            <i class="fas fa-user"></i>
+                            <span>David Johnson</span>
+                        </div>
+                        <div class="info-item">
+                            <i class="fas fa-car"></i>
+                            <span>Toyota Camry - ND-4357</span>
+                        </div>
+                        <div class="info-item">
+                            <i class="fas fa-clock"></i>
+                            <span>15 mins</span>
+                        </div>
+                        <div class="info-item">
+                            <i class="fas fa-dollar-sign"></i>
+                            <span>LKR 600</span>
+                        </div>
+                    </div>
+                    <div class="booking-actions">
+                        <button class="btn btn-outline" onclick="showBookingDetails('RID-2024-004')">
+                            <i class="fas fa-info-circle"></i>
+                            Details
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Booking Details Modal -->
+    <div id="bookingDetailsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-title">Booking Details</h3>
+                <span class="close" onclick="closeModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="details-tabs">
+                    <button class="tab-btn active" data-tab="booking-info">Trip Info</button>
+                    <button class="tab-btn" data-tab="customer-details">Customer</button>
+                    <button class="tab-btn" data-tab="route-details">Route</button>
+                </div>
+                
+                <div id="booking-info" class="tab-content active">
+                    <div class="info-section">
+                        <h4>Booking Information</h4>
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <label>Booking ID</label>
+                                <span id="modal-booking-id">#RID-2024-001</span>
+                            </div>
+                            <div class="info-item">
+                                <label>Current Status</label>
+                                <span id="modal-status" class="status-badge in-progress">In Progress</span>
+                            </div>
+                            <div class="info-item">
+                                <label>Date & Time</label>
+                                <span id="modal-datetime">Today, Sep 19 - 10:30 AM</span>
+                            </div>
+                            <div class="info-item">
+                                <label>Estimated Duration</label>
+                                <span id="modal-duration">45 minutes</span>
+                            </div>
+                            <div class="info-item">
+                                <label>Total Fare</label>
+                                <span id="modal-fare">LKR 2,500</span>
+                            </div>
+                            <div class="info-item">
+                                <label>Distance</label>
+                                <span id="modal-distance">32 km</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="info-section">
+                        <h4>Special Instructions</h4>
+                        <div class="instructions-list">
+                            <div class="instruction-item">
+                                <i class="fas fa-suitcase"></i>
+                                <span>Customer has large luggage - please ensure trunk space</span>
+                            </div>
+                            <div class="instruction-item">
+                                <i class="fas fa-phone"></i>
+                                <span>Call customer upon arrival at pickup location</span>
+                            </div>
+                            <div class="instruction-item">
+                                <i class="fas fa-clock"></i>
+                                <span>Flight departure at 1:30 PM - time sensitive</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="customer-details" class="tab-content">
+                    <div class="info-section">
+                        <h4>Customer Profile</h4>
+                        <div class="customer-profile">
+                            <div class="profile-img-large">S</div>
+                            <div class="customer-info">
+                                <h5 id="modal-customer-name">Sivajani Perera</h5>
+                                <div class="customer-rating">
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="far fa-star"></i>
+                                    <span>4.2 rating</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <label>Phone Number</label>
+                                <span id="modal-customer-phone">+94 77-123-4567</span>
+                            </div>
+                            <div class="info-item">
+                                <label>Email</label>
+                                <span id="modal-customer-email">sivajani.p@email.com</span>
+                            </div>
+                            <div class="info-item">
+                                <label>Previous Rides</label>
+                                <span id="modal-previous-rides">12 rides</span>
+                            </div>
+                            <div class="info-item">
+                                <label>Customer Since</label>
+                                <span id="modal-member-since">March 2024</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="route-details" class="tab-content">
+                    <div class="info-section">
+                        <h4>Route Information</h4>
+                        <div class="route-details">
+                            <div class="route-point pickup">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <div class="route-info">
+                                    <label>Pickup Location</label>
+                                    <span id="modal-pickup">Colombo Fort Railway Station, Platform 1</span>
+                                </div>
+                            </div>
+                            <div class="route-divider">
+                                <i class="fas fa-route"></i>
+                            </div>
+                            <div class="route-point dropoff">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <div class="route-info">
+                                    <label>Drop-off Location</label>
+                                    <span id="modal-dropoff">Bandaranaike International Airport, Departure Terminal</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="info-section">
+                        <h4>Vehicle Details</h4>
+                        <div class="vehicle-display">
+                            <div class="vehicle-icon">
+                                <i class="fas fa-car"></i>
+                            </div>
+                            <div class="vehicle-info">
+                                <h5 id="modal-vehicle-model">Toyota Camry 2022</h5>
+                                <p id="modal-vehicle-plate">License: ND-4357</p>
+                                <p id="modal-vehicle-color">White • Sedan • AC</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal()">Close</button>
+                <button class="btn btn-outline" onclick="contactCustomer()">
+                    <i class="fas fa-phone"></i> Call Customer
+                </button>
+                <button class="btn btn-primary" id="primaryActionBtn" onclick="primaryAction()">
+                    <i class="fas fa-check"></i> Complete Ride
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Toggle sidebar for mobile
+        document.getElementById('sidebarToggle').addEventListener('click', function() {
+            document.getElementById('sidebar').classList.toggle('active');
+        });
+
+        // Navigation to Issue Reporting Page
+        function navigateToIssueReporting() {
+            // Show loading animation
+            const btn = event.target.closest('.vehicle-issues-btn');
+            const originalContent = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
+            btn.disabled = true;
+            
+            // Simulate loading and redirect
+            setTimeout(() => {
+                window.location.href = 'issuereporting.html';
+            }, 1000);
+        }
+
+        // Filter functionality
+        document.querySelectorAll('.filter-btn:not(.vehicle-issues-btn)').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.filter-btn:not(.vehicle-issues-btn)').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                
+                const filter = this.dataset.filter;
+                const cards = document.querySelectorAll('.booking-card');
+                
+                cards.forEach(card => {
+                    if (filter === 'all' || card.dataset.status === filter) {
+                        card.style.display = 'block';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            });
+        });
+
+        // Sort functionality
+        document.getElementById('sortBookings').addEventListener('change', function() {
+            const sortBy = this.value;
+            const grid = document.getElementById('bookingsGrid');
+            const cards = Array.from(grid.children);
+            
+            cards.sort((a, b) => {
+                if (sortBy === 'time-asc') {
+                    return a.dataset.time.localeCompare(b.dataset.time);
+                } else if (sortBy === 'time-desc') {
+                    return b.dataset.time.localeCompare(a.dataset.time);
+                }
+                return 0;
+            });
+            
+            cards.forEach(card => grid.appendChild(card));
+        });
+
+        // Modal functions
+        function showBookingDetails(bookingId) {
+            const modal = document.getElementById('bookingDetailsModal');
+            document.getElementById('modal-booking-id').textContent = bookingId;
+            modal.classList.add('show');
+        }
+
+        function closeModal() {
+            document.getElementById('bookingDetailsModal').classList.remove('show');
+        }
+
+        // Tab switching
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const tab = this.dataset.tab;
+                
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                
+                this.classList.add('active');
+                document.getElementById(tab).classList.add('active');
+            });
+        });
+
+        // Action functions
+        function startRide(bookingId) {
+            const btn = event.target;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Starting...';
+            btn.disabled = true;
+            
+            setTimeout(() => {
+                btn.innerHTML = '<i class="fas fa-check"></i> Started';
+                btn.className = 'btn btn-primary';
+                
+                // Update status
+                const card = btn.closest('.booking-card');
+                card.classList.remove('upcoming');
+                card.classList.add('in-progress');
+                card.querySelector('.status-badge').innerHTML = '<i class="fas fa-road"></i> In Progress';
+                card.querySelector('.status-badge').className = 'status-badge in-progress';
+                
+                setTimeout(() => {
+                    btn.innerHTML = '<i class="fas fa-check"></i> Complete Ride';
+                    btn.onclick = () => completeRide(bookingId);
+                    btn.disabled = false;
+                }, 2000);
+            }, 1500);
+        }
+
+        function completeRide(bookingId) {
+            if (confirm('Are you sure you want to complete this ride?')) {
+                const btn = event.target;
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Completing...';
+                btn.disabled = true;
+                
+                setTimeout(() => {
+                    btn.innerHTML = '<i class="fas fa-check"></i> Completed';
+                    btn.style.backgroundColor = '#28a745';
+                    
+                    // Remove card after completion
+                    setTimeout(() => {
+                        const card = btn.closest('.booking-card');
+                        card.style.transform = 'translateX(-100%)';
+                        card.style.opacity = '0';
+                        
+                        setTimeout(() => {
+                            card.remove();
+                            updateStats();
+                        }, 300);
+                    }, 2000);
+                }, 1500);
+            }
+        }
+
+        function contactCustomer(bookingId) {
+            const btn = event.target;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Calling...';
+            btn.disabled = true;
+            
+            setTimeout(() => {
+                btn.innerHTML = '<i class="fas fa-phone-alt fa-pulse"></i> Connected';
+                btn.style.backgroundColor = '#28a745';
+                
+                setTimeout(() => {
+                    btn.innerHTML = '<i class="fas fa-phone"></i> Call Customer';
+                    btn.disabled = false;
+                    btn.style.backgroundColor = '';
+                }, 3000);
+            }, 2000);
+        }
+
+        function updateStats() {
+            const activeCards = document.querySelectorAll('.booking-card').length;
+            const inProgressCards = document.querySelectorAll('.booking-card.in-progress').length;
+            const upcomingCards = document.querySelectorAll('.booking-card.upcoming').length;
+            
+            document.querySelector('.stat-item:nth-child(1) .stat-number').textContent = activeCards;
+            document.querySelector('.stat-item:nth-child(2) .stat-number').textContent = inProgressCards;
+            document.querySelector('.stat-item:nth-child(3) .stat-number').textContent = upcomingCards;
+        }
+
+        // Logout functionality
+        document.querySelector('.logout').addEventListener('click', function() {
+            if (confirm('Are you sure you want to logout?')) {
+                this.innerHTML = '<i class="fas fa-spinner fa-spin"></i><span>Logging out...</span>';
+                setTimeout(() => {
+                    alert('Logged out successfully!');
+                    // window.location.href = 'login.html';
+                }, 2000);
+            }
+        });
+
+        // Close modal when clicking outside
+        window.addEventListener('click', function(event) {
+            const modal = document.getElementById('bookingDetailsModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        });
+
+        // Add smooth animations to cards
+        document.querySelectorAll('.booking-card').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-5px)';
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- =================== -->
+    <!-- Meta & Stylesheets -->
+    <!-- =================== -->
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Driver Dashboard</title>
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+    />
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
+    />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet"
+    />
+    <!-- Updated CSS file to match home theme -->
+    <link rel="stylesheet" href="dashboard.css" />
+</head>
+<body>
+    <div class="container">
+        <!-- =================== -->
+        <!-- Sidebar Navigation -->
+        <!-- =================== -->
+        <div class="sidebar" id="sidebar">
+            <div class="logo">
+                <img src="logo.png" alt="Logo" class="logo">
+            </div> 
+            <div class="nav-menu">
+                <div class="nav-item active">
+                    <i class="fas fa-house"></i>
+                    <a href="dashboard.html"><span> Home</span></a>
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-calendar-alt"></i>
+                    <a href="drivercalview.html"><span>Calendar</span></a>
+                </div>
+                <div class="nav-item" data-page="ongoing">
+                    <i class="fas fa-clock"></i>
+                    <a href="ongoing.html"><span>Ongoing Bookings</span></a>
+                </div>
+                <div class="nav-item" data-page="bookings">
+                    <i class="fas fa-history"></i>
+                    <a href="pastbooking.html"><span>Past Bookings</span></a>
+                </div>
+                <div class="logout">
+                    <i class="fas fa-sign-out"></i>
+                    <span>Logout</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- ===================
+                 Header Section
+        =================== -->
+        <div class="header">
+            <div class="header-left">
+                <button class="sidebar-toggle" id="sidebarToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h1>Driver Dashboard</h1>
+            </div>
+            <div class="header-actions">
+                <!-- Notifications -->
+                <a href="notification.html"><div class="notification" id="bellNotification" title="Notifications">
+                    <i class="fas fa-bell"></i>
+                    <div class="badge" id="bellBadge">3</div></a>
+                </div>
+                <a href="messages.html"><div class="notification" id="messageNotification" title="Messages">
+                    <i class="fas fa-envelope"></i>
+                    <div class="badge" id="messageBadge">5</div></a>
+                </div>
+                <!-- User Profile -->
+                <div class="user-profile" id="userProfile">
+                    <a href="profile.html"><div class="profile-img">K</div></a>
+                    <div class="user-info">
+                        <div class="user-name">Kamal</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- =================== -->
+        <!-- Main Content -->
+        <!-- =================== -->
+        <div class="main-content">
+            <!-- Stats Cards -->
+            <div class="stats-section">
+                <!-- Monthly Income Graph -->
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <h3>Monthly Income Graph</h3>
+                    </div>
+                    <div class="stat-value">$2,450</div>
+                    <div class="chart-container">
+                        <div class="bar-chart">
+                            <div class="bar" style="height: 40%"></div>
+                            <div class="bar" style="height: 60%"></div>
+                            <div class="bar" style="height: 80%"></div>
+                            <div class="bar" style="height: 100%"></div>
+                            <div class="bar" style="height: 90%"></div>
+                            <div class="bar" style="height: 70%"></div>
+                            <div class="bar" style="height: 85%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Weekly Bookings Number Graph -->
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <h3>Weekly Bookings Number Graph</h3>
+                    </div>
+                    <div class="stat-value">28</div>
+                    <div class="chart-container">
+                        <div class="bar-chart">
+                            <div class="bar" style="height: 50%"></div>
+                            <div class="bar" style="height: 70%"></div>
+                            <div class="bar" style="height: 90%"></div>
+                            <div class="bar" style="height: 80%"></div>
+                            <div class="bar" style="height: 100%"></div>
+                            <div class="bar" style="height: 75%"></div>
+                            <div class="bar" style="height: 60%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Daily Driving Hours Graph -->
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <h3>Daily Driving Hours Graph</h3>
+                    </div>
+                    <div class="stat-value">8.5h</div>
+                    <div class="chart-container">
+                        <div class="line-chart">
+                            <svg viewBox="0 0 200 60" class="line-svg">
+                                <!-- Updated line chart colors to match theme -->
+                                <polyline
+                                    fill="none"
+                                    stroke="var(--primary)"
+                                    stroke-width="3"
+                                    points="10,40 30,35 50,25 70,30 90,20 110,15 130,25 150,20 170,10 190,15"
+                                />
+                                <circle cx="10" cy="40" r="3" fill="var(--primary)"/>
+                                <circle cx="30" cy="35" r="3" fill="var(--primary)"/>
+                                <circle cx="50" cy="25" r="3" fill="var(--primary)"/>
+                                <circle cx="70" cy="30" r="3" fill="var(--primary)"/>
+                                <circle cx="90" cy="20" r="3" fill="var(--primary)"/>
+                                <circle cx="110" cy="15" r="3" fill="var(--primary)"/>
+                                <circle cx="130" cy="25" r="3" fill="var(--primary)"/>
+                                <circle cx="150" cy="20" r="3" fill="var(--primary)"/>
+                                <circle cx="170" cy="10" r="3" fill="var(--primary)"/>
+                                <circle cx="190" cy="15" r="3" fill="var(--primary)"/>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pie Chart and Action Buttons Section -->
+            <div class="bottom-section">
+                <!-- Pie Chart Section -->
+                <div class="pie-chart-section">
+                    <h3>Pie chart for completed, pending, cancelled, completed bookings</h3>
+                    <div class="pie-chart-container">
+                        <div class="pie-chart">
+                            <div class="pie-slice" style="--percentage: 65; --color: var(--primary);">
+                                <span class="percentage">65%</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="pie-stats">
+                        <div class="pie-stat-item">
+                            <span class="stat-label">Completed</span>
+                            <span class="stat-number">18</span>
+                        </div>
+                        <div class="pie-stat-item">
+                            <span class="stat-label">Pending</span>
+                            <span class="stat-number">6</span>
+                        </div>
+                        <div class="pie-stat-item">
+                            <span class="stat-label">Cancelled</span>
+                            <span class="stat-number">4</span>
+                        </div>
+                        <div class="pie-stat-item">
+                            <span class="stat-label">Total</span>
+                            <span class="stat-number">28</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons Section -->
+                <div class="action-buttons-section">
+                    <button class="action-btn message-btn">
+                        <i class="fas fa-comment"></i>
+                        Message Company
+                    </button>
+                    <button class="action-btn contact-btn">
+                        <i class="fas fa-phone"></i>
+                        Contact Admin
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('active');
+        }
+
+        // Close sidebar when clicking outside on mobile
+        document.addEventListener('click', function(event) {
+            const sidebar = document.getElementById('sidebar');
+            const toggle = document.querySelector('.mobile-menu-toggle');
+            
+            if (window.innerWidth <= 992) {
+                if (!sidebar.contains(event.target) && !toggle.contains(event.target)) {
+                    sidebar.classList.remove('active');
+                }
+            }
+        });
+
+        // Handle window resize
+        window.addEventListener('resize', function() {
+            const sidebar = document.getElementById('sidebar');
+            if (window.innerWidth > 992) {
+                sidebar.classList.remove('active');
+            }
+        });
+
+        // Add smooth scrolling for navigation links
+        document.querySelectorAll('.nav-item a').forEach(link => {
+            link.addEventListener('click', function(e) {
+                // Close mobile menu when link is clicked
+                if (window.innerWidth <= 992) {
+                    document.getElementById('sidebar').classList.remove('active');
+                }
+            });
+        });
+
+        document.querySelector('.message-btn').addEventListener('click', function() {
+            const btn = this;
+            const originalText = btn.innerHTML;
+            
+            // Show loading state
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+            btn.disabled = true;
+            btn.style.opacity = '0.7';
+            
+            // Simulate API call
+            setTimeout(() => {
+                // Show success state
+                btn.innerHTML = '<i class="fas fa-check"></i> Message Sent!';
+                btn.style.backgroundColor = '#28a745';
+                
+                // Reset after 2 seconds
+                setTimeout(() => {
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                    btn.style.opacity = '1';
+                    btn.style.backgroundColor = '';
+                }, 2000);
+            }, 1500);
+        });
+
+        document.querySelector('.contact-btn').addEventListener('click', function() {
+            const btn = this;
+            const originalText = btn.innerHTML;
+            
+            // Show loading state
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Connecting...';
+            btn.disabled = true;
+            btn.style.opacity = '0.7';
+            
+            // Simulate connection
+            setTimeout(() => {
+                // Show connected state
+                btn.innerHTML = '<i class="fas fa-phone-alt"></i> Connected!';
+                btn.style.backgroundColor = '#28a745';
+                
+                // Show call in progress
+                setTimeout(() => {
+                    btn.innerHTML = '<i class="fas fa-phone-alt fa-pulse"></i> In Call...';
+                    
+                    // End call after 3 seconds
+                    setTimeout(() => {
+                        btn.innerHTML = '<i class="fas fa-phone-slash"></i> Call Ended';
+                        btn.style.backgroundColor = '#6c757d';
+                        
+                        // Reset after 2 seconds
+                        setTimeout(() => {
+                            btn.innerHTML = originalText;
+                            btn.disabled = false;
+                            btn.style.opacity = '1';
+                            btn.style.backgroundColor = '';
+                        }, 2000);
+                    }, 3000);
+                }, 1000);
+            }, 1500);
+        });
+
+        document.querySelector('.logout').addEventListener('click', function() {
+            const logoutItem = this;
+            
+            if (confirm('Are you sure you want to logout?')) {
+                const originalText = logoutItem.innerHTML;
+                
+                // Show loading state
+                logoutItem.innerHTML = '<i class="fas fa-spinner fa-spin"></i><span>Logging out...</span>';
+                logoutItem.style.opacity = '0.7';
+                
+                // Simulate logout process
+                setTimeout(() => {
+                    logoutItem.innerHTML = '<i class="fas fa-check"></i><span>Logged out!</span>';
+                    
+                    // Redirect after showing success
+                    setTimeout(() => {
+                        alert('Redirecting to login page...');
+                        // window.location.href = 'login.html'; // Uncomment for actual redirect
+                    }, 1000);
+                }, 2000);
+            }
+        });
+
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('mouseenter', function() {
+                if (!this.classList.contains('active')) {
+                    this.style.transform = 'translateX(5px)';
+                    this.style.transition = 'transform 0.2s ease';
+                }
+            });
+            
+            item.addEventListener('mouseleave', function() {
+                if (!this.classList.contains('active')) {
+                    this.style.transform = 'translateX(0)';
+                }
+            });
+        });
+
+        document.querySelectorAll('.stat-card').forEach(card => {
+            card.addEventListener('click', function() {
+                this.style.transform = 'scale(0.98)';
+                setTimeout(() => {
+                    this.style.transform = 'scale(1)';
+                }, 150);
+            });
+        });
+    </script>
+</body>
+</html>

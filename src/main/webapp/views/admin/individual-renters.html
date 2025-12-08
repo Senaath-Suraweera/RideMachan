@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Individual Renters - Ride Machan</title>
+    <link rel="stylesheet" href="css/styles.css" />
+    <link rel="stylesheet" href="css/sidebar.css" />
+    <link rel="stylesheet" href="css/individual-renters.css" />
+  </head>
+  <body>
+    <!-- Sidebar auto-inject -->
+    <script src="js/sidebar.js"></script>
+
+    <main class="main-content">
+      <header class="page-header">
+        <div class="header-content">
+          <h1 class="page-title">Individual Renters</h1>
+          <div class="header-actions">
+            <button class="btn btn-primary" onclick="openRegisterDriverModal()">
+              + Register Renter
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <!-- Search and Filter Section -->
+      <section class="search-filter-section card" role="search">
+        <div class="filter-row">
+          <div class="form-group">
+            <label class="form-label" for="renterSearch">Search</label>
+            <input
+              id="renterSearch"
+              class="form-control"
+              type="text"
+              placeholder="Name, company, or ID"
+              autocomplete="off"
+            />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="locationFilter">Location</label>
+            <select id="locationFilter" class="form-select">
+              <option value="">All</option>
+              <!-- populated by JS -->
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="statusFilter">Status</label>
+            <select id="statusFilter" class="form-select">
+              <option value="">All</option>
+              <option value="active">Active</option>
+              <option value="pending">Pending</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="minRatingFilter">Min rating</label>
+            <select id="minRatingFilter" class="form-select">
+              <option value="">Any</option>
+              <option value="4.5">4.5+</option>
+              <option value="4.0">4.0+</option>
+              <option value="3.5">3.5+</option>
+              <option value="3.0">3.0+</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="sortOrder">Sort</label>
+            <select id="sortOrder" class="form-select">
+              <option value="name_asc">Name: A → Z</option>
+              <option value="name_desc">Name: Z → A</option>
+              <option value="rating_desc">Rating: High → Low</option>
+              <option value="rating_asc">Rating: Low → High</option>
+              <option value="id_asc">ID: Low → High</option>
+              <option value="id_desc">ID: High → Low</option>
+            </select>
+          </div>
+
+          <div class="search-actions">
+            <button class="btn btn-primary" id="applyFiltersBtn">Search</button>
+            <button class="btn btn-secondary" id="resetFiltersBtn">
+              Reset
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Renters list as cards -->
+      <section class="renters-section card">
+        <div class="section-header">
+          <h3 class="section-title" id="rentersListTitle">
+            Individual Renters (0)
+          </h3>
+        </div>
+        <div class="renters-grid" id="rentersGrid"></div>
+      </section>
+    </main>
+
+    <!-- Register Renter Modal (reusing your existing structure) -->
+    <div class="modal" id="registerDriverModal" aria-hidden="true">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>Register New Individual Renter</h3>
+          <button class="modal-close" onclick="closeRegisterDriverModal()">
+            ×
+          </button>
+        </div>
+        <div class="modal-body">
+          <form id="registerDriverForm">
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Full Name *</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  name="fullName"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Age *</label>
+                <input
+                  type="number"
+                  class="form-control"
+                  name="age"
+                  min="18"
+                  max="80"
+                  required
+                />
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Phone Number *</label>
+                <input type="tel" class="form-control" name="phone" required />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Email Address</label>
+                <input type="email" class="form-control" name="email" />
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Location *</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  name="location"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Company</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  name="company"
+                  placeholder="Independent if blank"
+                />
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Experience (Years)</label>
+              <input
+                type="number"
+                class="form-control"
+                name="experience"
+                min="0"
+              />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Business Registration No.</label>
+              <input type="text" class="form-control" name="licenseNumber" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">NIC Number *</label>
+              <input
+                type="text"
+                class="form-control"
+                name="nicNumber"
+                required
+              />
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button
+            class="btn btn-secondary"
+            onclick="closeRegisterDriverModal()"
+          >
+            Cancel
+          </button>
+          <button class="btn btn-primary" onclick="registerDriver()">
+            Register Renter
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script src="js/individual-renters.js"></script>
+  </body>
+</html>

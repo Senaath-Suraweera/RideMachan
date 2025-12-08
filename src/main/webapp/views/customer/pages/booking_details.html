@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Booking Details - Ride Machan</title>
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+    />
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
+    />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../css/main.css" />
+    <link rel="stylesheet" href="../css/booking_details.css" />
+</head>
+<body>
+    <div class="container">
+        <!-- Navbar Component -->
+        <div id="navbar-container"></div>
+
+        <!-- Header Component -->
+        <div id="header-container"></div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Back Button -->
+            <button class="back-btn" onclick="window.location.href='bookings.html'">
+                <i class="fas fa-arrow-left"></i>
+                Back to Bookings
+            </button>
+
+            <!-- Booking Header -->
+            <div class="booking-detail-header">
+                <div class="booking-ref-section">
+                    <h2>Booking Details</h2>
+                    <div class="ref-info">
+                        <span class="booking-ref">Booking ID: <strong id="bookingId">Loading...</strong></span>
+                        <span class="status-badge" id="bookingStatus">Loading...</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Vehicle Information Card -->
+            <div class="detail-card vehicle-card">
+                <div class="card-header">
+                    <h3><i class="fas fa-car"></i> Vehicle Information</h3>
+                </div>
+                <div class="card-body">
+                    <div class="vehicle-showcase">
+                        <div class="vehicle-image-container">
+                            <div class="vehicle-placeholder" id="vehiclePlaceholder">
+                                <i class="fas fa-car"></i>
+                            </div>
+                        </div>
+                        <div class="vehicle-info-details">
+                            <h2 id="vehicleName">Loading...</h2>
+                            <div class="company-info" onclick="navigateToCompany()" style="cursor: pointer; margin-bottom: 15px;">
+                                <span class="company-badge">
+                                    <i class="fas fa-building"></i> 
+                                    <span id="companyName">Loading...</span>
+                                    <i class="fas fa-external-link-alt" style="font-size: 12px; margin-left: 5px;"></i>
+                                </span>
+                            </div>
+                            <div class="vehicle-meta">
+                                <span class="vehicle-type" id="vehicleType">
+                                    <i class="fas fa-tag"></i> <span id="vehicleTypeText">-</span>
+                                </span>
+                                <span class="vehicle-plate" id="vehiclePlate">
+                                    <i class="fas fa-id-card"></i> <span id="vehiclePlateText">-</span>
+                                </span>
+                                <span class="rental-type" id="rentalType">
+                                    <i class="fas fa-user-tie"></i> <span id="rentalTypeText">-</span>
+                                </span>
+                            </div>
+                            <div class="vehicle-features">
+                                <h4>Features</h4>
+                                <div class="features-grid" id="vehicleFeatures">
+                                    <span class="feature"><i class="fas fa-snowflake"></i> Air Conditioning</span>
+                                    <span class="feature"><i class="fas fa-map-marked-alt"></i> GPS Navigation</span>
+                                    <span class="feature"><i class="fas fa-user-friends"></i> 4 Passengers</span>
+                                    <span class="feature"><i class="fas fa-suitcase"></i> 2 Luggage</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Driver Information Card (Hidden for Self-Drive) -->
+            <div class="detail-card driver-card" id="driverCard" style="display: none;">
+                <div class="card-header">
+                    <h3><i class="fas fa-user-circle"></i> Driver Information</h3>
+                </div>
+                <div class="card-body">
+                    <div class="driver-profile-section" onclick="navigateToDriverProfile()">
+                        <div class="driver-avatar-large">
+                            <div class="driver-placeholder" id="driverPlaceholder">
+                                <i class="fas fa-user"></i>
+                            </div>
+                        </div>
+                        <div class="driver-info-details">
+                            <h3 id="driverName">-</h3>
+                            <div class="driver-rating">
+                                <div class="stars" id="driverStars">
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star-half-alt"></i>
+                                </div>
+                                <span class="rating-text" id="driverRating">-</span>
+                                <span class="rating-count" id="driverReviews">(-)</span>
+                            </div>
+                            <p class="driver-bio" id="driverBio">-</p>
+                            <div class="driver-stats">
+                                <div class="stat-item">
+                                    <i class="fas fa-route"></i>
+                                    <span id="driverTrips">- Trips</span>
+                                </div>
+                                <div class="stat-item">
+                                    <i class="fas fa-clock"></i>
+                                    <span id="driverExperience">- Years</span>
+                                </div>
+                                <div class="stat-item">
+                                    <i class="fas fa-language"></i>
+                                    <span id="driverLanguages">-</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="view-profile-indicator">
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
+                    </div>
+                    <div class="driver-contact-actions">
+                        <button class="btn btn-primary" onclick="callDriver()">
+                            <i class="fas fa-phone"></i>
+                            Call Driver
+                        </button>
+                        <button class="btn btn-outline" onclick="messageDriver()">
+                            <i class="fas fa-message"></i>
+                            Message Driver
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Self-Drive Notice (Hidden for With Driver) -->
+            <div class="detail-card self-drive-card" id="selfDriveCard" style="display: none;">
+                <div class="card-header">
+                    <h3><i class="fas fa-key"></i> Self-Drive Rental</h3>
+                </div>
+                <div class="card-body">
+                    <div class="self-drive-info">
+                        <div class="info-icon">
+                            <i class="fas fa-car-side"></i>
+                        </div>
+                        <div class="info-content">
+                            <h4>Self-Drive Instructions</h4>
+                            <ul class="instruction-list">
+                                <li><i class="fas fa-check"></i> Valid driving license required at pickup</li>
+                                <li><i class="fas fa-check"></i> Security deposit will be collected</li>
+                                <li><i class="fas fa-check"></i> Vehicle inspection will be done before handover</li>
+                                <li><i class="fas fa-check"></i> 24/7 roadside assistance available</li>
+                                <li><i class="fas fa-check"></i> Fuel policy: Return with same fuel level</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Booking Schedule Card -->
+            <div class="detail-card schedule-card">
+                <div class="card-header">
+                    <h3><i class="fas fa-calendar-alt"></i> Booking Schedule</h3>
+                </div>
+                <div class="card-body">
+                    <div class="schedule-timeline">
+                        <div class="timeline-item">
+                            <div class="timeline-icon pickup">
+                                <i class="fas fa-map-marker-alt"></i>
+                            </div>
+                            <div class="timeline-content">
+                                <h4>Pickup Location</h4>
+                                <p class="location" id="pickupLocation">-</p>
+                                <div class="datetime">
+                                    <span class="date" id="pickupDate">
+                                        <i class="fas fa-calendar"></i> -
+                                    </span>
+                                    <span class="time" id="pickupTime">
+                                        <i class="fas fa-clock"></i> -
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="timeline-connector">
+                            <div class="connector-line"></div>
+                            <div class="duration-badge" id="duration">
+                                <i class="fas fa-hourglass-half"></i> <span id="durationText">-</span>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-icon dropoff">
+                                <i class="fas fa-flag-checkered"></i>
+                            </div>
+                            <div class="timeline-content">
+                                <h4>Drop-off Location</h4>
+                                <p class="location" id="dropoffLocation">-</p>
+                                <div class="datetime">
+                                    <span class="date" id="dropoffDate">
+                                        <i class="fas fa-calendar"></i> -
+                                    </span>
+                                    <span class="time" id="dropoffTime">
+                                        <i class="fas fa-clock"></i> -
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cost Breakdown Card -->
+            <div class="detail-card cost-card">
+                <div class="card-header">
+                    <h3><i class="fas fa-receipt"></i> Cost Breakdown</h3>
+                </div>
+                <div class="card-body">
+                    <div class="cost-breakdown">
+                        <div class="cost-item">
+                            <span class="cost-label">Base Fare</span>
+                            <span class="cost-value" id="baseFare">LKR 0</span>
+                        </div>
+                        <div class="cost-item" id="driverChargesRow">
+                            <span class="cost-label">Driver Charges</span>
+                            <span class="cost-value" id="driverCharges">LKR 0</span>
+                        </div>
+                        <div class="cost-item">
+                            <span class="cost-label">Service Fee</span>
+                            <span class="cost-value" id="serviceFee">LKR 0</span>
+                        </div>
+                        <div class="cost-divider"></div>
+                        <div class="cost-item total">
+                            <span class="cost-label">Total Amount</span>
+                            <span class="cost-value" id="totalAmount">LKR 0</span>
+                        </div>
+                        <div class="payment-status" id="paymentStatus">
+                            <i class="fas fa-check-circle"></i> <span id="paymentStatusText">-</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="detail-actions">
+                <button class="btn btn-primary" onclick="viewInvoice()">
+                    <i class="fas fa-file-invoice"></i>
+                    View Invoice
+                </button>
+                <button class="btn btn-warning" onclick="contactSupport()">
+                    <i class="fas fa-headset"></i>
+                    Contact Support
+                </button>
+                <button class="btn btn-danger" onclick="cancelBooking()">
+                    <i class="fas fa-times-circle"></i>
+                    Cancel Booking
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cancel Confirmation Modal -->
+    <div id="cancelModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-exclamation-triangle"></i> Cancel Booking</h3>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to cancel this booking?</p>
+                <p class="warning-text">This action cannot be undone. Cancellation charges may apply.</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeCancelModal()">No, Keep Booking</button>
+                <button class="btn btn-danger" onclick="confirmCancel()">Yes, Cancel Booking</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Support Modal -->
+    <div id="supportModal" class="modal">
+        <div class="modal-content modal-content-scrollable">
+            <div class="modal-header">
+                <h3><i class="fas fa-headset"></i> Contact Support</h3>
+            </div>
+            <div class="modal-body modal-body-scrollable">
+                <div class="support-options">
+                    <div class="support-option" id="driverSupportOption" style="display: none;">
+                        <h4><i class="fas fa-user-tie"></i> Contact Driver</h4>
+                        <p id="driverContactInfo">-</p>
+                        <button class="btn btn-primary btn-sm" onclick="contactDriverPhone()">
+                            <i class="fas fa-phone"></i> Call Driver
+                        </button>
+                    </div>
+                    
+                    <div class="support-option">
+                        <h4><i class="fas fa-building"></i> Contact Company</h4>
+                        <p id="companyContactInfo">-</p>
+                        <button class="btn btn-primary btn-sm" onclick="contactCompanyPhone()">
+                            <i class="fas fa-phone"></i> Call Company
+                        </button>
+                    </div>
+                    
+                    <div class="support-option">
+                        <h4><i class="fas fa-shield-alt"></i> Ride Machan Admin</h4>
+                        <p>24/7 Customer Support</p>
+                        <p><strong>Phone:</strong> +94 11 234 5678</p>
+                        <p><strong>Email:</strong> support@ridemachan.com</p>
+                        <button class="btn btn-primary btn-sm" onclick="contactAdmin()">
+                            <i class="fas fa-phone"></i> Call Support
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeSupportModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/booking_details.js"></script>
+</body>
+</html>

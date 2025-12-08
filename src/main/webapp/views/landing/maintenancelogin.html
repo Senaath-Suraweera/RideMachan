@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Maintenance Staff Login - Ride Machan</title>
+    <link rel="stylesheet" href="maintenancestyles.css" />
+    <link rel="stylesheet" href="maintenancelogin.css" />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="login-card">
+      <h2>Maintenance Staff Login</h2>
+      <form id="loginForm">
+        <div class="input-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" name="email" required />
+        </div>
+        <div class="input-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" name="password" required />
+        </div>
+        <button type="submit" class="btn btn-primary">Login</button>
+        <p id="errorMsg" class="error" style="display: none">
+          Invalid email or password
+        </p>
+      </form>
+    </div>
+
+    <script src="maintenancelogin.js"></script>
+  </body>
+</html>

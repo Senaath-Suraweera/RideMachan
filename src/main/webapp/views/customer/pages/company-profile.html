@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Company Profile - Ride Machan</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <!-- Updated to use main.css and company-profile.css -->
+    <link rel="stylesheet" href="../css/main.css" />
+    <link rel="stylesheet" href="../css/company-profile.css" />
+</head>
+<body>
+    <div class="container">
+        <!-- Include Sidebar Navigation -->
+        <div id="navbar-container"></div>
+
+        <!-- Include Header -->
+        <div id="header-container"></div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="content-wrapper">
+                <div class="breadcrumb">
+                    <span>Learn more about our trusted rental partner</span>
+                </div>
+
+                <!-- Company Header -->
+                <div class="company-header">
+                    <div class="company-logo">
+                        <i class="fas fa-car" id="companyIcon"></i>
+                    </div>
+                    <div class="company-info">
+                        <h2 id="companyName">Premium Rentals</h2>
+                        <div class="location">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span id="companyLocation">Colombo 5, Sri Lanka</span>
+                        </div>
+                        <div class="rating">
+                            <div class="stars" id="companyStars">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="far fa-star"></i>
+                            </div>
+                            <span class="rating-text" id="companyRating">4.7 (249 reviews)</span>
+                        </div>
+                        <div class="company-meta" id="companyMeta">
+                            <span>Established: 2018</span>
+                            <span>Years in Service: 6</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="profile-grid">
+                    <!-- Left Column -->
+                    <div class="left-column">
+                        <!-- About Section -->
+                        <div class="section about-section">
+                            <h3>About <span id="aboutCompanyName">Premium Rentals</span></h3>
+                            <p id="companyDescription">Premium Rentals is a leading car rental service provider in Sri Lanka, offering high-quality vehicles for business and leisure travel. We pride ourselves on excellent customer service and maintaining a modern fleet of well-maintained vehicles.</p>
+                        </div>
+
+                        <!-- Services Section -->
+                        <div class="section services-section">
+                            <h3>Services & Features</h3>
+                            <div class="services-grid" id="servicesGrid">
+                                <div class="service-item">
+                                    <i class="fas fa-headset"></i>
+                                    <span>24/7 Customer Support</span>
+                                </div>
+                                <div class="service-item">
+                                    <i class="fas fa-truck"></i>
+                                    <span>Free Delivery & Pickup</span>
+                                </div>
+                                <div class="service-item">
+                                    <i class="fas fa-shield-alt"></i>
+                                    <span>Comprehensive Insurance</span>
+                                </div>
+                                <div class="service-item">
+                                    <i class="fas fa-satellite-dish"></i>
+                                    <span>GPS Navigation</span>
+                                </div>
+                                <div class="service-item">
+                                    <i class="fas fa-tools"></i>
+                                    <span>Emergency Roadside Assistance</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Fleet Section -->
+                        <div class="section fleet-section">
+                            <h3>Our Fleet</h3>
+                            <div class="fleet-grid" id="fleetGrid">
+                                <!-- Fleet items will be populated by JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Column -->
+                    <div class="right-column">
+                        <!-- Contact Information -->
+                        <div class="section contact-section">
+                            <h3>Contact Information</h3>
+                            <div id="contactInfo">
+                                <div class="contact-item">
+                                    <i class="fas fa-phone"></i>
+                                    <span id="companyPhone">+94 11 234 5678</span>
+                                </div>
+                                <div class="contact-item">
+                                    <i class="fas fa-envelope"></i>
+                                    <span id="companyEmail">info@premiumrentals.lk</span>
+                                </div>
+                                <div class="contact-item">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    <span id="companyAddress">Colombo 5, Sri Lanka</span>
+                                </div>
+                            </div>
+                            <button class="btn btn-primary" onclick="contactCompany()">
+                                <i class="fas fa-phone"></i>
+                                Contact Company
+                            </button>
+                        </div>
+
+                        <!-- Statistics -->
+                        <div class="section stats-section">
+                            <h3>Company Statistics</h3>
+                            <div id="companyStats">
+                                <div class="stat-item">
+                                    <div class="stat-number">150+</div>
+                                    <div class="stat-label">Total Vehicles</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-number">5,000+</div>
+                                    <div class="stat-label">Happy Customers</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-number">6</div>
+                                    <div class="stat-label">Years in Service</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Certifications -->
+                        <div class="section certifications-section">
+                            <h3>Certifications & Licenses</h3>
+                            <div id="certifications">
+                                <div class="cert-item">
+                                    <i class="fas fa-check-circle"></i>
+                                    <span>Licensed by Tourism Board</span>
+                                </div>
+                                <div class="cert-item">
+                                    <i class="fas fa-check-circle"></i>
+                                    <span>ISO 9001 Certified</span>
+                                </div>
+                                <div class="cert-item">
+                                    <i class="fas fa-check-circle"></i>
+                                    <span>AA Approved</span>
+                                </div>
+                                <div class="cert-item">
+                                    <i class="fas fa-check-circle"></i>
+                                    <span>Fully Insured Fleet</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Quick Actions -->
+                        <div class="section actions-section">
+                            <h3>Quick Actions</h3>
+                            <button class="btn btn-primary action-btn" onclick="bookNow()">
+                                <i class="fas fa-calendar"></i>
+                                Book Now
+                            </button>
+                            <button class="btn btn-outline action-btn" onclick="writeReview()">
+                                <i class="fas fa-star"></i>
+                                Write Review
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Load components function
+        function loadComponent(elementId, filePath) {
+            fetch(filePath)
+                .then(response => response.text())
+                .then(data => {
+                    let modifiedData = data;
+                    if (elementId === 'header-container') {
+                        modifiedData = data.replace('{{PAGE_TITLE}}', 'Company Profile');
+                        // Add back button to header after loading
+                        setTimeout(() => {
+                            const headerLeft = document.querySelector('.header .hi');
+                            if (headerLeft && !headerLeft.querySelector('.back-btn')) {
+                                const backBtn = document.createElement('button');
+                                backBtn.className = 'back-btn';
+                                backBtn.onclick = goBack;
+                                backBtn.innerHTML = '<i class="fas fa-arrow-left"></i> Back';
+                                headerLeft.style.display = 'flex';
+                                headerLeft.style.alignItems = 'center';
+                                headerLeft.style.gap = '20px';
+                                headerLeft.insertBefore(backBtn, headerLeft.firstChild);
+                            }
+                        }, 100);
+                    }
+                    document.getElementById(elementId).innerHTML = modifiedData;
+                    const scripts = document.getElementById(elementId).getElementsByTagName('script');
+                    for (let script of scripts) {
+                        eval(script.innerHTML);
+                    }
+                })
+                .catch(error => console.error('Error loading component:', error));
+        }
+
+        // Company data with Sri Lankan context
+        const companyData = {
+            1: {
+                name: "Premium Rentals",
+                location: "Colombo 03, Sri Lanka",
+                rating: 4.7,
+                reviews: 249,
+                established: 2018,
+                yearsInService: 6,
+                phone: "+94 11 234 5678",
+                email: "info@premiumrentals.lk",
+                address: "No. 123, Galle Road, Colombo 03, Sri Lanka",
+                description: "Premium Rentals is a leading car rental service provider in Sri Lanka, offering high-quality vehicles for business and leisure travel. We pride ourselves on excellent customer service and maintaining a modern fleet of well-maintained vehicles across Colombo and major tourist destinations.",
+                totalVehicles: "150+",
+                customers: "5,000+",
+                services: [
+                    { icon: "fas fa-headset", name: "24/7 Customer Support" },
+                    { icon: "fas fa-truck", name: "Free Delivery & Pickup" },
+                    { icon: "fas fa-shield-alt", name: "Comprehensive Insurance" },
+                    { icon: "fas fa-satellite-dish", name: "GPS Navigation" },
+                    { icon: "fas fa-tools", name: "Emergency Roadside Assistance" }
+                ],
+                fleet: [
+                    { name: "Honda Vezel", seats: 5, price: 6500, type: "SUV", id: 1 },
+                    { name: "BMW 3 Series", seats: 5, price: 8500, type: "Sedan", id: 7 },
+                    { name: "Mercedes E-Class", seats: 5, price: 12000, type: "Luxury", id: 8 },
+                    { name: "Toyota Prado", seats: 7, price: 15000, type: "SUV", id: 9 }
+                ]
+            },
+            2: {
+                name: "City Car Rentals",
+                location: "Kandy, Sri Lanka",
+                rating: 4.3,
+                reviews: 187,
+                established: 2015,
+                yearsInService: 9,
+                phone: "+94 81 234 5679",
+                email: "info@citycarrentals.lk",
+                address: "No. 45, Peradeniya Road, Kandy, Sri Lanka",
+                description: "City Car Rentals has been serving the hill country for nearly a decade, providing reliable transportation solutions for tourists and locals alike. Specializing in economy and mid-range vehicles perfect for exploring the scenic routes of central Sri Lanka.",
+                totalVehicles: "85+",
+                customers: "3,200+",
+                services: [
+                    { icon: "fas fa-headset", name: "Customer Support" },
+                    { icon: "fas fa-map-marked-alt", name: "Local Area Expertise" },
+                    { icon: "fas fa-shield-alt", name: "Basic Insurance" },
+                    { icon: "fas fa-gas-pump", name: "Fuel Efficient Fleet" }
+                ],
+                fleet: [
+                    { name: "Toyota Axio", seats: 5, price: 4500, type: "Sedan", id: 2 },
+                    { name: "Honda Fit", seats: 5, price: 4000, type: "Hatchback", id: 10 },
+                    { name: "Nissan Sunny", seats: 5, price: 5000, type: "Sedan", id: 11 }
+                ]
+            },
+            3: {
+                name: "Budget Wheels",
+                location: "Galle, Sri Lanka",
+                rating: 4.0,
+                reviews: 98,
+                established: 2019,
+                yearsInService: 5,
+                phone: "+94 91 234 5680",
+                email: "contact@budgetwheels.lk",
+                address: "No. 78, Matara Road, Galle, Sri Lanka",
+                description: "Budget Wheels focuses on providing affordable transportation solutions for budget-conscious travelers exploring the southern coast of Sri Lanka. Our fleet consists of well-maintained economy vehicles perfect for coastal adventures.",
+                totalVehicles: "45+",
+                customers: "1,800+",
+                services: [
+                    { icon: "fas fa-dollar-sign", name: "Budget Friendly" },
+                    { icon: "fas fa-umbrella-beach", name: "Coastal Area Specialist" },
+                    { icon: "fas fa-shield-alt", name: "Basic Insurance" },
+                    { icon: "fas fa-phone", name: "Local Support" }
+                ],
+                fleet: [
+                    { name: "Suzuki Alto", seats: 4, price: 3500, type: "Hatchback", id: 3 },
+                    { name: "Maruti 800", seats: 4, price: 2800, type: "Hatchback", id: 12 },
+                    { name: "Toyota Vitz", seats: 5, price: 3800, type: "Hatchback", id: 13 }
+                ]
+            }
+        };
+
+        function loadCompanyProfile() {
+            const companyId = sessionStorage.getItem('selectedCompanyId') || '1';
+            const company = companyData[companyId];
+
+            if (!company) {
+                console.error('Company not found');
+                return;
+            }
+
+            // Update company header
+            document.getElementById('companyName').textContent = company.name;
+            document.getElementById('aboutCompanyName').textContent = company.name;
+            document.getElementById('companyLocation').textContent = company.location;
+            document.getElementById('companyRating').textContent = `${company.rating} (${company.reviews} reviews)`;
+            document.getElementById('companyMeta').innerHTML = `
+                <span>Established: ${company.established}</span>
+                <span>Years in Service: ${company.yearsInService}</span>
+            `;
+
+            // Update stars
+            updateStars('companyStars', company.rating);
+
+            // Update description
+            document.getElementById('companyDescription').textContent = company.description;
+
+            // Update contact info
+            document.getElementById('companyPhone').textContent = company.phone;
+            document.getElementById('companyEmail').textContent = company.email;
+            document.getElementById('companyAddress').textContent = company.address;
+
+            // Update services
+            const servicesGrid = document.getElementById('servicesGrid');
+            servicesGrid.innerHTML = company.services.map(service => `
+                <div class="service-item">
+                    <i class="${service.icon}"></i>
+                    <span>${service.name}</span>
+                </div>
+            `).join('');
+
+            // Update fleet
+            const fleetGrid = document.getElementById('fleetGrid');
+            fleetGrid.innerHTML = company.fleet.map(vehicle => `
+                <div class="fleet-item" onclick="viewVehicleDetails(${vehicle.id})">
+                    <h4>${vehicle.name}</h4>
+                    <div class="fleet-details">
+                        <span class="seats">${vehicle.type} • ${vehicle.seats} seats</span>
+                        <span class="price">LKR ${vehicle.price.toLocaleString()}/day</span>
+                    </div>
+                    <button class="btn btn-outline btn-sm" onclick="event.stopPropagation(); viewVehicleDetails(${vehicle.id})">View Details</button>
+                </div>
+            `).join('');
+
+            // Update statistics
+            document.getElementById('companyStats').innerHTML = `
+                <div class="stat-item">
+                    <div class="stat-number">${company.totalVehicles}</div>
+                    <div class="stat-label">Total Vehicles</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">${company.customers}</div>
+                    <div class="stat-label">Happy Customers</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">${company.yearsInService}</div>
+                    <div class="stat-label">Years in Service</div>
+                </div>
+            `;
+        }
+
+        function updateStars(containerId, rating) {
+            const container = document.getElementById(containerId);
+            let starsHTML = '';
+            
+            for (let i = 1; i <= 5; i++) {
+                if (i <= Math.floor(rating)) {
+                    starsHTML += '<i class="fas fa-star"></i>';
+                } else if (i === Math.ceil(rating) && rating % 1 !== 0) {
+                    starsHTML += '<i class="fas fa-star-half-alt"></i>';
+                } else {
+                    starsHTML += '<i class="far fa-star"></i>';
+                }
+            }
+            
+            container.innerHTML = starsHTML;
+        }
+
+        function contactCompany() {
+            const companyId = sessionStorage.getItem('selectedCompanyId') || '1';
+            const company = companyData[companyId];
+            
+            if (company) {
+                showNotification(`Contact ${company.name}: Phone: ${company.phone}, Email: ${company.email}`, 'info');
+            }
+        }
+
+        function bookNow() {
+            showNotification('Redirecting to booking page with company pre-selected...', 'success');
+            setTimeout(() => {
+                window.location.href = 'search.html';
+            }, 1500);
+        }
+
+        function writeReview() {
+            const popup = document.createElement('div');
+            popup.className = 'popup-overlay';
+            popup.innerHTML = `
+                <div class="popup-content" style="
+                    position: fixed;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    background: white;
+                    padding: 30px;
+                    border-radius: var(--radius);
+                    box-shadow: var(--shadow-lg);
+                    z-index: 10000;
+                    max-width: 500px;
+                    width: 90%;
+                ">
+                    <div class="popup-header" style="margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 15px;">
+                        <h3 style="margin: 0; color: var(--text);">Write a Review</h3>
+                        <button class="close-btn" onclick="closePopup()" style="
+                            position: absolute;
+                            top: 15px;
+                            right: 15px;
+                            background: none;
+                            border: none;
+                            font-size: 24px;
+                            cursor: pointer;
+                            color: var(--text-light);
+                        ">&times;</button>
+                    </div>
+                    <div class="popup-body">
+                        <div style="margin-bottom: 15px;">
+                            <label style="display: block; margin-bottom: 5px; font-weight: 500;">Rating:</label>
+                            <div class="review-stars" style="margin-bottom: 15px;">
+                                <i class="far fa-star" data-rating="1" style="cursor: pointer; margin-right: 5px; color: #ddd; font-size: 20px;"></i>
+                                <i class="far fa-star" data-rating="2" style="cursor: pointer; margin-right: 5px; color: #ddd; font-size: 20px;"></i>
+                                <i class="far fa-star" data-rating="3" style="cursor: pointer; margin-right: 5px; color: #ddd; font-size: 20px;"></i>
+                                <i class="far fa-star" data-rating="4" style="cursor: pointer; margin-right: 5px; color: #ddd; font-size: 20px;"></i>
+                                <i class="far fa-star" data-rating="5" style="cursor: pointer; margin-right: 5px; color: #ddd; font-size: 20px;"></i>
+                            </div>
+                        </div>
+                        <textarea class="review-text" placeholder="Write your review here..." style="
+                            width: 100%;
+                            min-height: 100px;
+                            padding: 10px;
+                            border: 1px solid #ddd;
+                            border-radius: var(--radius-sm);
+                            resize: vertical;
+                            font-family: inherit;
+                        "></textarea>
+                    </div>
+                    <div class="popup-footer" style="margin-top: 20px; display: flex; gap: 10px; justify-content: flex-end;">
+                        <button class="btn btn-primary" onclick="submitReview()" style="padding: 8px 20px;">Submit Review</button>
+                        <button class="btn btn-outline" onclick="closePopup()" style="padding: 8px 20px;">Cancel</button>
+                    </div>
+                </div>
+                <div class="popup-backdrop" onclick="closePopup()" style="
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background: rgba(0, 0, 0, 0.5);
+                    z-index: 9999;
+                "></div>
+            `;
+            document.body.appendChild(popup);
+            
+            // Add star rating functionality
+            const stars = popup.querySelectorAll('.review-stars i');
+            let selectedRating = 0;
+            
+            stars.forEach((star, index) => {
+                star.addEventListener('click', () => {
+                    selectedRating = index + 1;
+                    updateReviewStars(stars, selectedRating);
+                });
+                
+                star.addEventListener('mouseover', () => {
+                    updateReviewStars(stars, index + 1);
+                });
+            });
+            
+            popup.querySelector('.review-stars').addEventListener('mouseleave', () => {
+                updateReviewStars(stars, selectedRating);
+            });
+        }
+
+        function updateReviewStars(stars, rating) {
+            stars.forEach((star, index) => {
+                if (index < rating) {
+                    star.className = 'fas fa-star';
+                    star.style.color = '#ffd700';
+                } else {
+                    star.className = 'far fa-star';
+                    star.style.color = '#ddd';
+                }
+            });
+        }
+
+        function submitReview() {
+            const reviewText = document.querySelector('.review-text').value;
+            const selectedRating = document.querySelectorAll('.review-stars .fas').length;
+            
+            if (selectedRating === 0) {
+                showNotification('Please select a rating', 'warning');
+                return;
+            }
+            
+            if (!reviewText.trim()) {
+                showNotification('Please write a review', 'warning');
+                return;
+            }
+            
+            closePopup();
+            showNotification('Review submitted successfully! Thank you for your feedback.', 'success');
+        }
+
+        function viewVehicleDetails(vehicleId) {
+            // Store vehicle ID and current page for navigation
+            sessionStorage.setItem('selectedVehicleId', vehicleId);
+            sessionStorage.setItem('previousPage', 'company-profile');
+            // Navigate to vehicle profile page
+            window.location.href = 'vehicle-profile.html';
+        }
+
+        function goBack() {
+    if (window.history.length > 1) {
+        window.history.back();
+    } else {
+        // Fallback if there's no history (e.g., page opened directly)
+        window.location.href = 'search.html';
+    }
+}
+
+
+        function closePopup() {
+            const popup = document.querySelector('.popup-overlay');
+            if (popup) {
+                popup.remove();
+            }
+        }
+
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 12px 20px;
+                background: ${type === 'success' ? 'var(--success)' : type === 'warning' ? 'var(--warning)' : 'var(--info)'};
+                color: white;
+                border-radius: var(--radius);
+                box-shadow: var(--shadow);
+                z-index: 10000;
+                font-weight: 500;
+                transform: translateX(400px);
+                transition: transform 0.3s ease;
+                max-width: 300px;
+            `;
+            notification.textContent = message;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.transform = 'translateX(0)';
+            }, 100);
+            
+            setTimeout(() => {
+                notification.style.transform = 'translateX(400px)';
+                setTimeout(() => {
+                    if (document.body.contains(notification)) {
+                        document.body.removeChild(notification);
+                    }
+                }, 300);
+            }, 3000);
+        }
+
+        // Load components and initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            loadComponent('navbar-container', '../components/navbar.html');
+            loadComponent('header-container', '../components/header.html');
+            
+            // Load company profile data after components are loaded
+            setTimeout(() => {
+                loadCompanyProfile();
+            }, 200);
+        });
+
+        // Add hover effects to interactive elements
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('fleet-item') || e.target.closest('.fleet-item')) {
+                const fleetItem = e.target.classList.contains('fleet-item') ? e.target : e.target.closest('.fleet-item');
+                fleetItem.style.transform = 'scale(0.98)';
+                setTimeout(() => {
+                    fleetItem.style.transform = 'translateY(-2px)';
+                }, 100);
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Vehicles | RideMachan</title>
+
+    <!-- Shared styles -->
+    <link rel="stylesheet" href="../css/styles.css" />
+    <link rel="stylesheet" href="../css/sidebar.css" />
+    <link rel="stylesheet" href="../css/my-vehicles.css" />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <!-- Sidebar -->
+    <div id="sidebar-container"></div>
+
+    <!-- Page container -->
+    <div class="container">
+      <div class="main-content">
+        <div class="page-header">
+          <h1>My Vehicles</h1>
+          <button class="btn btn-primary" onclick="openRegisterModal()">
+            <i class="fas fa-plus"></i> Register Vehicle
+          </button>
+        </div>
+
+        <!-- Vehicles grid -->
+        <div id="vehiclesGrid" class="vehicles-grid">
+          <p>Loading vehicles...</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Register Vehicle Modal -->
+    <div class="modal-overlay" id="registerVehicleModal">
+      <div class="modal">
+        <div class="modal-header">
+          <h2>Register a Vehicle</h2>
+          <button class="modal-close" onclick="closeRegisterModal()">×</button>
+        </div>
+        <div class="modal-body">
+          <form id="registerVehicleForm" enctype="multipart/form-data">
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Vehicle Brand</label>
+                <input
+                  type="text"
+                  name="vehiclebrand"
+                  class="form-control"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Vehicle Model</label>
+                <input
+                  type="text"
+                  name="vehiclemodel"
+                  class="form-control"
+                  required
+                />
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Number Plate</label>
+                <input
+                  type="text"
+                  name="numberplatenumber"
+                  class="form-control"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Color</label>
+                <input type="text" name="color" class="form-control" required />
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Tare Weight (kg)</label>
+                <input
+                  type="number"
+                  name="tareweight"
+                  class="form-control"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Engine Capacity (cc)</label>
+                <input
+                  type="number"
+                  name="enginecapacity"
+                  class="form-control"
+                  required
+                />
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Passengers</label>
+                <input
+                  type="number"
+                  name="numberofpassengers"
+                  class="form-control"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Milage</label>
+                <input type="text" name="milage" class="form-control" />
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Engine Number</label>
+                <input
+                  type="text"
+                  name="enginenumber"
+                  class="form-control"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Chasis Number</label>
+                <input
+                  type="text"
+                  name="chasisnumber"
+                  class="form-control"
+                  required
+                />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Description</label>
+              <textarea name="description" class="form-control"></textarea>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Registration Document (PDF)</label>
+                <input
+                  type="file"
+                  name="registrationdocumentation"
+                  class="form-control"
+                  accept=".pdf"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Vehicle Image</label>
+                <input
+                  type="file"
+                  name="vehicleimages"
+                  class="form-control"
+                  accept="image/*"
+                  required
+                />
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" onclick="closeRegisterModal()">
+            Cancel
+          </button>
+          <button
+            type="submit"
+            form="registerVehicleForm"
+            class="btn btn-primary"
+          >
+            Register
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Update Vehicle Modal -->
+    <!-- Update Vehicle Modal -->
+    <div class="modal-overlay" id="updateVehicleModal">
+      <div class="modal">
+        <div class="modal-header">
+          <h2>Update Vehicle</h2>
+          <button class="modal-close" onclick="closeUpdateModal()">×</button>
+        </div>
+        <div class="modal-body">
+          <form id="updateVehicleForm" enctype="multipart/form-data">
+            <input type="hidden" id="updateVehicleId" name="vehicleid" />
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Vehicle Brand</label>
+                <input
+                  type="text"
+                  id="updateBrand"
+                  name="vehiclebrand"
+                  class="form-control"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Vehicle Model</label>
+                <input
+                  type="text"
+                  id="updateModel"
+                  name="vehiclemodel"
+                  class="form-control"
+                  required
+                />
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Number Plate</label>
+                <input
+                  type="text"
+                  id="updatePlate"
+                  name="numberplatenumber"
+                  class="form-control"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Color</label>
+                <input
+                  type="text"
+                  id="updateColor"
+                  name="color"
+                  class="form-control"
+                  required
+                />
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Tare Weight (kg)</label>
+                <input
+                  type="number"
+                  id="updateTareWeight"
+                  name="tareweight"
+                  class="form-control"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Engine Capacity (cc)</label>
+                <input
+                  type="number"
+                  id="updateEngineCapacity"
+                  name="enginecapacity"
+                  class="form-control"
+                  required
+                />
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Passengers</label>
+                <input
+                  type="number"
+                  id="updatePassengers"
+                  name="numberofpassengers"
+                  class="form-control"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Milage</label>
+                <input
+                  type="text"
+                  id="updateMilage"
+                  name="milage"
+                  class="form-control"
+                />
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Engine Number</label>
+                <input
+                  type="text"
+                  id="updateEngineNumber"
+                  name="enginenumber"
+                  class="form-control"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Chasis Number</label>
+                <input
+                  type="text"
+                  id="updateChasisNumber"
+                  name="chasisnumber"
+                  class="form-control"
+                  required
+                />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Description</label>
+              <textarea
+                id="updateDescription"
+                name="description"
+                class="form-control"
+              ></textarea>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Registration Document (PDF)</label>
+                <input
+                  type="file"
+                  id="updateRegDoc"
+                  name="registrationdocumentation"
+                  class="form-control"
+                  accept=".pdf"
+                />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Vehicle Image</label>
+                <input
+                  type="file"
+                  id="updateImage"
+                  name="vehicleimages"
+                  class="form-control"
+                  accept="image/*"
+                />
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" onclick="closeUpdateModal()">
+            Cancel
+          </button>
+          <button
+            type="submit"
+            form="updateVehicleForm"
+            class="btn btn-primary"
+          >
+            Update
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script src="../js/sidebar.js"></script>
+    <script src="../js/my-vehicles.js"></script>
+  </body>
+</html>

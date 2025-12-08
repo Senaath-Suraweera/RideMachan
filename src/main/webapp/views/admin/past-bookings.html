@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ongoing Bookings - RideMachan</title>
+    <link rel="stylesheet" href="css/styles.css" />
+    <link rel="stylesheet" href="css/past-bookings.css" />
+  </head>
+  <body class="no-sidebar">
+    <div class="container">
+      <div class="main-content">
+        <div class="page-header">
+          <h1>Ongoing Bookings</h1>
+        </div>
+        <p class="page-subtitle">
+          Manage and track your vehicle rental bookings
+        </p>
+
+        <div class="search-filter-section">
+          <div class="filter-row">
+            <div class="form-group">
+              <label class="form-label">Vehicle type</label>
+              <select class="form-select" id="vehicleTypeFilter">
+                <option>Select type</option>
+                <option>Sedan</option>
+                <option>SUV</option>
+                <option>Hatchback</option>
+                <option>Luxury</option>
+                <option>Economy</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Location</label>
+              <input
+                type="text"
+                class="form-control"
+                placeholder="Enter location"
+                id="locationFilter"
+              />
+            </div>
+            <div class="form-group">
+              <label class="form-label">From</label>
+              <input type="date" class="form-control" id="fromDate" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">To</label>
+              <input type="date" class="form-control" id="toDate" />
+            </div>
+          </div>
+          <div class="filter-options">
+            <label class="checkbox-label">
+              <input type="checkbox" id="withDriver" /> with driver
+            </label>
+            <label class="checkbox-label">
+              <input type="checkbox" id="accepted" /> Accepted
+            </label>
+            <label class="checkbox-label">
+              <input type="checkbox" id="pickedUp" /> Picked up
+            </label>
+            <label class="checkbox-label">
+              <input type="checkbox" id="paid" /> Paid
+            </label>
+          </div>
+          <div class="filter-actions">
+            <button class="btn btn-primary" onclick="applyFilters()">
+              🔍 Search
+            </button>
+            <div class="sort-controls">
+              <button
+                class="btn btn-secondary filter-toggle"
+                onclick="toggleFilters()"
+              >
+                Hide Filters
+              </button>
+              <select class="form-select" id="sortSelect">
+                <option>Descending</option>
+                <option>Ascending</option>
+                <option>Date (Newest)</option>
+                <option>Date (Oldest)</option>
+                <option>Price (High to Low)</option>
+                <option>Price (Low to High)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bookings List -->
+        <div class="bookings-container">
+          <!-- Booking Item 1 -->
+          <div class="booking-card" data-status="paid">
+            <div class="booking-header">
+              <div class="booking-id">
+                <h3>Booking ID: BK001</h3>
+                <span class="customer-name"> John Smith</span>
+              </div>
+              <div class="booking-status paid">Paid</div>
+            </div>
+            <div class="booking-content">
+              <div class="booking-left">
+                <div class="vehicle-image">
+                  <span class="vehicle-icon"></span>
+                  <div class="image-placeholder">Image of Vehicle</div>
+                </div>
+                <div class="rental-info">
+                  <div class="rental-company">
+                    <strong>Rental Company</strong>
+                    <span>Premium Rentals Ltd</span>
+                  </div>
+                  <div class="driver-info">
+                    <strong>Driver</strong>
+                    <span> Michael Johnson</span>
+                  </div>
+                  <div class="location-info">
+                    <strong>Location</strong>
+                    <span>📍 Colombo, Sri Lanka</span>
+                  </div>
+                </div>
+              </div>
+              <div class="booking-right">
+                <div class="vehicle-details">
+                  <strong>Vehicle</strong>
+                  <span> Toyota Camry 2023</span>
+                </div>
+                <div class="duration-info">
+                  <strong>Duration</strong>
+                  <span> 3 days</span>
+                </div>
+              </div>
+            </div>
+            <div class="booking-footer">
+              <div class="status-indicators">
+                <span class="status-dot accepted">● Accepted</span>
+                <span class="status-dot paid">● Paid</span>
+              </div>
+              <div class="booking-actions">
+                <span class="action-label">Pick-up</span>
+                <span class="action-label">Drop-off</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Booking Item 2 -->
+          <div class="booking-card" data-status="in-progress">
+            <div class="booking-header">
+              <div class="booking-id">
+                <h3>Booking ID: BK002</h3>
+                <span class="customer-name"> Sarah Wilson</span>
+              </div>
+              <div class="booking-status in-progress">In Progress</div>
+            </div>
+            <div class="booking-content">
+              <div class="booking-left">
+                <div class="vehicle-image">
+                  <span class="vehicle-icon"></span>
+                  <div class="image-placeholder">Image of Vehicle</div>
+                </div>
+                <div class="rental-info">
+                  <div class="rental-company">
+                    <strong>Rental Company</strong>
+                    <span>City Car Rentals</span>
+                  </div>
+                  <div class="duration-info">
+                    <strong>Duration</strong>
+                    <span> 5 days</span>
+                  </div>
+                  <div class="location-info">
+                    <strong>Location</strong>
+                    <span>📍 Kandy, Sri Lanka</span>
+                  </div>
+                </div>
+              </div>
+              <div class="booking-right">
+                <div class="vehicle-details">
+                  <strong>Vehicle</strong>
+                  <span> Honda Civic 2022</span>
+                </div>
+              </div>
+            </div>
+            <div class="booking-footer">
+              <div class="status-indicators">
+                <span class="status-dot accepted">● Accepted</span>
+                <span class="status-dot paid">● Paid</span>
+                <span class="status-dot pickup">● Pick-up</span>
+              </div>
+              <div class="booking-actions">
+                <span class="action-label">Drop-off</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Booking Item 3 -->
+          <div class="booking-card" data-status="accepted">
+            <div class="booking-header">
+              <div class="booking-id">
+                <h3>Booking ID: BK003</h3>
+                <span class="customer-name"> David Brown</span>
+              </div>
+              <div class="booking-status accepted">Accepted</div>
+            </div>
+            <div class="booking-content">
+              <div class="booking-left">
+                <div class="vehicle-image">
+                  <span class="vehicle-icon"></span>
+                  <div class="image-placeholder">Image of Vehicle</div>
+                </div>
+                <div class="rental-info">
+                  <div class="rental-company">
+                    <strong>Rental Company</strong>
+                    <span>Elite Vehicle Services</span>
+                  </div>
+                  <div class="driver-info">
+                    <strong>Driver</strong>
+                    <span> Alex Fernando</span>
+                  </div>
+                  <div class="location-info">
+                    <strong>Location</strong>
+                    <span>📍 Galle, Sri Lanka</span>
+                  </div>
+                </div>
+              </div>
+              <div class="booking-right">
+                <div class="vehicle-details">
+                  <strong>Vehicle</strong>
+                  <span> BMW X5 2023</span>
+                </div>
+                <div class="duration-info">
+                  <strong>Duration</strong>
+                  <span> 2 days</span>
+                </div>
+              </div>
+            </div>
+            <div class="booking-footer">
+              <div class="status-indicators">
+                <span class="status-dot accepted">● Accepted</span>
+                <span class="status-dot paid">Paid</span>
+              </div>
+              <div class="booking-actions">
+                <span class="action-label">Pick-up</span>
+                <span class="action-label">Drop-off</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Load More Section -->
+        <div class="load-more-section">
+          <button class="btn btn-secondary" onclick="loadMoreBookings()">
+            Load More Bookings
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Booking Details Modal -->
+    <div class="modal-overlay" id="bookingDetailsModal">
+      <div class="modal">
+        <div class="modal-header">
+          <h2>Booking Details</h2>
+          <button class="modal-close" onclick="closeBookingModal()">×</button>
+        </div>
+        <div class="modal-body" id="bookingModalContent">
+          <!-- Content will be populated dynamically -->
+        </div>
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            onclick="closeBookingModal()"
+          >
+            Close
+          </button>
+          <button
+            type="button"
+            class="btn btn-primary"
+            onclick="updateBookingStatus()"
+          >
+            Update Status
+          </button>
+        </div>
+      </div>
+    </div>
+    <script src="js/past-bookings.js"></script>
+  </body>
+</html>

@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Driver Profile - Ride Booker</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/main.css" />
+  <link rel="stylesheet" href="../css/driver-profile.css" />
+</head>
+<body>
+  <div class="container">
+    <div id="navbar-container"></div>
+    <div id="header-container"></div>
+
+    <div class="main-content">
+      <div class="content-wrapper">
+        <div class="breadcrumb">
+          <button class="back-btn" onclick="goBack()">
+            <i class="fas fa-arrow-left"></i> Back
+          </button>
+        </div>
+
+        <div class="driver-profile-container">
+          <!-- Driver Profile Card -->
+          <div class="driver-profile-card">
+            <div class="driver-header">
+              <div class="driver-avatar">
+                <div class="driver-avatar-img" id="driverAvatarImg">-</div>
+              </div>
+              <div class="driver-info">
+                <div class="driver-name">
+                  <h2 id="driverName">Loading...</h2>
+                  <span class="verified-badge">
+                    <i class="fas fa-check-circle"></i> Verified
+                  </span>
+                </div>
+                <div class="driver-price" id="driverPrice">-</div>
+              </div>
+            </div>
+
+            <div class="driver-stats">
+              <div class="stat-item">
+                <i class="fas fa-map-marker-alt"></i>
+                <span id="driverLocation">-</span>
+              </div>
+              <div class="stat-item">
+                <i class="fas fa-calendar-alt"></i>
+                <span id="driverExperience">-</span>
+              </div>
+              <div class="stat-item">
+                <i class="fas fa-route"></i>
+                <span id="driverTrips">-</span>
+              </div>
+            </div>
+
+            <div class="action-buttons">
+              <button class="btn btn-primary" onclick="openCallModal()">
+                <i class="fas fa-phone"></i>
+                <span>Call Driver</span>
+              </button>
+              <button class="btn btn-outline" onclick="openMessageModal()">
+                <i class="fas fa-comment"></i>
+                Message
+              </button>
+            </div>
+
+            <div class="driver-details-sections">
+              <div class="detail-section">
+                <h3>Languages:</h3>
+                <div class="tags" id="languageTags">
+                  <span class="tag">Loading...</span>
+                </div>
+              </div>
+
+              <div class="detail-section">
+                <h3>Specialties:</h3>
+                <div class="tags" id="specialtyTags">
+                  <span class="tag">Loading...</span>
+                </div>
+              </div>
+
+              <div class="detail-section">
+                <h3>Vehicle Types:</h3>
+                <div class="tags" id="vehicleTags">
+                  <span class="tag">Loading...</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Reviews and Ratings Section -->
+          <div class="reviews-ratings-card">
+            <div class="card-header">
+              <h3><i class="fas fa-star"></i> Reviews & Ratings</h3>
+            </div>
+
+            <div class="overall-rating-section">
+              <div class="overall-rating">
+                <div class="rating-number" id="overallRatingNumber">-</div>
+                <div class="rating-details">
+                  <div class="stars" id="overallStars">
+                    <i class="far fa-star"></i>
+                    <i class="far fa-star"></i>
+                    <i class="far fa-star"></i>
+                    <i class="far fa-star"></i>
+                    <i class="far fa-star"></i>
+                  </div>
+                  <div class="total-reviews" id="totalReviews">Loading...</div>
+                </div>
+              </div>
+
+              <div class="rating-breakdown">
+                <div class="rating-bar-item">
+                  <span class="rating-label">5 <i class="fas fa-star"></i></span>
+                  <div class="rating-bar">
+                    <div class="rating-bar-fill" id="rating5" style="width: 0%"></div>
+                  </div>
+                  <span class="rating-count" id="count5">0</span>
+                </div>
+                <div class="rating-bar-item">
+                  <span class="rating-label">4 <i class="fas fa-star"></i></span>
+                  <div class="rating-bar">
+                    <div class="rating-bar-fill" id="rating4" style="width: 0%"></div>
+                  </div>
+                  <span class="rating-count" id="count4">0</span>
+                </div>
+                <div class="rating-bar-item">
+                  <span class="rating-label">3 <i class="fas fa-star"></i></span>
+                  <div class="rating-bar">
+                    <div class="rating-bar-fill" id="rating3" style="width: 0%"></div>
+                  </div>
+                  <span class="rating-count" id="count3">0</span>
+                </div>
+                <div class="rating-bar-item">
+                  <span class="rating-label">2 <i class="fas fa-star"></i></span>
+                  <div class="rating-bar">
+                    <div class="rating-bar-fill" id="rating2" style="width: 0%"></div>
+                  </div>
+                  <span class="rating-count" id="count2">0</span>
+                </div>
+                <div class="rating-bar-item">
+                  <span class="rating-label">1 <i class="fas fa-star"></i></span>
+                  <div class="rating-bar">
+                    <div class="rating-bar-fill" id="rating1" style="width: 0%"></div>
+                  </div>
+                  <span class="rating-count" id="count1">0</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="add-review-section">
+              <h4><i class="fas fa-pencil-alt"></i> Rate This Driver</h4>
+              
+              <div class="rating-input">
+                <label>Your Rating:</label>
+                <div class="star-rating-input" id="starRatingInput">
+                  <i class="far fa-star" data-rating="1"></i>
+                  <i class="far fa-star" data-rating="2"></i>
+                  <i class="far fa-star" data-rating="3"></i>
+                  <i class="far fa-star" data-rating="4"></i>
+                  <i class="far fa-star" data-rating="5"></i>
+                </div>
+                <span class="selected-rating" id="selectedRating">Select a rating</span>
+              </div>
+
+              <div class="form-group">
+                <label>Your Review:</label>
+                <textarea class="form-control" id="reviewText" placeholder="Tell us about your experience..." rows="3"></textarea>
+              </div>
+
+              <button class="btn btn-primary btn-submit-rating" onclick="submitRating()">
+                <i class="fas fa-paper-plane"></i> Submit Review
+              </button>
+            </div>
+
+            <div class="reviews-list-section">
+              <div class="reviews-list-header">
+                <h4><i class="fas fa-comments"></i> Customer Reviews</h4>
+                <button class="btn-toggle-reviews" id="toggleReviewsBtn" onclick="toggleAllReviews()">
+                  <span id="toggleBtnText">View All Reviews</span>
+                  <i class="fas fa-chevron-down" id="toggleBtnIcon"></i>
+                </button>
+              </div>
+
+              <div class="reviews-list" id="recentReviewsList">
+                <div class="review-item">
+                  <div class="review-header">
+                    <span class="reviewer-name">Loading...</span>
+                    <span class="review-date">-</span>
+                  </div>
+                  <div class="review-stars">
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                  </div>
+                  <p class="review-text">Loading reviews...</p>
+                </div>
+              </div>
+
+              <div class="all-reviews-list" id="allReviewsList" style="display: none;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Call Driver Modal -->
+  <div class="modal-overlay" id="callModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3><i class="fas fa-phone"></i> Call Driver</h3>
+        <button class="modal-close" onclick="closeCallModal()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="call-info">
+          <div class="call-avatar" id="callAvatar">-</div>
+          <div class="call-driver-name" id="callDriverName">Driver Name</div>
+          <div class="call-phone" id="callDriverPhone">
+            <i class="fas fa-phone"></i>
+            <span>+94 77 123 4567</span>
+          </div>
+          <div class="call-note">
+            <i class="fas fa-info-circle"></i>
+            <span>You will be redirected to your phone's dialer to complete the call.</span>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeCallModal()">Cancel</button>
+        <button class="btn btn-primary" onclick="makeCall()">
+          <i class="fas fa-phone"></i> Call Now
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Message Driver Modal -->
+  <div class="modal-overlay" id="messageModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3><i class="fas fa-comment"></i> Send Message</h3>
+        <button class="modal-close" onclick="closeMessageModal()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="message-to" id="messageTo">
+          Send a message to <strong id="messageDriverName">Driver Name</strong>
+        </div>
+        <div class="form-group">
+          <label>Your Message:</label>
+          <textarea class="form-control" id="messageText" placeholder="Type your message here..." rows="5"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeMessageModal()">Cancel</button>
+        <button class="btn btn-primary" onclick="sendMessage()">
+          <i class="fas fa-paper-plane"></i> Send Message
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function loadComponent(elementId, filePath) {
+      fetch(filePath)
+        .then(response => response.text())
+        .then(data => {
+          document.getElementById(elementId).innerHTML = data;
+          
+          // Update page title in header after loading
+          if (elementId === 'header-container') {
+            setTimeout(() => {
+              const headerTitle = document.querySelector('.header h1');
+              if (headerTitle) {
+                headerTitle.textContent = 'Driver Profile';
+              }
+            }, 100);
+          }
+        })
+        .catch(error => console.error('Error loading component:', error));
+    }
+
+    // Driver database matching booking details
+    const driversDatabase = {
+      'driver-001': {
+        id: 'driver-001',
+        name: 'Lasith Perera',
+        initial: 'LP',
+        price: 2500,
+        location: 'Colombo, Sri Lanka',
+        experience: 8,
+        trips: 250,
+        rating: 4.8,
+        reviews: 156,
+        languages: ['Sinhala', 'English', 'Tamil'],
+        specialties: ['Airport transfers', 'Long distance', 'City tours'],
+        vehicles: ['Toyota Prius', 'Toyota Axio'],
+        phone: '+94 77 123 4567',
+        bio: 'Experienced professional driver with over 8 years of service. Specialized in long-distance tours and airport transfers.',
+        ratingBreakdown: { 5: 122, 4: 23, 3: 8, 2: 2, 1: 1 }
+      },
+      'driver-002': {
+        id: 'driver-002',
+        name: 'Ruwan Silva',
+        initial: 'RS',
+        price: 2300,
+        location: 'Colombo, Sri Lanka',
+        experience: 9,
+        trips: 200,
+        rating: 4.7,
+        reviews: 152,
+        languages: ['English', 'Sinhala', 'Tamil'],
+        specialties: ['Airport transfers', 'City tours'],
+        vehicles: ['Toyota Prius'],
+        phone: '+94 71 234 5678',
+        bio: 'Professional driver specializing in airport transfers and city tours. Known for punctuality and excellent customer service.',
+        ratingBreakdown: { 5: 110, 4: 28, 3: 10, 2: 3, 1: 1 }
+      },
+      'driver-003': {
+        id: 'driver-003',
+        name: 'Chaminda Fernando',
+        initial: 'CF',
+        price: 2200,
+        location: 'Colombo, Sri Lanka',
+        experience: 6,
+        trips: 150,
+        rating: 4.6,
+        reviews: 98,
+        languages: ['Sinhala', 'English'],
+        specialties: ['Cultural tours', 'Long distance'],
+        vehicles: ['Toyota Aqua'],
+        phone: '+94 76 345 6789',
+        bio: 'Friendly and knowledgeable driver with extensive experience in cultural site tours.',
+        ratingBreakdown: { 5: 70, 4: 18, 3: 7, 2: 2, 1: 1 }
+      }
+    };
+
+    const reviewsDatabase = {
+      'driver-001': [
+        { name: 'Priya Fernando', date: '2024-02-08', rating: 5, text: 'Very friendly and punctual driver. Made the trip comfortable and safe.' },
+        { name: 'Ravi Silva', date: '2024-01-15', rating: 5, text: 'Clean vehicle and excellent driving skills. Highly recommended!' },
+        { name: 'Nimal Perera', date: '2024-01-07', rating: 4, text: 'Great service, knows the routes very well. Good experience overall.' }
+      ],
+      'driver-002': [
+        { name: 'Kasun Perera', date: '2024-02-05', rating: 5, text: 'Excellent driver! Very professional and punctual.' },
+        { name: 'Dilini Silva', date: '2024-01-20', rating: 5, text: 'Great service and friendly driver.' },
+        { name: 'Saman Kumar', date: '2024-01-10', rating: 4, text: 'Good driver, knows all the shortcuts.' }
+      ],
+      'driver-003': [
+        { name: 'Amaya Fernando', date: '2024-02-01', rating: 5, text: 'Very knowledgeable about cultural sites.' },
+        { name: 'Nuwan Perera', date: '2024-01-18', rating: 4, text: 'Good service and comfortable ride.' },
+        { name: 'Thilini Silva', date: '2024-01-08', rating: 5, text: 'Friendly driver with great local knowledge.' }
+      ]
+    };
+
+    let selectedDriver = null;
+    let userRating = 0;
+    let showingAllReviews = false;
+
+    function loadDriverProfile() {
+      const driverId = sessionStorage.getItem('selectedDriverId') || 'driver-001';
+      selectedDriver = driversDatabase[driverId];
+      
+      if (!selectedDriver) {
+        showNotification('Driver not found', 'error');
+        return;
+      }
+      
+      document.getElementById('driverAvatarImg').textContent = selectedDriver.initial;
+      document.getElementById('driverName').textContent = selectedDriver.name;
+      document.getElementById('driverPrice').textContent = `LKR ${selectedDriver.price.toLocaleString()}/hour`;
+      document.getElementById('driverLocation').textContent = selectedDriver.location;
+      document.getElementById('driverExperience').textContent = `${selectedDriver.experience} years experience`;
+      document.getElementById('driverTrips').textContent = `${selectedDriver.trips}+ Trips`;
+      
+      document.getElementById('overallRatingNumber').textContent = selectedDriver.rating;
+      document.getElementById('totalReviews').textContent = `Based on ${selectedDriver.reviews} reviews`;
+      document.getElementById('overallStars').innerHTML = generateStars(selectedDriver.rating);
+      
+      document.getElementById('languageTags').innerHTML = selectedDriver.languages.map(lang => 
+        `<span class="tag">${lang}</span>`
+      ).join('');
+      
+      document.getElementById('specialtyTags').innerHTML = selectedDriver.specialties.map(specialty => 
+        `<span class="tag">${specialty}</span>`
+      ).join('');
+
+      document.getElementById('vehicleTags').innerHTML = selectedDriver.vehicles.map(vehicle => 
+        `<span class="tag">${vehicle}</span>`
+      ).join('');
+
+      // Update rating breakdown
+      const breakdown = selectedDriver.ratingBreakdown;
+      const total = selectedDriver.reviews;
+      for (let i = 1; i <= 5; i++) {
+        const count = breakdown[i] || 0;
+        const percent = (count / total) * 100;
+        document.getElementById(`rating${i}`).style.width = `${percent}%`;
+        document.getElementById(`count${i}`).textContent = count;
+      }
+
+      // Load reviews
+      loadReviews(driverId);
+
+      const previousPage = sessionStorage.getItem('previousPage');
+      const backBtn = document.querySelector('.back-btn');
+      if (previousPage === 'booking_details') {
+        backBtn.innerHTML = '<i class="fas fa-arrow-left"></i> Back to Booking';
+      } else {
+        backBtn.innerHTML = '<i class="fas fa-arrow-left"></i> Back to Search';
+      }
+    }
+
+    function loadReviews(driverId) {
+      const reviews = reviewsDatabase[driverId] || [];
+      const recentReviews = reviews.slice(0, 3);
+      
+      document.getElementById('recentReviewsList').innerHTML = recentReviews.map(review => `
+        <div class="review-item">
+          <div class="review-header">
+            <span class="reviewer-name">${review.name}</span>
+            <span class="review-date">${review.date}</span>
+          </div>
+          <div class="review-stars">
+            ${generateReviewStars(review.rating)}
+          </div>
+          <p class="review-text">${review.text}</p>
+        </div>
+      `).join('');
+    }
+
+    function toggleAllReviews() {
+      const allReviewsList = document.getElementById('allReviewsList');
+      const toggleBtnText = document.getElementById('toggleBtnText');
+      const toggleBtnIcon = document.getElementById('toggleBtnIcon');
+      
+      showingAllReviews = !showingAllReviews;
+      
+      if (showingAllReviews) {
+        allReviewsList.style.display = 'block';
+        toggleBtnText.textContent = 'Show Less';
+        toggleBtnIcon.className = 'fas fa-chevron-up';
+      } else {
+        allReviewsList.style.display = 'none';
+        toggleBtnText.textContent = 'View All Reviews';
+        toggleBtnIcon.className = 'fas fa-chevron-down';
+      }
+    }
+
+    function generateStars(rating) {
+      let stars = '';
+      for (let i = 1; i <= 5; i++) {
+        if (i <= Math.floor(rating)) {
+          stars += '<i class="fas fa-star"></i>';
+        } else if (i === Math.ceil(rating) && rating % 1 !== 0) {
+          stars += '<i class="fas fa-star-half-alt"></i>';
+        } else {
+          stars += '<i class="far fa-star"></i>';
+        }
+      }
+      return stars;
+    }
+
+    function generateReviewStars(rating) {
+      let stars = '';
+      for (let i = 1; i <= 5; i++) {
+        stars += i <= rating ? '<i class="fas fa-star"></i>' : '<i class="far fa-star"></i>';
+      }
+      return stars;
+    }
+
+    // Modal Functions
+    function openCallModal() {
+      if (!selectedDriver) return;
+      
+      document.getElementById('callAvatar').textContent = selectedDriver.initial;
+      document.getElementById('callDriverName').textContent = selectedDriver.name;
+      document.getElementById('callDriverPhone').innerHTML = `
+        <i class="fas fa-phone"></i>
+        <span>${selectedDriver.phone}</span>
+      `;
+      
+      document.getElementById('callModal').classList.add('show');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeCallModal() {
+      document.getElementById('callModal').classList.remove('show');
+      document.body.style.overflow = 'auto';
+    }
+
+    function makeCall() {
+      if (selectedDriver) {
+        showNotification(`Calling ${selectedDriver.name}...`, 'info');
+        closeCallModal();
+        setTimeout(() => {
+          window.location.href = `tel:${selectedDriver.phone}`;
+        }, 500);
+      }
+    }
+
+    function openMessageModal() {
+      if (!selectedDriver) return;
+      
+      document.getElementById('messageDriverName').textContent = selectedDriver.name;
+      document.getElementById('messageText').value = '';
+      
+      document.getElementById('messageModal').classList.add('show');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeMessageModal() {
+      document.getElementById('messageModal').classList.remove('show');
+      document.body.style.overflow = 'auto';
+    }
+
+    function sendMessage() {
+      const messageText = document.getElementById('messageText').value.trim();
+      
+      if (!messageText) {
+        showNotification('Please enter a message', 'warning');
+        return;
+      }
+      
+      showNotification('Message sent successfully!', 'success');
+      closeMessageModal();
+      
+      // Clear the textarea
+      document.getElementById('messageText').value = '';
+    }
+
+    function submitRating() {
+      const reviewText = document.getElementById('reviewText').value.trim();
+      
+      if (userRating === 0) {
+        showNotification('Please select a rating', 'warning');
+        return;
+      }
+      
+      if (!reviewText) {
+        showNotification('Please write a review', 'warning');
+        return;
+      }
+      
+      showNotification('Thank you for your review!', 'success');
+      
+      userRating = 0;
+      document.getElementById('reviewText').value = '';
+      document.getElementById('selectedRating').textContent = 'Select a rating';
+      
+      const stars = document.querySelectorAll('.star-rating-input i');
+      stars.forEach(star => {
+        star.classList.remove('fas');
+        star.classList.add('far');
+      });
+    }
+
+    function showNotification(message, type = 'info') {
+      const notification = document.createElement('div');
+      notification.className = `notification-toast ${type}`;
+      
+      const icon = type === 'success' ? 'check-circle' : 
+                  type === 'warning' ? 'exclamation-triangle' : 
+                  type === 'error' ? 'times-circle' : 'info-circle';
+      
+      notification.innerHTML = `
+        <i class="fas fa-${icon}"></i>
+        <span>${message}</span>
+      `;
+      
+      document.body.appendChild(notification);
+      setTimeout(() => notification.classList.add('show'), 100);
+      
+      setTimeout(() => {
+        notification.classList.remove('show');
+        setTimeout(() => notification.remove(), 300);
+      }, 3000);
+    }
+
+    function goBack() {
+      const previousPage = sessionStorage.getItem('previousPage');
+      if (previousPage === 'booking_details') {
+        window.history.back();
+      } else {
+        window.location.href = 'search.html';
+      }
+    }
+
+    function initializeStarRating() {
+      const stars = document.querySelectorAll('.star-rating-input i');
+      
+      stars.forEach(star => {
+        star.addEventListener('click', function() {
+          userRating = parseInt(this.getAttribute('data-rating'));
+          updateStarDisplay();
+          document.getElementById('selectedRating').textContent = `${userRating} star${userRating > 1 ? 's' : ''}`;
+        });
+        
+        star.addEventListener('mouseenter', function() {
+          const hoverRating = parseInt(this.getAttribute('data-rating'));
+          stars.forEach((s, index) => {
+            if (index < hoverRating) {
+              s.classList.remove('far');
+              s.classList.add('fas');
+            } else {
+              s.classList.remove('fas');
+              s.classList.add('far');
+            }
+          });
+        });
+      });
+      
+      document.querySelector('.star-rating-input').addEventListener('mouseleave', updateStarDisplay);
+    }
+
+    function updateStarDisplay() {
+      const stars = document.querySelectorAll('.star-rating-input i');
+      stars.forEach((star, index) => {
+        if (index < userRating) {
+          star.classList.remove('far');
+          star.classList.add('fas');
+        } else {
+          star.classList.remove('fas');
+          star.classList.add('far');
+        }
+      });
+    }
+
+    // Close modals when clicking outside
+    document.addEventListener('click', function(event) {
+      if (event.target.classList.contains('modal-overlay')) {
+        if (event.target.id === 'callModal') {
+          closeCallModal();
+        } else if (event.target.id === 'messageModal') {
+          closeMessageModal();
+        }
+      }
+    });
+
+    // Close modals with Escape key
+    document.addEventListener('keydown', function(event) {
+      if (event.key === 'Escape') {
+        closeCallModal();
+        closeMessageModal();
+      }
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+      loadComponent('navbar-container', '../components/navbar.html');
+      loadComponent('header-container', '../components/header.html');
+      
+      setTimeout(() => {
+        loadDriverProfile();
+        initializeStarRating();
+      }, 200);
+    });
+  </script>
+</body>
+</html>

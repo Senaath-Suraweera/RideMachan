@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Promotions - Ride Machan</title>
+    <link rel="stylesheet" href="css/styles.css" />
+    <link rel="stylesheet" href="css/sidebar.css" />
+    <link rel="stylesheet" href="css/promotions.css" />
+  </head>
+  <body>
+    <div class="container">
+      <main class="main-content">
+        <header class="page-header">
+          <div class="header-content">
+            <h1 class="page-title">Promotions</h1>
+            <div class="header-actions">
+              <button
+                class="btn btn-primary"
+                onclick="openCreatePromotionModal()"
+              >
+                + Create Promotion
+              </button>
+            </div>
+          </div>
+        </header>
+
+        <!-- Filters Section -->
+        <div class="filters-section">
+          <div class="filter-grid">
+            <div class="filter-group">
+              <label class="filter-label">Vehicle type</label>
+              <select class="form-select" id="vehicleTypeFilter">
+                <option value="">Vehicle type</option>
+                <option value="sedan">Sedan</option>
+                <option value="suv">SUV</option>
+                <option value="hatchback">Hatchback</option>
+                <option value="van">Van</option>
+              </select>
+            </div>
+
+            <div class="filter-group">
+              <label class="filter-label">Location</label>
+              <select class="form-select" id="locationFilter">
+                <option value="">Location</option>
+                <option value="colombo">Colombo</option>
+                <option value="kandy">Kandy</option>
+                <option value="galle">Galle</option>
+                <option value="negombo">Negombo</option>
+              </select>
+            </div>
+
+            <div class="filter-group">
+              <label class="filter-label">From</label>
+              <input type="date" class="form-control" id="fromDate" />
+            </div>
+
+            <div class="filter-group">
+              <label class="filter-label">To</label>
+              <input type="date" class="form-control" id="toDate" />
+            </div>
+
+            <div class="filter-group">
+              <label class="filter-label">Discount</label>
+              <select class="form-select" id="discountFilter">
+                <option value="">Dropdown of percentage</option>
+                <option value="10">10% Off</option>
+                <option value="15">15% Off</option>
+                <option value="20">20% Off</option>
+                <option value="25">25% Off</option>
+                <option value="30">30% Off</option>
+                <option value="50">50% Off</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="filter-options">
+            <label class="checkbox-container">
+              <input type="checkbox" id="withDriverFilter" />
+              <span class="checkmark"></span>
+              with driver
+            </label>
+          </div>
+
+          <div class="search-actions">
+            <button class="btn btn-primary" onclick="searchPromotions()">
+              Search
+            </button>
+          </div>
+        </div>
+
+        <!-- Promotions Grid -->
+        <div class="promotions-section">
+          <div class="promotions-grid" id="promotionsGrid">
+            <!-- Promotion 1 -->
+            <div class="promotion-card" data-promotion-id="1">
+              <div class="promotion-image">
+                <div class="image-placeholder">Image of vehicle</div>
+                <div class="discount-badge">20% OFF</div>
+              </div>
+              <div class="promotion-content">
+                <h3 class="vehicle-name">Vehicle name</h3>
+                <div class="company-info">
+                  <span class="company-label">Rental company name</span>
+                </div>
+                <div class="pricing">
+                  <span class="original-price">Rs. 6000/day</span>
+                  <span class="discounted-price">Rs. 4800/day</span>
+                </div>
+                <div class="promotion-details">
+                  <div class="detail-row">
+                    <span class="detail-label">Vehicle</span>
+                    <span class="detail-value">Toyota Camry</span>
+                  </div>
+                  <div class="detail-row">
+                    <span class="detail-label">Driver</span>
+                    <span class="detail-value">Included</span>
+                  </div>
+                </div>
+                <div class="promotion-period">
+                  <span class="period-label">Valid:</span>
+                  <span class="period-dates">Jan 15 - Feb 15, 2024</span>
+                </div>
+                <div class="promotion-actions">
+                  <button
+                    class="btn btn-primary btn-sm"
+                    onclick="bookPromotion(1)"
+                  >
+                    Book Now
+                  </button>
+                  <button
+                    class="btn btn-secondary btn-sm"
+                    onclick="viewDetails(1)"
+                  >
+                    View Details
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Promotion 2 -->
+            <div class="promotion-card" data-promotion-id="2">
+              <div class="promotion-image">
+                <div class="image-placeholder">Image of vehicle</div>
+                <div class="discount-badge">15% OFF</div>
+              </div>
+              <div class="promotion-content">
+                <h3 class="vehicle-name">Vehicle name</h3>
+                <div class="company-info">
+                  <span class="company-label">Rental company name</span>
+                </div>
+                <div class="pricing">
+                  <span class="original-price">Rs. 5000/day</span>
+                  <span class="discounted-price">Rs. 4250/day</span>
+                </div>
+                <div class="promotion-details">
+                  <div class="detail-row">
+                    <span class="detail-label">Vehicle</span>
+                    <span class="detail-value">Honda Civic</span>
+                  </div>
+                  <div class="detail-row">
+                    <span class="detail-label">Driver</span>
+                    <span class="detail-value">Optional</span>
+                  </div>
+                </div>
+                <div class="promotion-period">
+                  <span class="period-label">Valid:</span>
+                  <span class="period-dates">Jan 20 - Mar 20, 2024</span>
+                </div>
+                <div class="promotion-actions">
+                  <button
+                    class="btn btn-primary btn-sm"
+                    onclick="bookPromotion(2)"
+                  >
+                    Book Now
+                  </button>
+                  <button
+                    class="btn btn-secondary btn-sm"
+                    onclick="viewDetails(2)"
+                  >
+                    View Details
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Promotion 3 -->
+            <div class="promotion-card" data-promotion-id="3">
+              <div class="promotion-image">
+                <div class="image-placeholder">Image of vehicle</div>
+                <div class="discount-badge">30% OFF</div>
+              </div>
+              <div class="promotion-content">
+                <h3 class="vehicle-name">Vehicle name</h3>
+                <div class="company-info">
+                  <span class="company-label">Rental company name</span>
+                </div>
+                <div class="pricing">
+                  <span class="original-price">Rs. 4000/day</span>
+                  <span class="discounted-price">Rs. 2800/day</span>
+                </div>
+                <div class="promotion-details">
+                  <div class="detail-row">
+                    <span class="detail-label">Vehicle</span>
+                    <span class="detail-value">Suzuki Alto</span>
+                  </div>
+                  <div class="detail-row">
+                    <span class="detail-label">Driver</span>
+                    <span class="detail-value">Not Available</span>
+                  </div>
+                </div>
+                <div class="promotion-period">
+                  <span class="period-label">Valid:</span>
+                  <span class="period-dates">Feb 01 - Feb 28, 2024</span>
+                </div>
+                <div class="promotion-actions">
+                  <button
+                    class="btn btn-primary btn-sm"
+                    onclick="bookPromotion(3)"
+                  >
+                    Book Now
+                  </button>
+                  <button
+                    class="btn btn-secondary btn-sm"
+                    onclick="viewDetails(3)"
+                  >
+                    View Details
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <!-- Create Promotion Modal -->
+    <div class="modal" id="createPromotionModal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>Create New Promotion</h3>
+          <button class="modal-close" onclick="closeCreatePromotionModal()">
+            &times;
+          </button>
+        </div>
+        <div class="modal-body">
+          <form id="createPromotionForm">
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Promotion Title *</label>
+                <input type="text" class="form-control" name="title" required />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Discount Percentage *</label>
+                <select class="form-select" name="discount" required>
+                  <option value="">Select Discount</option>
+                  <option value="10">10%</option>
+                  <option value="15">15%</option>
+                  <option value="20">20%</option>
+                  <option value="25">25%</option>
+                  <option value="30">30%</option>
+                  <option value="50">50%</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Vehicle Type *</label>
+                <select class="form-select" name="vehicleType" required>
+                  <option value="">Select Vehicle Type</option>
+                  <option value="sedan">Sedan</option>
+                  <option value="suv">SUV</option>
+                  <option value="hatchback">Hatchback</option>
+                  <option value="van">Van</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Rental Company *</label>
+                <select class="form-select" name="company" required>
+                  <option value="">Select Company</option>
+                  <option value="abc-rentals">ABC Rentals</option>
+                  <option value="xyz-motors">XYZ Motors</option>
+                  <option value="quick-rentals">Quick Rentals</option>
+                  <option value="premium-cars">Premium Cars</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Start Date *</label>
+                <input
+                  type="date"
+                  class="form-control"
+                  name="startDate"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label class="form-label">End Date *</label>
+                <input
+                  type="date"
+                  class="form-control"
+                  name="endDate"
+                  required
+                />
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Original Price (Rs/day) *</label>
+              <input
+                type="number"
+                class="form-control"
+                name="originalPrice"
+                min="1000"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Promotion Description</label>
+              <textarea
+                class="form-control"
+                name="description"
+                rows="3"
+                placeholder="Describe the promotion details..."
+              ></textarea>
+            </div>
+            <div class="form-group">
+              <label class="checkbox-container">
+                <input type="checkbox" name="driverIncluded" />
+                <span class="checkmark"></span>
+                Driver Included
+              </label>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button
+            class="btn btn-secondary"
+            onclick="closeCreatePromotionModal()"
+          >
+            Cancel
+          </button>
+          <button class="btn btn-primary" onclick="createPromotion()">
+            Create Promotion
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Promotion Details Modal -->
+    <div class="modal" id="promotionDetailsModal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 id="promotionDetailsTitle">Promotion Details</h3>
+          <button class="modal-close" onclick="closePromotionDetailsModal()">
+            &times;
+          </button>
+        </div>
+        <div class="modal-body">
+          <div id="promotionDetailsContent">
+            <!-- Details will be loaded here -->
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button
+            class="btn btn-secondary"
+            onclick="closePromotionDetailsModal()"
+          >
+            Close
+          </button>
+          <button class="btn btn-primary" onclick="editPromotion()">
+            Edit Promotion
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script src="js/sidebar.js"></script>
+    <script src="js/promotions.js"></script>
+  </body>
+</html>

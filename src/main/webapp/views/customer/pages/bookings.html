@@ -1,0 +1,1018 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Bookings - Ride Machan</title>
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+    />
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
+    />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../css/main.css" />
+    <link rel="stylesheet" href="../css/bookings.css" />
+</head>
+<body>
+    <div class="container">
+        <div id="navbar-container"></div>
+        <div id="header-container"></div>
+
+        <div class="main-content">
+            <div class="tab-content active" id="vehicle-bookings">
+                <!-- Booking Type Filter -->
+                <div class="booking-filters">
+                    <div class="filter-tabs">
+                        <button class="filter-btn active" data-filter="all" data-category="vehicle">
+                            <i class="fas fa-list"></i>
+                            All
+                        </button>
+                        <button class="filter-btn" data-filter="active" data-category="vehicle">
+                            <i class="fas fa-play"></i>
+                            Active
+                        </button>
+                        <button class="filter-btn" data-filter="upcoming" data-category="vehicle">
+                            <i class="fas fa-clock"></i>
+                            Upcoming
+                        </button>
+                        <button class="filter-btn" data-filter="past" data-category="vehicle">
+                            <i class="fas fa-history"></i>
+                            Past
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Active Vehicle Booking -->
+                <div class="booking-section vehicle-active">
+                    <h3 class="section-title">
+                        <i class="fas fa-play-circle text-success"></i>
+                        Active Vehicle Booking
+                    </h3>
+                    <div class="booking-card active-booking" data-booking-id="CC-2024-008" onclick="navigateToDetails(this)">
+                        <div class="booking-header">
+                            <div class="vehicle-info">
+                                <div class="vehicle-icon">
+                                    <i class="fas fa-car"></i>
+                                </div>
+                                <div class="vehicle-details">
+                                    <h4>Toyota Prius</h4>
+                                    <span class="booking-id">Booking ID: CC-2024-008</span>
+                                </div>
+                            </div>
+                            <div class="booking-status">
+                                <span class="status-badge active-progress">Active</span>
+                                <span class="booking-type">With Driver</span>
+                            </div>
+                        </div>
+                        <div class="booking-content">
+                            <div class="booking-info">
+                                <div class="info-row">
+                                    <span class="label">Date:</span>
+                                    <span class="value">8/13/2024</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="label">Time:</span>
+                                    <span class="value">09:00 - 18:00</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="label">From:</span>
+                                    <span class="value">Colombo Fort Railway Station</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="label">To:</span>
+                                    <span class="value">Kandy City Center</span>
+                                </div>
+                            </div>
+                            <div class="driver-info">
+                                <div class="driver-avatar">
+                                    <span>LP</span>
+                                </div>
+                                <div class="driver-details">
+                                    <span class="driver-name">Lasith Perera</span>
+                                    <div class="driver-rating">
+                                        <i class="fas fa-star"></i>
+                                        <span>4.8</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="amount-info">
+                                <span class="amount">LKR 15,000</span>
+                                <span class="payment-badge paid">Paid</span>
+                            </div>
+                        </div>
+                        <div class="booking-actions" onclick="event.stopPropagation()">
+                            <button class="btn btn-outline btn-sm" onclick="navigateToDetails(this.closest('.booking-card'))">
+                                <i class="fas fa-eye"></i>
+                                View Details
+                            </button>
+                            <button class="btn btn-primary btn-sm" onclick="openMessageModal('CC-2024-008')">
+                                <i class="fas fa-message"></i>
+                                Message Driver
+                            </button>
+                            <button class="btn btn-success btn-sm" onclick="openCallModal('CC-2024-008')">
+                                <i class="fas fa-phone"></i>
+                                Call Driver
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Upcoming Vehicle Bookings -->
+                <div class="booking-section vehicle-upcoming">
+                    <h3 class="section-title">
+                        <i class="fas fa-clock text-warning"></i>
+                        Upcoming Vehicle Bookings
+                    </h3>
+
+                    <!-- Toyota Prius Booking -->
+                    <div class="booking-card" data-booking-id="CC-2024-009" onclick="navigateToDetails(this)">
+                        <div class="booking-header">
+                            <div class="vehicle-info">
+                                <div class="vehicle-icon">
+                                    <i class="fas fa-car"></i>
+                                </div>
+                                <div class="vehicle-details">
+                                    <h4>Toyota Prius</h4>
+                                    <span class="booking-id">Booking ID: CC-2024-009</span>
+                                </div>
+                            </div>
+                            <div class="booking-status">
+                                <span class="status-badge paid">Paid</span>
+                                <span class="booking-type">With Driver</span>
+                            </div>
+                        </div>
+                        <div class="booking-content">
+                            <div class="booking-info">
+                                <div class="info-row">
+                                    <span class="label">Date:</span>
+                                    <span class="value">8/16/2024</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="label">Time:</span>
+                                    <span class="value">06:00 - 18:00</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="label">From:</span>
+                                    <span class="value">Colombo Fort Railway Station</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="label">To:</span>
+                                    <span class="value">Bandaranaike International Airport</span>
+                                </div>
+                            </div>
+                            <div class="driver-info">
+                                <div class="driver-avatar">
+                                    <span>RS</span>
+                                </div>
+                                <div class="driver-details">
+                                    <span class="driver-name">Ruwan Silva</span>
+                                    <div class="driver-rating">
+                                        <i class="fas fa-star"></i>
+                                        <span>4.7</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="amount-info">
+                                <span class="amount">LKR 12,000</span>
+                                <span class="payment-badge paid">Paid</span>
+                            </div>
+                        </div>
+                        <div class="booking-actions" onclick="event.stopPropagation()">
+                            <button class="btn btn-outline btn-sm" onclick="navigateToDetails(this.closest('.booking-card'))">
+                                <i class="fas fa-eye"></i>
+                                View Details
+                            </button>
+                            <button class="btn btn-warning btn-sm" onclick="openMessageModal('CC-2024-009')">
+                                <i class="fas fa-message"></i>
+                                Message Driver
+                            </button>
+                            <button class="btn btn-danger btn-sm" onclick="openCancelModal('CC-2024-009')">
+                                <i class="fas fa-times"></i>
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Toyota Aqua Booking -->
+                    <div class="booking-card" data-booking-id="BB-2024-010" onclick="navigateToDetails(this)">
+                        <div class="booking-header">
+                            <div class="vehicle-info">
+                                <div class="vehicle-icon">
+                                    <i class="fas fa-car"></i>
+                                </div>
+                                <div class="vehicle-details">
+                                    <h4>Toyota Aqua</h4>
+                                    <span class="booking-id">Booking ID: BB-2024-010</span>
+                                </div>
+                            </div>
+                            <div class="booking-status">
+                                <span class="status-badge paid">Paid</span>
+                                <span class="booking-type">With Driver</span>
+                            </div>
+                        </div>
+                        <div class="booking-content">
+                            <div class="booking-info">
+                                <div class="info-row">
+                                    <span class="label">Date:</span>
+                                    <span class="value">8/18/2024</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="label">Time:</span>
+                                    <span class="value">06:00 - 20:00</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="label">From:</span>
+                                    <span class="value">Galle Face Green</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="label">To:</span>
+                                    <span class="value">Sigiriya Rock Fortress</span>
+                                </div>
+                            </div>
+                            <div class="driver-info">
+                                <div class="driver-avatar">
+                                    <span>CF</span>
+                                </div>
+                                <div class="driver-details">
+                                    <span class="driver-name">Chaminda Fernando</span>
+                                    <div class="driver-rating">
+                                        <i class="fas fa-star"></i>
+                                        <span>4.6</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="amount-info">
+                                <span class="amount">LKR 25,000</span>
+                                <span class="payment-badge paid">Paid</span>
+                            </div>
+                        </div>
+                        <div class="booking-actions" onclick="event.stopPropagation()">
+                            <button class="btn btn-outline btn-sm" onclick="navigateToDetails(this.closest('.booking-card'))">
+                                <i class="fas fa-eye"></i>
+                                View Details
+                            </button>
+                            <button class="btn btn-warning btn-sm" onclick="openMessageModal('BB-2024-010')">
+                                <i class="fas fa-message"></i>
+                                Message Driver
+                            </button>
+                            <button class="btn btn-danger btn-sm" onclick="openCancelModal('BB-2024-010')">
+                                <i class="fas fa-times"></i>
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Suzuki Alto Booking (Self-Drive) -->
+                    <div class="booking-card" data-booking-id="SD-2024-011" onclick="navigateToDetails(this)">
+                        <div class="booking-header">
+                            <div class="vehicle-info">
+                                <div class="vehicle-icon">
+                                    <i class="fas fa-car"></i>
+                                </div>
+                                <div class="vehicle-details">
+                                    <h4>Suzuki Alto</h4>
+                                    <span class="booking-id">Booking ID: SD-2024-011</span>
+                                </div>
+                            </div>
+                            <div class="booking-status">
+                                <span class="status-badge paid">Paid</span>
+                                <span class="booking-type self-drive-badge">Self-Drive</span>
+                            </div>
+                        </div>
+                        <div class="booking-content">
+                            <div class="booking-info">
+                                <div class="info-row">
+                                    <span class="label">Date:</span>
+                                    <span class="value">8/20/2024</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="label">Time:</span>
+                                    <span class="value">06:00 - 17:00</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="label">From:</span>
+                                    <span class="value">Kandy City Centre</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="label">To:</span>
+                                    <span class="value">Temple of the Tooth</span>
+                                </div>
+                            </div>
+                            <div class="driver-info">
+                                <div class="self-drive-badge-large">
+                                    <i class="fas fa-steering-wheel"></i>
+                                </div>
+                                <div class="driver-details">
+                                    <span class="driver-name">Self Drive Rental</span>
+                                </div>
+                            </div>
+                            <div class="amount-info">
+                                <span class="amount">LKR 8,500</span>
+                                <span class="payment-badge paid">Paid</span>
+                            </div>
+                        </div>
+                        <div class="booking-actions" onclick="event.stopPropagation()">
+                            <button class="btn btn-outline btn-sm" onclick="navigateToDetails(this.closest('.booking-card'))">
+                                <i class="fas fa-eye"></i>
+                                View Details
+                            </button>
+                            <button class="btn btn-warning btn-sm" onclick="openMessageModal('SD-2024-011')">
+                                <i class="fas fa-message"></i>
+                                Message Company
+                            </button>
+                            <button class="btn btn-danger btn-sm" onclick="openCancelModal('SD-2024-011')">
+                                <i class="fas fa-times"></i>
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Past Vehicle Bookings -->
+                <div class="booking-section vehicle-past">
+                    <h3 class="section-title">
+                        <i class="fas fa-history text-info"></i>
+                        Past Vehicle Bookings
+                    </h3>
+
+                    <!-- Completed Booking -->
+                    <div class="booking-card completed" data-booking-id="LL-2024-004" onclick="navigateToDetails(this)">
+                        <div class="booking-header">
+                            <div class="vehicle-info">
+                                <div class="vehicle-icon">
+                                    <i class="fas fa-car"></i>
+                                </div>
+                                <div class="vehicle-details">
+                                    <h4>Toyota Prius</h4>
+                                    <span class="booking-id">Booking ID: LL-2024-004</span>
+                                </div>
+                            </div>
+                            <div class="booking-status">
+                                <span class="status-badge completed">Completed</span>
+                                <span class="booking-type">With Driver</span>
+                            </div>
+                        </div>
+                        <div class="booking-content">
+                            <div class="booking-info">
+                                <div class="info-row">
+                                    <span class="label">Date:</span>
+                                    <span class="value">8/10/2024</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="label">Time:</span>
+                                    <span class="value">09:00 - 18:00</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="label">From:</span>
+                                    <span class="value">Colombo Airport</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="label">To:</span>
+                                    <span class="value">Kandy Queens Hotel</span>
+                                </div>
+                            </div>
+                            <div class="driver-info">
+                                <div class="driver-avatar">
+                                    <span>LP</span>
+                                </div>
+                                <div class="driver-details">
+                                    <span class="driver-name">Lasith Perera</span>
+                                    <div class="driver-rating">
+                                        <i class="fas fa-star"></i>
+                                        <span>4.8</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="amount-info">
+                                <span class="amount">LKR 18,000</span>
+                                <span class="payment-badge paid">Paid</span>
+                            </div>
+                        </div>
+                        <div class="booking-actions" onclick="event.stopPropagation()">
+                            <button class="btn btn-outline btn-sm" onclick="navigateToDetails(this.closest('.booking-card'))">
+                                <i class="fas fa-eye"></i>
+                                View Details
+                            </button>
+                            <button class="btn btn-primary btn-sm" onclick="openRatingModal('LL-2024-004')">
+                                <i class="fas fa-star"></i>
+                                Rate Experience
+                            </button>
+                            <button class="btn btn-success btn-sm" onclick="openRebookModal('LL-2024-004')">
+                                <i class="fas fa-redo"></i>
+                                Book Again
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Message Modal -->
+    <div id="messageModal" class="action-modal">
+        <div class="action-modal-content">
+            <div class="action-modal-header">
+                <h3>Send Message</h3>
+                <button class="modal-close" onclick="closeMessageModal()">&times;</button>
+            </div>
+            <div class="action-modal-body">
+                <p class="modal-subtitle" id="messageSubtitle"></p>
+                <textarea id="messageText" placeholder="Type your message here..." rows="5"></textarea>
+            </div>
+            <div class="action-modal-footer">
+                <button class="btn btn-outline" onclick="closeMessageModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="sendMessage()">
+                    <i class="fas fa-paper-plane"></i>
+                    Send Message
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Call Modal -->
+    <div id="callModal" class="action-modal">
+        <div class="action-modal-content">
+            <div class="action-modal-header">
+                <h3>Make a Call</h3>
+                <button class="modal-close" onclick="closeCallModal()">&times;</button>
+            </div>
+            <div class="action-modal-body">
+                <div class="call-info">
+                    <i class="fas fa-phone-alt call-icon"></i>
+                    <p class="modal-subtitle" id="callSubtitle"></p>
+                    <p class="phone-number" id="callPhone"></p>
+                </div>
+            </div>
+            <div class="action-modal-footer">
+                <button class="btn btn-outline" onclick="closeCallModal()">Cancel</button>
+                <button class="btn btn-success" onclick="makeCall()">
+                    <i class="fas fa-phone"></i>
+                    Call Now
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cancel Modal -->
+    <div id="cancelModal" class="action-modal">
+        <div class="action-modal-content">
+            <div class="action-modal-header">
+                <h3>Cancel Booking</h3>
+                <button class="modal-close" onclick="closeCancelModal()">&times;</button>
+            </div>
+            <div class="action-modal-body">
+                <div class="warning-info">
+                    <i class="fas fa-exclamation-triangle warning-icon"></i>
+                    <p class="modal-subtitle" id="cancelSubtitle"></p>
+                    <div class="cancel-details" id="cancelDetails"></div>
+                    <p class="warning-text">⚠️ Cancellation fees may apply according to our cancellation policy.</p>
+                </div>
+            </div>
+            <div class="action-modal-footer">
+                <button class="btn btn-outline" onclick="closeCancelModal()">Keep Booking</button>
+                <button class="btn btn-danger" onclick="confirmCancellation()">
+                    <i class="fas fa-times"></i>
+                    Cancel Booking
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Rating Modal -->
+    <div id="ratingModal" class="action-modal">
+        <div class="action-modal-content rating-modal-content">
+            <div class="action-modal-header">
+                <h3>Rate Your Experience</h3>
+                <button class="modal-close" onclick="closeRatingModal()">&times;</button>
+            </div>
+            <div class="action-modal-body">
+                <div class="rating-section">
+                    <label>Overall Experience</label>
+                    <div class="star-rating" id="overallRating">
+                        <i class="far fa-star" data-rating="1"></i>
+                        <i class="far fa-star" data-rating="2"></i>
+                        <i class="far fa-star" data-rating="3"></i>
+                        <i class="far fa-star" data-rating="4"></i>
+                        <i class="far fa-star" data-rating="5"></i>
+                    </div>
+                </div>
+                <div class="rating-section">
+                    <label>Driver/Service Quality</label>
+                    <div class="star-rating" id="serviceRating">
+                        <i class="far fa-star" data-rating="1"></i>
+                        <i class="far fa-star" data-rating="2"></i>
+                        <i class="far fa-star" data-rating="3"></i>
+                        <i class="far fa-star" data-rating="4"></i>
+                        <i class="far fa-star" data-rating="5"></i>
+                    </div>
+                </div>
+                <div class="rating-section">
+                    <label>Vehicle Condition</label>
+                    <div class="star-rating" id="vehicleRating">
+                        <i class="far fa-star" data-rating="1"></i>
+                        <i class="far fa-star" data-rating="2"></i>
+                        <i class="far fa-star" data-rating="3"></i>
+                        <i class="far fa-star" data-rating="4"></i>
+                        <i class="far fa-star" data-rating="5"></i>
+                    </div>
+                </div>
+                <div class="rating-section">
+                    <label>Comments (Optional)</label>
+                    <textarea id="ratingComments" rows="4" placeholder="Share your experience..."></textarea>
+                </div>
+            </div>
+            <div class="action-modal-footer">
+                <button class="btn btn-outline" onclick="closeRatingModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="submitRating()">Submit Rating</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Rebook Modal -->
+    <div id="rebookModal" class="action-modal">
+        <div class="action-modal-content">
+            <div class="action-modal-header">
+                <h3>Book Again</h3>
+                <button class="modal-close" onclick="closeRebookModal()">&times;</button>
+            </div>
+            <div class="action-modal-body">
+                <div class="rebook-info">
+                    <i class="fas fa-redo rebook-icon"></i>
+                    <p class="modal-subtitle" id="rebookSubtitle"></p>
+                    <div class="rebook-details" id="rebookDetails"></div>
+                    <p class="info-text">You'll be redirected to the search page with your previous booking details pre-filled.</p>
+                </div>
+            </div>
+            <div class="action-modal-footer">
+                <button class="btn btn-outline" onclick="closeRebookModal()">Cancel</button>
+                <button class="btn btn-success" onclick="confirmRebook()">
+                    <i class="fas fa-search"></i>
+                    Search Similar Vehicles
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const bookingsDatabase = {
+            'CC-2024-008': { 
+                companyId: '1', 
+                rentalType: 'with-driver', 
+                driver: { name: 'Lasith Perera', phone: '+94771234567' },
+                company: { name: 'City Car Rentals', phone: '+94812345678' },
+                vehicle: 'Toyota Prius',
+                date: '8/13/2024',
+                time: '09:00 - 18:00'
+            },
+            'CC-2024-009': { 
+                companyId: '1', 
+                rentalType: 'with-driver', 
+                driver: { name: 'Ruwan Silva', phone: '+94712345678' },
+                company: { name: 'City Car Rentals', phone: '+94812345678' },
+                vehicle: 'Toyota Prius',
+                date: '8/16/2024',
+                time: '06:00 - 18:00'
+            },
+            'BB-2024-010': { 
+                companyId: '3', 
+                rentalType: 'with-driver', 
+                driver: { name: 'Chaminda Fernando', phone: '+94763456789' },
+                company: { name: 'Budget Car Rentals', phone: '+94773456789' },
+                vehicle: 'Toyota Aqua',
+                date: '8/18/2024',
+                time: '06:00 - 20:00'
+            },
+            'SD-2024-011': { 
+                companyId: '2', 
+                rentalType: 'self-drive', 
+                company: { name: 'City Car Rentals', phone: '+94812345679' },
+                vehicle: 'Suzuki Alto',
+                date: '8/20/2024',
+                time: '06:00 - 17:00'
+            },
+            'LL-2024-004': { 
+                companyId: '1', 
+                rentalType: 'with-driver', 
+                driver: { name: 'Lasith Perera', phone: '+94771234567' },
+                company: { name: 'City Car Rentals', phone: '+94812345678' },
+                vehicle: 'Toyota Prius',
+                date: '8/10/2024',
+                time: '09:00 - 18:00'
+            }
+        };
+
+        let currentBookingId = null;
+        let ratings = {
+            overall: 0,
+            service: 0,
+            vehicle: 0
+        };
+
+        function loadComponent(elementId, filePath, callback) {
+            fetch(filePath)
+                .then(response => response.text())
+                .then(html => {
+                    // If loading header, replace placeholder with page title
+                    if (elementId === 'header-container') {
+                        html = html.replace('{{PAGE_TITLE}}', 'MY BOOKINGS');
+                    }
+                    document.getElementById(elementId).innerHTML = html;
+                    // Execute any inline scripts contained in the loaded component
+                    executeComponentScripts(elementId);
+                    if (callback) callback();
+                })
+                .catch(error => console.error('Error loading component:', error));
+        }
+
+        // Execute scripts inside a loaded component container by creating new script nodes
+        function executeComponentScripts(containerId) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+
+            const scripts = container.querySelectorAll('script');
+            scripts.forEach(oldScript => {
+                const newScript = document.createElement('script');
+                if (oldScript.src) {
+                    newScript.src = oldScript.src;
+                } else {
+                    newScript.textContent = oldScript.textContent;
+                }
+                document.body.appendChild(newScript);
+                // Remove the old script tag to avoid duplication
+                oldScript.parentNode && oldScript.parentNode.removeChild(oldScript);
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            loadComponent('navbar-container', '../components/navbar.html', () => {
+                // Ensure navbar scripts have run and then set active item
+                if (typeof initializeNavbar === 'function') initializeNavbar();
+                const navItems = document.querySelectorAll('.nav-item');
+                navItems.forEach(item => item.classList.remove('active'));
+                const bookingsNav = document.querySelector('[data-page="bookings"]');
+                if (bookingsNav) bookingsNav.classList.add('active');
+            });
+
+            loadComponent('header-container', '../components/header.html', () => {
+                // Ensure header initialization runs after scripts are executed
+                if (typeof initializeHeader === 'function') initializeHeader();
+                // Force the header title to MY BOOKINGS (matches Search page pattern)
+                const pageTitle = document.querySelector('.hi h1');
+                if (pageTitle) {
+                    pageTitle.textContent = 'MY BOOKINGS';
+                    const subtitle = document.querySelector('.subtitle');
+                    if (subtitle) subtitle.textContent = 'Manage your vehicle reservations';
+                }
+            });
+
+            initializeBookingPage();
+            initializeRatingModal();
+        });
+
+        function navigateToDetails(element) {
+            const bookingId = element.dataset.bookingId;
+            if (bookingId) {
+                window.location.href = `booking_details.html?id=${bookingId}`;
+            }
+        }
+
+        function initializeBookingPage() {
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const category = btn.dataset.category;
+                    document.querySelectorAll(`.filter-btn[data-category="${category}"]`).forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    const filter = btn.dataset.filter;
+                    handleVehicleFilter(filter);
+                });
+            });
+
+            handleVehicleFilter('all');
+        }
+
+        function handleVehicleFilter(filter) {
+            const sections = {
+                'vehicle-active': document.querySelector('.vehicle-active'),
+                'vehicle-upcoming': document.querySelector('.vehicle-upcoming'),
+                'vehicle-past': document.querySelector('.vehicle-past')
+            };
+
+            Object.values(sections).forEach(section => {
+                if (section) section.style.display = 'none';
+            });
+
+            switch(filter) {
+                case 'all':
+                    Object.values(sections).forEach(section => {
+                        if (section) section.style.display = 'block';
+                    });
+                    break;
+                case 'active':
+                    if (sections['vehicle-active']) sections['vehicle-active'].style.display = 'block';
+                    break;
+                case 'upcoming':
+                    if (sections['vehicle-upcoming']) sections['vehicle-upcoming'].style.display = 'block';
+                    break;
+                case 'past':
+                    if (sections['vehicle-past']) sections['vehicle-past'].style.display = 'block';
+                    break;
+            }
+        }
+
+        // Message Modal Functions
+        function openMessageModal(bookingId) {
+            currentBookingId = bookingId;
+            const booking = bookingsDatabase[bookingId];
+            if (!booking) return;
+
+            const modal = document.getElementById('messageModal');
+            const subtitle = document.getElementById('messageSubtitle');
+            
+            if (booking.rentalType === 'self-drive') {
+                subtitle.textContent = `Send a message to ${booking.company.name} about their ${booking.vehicle}:`;
+            } else {
+                subtitle.textContent = `Send a message to ${booking.driver.name} about their ${booking.vehicle}:`;
+            }
+            
+            modal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeMessageModal() {
+            document.getElementById('messageModal').style.display = 'none';
+            document.getElementById('messageText').value = '';
+            document.body.style.overflow = 'auto';
+        }
+
+        function sendMessage() {
+            const message = document.getElementById('messageText').value.trim();
+            if (!message) {
+                showNotification('Please enter a message', 'warning');
+                return;
+            }
+
+            const booking = bookingsDatabase[currentBookingId];
+            if (!booking) return;
+
+            if (booking.rentalType === 'self-drive') {
+                window.location.href = `sms:${booking.company.phone}?body=${encodeURIComponent(message + ' - Booking ID: ' + currentBookingId)}`;
+            } else {
+                window.location.href = `sms:${booking.driver.phone}?body=${encodeURIComponent(message + ' - Booking ID: ' + currentBookingId)}`;
+            }
+            
+            closeMessageModal();
+            showNotification('Opening messaging app...', 'success');
+        }
+
+        // Call Modal Functions
+        function openCallModal(bookingId) {
+            currentBookingId = bookingId;
+            const booking = bookingsDatabase[bookingId];
+            if (!booking) return;
+
+            const modal = document.getElementById('callModal');
+            const subtitle = document.getElementById('callSubtitle');
+            const phone = document.getElementById('callPhone');
+            
+            if (booking.rentalType === 'self-drive') {
+                subtitle.textContent = `Call ${booking.company.name} about ${booking.vehicle}`;
+                phone.textContent = booking.company.phone;
+            } else {
+                subtitle.textContent = `Call ${booking.driver.name} - ${booking.vehicle} Driver`;
+                phone.textContent = booking.driver.phone;
+            }
+            
+            modal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeCallModal() {
+            document.getElementById('callModal').style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        function makeCall() {
+            const booking = bookingsDatabase[currentBookingId];
+            if (!booking) return;
+
+            if (booking.rentalType === 'self-drive') {
+                window.location.href = `tel:${booking.company.phone}`;
+            } else {
+                window.location.href = `tel:${booking.driver.phone}`;
+            }
+            
+            closeCallModal();
+        }
+
+        // Cancel Modal Functions
+        function openCancelModal(bookingId) {
+            currentBookingId = bookingId;
+            const booking = bookingsDatabase[bookingId];
+            if (!booking) return;
+
+            const modal = document.getElementById('cancelModal');
+            const subtitle = document.getElementById('cancelSubtitle');
+            const details = document.getElementById('cancelDetails');
+            
+            subtitle.textContent = `Are you sure you want to cancel this booking?`;
+            details.innerHTML = `
+                <div class="detail-item">
+                    <strong>Vehicle:</strong> ${booking.vehicle}
+                </div>
+                <div class="detail-item">
+                    <strong>Booking ID:</strong> ${bookingId}
+                </div>
+                <div class="detail-item">
+                    <strong>Date:</strong> ${booking.date}
+                </div>
+                <div class="detail-item">
+                    <strong>Time:</strong> ${booking.time}
+                </div>
+            `;
+            
+            modal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeCancelModal() {
+            document.getElementById('cancelModal').style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        function confirmCancellation() {
+            const card = document.querySelector(`[data-booking-id="${currentBookingId}"]`);
+            if (card) {
+                card.style.opacity = '0.5';
+                card.style.pointerEvents = 'none';
+                setTimeout(() => {
+                    card.remove();
+                    showNotification('Booking cancelled successfully', 'success');
+                }, 500);
+            }
+            closeCancelModal();
+        }
+
+        // Rating Modal Functions
+        function openRatingModal(bookingId) {
+            currentBookingId = bookingId;
+            document.getElementById('ratingModal').style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeRatingModal() {
+            document.getElementById('ratingModal').style.display = 'none';
+            document.body.style.overflow = 'auto';
+            resetRatings();
+        }
+
+        function initializeRatingModal() {
+            document.querySelectorAll('.star-rating').forEach(ratingDiv => {
+                const stars = ratingDiv.querySelectorAll('i');
+                stars.forEach(star => {
+                    star.addEventListener('click', function() {
+                        const rating = parseInt(this.dataset.rating);
+                        const ratingType = ratingDiv.id.replace('Rating', '');
+                        ratings[ratingType] = rating;
+                        
+                        stars.forEach((s, index) => {
+                            if (index < rating) {
+                                s.classList.remove('far');
+                                s.classList.add('fas');
+                            } else {
+                                s.classList.remove('fas');
+                                s.classList.add('far');
+                            }
+                        });
+                    });
+
+                    star.addEventListener('mouseenter', function() {
+                        const rating = parseInt(this.dataset.rating);
+                        stars.forEach((s, index) => {
+                            if (index < rating) {
+                                s.style.color = '#f8961e';
+                            } else {
+                                s.style.color = '';
+                            }
+                        });
+                    });
+                });
+
+                ratingDiv.addEventListener('mouseleave', function() {
+                    const ratingType = ratingDiv.id.replace('Rating', '');
+                    const currentRating = ratings[ratingType];
+                    stars.forEach((s, index) => {
+                        if (index < currentRating) {
+                            s.style.color = '#f8961e';
+                        } else {
+                            s.style.color = '';
+                        }
+                    });
+                });
+            });
+        }
+
+        function resetRatings() {
+            ratings = { overall: 0, service: 0, vehicle: 0 };
+            document.querySelectorAll('.star-rating i').forEach(star => {
+                star.classList.remove('fas');
+                star.classList.add('far');
+                star.style.color = '';
+            });
+            document.getElementById('ratingComments').value = '';
+        }
+
+        function submitRating() {
+            if (ratings.overall === 0 || ratings.service === 0 || ratings.vehicle === 0) {
+                showNotification('Please provide all ratings', 'warning');
+                return;
+            }
+
+            const comments = document.getElementById('ratingComments').value;
+            
+            showNotification('Submitting your rating...', 'info');
+            
+            setTimeout(() => {
+                showNotification('Thank you for your feedback!', 'success');
+                closeRatingModal();
+                
+                const card = document.querySelector(`[data-booking-id="${currentBookingId}"]`);
+                if (card) {
+                    const rateButton = card.querySelector('.btn-primary');
+                    if (rateButton) {
+                        rateButton.innerHTML = '<i class="fas fa-check"></i> Rated';
+                        rateButton.disabled = true;
+                        rateButton.style.opacity = '0.6';
+                    }
+                }
+            }, 1000);
+        }
+
+        // Rebook Modal Functions
+        function openRebookModal(bookingId) {
+            currentBookingId = bookingId;
+            const booking = bookingsDatabase[bookingId];
+            if (!booking) return;
+
+            const modal = document.getElementById('rebookModal');
+            const subtitle = document.getElementById('rebookSubtitle');
+            const details = document.getElementById('rebookDetails');
+            
+            subtitle.textContent = `Book ${booking.vehicle} again for your next trip`;
+            details.innerHTML = `
+                <div class="detail-item">
+                    <strong>Previous Vehicle:</strong> ${booking.vehicle}
+                </div>
+                <div class="detail-item">
+                    <strong>Rental Type:</strong> ${booking.rentalType === 'self-drive' ? 'Self-Drive' : 'With Driver'}
+                </div>
+                <div class="detail-item">
+                    <strong>Company:</strong> ${booking.company.name}
+                </div>
+            `;
+            
+            modal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeRebookModal() {
+            document.getElementById('rebookModal').style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        function confirmRebook() {
+            sessionStorage.setItem('rebookingId', currentBookingId);
+            window.location.href = 'search.html';
+        }
+
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `notification-toast ${type}`;
+            notification.innerHTML = `
+                <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'warning' ? 'exclamation-triangle' : 'info-circle'}"></i>
+                <span>${message}</span>
+            `;
+            
+            document.body.appendChild(notification);
+            setTimeout(() => notification.classList.add('show'), 100);
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+
+        // Close modals on outside click
+        window.onclick = function(event) {
+            if (event.target.classList.contains('action-modal')) {
+                event.target.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }
+        }
+    </script>
+</body>
+</html>

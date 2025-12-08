@@ -44,201 +44,221 @@ const staffData = [
     vehicles: ["2021 Mercedes C200 - MNO-678"],
     badges: ["Paint Specialist", "Body Repair"],
   },
-]
+];
 
 // Initialize page
 document.addEventListener("DOMContentLoaded", () => {
-  initializeSearch()
-  initializeFilter()
-  updateStats()
-})
+  initializeSearch();
+  initializeFilter();
+  updateStats();
+});
 
 // Search functionality
 function initializeSearch() {
-  const searchInput = document.getElementById("staffSearch")
+  const searchInput = document.getElementById("staffSearch");
   if (searchInput) {
     searchInput.addEventListener("input", function () {
-      const searchTerm = this.value.toLowerCase()
-      filterStaff(searchTerm)
-    })
+      const searchTerm = this.value.toLowerCase();
+      filterStaff(searchTerm);
+    });
   }
 }
 
 // Filter functionality
 function initializeFilter() {
-  const filterSelect = document.getElementById("staffFilter")
+  const filterSelect = document.getElementById("staffFilter");
   if (filterSelect) {
     filterSelect.addEventListener("change", function () {
-      const filterValue = this.value
-      filterStaffByStatus(filterValue)
-    })
+      const filterValue = this.value;
+      filterStaffByStatus(filterValue);
+    });
   }
 }
 
 // Filter staff by search term
 function filterStaff(searchTerm) {
-  const staffCards = document.querySelectorAll(".staff-card")
+  const staffCards = document.querySelectorAll(".staff-card");
 
   staffCards.forEach((card) => {
-    const staffName = card.querySelector(".staff-name").textContent.toLowerCase()
-    const staffId = card.querySelector(".staff-id").textContent.toLowerCase()
-    const specialization = card.querySelector(".staff-specialization").textContent.toLowerCase()
+    const staffName = card
+      .querySelector(".staff-name")
+      .textContent.toLowerCase();
+    const staffId = card.querySelector(".staff-id").textContent.toLowerCase();
+    const specialization = card
+      .querySelector(".staff-specialization")
+      .textContent.toLowerCase();
 
-    if (staffName.includes(searchTerm) || staffId.includes(searchTerm) || specialization.includes(searchTerm)) {
-      card.style.display = "block"
+    if (
+      staffName.includes(searchTerm) ||
+      staffId.includes(searchTerm) ||
+      specialization.includes(searchTerm)
+    ) {
+      card.style.display = "block";
     } else {
-      card.style.display = "none"
+      card.style.display = "none";
     }
-  })
+  });
 }
 
 // Filter staff by status
 function filterStaffByStatus(status) {
-  const staffCards = document.querySelectorAll(".staff-card")
+  const staffCards = document.querySelectorAll(".staff-card");
 
   staffCards.forEach((card) => {
     if (status === "all") {
-      card.style.display = "block"
+      card.style.display = "block";
     } else {
-      const cardStatus = card.getAttribute("data-status")
+      const cardStatus = card.getAttribute("data-status");
       if (cardStatus === status) {
-        card.style.display = "block"
+        card.style.display = "block";
       } else {
-        card.style.display = "none"
+        card.style.display = "none";
       }
     }
-  })
+  });
 }
 
 // Update statistics
 function updateStats() {
-  const totalStaff = staffData.length
-  const availableStaff = staffData.filter((staff) => staff.status === "available").length
-  const onJobStaff = staffData.filter((staff) => staff.status === "on-job").length
-  const offlineStaff = staffData.filter((staff) => staff.status === "offline").length
-  const totalVehicles = staffData.reduce((total, staff) => total + staff.vehicles.length, 0)
+  const totalStaff = staffData.length;
+  const availableStaff = staffData.filter(
+    (staff) => staff.status === "available"
+  ).length;
+  const onJobStaff = staffData.filter(
+    (staff) => staff.status === "on-job"
+  ).length;
+  const offlineStaff = staffData.filter(
+    (staff) => staff.status === "offline"
+  ).length;
+  const totalVehicles = staffData.reduce(
+    (total, staff) => total + staff.vehicles.length,
+    0
+  );
 
   // Update stat cards if they exist
-  const statCards = document.querySelectorAll(".stat-card .stat-number")
+  const statCards = document.querySelectorAll(".stat-card .stat-number");
   if (statCards.length >= 5) {
-    statCards[0].textContent = totalStaff
-    statCards[1].textContent = availableStaff
-    statCards[2].textContent = onJobStaff
-    statCards[3].textContent = offlineStaff
-    statCards[4].textContent = totalVehicles
+    statCards[0].textContent = totalStaff;
+    statCards[1].textContent = availableStaff;
+    statCards[2].textContent = onJobStaff;
+    statCards[3].textContent = offlineStaff;
+    statCards[4].textContent = totalVehicles;
   }
 }
 
 // Modal functions
 function openAddStaffModal() {
-  const modal = document.getElementById("addStaffModal")
+  const modal = document.getElementById("addStaffModal");
   if (modal) {
-    modal.style.display = "block"
-    document.body.style.overflow = "hidden"
+    modal.style.display = "block";
+    document.body.style.overflow = "hidden";
   }
 }
 
 function closeAddStaffModal() {
-  const modal = document.getElementById("addStaffModal")
+  const modal = document.getElementById("addStaffModal");
   if (modal) {
-    modal.style.display = "none"
-    document.body.style.overflow = "auto"
+    modal.style.display = "none";
+    document.body.style.overflow = "auto";
 
     // Reset form
-    const form = document.getElementById("addStaffForm")
+    const form = document.getElementById("addStaffForm");
     if (form) {
-      form.reset()
+      form.reset();
     }
   }
 }
 
 // Staff action functions
 function viewStaffDetails(staffId) {
-  console.log("[v0] Viewing details for staff:", staffId)
+  console.log("[v0] Viewing details for staff:", staffId);
   // Implement staff details view
-  alert(`Viewing details for staff: ${staffId}`)
+  alert(`Viewing details for staff: ${staffId}`);
 }
 
 function messageStaff(staffId) {
-  console.log("[v0] Opening message for staff:", staffId)
+  console.log("[v0] Opening message for staff:", staffId);
   // Implement messaging functionality
-  alert(`Opening message for staff: ${staffId}`)
+  alert(`Opening message for staff: ${staffId}`);
 }
 
 function manageStaff(staffId) {
-  console.log("[v0] Managing staff:", staffId)
+  console.log("[v0] Managing staff:", staffId);
   // Implement staff management
-  alert(`Managing staff: ${staffId}`)
+  alert(`Managing staff: ${staffId}`);
 }
 
 // Add staff form submission
+// Add staff form submission to backend
 document.addEventListener("DOMContentLoaded", () => {
-  const addStaffForm = document.getElementById("addStaffForm")
-  if (addStaffForm) {
-    addStaffForm.addEventListener("submit", function (e) {
-      e.preventDefault()
+  const addStaffForm = document.getElementById("addStaffForm");
 
-      const formData = new FormData(this)
-      const staffData = {
-        name: document.getElementById("staffName").value,
-        phone: document.getElementById("staffPhone").value,
-        email: document.getElementById("staffEmail").value,
-        specialization: document.getElementById("staffSpecialization").value,
-        experience: document.getElementById("staffExperience").value,
-        certifications: document.getElementById("staffCertifications").value,
+  if (addStaffForm) {
+    addStaffForm.addEventListener("submit", async function (e) {
+      e.preventDefault();
+
+      const password = document.getElementById("password").value;
+      const confirmPassword = document.getElementById("confirmPassword").value;
+
+      if (password !== confirmPassword) {
+        alert("Passwords do not match!");
+        return;
       }
 
-      console.log("[v0] Adding new staff member:", staffData)
+      const staffData = {
+        username: document.getElementById("username").value,
+        firstname: document.getElementById("firstname").value,
+        lastname: document.getElementById("lastname").value,
+        contactNumber: document.getElementById("contactNumber").value,
+        email: document.getElementById("email").value,
+        password: password,
+        companyId: 1, // temporary — replace later with logged-in company ID
+      };
 
-      // Simulate adding staff
-      alert("Staff member added successfully!")
-      closeAddStaffModal()
-    })
+      console.log("[DEBUG] Sending staff signup data:", staffData);
+
+      try {
+        const response = await fetch(
+          "http://localhost:8080/maintenancestaff/signup",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(staffData),
+          }
+        );
+
+        const result = await response.json();
+        console.log("[DEBUG] Server response:", result);
+
+        if (response.ok && result.status === "success") {
+          alert("Staff member registered successfully!");
+          closeAddStaffModal();
+          addStaffForm.reset();
+        } else {
+          alert("Error: " + (result.message || "Failed to register staff."));
+        }
+      } catch (error) {
+        console.error("[ERROR] Failed to send signup request:", error);
+        alert("Network or server error while registering staff.");
+      }
+    });
   }
-})
+});
 
 // Close modal when clicking outside
 window.addEventListener("click", (event) => {
-  const modal = document.getElementById("addStaffModal")
+  const modal = document.getElementById("addStaffModal");
   if (event.target === modal) {
-    closeAddStaffModal()
+    closeAddStaffModal();
   }
-})
+});
 
 // Keyboard navigation
 document.addEventListener("keydown", (event) => {
   if (event.key === "Escape") {
-    closeAddStaffModal()
+    closeAddStaffModal();
   }
-})
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+});
 
 // ====== Message Staff Popup JS ======
 
@@ -264,13 +284,13 @@ messageModal.innerHTML = `
     <textarea id="messageContent" placeholder="Type your message..." style="width:100%; height:120px; margin-top:10px; padding:8px; border:1px solid #ccc; border-radius:4px;"></textarea>
     <button id="sendMessageBtn" style="margin-top:10px; padding:10px 20px; background:#4CAF50; color:#fff; border:none; border-radius:4px; cursor:pointer;">Send</button>
   </div>
-`;  
+`;
 
 document.body.appendChild(messageModal);
 
 // Open Message Modal
 function messageStaff(staffId) {
-  const staff = staffData.find(s => s.id === staffId);
+  const staff = staffData.find((s) => s.id === staffId);
   if (!staff) return;
 
   document.getElementById("messageStaffName").textContent = `To: ${staff.name}`;
@@ -299,7 +319,9 @@ document.getElementById("sendMessageBtn").addEventListener("click", () => {
 });
 
 // Close modal via close button
-document.getElementById("closeMessageModal").addEventListener("click", closeMessageModal);
+document
+  .getElementById("closeMessageModal")
+  .addEventListener("click", closeMessageModal);
 
 // Close modal when clicking outside
 window.addEventListener("click", (event) => {
@@ -314,43 +336,6 @@ document.addEventListener("keydown", (event) => {
     closeMessageModal();
   }
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 // ====== Manage Staff Modal ======
 
@@ -412,148 +397,124 @@ manageModal.innerHTML = `
 
 document.body.appendChild(manageModal);
 
+// // ========================
+// // ADD STAFF MODAL - JS ONLY
+// // ========================
 
+// function openAddStaffModal() {
+//   // Create overlay
+//   const overlay = document.createElement("div");
+//   overlay.id = "addStaffOverlay";
+//   overlay.style.position = "fixed";
+//   overlay.style.top = 0;
+//   overlay.style.left = 0;
+//   overlay.style.width = "100%";
+//   overlay.style.height = "100%";
+//   overlay.style.backgroundColor = "rgba(0,0,0,0.5)";
+//   overlay.style.display = "flex";
+//   overlay.style.justifyContent = "center";
+//   overlay.style.alignItems = "center";
+//   overlay.style.zIndex = 1000;
 
+//   // Create modal container
+//   const modal = document.createElement("div");
+//   modal.id = "addStaffModal";
+//   modal.style.backgroundColor = "#fff";
+//   modal.style.padding = "20px";
+//   modal.style.borderRadius = "10px";
+//   modal.style.width = "400px";
+//   modal.style.boxShadow = "0 5px 15px rgba(0,0,0,0.3)";
+//   modal.style.position = "relative";
+//   modal.style.width = "400px";
+//   modal.style.maxHeight = "80vh"; // <-- Maximum 80% of viewport height
+//   modal.style.overflowY = "auto"; // <-- Enable vertical scrolling
+//   modal.style.padding = "20px";
+//   modal.style.borderRadius = "10px";
+//   modal.style.boxShadow = "0 5px 15px rgba(0,0,0,0.3)";
+//   modal.style.position = "relative";
 
+//   // Modal header
+//   const header = document.createElement("div");
+//   header.style.display = "flex";
+//   header.style.justifyContent = "space-between";
+//   header.style.alignItems = "center";
+//   const title = document.createElement("h2");
+//   title.textContent = "Add New Staff Member";
+//   const closeBtn = document.createElement("span");
+//   closeBtn.innerHTML = "&times;";
+//   closeBtn.style.cursor = "pointer";
+//   closeBtn.style.fontSize = "24px";
+//   closeBtn.onclick = () => document.body.removeChild(overlay);
+//   header.appendChild(title);
+//   header.appendChild(closeBtn);
 
+//   // Modal form
+//   const form = document.createElement("form");
+//   form.id = "addStaffForm";
 
+//   form.style.marginTop = "30px";
 
+//   const fields = [
+//     { label: "Name", type: "text", name: "name" },
+//     { label: "Age", type: "number", name: "age" },
+//     { label: "Gender", type: "text", name: "gender" },
+//     { label: "Phone", type: "text", name: "phone" },
+//     { label: "Supervisor", type: "text", name: "supervisor" },
+//     { label: "Address", type: "text", name: "address" },
+//     { label: "Description", type: "text", name: "role" },
+//     { label: "Email", type: "email", name: "email" },
+//   ];
 
+//   fields.forEach((f) => {
+//     const wrapper = document.createElement("div");
+//     wrapper.style.marginBottom = "10px";
+//     const lbl = document.createElement("label");
+//     lbl.textContent = f.label;
+//     lbl.style.display = "block";
+//     lbl.style.marginBottom = "5px";
+//     const input = document.createElement("input");
+//     input.type = f.type;
+//     input.name = f.name;
+//     input.required = true;
+//     input.style.width = "100%";
+//     input.style.padding = "8px";
+//     input.style.borderRadius = "5px";
+//     input.style.border = "1px solid #ccc";
+//     input.style.display = "flex";
+//     wrapper.appendChild(lbl);
+//     wrapper.appendChild(input);
+//     form.appendChild(wrapper);
+//   });
 
+//   // Submit button
+//   const submitBtn = document.createElement("button");
+//   submitBtn.type = "submit";
+//   submitBtn.textContent = "Add Staff";
+//   submitBtn.style.padding = "10px 35px";
+//   submitBtn.style.border = "none";
+//   submitBtn.style.borderRadius = "5px";
+//   submitBtn.style.backgroundColor = "#4CAF50";
+//   submitBtn.style.color = "#fff";
+//   submitBtn.style.cursor = "pointer";
 
+//   form.appendChild(submitBtn);
 
+//   form.onsubmit = (e) => {
+//     e.preventDefault();
+//     const formData = new FormData(form);
+//     console.log("New Staff:", Object.fromEntries(formData.entries()));
+//     // Close modal after submit
+//     document.body.removeChild(overlay);
+//   };
 
+//   // Append everything
+//   modal.appendChild(header);
+//   modal.appendChild(form);
+//   overlay.appendChild(modal);
+//   document.body.appendChild(overlay);
+// }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// ========================
-// ADD STAFF MODAL - JS ONLY
-// ========================
-
-function openAddStaffModal() {
-    // Create overlay
-    const overlay = document.createElement('div');
-    overlay.id = 'addStaffOverlay';
-    overlay.style.position = 'fixed';
-    overlay.style.top = 0;
-    overlay.style.left = 0;
-    overlay.style.width = '100%';
-    overlay.style.height = '100%';
-    overlay.style.backgroundColor = 'rgba(0,0,0,0.5)';
-    overlay.style.display = 'flex';
-    overlay.style.justifyContent = 'center';
-    overlay.style.alignItems = 'center';
-    overlay.style.zIndex = 1000;
-
-    // Create modal container
-    const modal = document.createElement('div');
-    modal.id = 'addStaffModal';
-    modal.style.backgroundColor = '#fff';
-    modal.style.padding = '20px';
-    modal.style.borderRadius = '10px';
-    modal.style.width = '400px';
-    modal.style.boxShadow = '0 5px 15px rgba(0,0,0,0.3)';
-    modal.style.position = 'relative';
-    modal.style.width = '400px';
-    modal.style.maxHeight = '80vh'; // <-- Maximum 80% of viewport height
-    modal.style.overflowY = 'auto'; // <-- Enable vertical scrolling
-    modal.style.padding = '20px';
-    modal.style.borderRadius = '10px';
-    modal.style.boxShadow = '0 5px 15px rgba(0,0,0,0.3)';
-    modal.style.position = 'relative';
-
-    // Modal header
-    const header = document.createElement('div');
-    header.style.display = 'flex';
-    header.style.justifyContent = 'space-between';
-    header.style.alignItems = 'center';
-    const title = document.createElement('h2');
-    title.textContent = 'Add New Staff Member';
-    const closeBtn = document.createElement('span');
-    closeBtn.innerHTML = '&times;';
-    closeBtn.style.cursor = 'pointer';
-    closeBtn.style.fontSize = '24px';
-    closeBtn.onclick = () => document.body.removeChild(overlay);
-    header.appendChild(title);
-    header.appendChild(closeBtn);
-
-    // Modal form
-    const form = document.createElement('form');
-    form.id = 'addStaffForm';
-
-    form.style.marginTop = '30px';
-
-    const fields = [
-        { label: 'Name', type: 'text', name: 'name' },
-        { label: 'Age', type: 'number', name: 'age' },
-        { label: 'Gender', type: 'text', name: 'gender' },
-        { label: 'Phone', type: 'text', name: 'phone' },
-        { label: 'Supervisor', type: 'text', name: 'supervisor' },
-        { label: 'Address', type: 'text', name: 'address' },
-        { label: 'Description', type: 'text', name: 'role' },
-        { label: 'Email', type: 'email', name: 'email' },
-    ];
-
-    fields.forEach(f => {
-        const wrapper = document.createElement('div');
-        wrapper.style.marginBottom = '10px';
-        const lbl = document.createElement('label');
-        lbl.textContent = f.label;
-        lbl.style.display = 'block';
-        lbl.style.marginBottom = '5px';
-        const input = document.createElement('input');
-        input.type = f.type;
-        input.name = f.name;
-        input.required = true;
-        input.style.width = '100%';
-        input.style.padding = '8px';
-        input.style.borderRadius = '5px';        
-        input.style.border = '1px solid #ccc';
-        input.style.display = 'flex';
-        wrapper.appendChild(lbl);
-        wrapper.appendChild(input);
-        form.appendChild(wrapper);
-    });
-
-    // Submit button
-    const submitBtn = document.createElement('button');
-    submitBtn.type = 'submit';
-    submitBtn.textContent = 'Add Staff';
-    submitBtn.style.padding = '10px 35px';
-    submitBtn.style.border = 'none';
-    submitBtn.style.borderRadius = '5px';
-    submitBtn.style.backgroundColor = '#4CAF50';
-    submitBtn.style.color = '#fff';
-    submitBtn.style.cursor = 'pointer';
-
-    form.appendChild(submitBtn);
-
-    form.onsubmit = (e) => {
-        e.preventDefault();
-        const formData = new FormData(form);
-        console.log('New Staff:', Object.fromEntries(formData.entries()));
-        // Close modal after submit
-        document.body.removeChild(overlay);
-    };
-
-    // Append everything
-    modal.appendChild(header);
-    modal.appendChild(form);
-    overlay.appendChild(modal);
-    document.body.appendChild(overlay);
-}
-
-// Example: attach to button
-document.getElementById('addStaffBtn').addEventListener('click', openAddStaffModal);
+// // Example: attach to button
+// document
+//   .getElementById("addStaffBtn")
+//   .addEventListener("click", openAddStaffModal);

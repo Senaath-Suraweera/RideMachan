@@ -1,0 +1,367 @@
+/* Company Profile Specific Styles */
+
+/* Main Content */
+.main-content {
+    grid-column: 2;
+    padding: 30px;
+    background-color: #f5f7fb;
+    min-height: calc(100vh - var(--header-height));
+    overflow-y: auto;
+}
+
+.content-wrapper {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.breadcrumb {
+    margin-bottom: 25px;
+    font-size: 14px;
+    color: var(--text-light);
+}
+
+/* Back Button in Header */
+.back-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    background: rgba(67, 97, 238, 0.1);
+    color: var(--primary);
+    border: none;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 14px;
+    transition: var(--transition);
+}
+
+.back-btn:hover {
+    background: var(--primary);
+    color: white;
+    transform: translateY(-2px);
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+/* Company Header */
+.company-header {
+    background: white;
+    padding: 30px;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+    margin-bottom: 30px;
+    display: flex;
+    align-items: center;
+    gap: 25px;
+}
+
+.company-logo {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, #26C6C7, #4361ee);
+    border-radius: var(--radius);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 32px;
+}
+
+.company-info h2 {
+    font-size: 28px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 8px;
+}
+
+.location {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+    color: var(--text-light);
+    font-size: 14px;
+}
+
+.rating {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 15px;
+}
+
+.stars {
+    display: flex;
+    gap: 3px;
+}
+
+.stars i {
+    color: #ffd700;
+    font-size: 16px;
+}
+
+.rating-text {
+    font-size: 14px;
+    color: var(--text-light);
+}
+
+.company-meta {
+    display: flex;
+    gap: 20px;
+    font-size: 14px;
+    color: var(--text-light);
+}
+
+/* Profile Grid */
+.profile-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 30px;
+}
+
+/* Section Styles */
+.section {
+    background: white;
+    padding: 25px;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+    margin-bottom: 20px;
+}
+
+.section h3 {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 20px;
+    border-bottom: 2px solid #f0f0f0;
+    padding-bottom: 12px;
+}
+
+.about-section p {
+    line-height: 1.7;
+    color: var(--text-light);
+    font-size: 15px;
+}
+
+/* Services Section */
+.services-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 15px;
+}
+
+.service-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    background: #f8f9fa;
+    border-radius: var(--radius-sm);
+    transition: var(--transition);
+}
+
+.service-item:hover {
+    background: rgba(67, 97, 238, 0.05);
+    transform: translateY(-2px);
+}
+
+.service-item i {
+    color: var(--primary);
+    font-size: 16px;
+    width: 20px;
+}
+
+/* Fleet Section */
+.fleet-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.fleet-item {
+    padding: 20px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    transition: var(--transition);
+    cursor: pointer;
+}
+
+.fleet-item:hover {
+    border-color: var(--primary);
+    box-shadow: var(--shadow);
+    transform: translateY(-2px);
+}
+
+.fleet-item h4 {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 10px;
+    color: var(--dark);
+}
+
+.fleet-details {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.seats {
+    color: var(--text-light);
+    font-size: 14px;
+}
+
+.price {
+    font-weight: 600;
+    color: var(--primary);
+    font-size: 16px;
+}
+
+/* Contact Section */
+.contact-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 15px;
+    padding: 12px;
+    background: #f8f9fa;
+    border-radius: var(--radius-sm);
+    transition: var(--transition);
+}
+
+.contact-item:hover {
+    background: rgba(67, 97, 238, 0.05);
+}
+
+.contact-item i {
+    color: var(--primary);
+    width: 20px;
+    text-align: center;
+}
+
+/* Statistics Section */
+.stat-item {
+    text-align: center;
+    padding: 20px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    margin-bottom: 15px;
+    transition: var(--transition);
+    cursor: pointer;
+}
+
+.stat-item:hover {
+    border-color: var(--primary);
+    transform: translateY(-3px);
+    box-shadow: var(--shadow);
+}
+
+.stat-number {
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--primary);
+    margin-bottom: 8px;
+}
+
+.stat-label {
+    font-size: 14px;
+    color: var(--text-light);
+}
+
+/* Certifications Section */
+.cert-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+    padding: 10px;
+    background: #f8f9fa;
+    border-radius: var(--radius-sm);
+    transition: var(--transition);
+}
+
+.cert-item:hover {
+    background: rgba(76, 201, 240, 0.05);
+}
+
+.cert-item i {
+    color: var(--success);
+    font-size: 16px;
+}
+
+/* Action Buttons */
+.action-btn {
+    width: 100%;
+    margin-bottom: 12px;
+}
+
+/* Responsive Styles */
+@media (max-width: 1200px) {
+    .profile-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .services-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .fleet-grid {
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    }
+}
+
+@media (max-width: 992px) {
+    .main-content {
+        grid-column: 1 / -1;
+        padding: 20px;
+    }
+
+    .company-header {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .company-info {
+        text-align: center;
+    }
+
+    .company-meta {
+        justify-content: center;
+    }
+}
+
+@media (max-width: 768px) {
+    .company-header {
+        padding: 20px;
+    }
+
+    .company-info h2 {
+        font-size: 24px;
+    }
+
+    .section {
+        padding: 20px;
+    }
+
+    .section h3 {
+        font-size: 18px;
+    }
+
+    .services-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .fleet-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .company-meta {
+        flex-direction: column;
+        gap: 8px;
+    }
+}

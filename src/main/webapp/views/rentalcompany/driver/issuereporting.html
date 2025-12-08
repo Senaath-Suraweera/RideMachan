@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <!-- =================== -->
+        <!-- Meta & Stylesheets -->
+        <!-- =================== -->
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Issue Reporting - Ride Machan</title>
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+        />
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
+        />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+            rel="stylesheet"
+        />
+        <link rel="stylesheet" href="issuereporting.css" />
+    </head>
+    <body>
+        <div class="container">
+            <!-- ===================
+                 Sidebar Navigation
+        =================== -->
+        <div class="sidebar" id="sidebar">
+            <div class="logo">
+                <img src="logo.png" alt="Logo" class="logo">
+            </div>
+            <div class="nav-menu">
+                <div class="nav-item">
+                    <i class="fas fa-house"></i>
+                    <a href="dashboard.html"><span>Home</span></a>
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-calendar-alt"></i>
+                    <a href="drivercalview.html"><span>Calendar</span></a>
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-clock"></i>
+                    <a href="ongoing.html"><span>Ongoing Bookings</span></a>
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-history"></i>
+                    <a href="pastbooking.html"><span>Past Bookings</span></a>
+                </div>
+                <div class="logout">
+                    <i class="fas fa-sign-out"></i>
+                    <span>Logout</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===================
+                 Header Section
+        =================== -->
+        <div class="header">
+            <div class="header-left">
+                <button class="sidebar-toggle" id="sidebarToggle">
+                </button>
+                <h1>Issue Reporting</h1>
+            </div>
+            <div class="header-actions">
+                <!-- Notifications -->
+                <a href="notification.html"><div class="notification" id="bellNotification" title="Notifications">
+                    <i class="fas fa-bell"></i>
+                    <div class="badge" id="bellBadge">3</div></a>
+                </div>
+                <a href="messages.html"><div class="notification" id="messageNotification" title="Messages">
+                    <i class="fas fa-envelope"></i>
+                    <div class="badge" id="messageBadge">5</div></a>
+                </div>
+                <!-- User Profile -->
+                <div class="user-profile" id="userProfile">
+                    <a href="profile.html"><div class="profile-img">K</div></a>
+                    <div class="user-info">
+                        <div class="user-name">Kamal</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+            <!-- =================== -->
+            <!-- Main Content -->
+            <!-- =================== -->
+            <div class="main-content">
+                <!-- Issue Reporting Form -->
+                <div class="issue-form-container">
+                    <div class="form-header">
+                        <i class="fas fa-plus-circle"></i>
+                        <h2>Report New Issue</h2>
+                    </div>
+
+                    <form>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="category">Category <span class="required">*</span></label>
+                                <select id="category" class="form-control" required>
+                                    <option value="">Select category</option>
+                                    <option value="engine">Engine Problem</option>
+                                    <option value="tire">Tire Issue</option>
+                                    <option value="ac">AC Problem</option>
+                                    <option value="electrical">Electrical Issue</option>
+                                    <option value="brake">Brake Problem</option>
+                                    <option value="transmission">Transmission Issue</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="location">Location of the Issue <span class="required">*</span></label>
+                                <input type="text" id="location" class="form-control" placeholder="Enter location" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group full-width">
+                            <label for="description">Description <span class="required">*</span></label>
+                            <textarea id="description" class="form-control" rows="4" placeholder="Describe the issue in detail" required></textarea>
+                        </div>
+
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="booking-id">Related Booking ID</label>
+                                <input type="text" id="booking-id" class="form-control" placeholder="Enter booking ID (if applicable)">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="plate-number">Vehicle Plate Number</label>
+                                <input type="text" id="plate-number" class="form-control" placeholder="Enter vehicle plate number">
+                            </div>
+                        </div>
+
+                        <div class="form-group full-width upload-section">
+                            <label>Upload Photo</label>
+                            <div class="upload-area">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <div class="upload-text">
+                                    <strong>Choose file</strong> or drag and drop
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group full-width">
+                            <label>Is Vehicle Driveable?</label>
+                            <div class="radio-group">
+                                <div class="radio-item">
+                                    <input type="radio" id="driveable-yes" name="driveable" value="yes">
+                                    <label for="driveable-yes">Yes</label>
+                                </div>
+                                <div class="radio-item">
+                                    <input type="radio" id="driveable-no" name="driveable" value="no">
+                                    <label for="driveable-no">No</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="submit-btn">
+                            <i class="fas fa-paper-plane"></i> Submit Report
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Past Issues Section -->
+                <div class="past-issues-section">
+                    <div class="section-header">
+                        <i class="fas fa-history"></i>
+                        <h2>Past Issues</h2>
+                    </div>
+
+                    <table class="issues-table">
+                        <thead>
+                            <tr>
+                                <th>Issue ID</th>
+                                <th>Category</th>
+                                <th>Description</th>
+                                <th>Date</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>#RPT001</td>
+                                <td>Engine Problem</td>
+                                <td>Strange noise from engine during acceleration</td>
+                                <td>2024-04-15</td>
+                                <td><span class="status-badge status-pending">Pending</span></td>
+                                <td>
+                                    <button class="btn btn-outline btn-sm">
+                                        <i class="fas fa-eye"></i> View
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>#RPT002</td>
+                                <td>Tire Issue</td>
+                                <td>Front tire puncture on Main Street</td>
+                                <td>2024-04-10</td>
+                                <td><span class="status-badge status-resolved">Resolved</span></td>
+                                <td>
+                                    <button class="btn btn-outline btn-sm">
+                                        <i class="fas fa-eye"></i> View
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>#RPT003</td>
+                                <td>AC Problem</td>
+                                <td>Air conditioning not working properly</td>
+                                <td>2024-04-08</td>
+                                <td><span class="status-badge status-pending">Pending</span></td>
+                                <td>
+                                    <button class="btn btn-outline btn-sm">
+                                        <i class="fas fa-eye"></i> View
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>#RPT004</td>
+                                <td>Brake Problem</td>
+                                <td>Brake pedal feels spongy and unresponsive</td>
+                                <td>2024-04-05</td>
+                                <td><span class="status-badge status-resolved">Resolved</span></td>
+                                <td>
+                                    <button class="btn btn-outline btn-sm">
+                                        <i class="fas fa-eye"></i> View
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            // Handle form submission
+            document.querySelector('form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const submitBtn = document.querySelector('.submit-btn');
+                const originalText = submitBtn.innerHTML;
+                
+                // Show loading state
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
+                submitBtn.disabled = true;
+                
+                // Simulate API call
+                setTimeout(() => {
+                    // Show success state
+                    submitBtn.innerHTML = '<i class="fas fa-check"></i> Submitted Successfully!';
+                    submitBtn.style.backgroundColor = '#28a745';
+                    
+                    // Reset form
+                    this.reset();
+                    document.querySelector('.upload-text').innerHTML = '<strong>Choose file</strong> or drag and drop';
+                    
+                    // Show success notification
+                    showNotification('Issue reported successfully! You will receive updates via email.', 'success');
+                    
+                    // Reset button after 3 seconds
+                    setTimeout(() => {
+                        submitBtn.innerHTML = originalText;
+                        submitBtn.style.backgroundColor = '';
+                        submitBtn.disabled = false;
+                    }, 3000);
+                }, 2000);
+            });
+
+            // Handle file upload
+            document.querySelector('.upload-area').addEventListener('click', function() {
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.accept = 'image/*';
+                input.onchange = function(e) {
+                    const file = e.target.files[0];
+                    if (file) {
+                        // Validate file size (max 5MB)
+                        if (file.size > 5 * 1024 * 1024) {
+                            showNotification('File size must be less than 5MB', 'error');
+                            return;
+                        }
+                        
+                        // Show file preview
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            document.querySelector('.upload-text').innerHTML = `
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <img src="${e.target.result}" style="width: 40px; height: 40px; object-fit: cover; border-radius: 4px;">
+                                    <div>
+                                        <strong>${file.name}</strong>
+                                        <div style="font-size: 12px; color: #666;">${(file.size / 1024).toFixed(1)} KB</div>
+                                    </div>
+                                </div>
+                            `;
+                        };
+                        reader.readAsDataURL(file);
+                        
+                        showNotification('Photo uploaded successfully', 'success');
+                    }
+                };
+                input.click();
+            });
+
+            // Handle drag and drop
+            const uploadArea = document.querySelector('.upload-area');
+            
+            uploadArea.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                this.style.borderColor = '#4361ee';
+                this.style.backgroundColor = 'rgba(67, 97, 238, 0.05)';
+                this.style.transform = 'scale(1.02)';
+            });
+
+            uploadArea.addEventListener('dragleave', function(e) {
+                e.preventDefault();
+                this.style.borderColor = '#e9ecef';
+                this.style.backgroundColor = '#fafafa';
+                this.style.transform = 'scale(1)';
+            });
+
+            uploadArea.addEventListener('drop', function(e) {
+                e.preventDefault();
+                this.style.borderColor = '#e9ecef';
+                this.style.backgroundColor = '#fafafa';
+                this.style.transform = 'scale(1)';
+                
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    const file = files[0];
+                    
+                    // Validate file type
+                    if (!file.type.startsWith('image/')) {
+                        showNotification('Please upload an image file', 'error');
+                        return;
+                    }
+                    
+                    // Validate file size
+                    if (file.size > 5 * 1024 * 1024) {
+                        showNotification('File size must be less than 5MB', 'error');
+                        return;
+                    }
+                    
+                    // Show file preview
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        document.querySelector('.upload-text').innerHTML = `
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <img src="${e.target.result}" style="width: 40px; height: 40px; object-fit: cover; border-radius: 4px;">
+                                <div>
+                                    <strong>${file.name}</strong>
+                                    <div style="font-size: 12px; color: #666;">${(file.size / 1024).toFixed(1)} KB</div>
+                                </div>
+                            </div>
+                        `;
+                    };
+                    reader.readAsDataURL(file);
+                    
+                    showNotification('Photo uploaded successfully', 'success');
+                }
+            });
+
+            document.querySelectorAll('.btn-outline').forEach(button => {
+                button.addEventListener('click', function() {
+                    const row = this.closest('tr');
+                    const issueId = row.cells[0].textContent;
+                    const category = row.cells[1].textContent;
+                    const description = row.cells[2].textContent;
+                    const date = row.cells[3].textContent;
+                    const status = row.cells[4].textContent.trim();
+                    
+                    // Show loading state
+                    const originalText = this.innerHTML;
+                    this.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                    this.disabled = true;
+                    
+                    // Simulate loading
+                    setTimeout(() => {
+                        // Create and show modal with issue details
+                        showIssueModal({
+                            id: issueId,
+                            category: category,
+                            description: description,
+                            date: date,
+                            status: status
+                        });
+                        
+                        // Reset button
+                        this.innerHTML = originalText;
+                        this.disabled = false;
+                    }, 1000);
+                });
+            });
+
+            document.querySelector('.logout').addEventListener('click', function() {
+                if (confirm('Are you sure you want to logout?')) {
+                    showNotification('Logging out...', 'info');
+                    setTimeout(() => {
+                        window.location.href = 'login.html';
+                    }, 1500);
+                }
+            });
+
+            function showNotification(message, type = 'info') {
+                const notification = document.createElement('div');
+                notification.className = `notification-toast ${type}`;
+                notification.innerHTML = `
+                    <i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle'}"></i>
+                    <span>${message}</span>
+                `;
+                
+                // Add styles
+                notification.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    background: ${type === 'success' ? '#28a745' : type === 'error' ? '#dc3545' : '#17a2b8'};
+                    color: white;
+                    padding: 12px 20px;
+                    border-radius: 8px;
+                    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                    z-index: 10000;
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                    font-family: 'Poppins', sans-serif;
+                    font-size: 14px;
+                    transform: translateX(100%);
+                    transition: transform 0.3s ease;
+                `;
+                
+                document.body.appendChild(notification);
+                
+                // Animate in
+                setTimeout(() => {
+                    notification.style.transform = 'translateX(0)';
+                }, 100);
+                
+                // Remove after 4 seconds
+                setTimeout(() => {
+                    notification.style.transform = 'translateX(100%)';
+                    setTimeout(() => {
+                        document.body.removeChild(notification);
+                    }, 300);
+                }, 4000);
+            }
+
+            function showIssueModal(issue) {
+                const modal = document.createElement('div');
+                modal.className = 'issue-modal';
+                modal.innerHTML = `
+                    <div class="modal-overlay">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h3><i class="fas fa-exclamation-triangle"></i> Issue Details</h3>
+                                <button class="modal-close">&times;</button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="issue-detail">
+                                    <strong>Issue ID:</strong> ${issue.id}
+                                </div>
+                                <div class="issue-detail">
+                                    <strong>Category:</strong> ${issue.category}
+                                </div>
+                                <div class="issue-detail">
+                                    <strong>Date Reported:</strong> ${issue.date}
+                                </div>
+                                <div class="issue-detail">
+                                    <strong>Status:</strong> <span class="status-badge ${issue.status.toLowerCase().includes('resolved') ? 'status-resolved' : 'status-pending'}">${issue.status}</span>
+                                </div>
+                                <div class="issue-detail">
+                                    <strong>Description:</strong>
+                                    <p>${issue.description}</p>
+                                </div>
+                                ${issue.status.toLowerCase().includes('pending') ? `
+                                    <div class="modal-actions">
+                                        <button class="btn btn-primary" onclick="followUpIssue('${issue.id}')">
+                                            <i class="fas fa-phone"></i> Follow Up
+                                        </button>
+                                        <button class="btn btn-outline" onclick="cancelIssue('${issue.id}')">
+                                            <i class="fas fa-times"></i> Cancel Issue
+                                        </button>
+                                    </div>
+                                ` : ''}
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                // Add modal styles
+                modal.style.cssText = `
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    z-index: 10000;
+                `;
+                
+                const style = document.createElement('style');
+                style.textContent = `
+                    .modal-overlay {
+                        background: rgba(0,0,0,0.5);
+                        width: 100%;
+                        height: 100%;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        padding: 20px;
+                    }
+                    .modal-content {
+                        background: white;
+                        border-radius: 12px;
+                        max-width: 500px;
+                        width: 100%;
+                        max-height: 80vh;
+                        overflow-y: auto;
+                        box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+                    }
+                    .modal-header {
+                        padding: 20px;
+                        border-bottom: 1px solid #e9ecef;
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                    }
+                    .modal-header h3 {
+                        margin: 0;
+                        color: #3a0ca3;
+                        display: flex;
+                        align-items: center;
+                        gap: 10px;
+                    }
+                    .modal-close {
+                        background: none;
+                        border: none;
+                        font-size: 24px;
+                        cursor: pointer;
+                        color: #666;
+                        padding: 0;
+                        width: 30px;
+                        height: 30px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        border-radius: 50%;
+                        transition: all 0.2s;
+                    }
+                    .modal-close:hover {
+                        background: #f8f9fa;
+                        color: #333;
+                    }
+                    .modal-body {
+                        padding: 20px;
+                    }
+                    .issue-detail {
+                        margin-bottom: 15px;
+                    }
+                    .issue-detail strong {
+                        color: #333;
+                        display: block;
+                        margin-bottom: 5px;
+                    }
+                    .issue-detail p {
+                        margin: 5px 0 0 0;
+                        color: #666;
+                        line-height: 1.5;
+                    }
+                    .modal-actions {
+                        margin-top: 20px;
+                        padding-top: 20px;
+                        border-top: 1px solid #e9ecef;
+                        display: flex;
+                        gap: 10px;
+                    }
+                `;
+                document.head.appendChild(style);
+                
+                document.body.appendChild(modal);
+                
+                // Close modal functionality
+                modal.querySelector('.modal-close').addEventListener('click', () => {
+                    document.body.removeChild(modal);
+                    document.head.removeChild(style);
+                });
+                
+                modal.querySelector('.modal-overlay').addEventListener('click', (e) => {
+                    if (e.target === modal.querySelector('.modal-overlay')) {
+                        document.body.removeChild(modal);
+                        document.head.removeChild(style);
+                    }
+                });
+            }
+
+            function followUpIssue(issueId) {
+                showNotification(`Calling support for issue ${issueId}...`, 'info');
+                setTimeout(() => {
+                    showNotification('Connected to support team', 'success');
+                }, 2000);
+            }
+
+            function cancelIssue(issueId) {
+                if (confirm(`Are you sure you want to cancel issue ${issueId}?`)) {
+                    showNotification(`Issue ${issueId} has been cancelled`, 'success');
+                    // Close modal
+                    const modal = document.querySelector('.issue-modal');
+                    if (modal) {
+                        document.body.removeChild(modal);
+                    }
+                }
+            }
+
+            const formInputs = document.querySelectorAll('input, select, textarea');
+            formInputs.forEach(input => {
+                input.addEventListener('input', function() {
+                    // Auto-save to localStorage
+                    localStorage.setItem(`issue_form_${this.id}`, this.value);
+                    
+                    // Remove error styling if present
+                    this.style.borderColor = '';
+                });
+            });
+
+            window.addEventListener('load', function() {
+                formInputs.forEach(input => {
+                    const savedValue = localStorage.getItem(`issue_form_${input.id}`);
+                    if (savedValue) {
+                        input.value = savedValue;
+                    }
+                });
+            });
+        </script>
+    </body>
+</html>
