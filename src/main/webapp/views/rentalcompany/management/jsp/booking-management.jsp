@@ -1,3 +1,74 @@
+<!--<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+
+
+
+<c:forEach var="booking" items="${bookingsList}">
+    <div class="booking-card" data-status="${booking.status}">
+        <div class="booking-header">
+            <div class="booking-info">
+                <h3 class="booking-id">Booking ${booking.bookingId}</h3>
+                <span class="status-badge status-${booking.status}">${booking.status}</span>
+            </div>
+            <div class="booking-amount">
+                <span class="amount">Rs ${booking.totalAmount}</span>
+                <span class="payment-status">${booking.paymentStatus}</span>
+            </div>
+        </div>
+
+        <div class="booking-details">
+            <div class="detail-section">
+                <div class="section-header">
+                    <i class="fas fa-user"></i>
+                    <span>Customer Details</span>
+                </div>
+                <div class="section-content">
+                    <p class="customer-name">${booking.customerName}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</c:forEach>-->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 <%@ page import="java.sql.*, common.util.DBConnection" %>
 <!DOCTYPE html>
 <html lang="en">
@@ -12,7 +83,7 @@
 <body>
 <div class="dashboard-container">
 
-    <!-- Sidebar (same as before) -->
+     Sidebar (same as before) 
     <aside class="sidebar">
         <div class="logo-section">
             <img src="../assets/ridemachan-logo.png" alt="RideMachan Logo" class="logo">
@@ -59,7 +130,7 @@
         </div>
     </aside>
 
-    <!-- Main Content -->
+     Main Content
     <div class="main-content">
         <header class="header">
             <div class="header-left">

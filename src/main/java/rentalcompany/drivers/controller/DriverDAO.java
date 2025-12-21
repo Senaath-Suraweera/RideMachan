@@ -1,4 +1,4 @@
-package rentalcompany.drivers.dao;
+package rentalcompany.drivers.controller;
 
 import common.util.DBConnection;
 import common.util.PasswordServices;
