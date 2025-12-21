@@ -4,12 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bookings Management - ABC Rentals</title>
- 
+
     <link rel="stylesheet" href="../css/booking-management.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
-<body>  
+<body>
     <div class="dashboard-container">
 
         <!-- Sidebar -->
@@ -17,7 +17,7 @@
             <div class="logo-section">
                 <img src="../assets/ridemachan-logo.png" alt="RideMachan Logo" class="logo">
             </div>
-            
+
             <nav class="nav-menu">
                 <ul>
                     <li class="nav-item">
@@ -37,7 +37,7 @@
                             <i class="fas fa-box"></i>
                             <span>Bookings</span>
                         </a>
-                    </li>                    
+                    </li>
                     <li class="nav-item">
                         <a href="vehicle-fleet.html" class="nav-link">
                             <i class="fas fa-car"></i>
@@ -56,11 +56,11 @@
                             <span>Drivers</span>
                         </a>
                     </li>
-                    
+
 
                 </ul>
             </nav>
-            
+
             <div class="logout-section">
                 <a href="#" class="nav-link">
                     <i class="fas fa-sign-out"></i>
@@ -68,8 +68,8 @@
                 </a>
             </div>
         </aside>
-            
-             
+
+
 
         <!-- Main Content -->
         <div class="main-content">
@@ -94,8 +94,8 @@
                         <div class="user-avatar">A</div>
                         <span class="user-name">ABC Rentals</span>
                     </div>
-                </div>  
-            </header>  
+                </div>
+            </header>
 
             <!-- Page Content -->
             <div class="page-content">
@@ -133,10 +133,14 @@
                     </div>
                 </div>
 
-                <div class="bookings-grid" id="bookingsGrid">
+                <div id="bookingsGrid">
+
+                </div>
+
+                <!--<div class="bookings-grid" id="bookingsGrid">
 
                     <h1>Current Bookings</h1>
-                    <!-- Booking Card 1 - Active -->
+                    <!-- Booking Card 1 - Active
                     <div class="booking-card" data-status="active" >
                         <div class="booking-header">
                             <div class="booking-info">
@@ -196,7 +200,7 @@
                         <div class="booking-actions">
                             <a href="customer-profile1.html" id="customerLink">
                                 <button class="btn btn-outline message">
-                                    <i class="fas fa-eye"></i> 
+                                    <i class="fas fa-eye"></i>
                                     View Customer
                                 </button>
                             </a>
@@ -207,7 +211,7 @@
                         </div>
                     </div>
 
-                    <!-- Booking Card 3 - Pending -->
+                    <!-- Booking Card 3 - Pending
                     <div class="booking-card" data-status="pending">
                         <div class="booking-header">
                             <div class="booking-info">
@@ -290,7 +294,7 @@
 
                     <h1>Past Bookings</h1>
 
-                    <!-- Booking Card 2 - Completed -->
+                    <!-- Booking Card 2 - Completed
                     <div class="booking-card" data-status="completed" >
                         <div class="booking-header">
                             <div class="booking-info">
@@ -345,7 +349,7 @@
                                     </p>
                                 </div>
                             </div>
-                        </div> 
+                        </div>
 
                         <div class="booking-actions">
                             <a href="customer-profile2.html" id="customerLink">
@@ -354,17 +358,67 @@
                                     View Customer
                                 </button>
                             </a>
-                            
+
                         </div>
                     </div>
 
-                    
-                </div>
+
+                </div>-->
             </div>
         </div>
     </div>
 
-    <script src="../js/booking-management.js"></script>
-    <script src="../js/sidebar.js"></script>
+    <!--<script src="../js/booking-management.js"></script>-->
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+
+            const searchInput = document.getElementById("searchInput");
+            const bookingsGrid = document.getElementById("bookingsGrid");
+
+            function fetchBookings() {
+                const query = searchInput.value;
+                const servletURL = `displaybookings?searchInput=${encodeURIComponent(query)}`;
+
+                fetch(servletURL)
+                    .then(response => response.json())
+                    .then(data => {
+                        bookingsGrid.innerHTML = ""; // clear previous results
+
+                        bookingsGrid.innerHTML = "";
+
+                        // Check if data is an array
+                        if (Array.isArray(data)) {
+                            data.forEach(booking => {
+                                const card = document.createElement("div");
+                                card.className = "booking-card";
+                                card.innerHTML = `
+                        <h3>Booking ID: ${booking.bookingId}</h3>
+                        <p>Customer: ${booking.customerName}</p>
+                        <p>Status: ${booking.status}</p>
+                        <p>Amount: Rs ${booking.totalAmount}</p>
+                        <p>Payment: ${booking.paymentStatus}</p>
+                    `;
+                                bookingsGrid.appendChild(card);
+                            });
+                        } else {
+                            bookingsGrid.innerHTML = "No bookings found.";
+                        }
+
+                    })
+                    .catch(err => console.error(err));
+            }
+
+            // Fetch bookings on page load
+            fetchBookings();
+
+            // Fetch bookings as user types
+            searchInput.addEventListener("input", fetchBookings);
+        });
+
+    </script>
+
+
+    <!--<script src="../js/sidebar.js"></script>-->
 </body>
 </html>
