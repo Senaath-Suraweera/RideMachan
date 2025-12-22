@@ -373,47 +373,7 @@
     <script>
         document.addEventListener("DOMContentLoaded", () => {
 
-            const searchInput = document.getElementById("searchInput");
-            const bookingsGrid = document.getElementById("bookingsGrid");
 
-            function fetchBookings() {
-                const query = searchInput.value;
-                const servletURL = `displaybookings?searchInput=${encodeURIComponent(query)}`;
-
-                fetch(servletURL)
-                    .then(response => response.json())
-                    .then(data => {
-                        bookingsGrid.innerHTML = ""; // clear previous results
-
-                        bookingsGrid.innerHTML = "";
-
-                        // Check if data is an array
-                        if (Array.isArray(data)) {
-                            data.forEach(booking => {
-                                const card = document.createElement("div");
-                                card.className = "booking-card";
-                                card.innerHTML = `
-                        <h3>Booking ID: ${booking.bookingId}</h3>
-                        <p>Customer: ${booking.customerName}</p>
-                        <p>Status: ${booking.status}</p>
-                        <p>Amount: Rs ${booking.totalAmount}</p>
-                        <p>Payment: ${booking.paymentStatus}</p>
-                    `;
-                                bookingsGrid.appendChild(card);
-                            });
-                        } else {
-                            bookingsGrid.innerHTML = "No bookings found.";
-                        }
-
-                    })
-                    .catch(err => console.error(err));
-            }
-
-            // Fetch bookings on page load
-            fetchBookings();
-
-            // Fetch bookings as user types
-            searchInput.addEventListener("input", fetchBookings);
         });
 
     </script>
