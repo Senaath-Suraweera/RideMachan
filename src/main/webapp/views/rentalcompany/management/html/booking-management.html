@@ -133,7 +133,7 @@
                     </div>
                 </div>
 
-                <div id="bookingsGrid">
+                <div id="bookingGrid">
 
                 </div>
 
@@ -371,10 +371,51 @@
     <!--<script src="../js/booking-management.js"></script>-->
 
     <script>
-        document.addEventListener("DOMContentLoaded", () => {
+
+        let bookingInput = document.getElementById("searchInput");
 
 
-        });
+        function SearchBooking(e) {
+
+            e.preventDefault();
+
+            let bookingId = parseInt(bookingInput.value);
+
+            if (isNaN(bookingId)) {
+                alert("Please enter a valid booking ID");
+                return;
+            }
+
+            fetch('/displaybookings?bookingId=' + bookingId)
+                .then(response => response.json())
+                .then(data => {
+                    const bookingGrid = document.getElementById("bookingGrid");
+
+                    bookingGrid.innerHTML = "";
+
+                    if(!data || Object.keys(data).length === 0){
+                        bookingGrid.innerHTML = "<p>Booking not found</p>";
+                        return;
+                    }
+
+                    bookingGrid.innerHTML = `
+                            <div class="booking-card">
+                                <p><strong>Booking ID:</strong> ${data.bookingId}</p>
+                                <p><strong>Status:</strong> ${data.status}</p>
+                                <p><strong>Total Amount:</strong> ${data.totalAmount}</p>
+                                <p><strong>Payment Status:</strong> ${data.paymentStatus}</p>
+                                <p><strong>Customer Name:</strong> ${data.customerName}</p>
+                            </div>
+                        `;
+
+                })
+                .catch(error => {
+                    console.error('Error fetching booking', error)
+                });
+
+        }
+
+        bookingInput.addEventListener("input",SearchBooking);
 
     </script>
 
