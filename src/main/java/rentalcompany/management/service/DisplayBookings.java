@@ -7,6 +7,7 @@ import jakarta.servlet.http.*;
 
 
 import rentalcompany.management.model.RentalCompanyBookings;
+import rentalcompany.management.controller.RentalCompanyBookingsDAO;
 
 import java.io.IOException;
 import com.google.gson.Gson;
@@ -29,35 +30,12 @@ public class DisplayBookings extends HttpServlet {
 
         int bookingId = Integer.parseInt(bookingIdParam);
 
-        RentalCompanyBookings booking1 = new RentalCompanyBookings();
-        RentalCompanyBookings booking2 = new RentalCompanyBookings();
 
 
-        booking1.setBookingId(101);
-        booking1.setStatus("Active");
-        booking1.setTotalAmount(20000);
-        booking1.setPaymentStatus("Paid");
-        booking1.setCustomerName("Jack");
+        RentalCompanyBookings matchedbooking = RentalCompanyBookingsDAO.DisplayBookingAccordingTOId(bookingId);
 
 
-        booking2.setBookingId(102);
-        booking2.setStatus("Pending");
-        booking2.setTotalAmount(15000);
-        booking2.setPaymentStatus("Pending");
-        booking2.setCustomerName("Kasun");
 
-
-        RentalCompanyBookings[] bookings = {booking1, booking2};
-
-        RentalCompanyBookings matchedbooking = null;
-
-
-        for(int i=0; i<bookings.length; i++){
-            if(bookings[i].getBookingId() == bookingId){
-                matchedbooking = bookings[i];
-                break;
-            }
-        }
 
         if (matchedbooking == null) {
             resp.getWriter().write("{}"); // return empty object
