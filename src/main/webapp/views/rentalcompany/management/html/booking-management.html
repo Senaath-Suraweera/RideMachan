@@ -407,11 +407,61 @@
 
                     bookingGrid.innerHTML = `
                     <div class="booking-card">
-                        <p><strong>Booking ID:</strong> ${data.bookingId}</p>
-                        <p><strong>Status:</strong> ${data.status}</p>
-                        <p><strong>Total Amount:</strong> ${data.totalAmount}</p>
-                        <p><strong>Payment Status:</strong> ${data.paymentStatus}</p>
+                    <div class="booking-header">
+                        <div class="booking-info">
+                            <h3 class="booking-id">Booking ${data.bookingId}</h3>
+                            <span class="booking-date">Booked on ${data.bookedDateStr}</span>
+                            <span class="status-badge status-pending">${data.status}</span>
+                        </div>
+                        <div class="booking-amount">
+                            <span class="amount">Rs ${data.totalAmount}</span>
+                            <span class="payment-status ${data.paymentStatus.toLowerCase()}">Payment: ${data.paymentStatus}</span>
+                        </div>
                     </div>
+
+                    <div class="booking-details">
+                        <div class="detail-section">
+                            <div class="section-header">
+                                <i class="fas fa-user"></i>
+                                <span>Customer Details</span>
+                            </div>
+                            <div class="section-content">
+                                <p class="customer-name">${data.customerName}</p>
+                                <p class="customer-contact">
+                                    <i class="fas fa-phone"></i> ${data.customerPhoneNumber}
+                                </p>
+                                <p class="customer-email">${data.customerEmail}</p>
+                            </div>
+                        </div>
+
+                        <div class="detail-section">
+                            <div class="section-header">
+                                <i class="fas fa-car"></i>
+                                <span>Vehicle & Driver</span>
+                            </div>
+                            <div class="section-content">
+                                <p class="vehicle-name">${data.vehicleBrand || "N/A"} ${data.vehicleModel || ""}</p>
+                                <p class="vehicle-plate">Plate: ${data.numberPlate || "N/A"}</p>
+                                <p class="driver-name">Driver: ${data.driverName || "Not assigned"}</p>
+                            </div>
+                        </div>
+
+                        <div class="detail-section">
+                            <div class="section-header">
+                                <i class="fas fa-route"></i>
+                                <span>Trip Details</span>
+                            </div>
+                            <div class="section-content">
+                                <p class="trip-date">${data.tripStartDateStr} - ${data.tripEndDateStr}</p>
+                                <p class="trip-time">${data.startTimeStr} - ${data.endTimeStr}</p>
+                                <p class="trip-route">
+                                    <i class="fas fa-map-marker-alt"></i> From: ${data.pickupLocation}<br>
+                                    <i class="fas fa-flag-checkered"></i> To: ${data.dropLocation}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 `;
                 })
                 .catch(error => {
