@@ -374,23 +374,30 @@
 
         let bookingInput = document.getElementById("searchInput");
 
-
         function SearchBooking(e) {
-
             e.preventDefault();
 
             let bookingId = parseInt(bookingInput.value);
 
-            if (isNaN(bookingId)) {
+            if (isNaN(bookingId) || bookingInput.value.trim() === "") {
                 alert("Please enter a valid booking ID");
                 return;
             }
 
-            fetch('/displaybookings?bookingId=' + bookingId)
-                .then(response => response.json())
-                .then(data => {
-                    const bookingGrid = document.getElementById("bookingGrid");
+            console.log("Searching for booking ID:", bookingId);
 
+            // Use absolute path from root
+            fetch('/displaybookings?bookingId=' + bookingId)
+                .then(response => {
+                    console.log("Response status:", response.status);
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log("Received data:", data);
+                    const bookingGrid = document.getElementById("bookingGrid");
                     bookingGrid.innerHTML = "";
 
                     if(!data || Object.keys(data).length === 0){
@@ -399,23 +406,25 @@
                     }
 
                     bookingGrid.innerHTML = `
-                            <div class="booking-card">
-                                <p><strong>Booking ID:</strong> ${data.bookingId}</p>
-                                <p><strong>Status:</strong> ${data.status}</p>
-                                <p><strong>Total Amount:</strong> ${data.totalAmount}</p>
-                                <p><strong>Payment Status:</strong> ${data.paymentStatus}</p>
-                            </div>
-                        `;
-
+                    <div class="booking-card">
+                        <p><strong>Booking ID:</strong> ${data.bookingId}</p>
+                        <p><strong>Status:</strong> ${data.status}</p>
+                        <p><strong>Total Amount:</strong> ${data.totalAmount}</p>
+                        <p><strong>Payment Status:</strong> ${data.paymentStatus}</p>
+                    </div>
+                `;
                 })
                 .catch(error => {
-                    console.error('Error fetching booking', error)
+                    console.error('Error fetching booking:', error);
+                    alert('Error fetching booking: ' + error.message);
                 });
-
         }
 
-        bookingInput.addEventListener("input",SearchBooking);
-
+        bookingInput.addEventListener("keypress", function(e) {
+            if (e.key === "Enter") {
+                SearchBooking(e);
+            }
+        });
     </script>
 
 
