@@ -41,10 +41,6 @@ public class RentalCompanyBookingsDAO {
                 RentalCompanyBookings booking = new RentalCompanyBookings();
 
 
-                String pickupLocation = rs.getString("pickup_location");
-                String dropLocation = rs.getString("drop_location");
-
-
                 booking.setBookingId(rs.getInt("booking_id"));
                 booking.setCompanyId(rs.getInt("companyid"));
                 booking.setStatus(rs.getString("status"));
@@ -74,8 +70,8 @@ public class RentalCompanyBookingsDAO {
                 booking.setStartTimeStr(startTime != null ? startTime.toString() : null);
                 booking.setEndTimeStr(endTime != null ? endTime.toString() : null);
 
-                booking.setPickupLocation(pickupLocation);
-                booking.setDropLocation(dropLocation);
+                booking.setPickupLocation(rs.getString("pickup_location"));
+                booking.setDropLocation(rs.getString("drop_location"));
 
 
 
