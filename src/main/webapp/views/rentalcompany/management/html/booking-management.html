@@ -237,6 +237,11 @@
 
             let filteredBookings = [];
 
+            if (bookingId === "") {
+                renderAllBookings(AllBookings);
+                return;
+            }
+
             for(let i=0; i<AllBookings.length; i++){
 
                 if(AllBookings[i].bookingId == bookingId) {
