@@ -153,11 +153,60 @@
                         bookingCard.className = "booking-card";
 
                         bookingCard.innerHTML = `
-                            <p>Booking ID: ${booking.bookingId}</p>
-                            <p>Customer: ${booking.customerName}</p>
-                            <p>Vehicle: ${booking.vehicleBrand} ${booking.vehicleModel}</p>
-                            <p>Driver: ${booking.driverName}</p>
-                            <p>Status: ${booking.status}</p>
+                            <div class="booking-header">
+                                <div class="booking-info">
+                                    <h3 class="booking-id">Booking ${booking.bookingId}</h3>
+                                    <span class="booking-date">Booked on ${booking.bookedDate}</span>
+                                    <span class="status-badge status-pending">${booking.status}</span>
+                                </div>
+                                <div class="booking-amount">
+                                    <span class="amount">Rs ${booking.totalAmount}</span>
+                                    <span class="payment-status">Payment: ${booking.paymentStatus}</span>
+                                </div>
+                            </div>
+
+                            <div class="booking-details">
+                                <div class="detail-section">
+                                    <div class="section-header">
+                                        <i class="fas fa-user"></i>
+                                        <span>Customer Details</span>
+                                    </div>
+                                    <div class="section-content">
+                                        <p class="customer-name">${booking.customerName}</p>
+                                        <p class="customer-contact">
+                                            <i class="fas fa-phone"></i> ${booking.customerPhoneNumber}
+                                        </p>
+                                        <p class="customer-email">${booking.customerEmail}</p>
+                                    </div>
+                                </div>
+
+                                <div class="detail-section">
+                                    <div class="section-header">
+                                        <i class="fas fa-car"></i>
+                                        <span>Vehicle & Driver</span>
+                                    </div>
+                                    <div class="section-content">
+                                        <p class="vehicle-name">${booking.vehicleBrand || "N/A"} ${booking.vehicleModel || ""}</p>
+                                        <p class="vehicle-plate">Plate: ${booking.numberPlate || "N/A"}</p>
+                                        <p class="driver-name">Driver: ${booking.driverName || "Not assigned"}</p>
+                                    </div>
+                                </div>
+
+                                <div class="detail-section">
+                                    <div class="section-header">
+                                        <i class="fas fa-route"></i>
+                                        <span>Trip Details</span>
+                                    </div>
+                                    <div class="section-content">
+                                        <p class="trip-date">${booking.tripStartDate} - ${booking.tripEndDate}</p>
+                                        <p class="trip-time">${booking.startTimeStr} - ${booking.endTimeStr}</p>
+                                        <p class="trip-route">
+                                            <i class="fas fa-map-marker-alt"></i> From: ${booking.pickupLocation}<br>
+                                            <i class="fas fa-flag-checkered"></i> To: ${booking.dropLocation}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
                         `;
 
                         bookingGrid.appendChild(bookingCard);
