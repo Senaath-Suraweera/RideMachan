@@ -37,65 +37,39 @@ public class RentalCompanyBookingsDAO {
             ResultSet rs = ps.executeQuery();
 
             while(rs.next()) {
+
                 RentalCompanyBookings booking = new RentalCompanyBookings();
 
-                int bookingId = rs.getInt("booking_id");
-                int companyId = rs.getInt("companyid");
-                String status = rs.getString("status");
-                double totalAmount = rs.getDouble("total_amount");
-                String paymentStatus = rs.getString("payment_status");
-
-                int customerId = rs.getInt("customerid");
-                String customerName = rs.getString("customerName");
-                String customerPhoneNumber = rs.getString("mobilenumber");
-                String customerEmail = rs.getString("email");
-
-                int vehicleId = rs.getInt("vehicleid");
-                String vehicleBrand = rs.getString("vehiclebrand");
-                String vehicleModel = rs.getString("vehiclemodel");
-                String numberPlate = rs.getString("numberplatenumber");
-
-                int driverId = rs.getInt("driverid");
-                String driverName = rs.getString("driverName");
-
-                // Keep Dates as Date objects
-                Date bookedDate = rs.getDate("booked_Date");
-                Date tripStartDate = rs.getDate("trip_start_date");
-                Date tripEndDate = rs.getDate("trip_end_date");
-
-                Time startTime = rs.getTime("start_time");
-                Time endTime = rs.getTime("end_time");
-
-
-                booking.setStartTimeStr(startTime != null ? startTime.toString() : null);
-                booking.setEndTimeStr(endTime != null ? endTime.toString() : null);
 
                 String pickupLocation = rs.getString("pickup_location");
                 String dropLocation = rs.getString("drop_location");
 
 
-                booking.setBookingId(bookingId);
-                booking.setCompanyId(companyId);
-                booking.setStatus(status);
-                booking.setTotalAmount(totalAmount);
-                booking.setPaymentStatus(paymentStatus);
+                booking.setBookingId(rs.getInt("booking_id"));
+                booking.setCompanyId(rs.getInt("companyid"));
+                booking.setStatus(rs.getString("status"));
+                booking.setTotalAmount(rs.getDouble("total_amount"));
+                booking.setPaymentStatus(rs.getString("payment_status"));
 
-                booking.setCustomerId(customerId);
-                booking.setCustomerName(customerName);
-                booking.setCustomerPhoneNumber(customerPhoneNumber);
-                booking.setCustomerEmail(customerEmail);
+                booking.setCustomerId(rs.getInt("customerid"));
+                booking.setCustomerName(rs.getString("customerName"));
+                booking.setCustomerPhoneNumber(rs.getString("mobilenumber"));
+                booking.setCustomerEmail(rs.getString("email"));
 
-                booking.setVehicleId(vehicleId);
-                booking.setVehicleBrand(vehicleBrand);
-                booking.setVehicleModel(vehicleModel);
-                booking.setNumberPlate(numberPlate);
+                booking.setVehicleId(rs.getInt("vehicleid"));
+                booking.setVehicleBrand(rs.getString("vehiclebrand"));
+                booking.setVehicleModel(rs.getString("vehiclemodel"));
+                booking.setNumberPlate(rs.getString("numberplatenumber"));
 
-                booking.setDriverId(driverId);
-                booking.setDriverName(driverName);
+                booking.setDriverId(rs.getInt("driverid"));
+                booking.setDriverName(rs.getString("driverName"));
 
-                booking.setBookedDate(bookedDate);
-                booking.setTripStartDate(tripStartDate);
-                booking.setTripEndDate(tripEndDate);
+                booking.setBookedDate(rs.getDate("booked_Date"));
+                booking.setTripStartDate(rs.getDate("trip_start_date"));
+                booking.setTripEndDate(rs.getDate("trip_end_date"));
+
+                Time startTime = rs.getTime("start_time");
+                Time endTime = rs.getTime("end_time");
 
                 booking.setStartTimeStr(startTime != null ? startTime.toString() : null);
                 booking.setEndTimeStr(endTime != null ? endTime.toString() : null);
