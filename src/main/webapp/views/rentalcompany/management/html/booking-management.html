@@ -26,12 +26,6 @@
                             <span>Dashboard</span>
                         </a>
                     </li>
-                    <!--<li class="nav-item">
-                        <a href="vehicle-fleet.html" class="nav-link">
-                            <i class="fas fa-building"></i>
-                            <span>Entity Registration</span>
-                        </a>
-                    </li>-->
                     <li class="nav-item active">
                         <a href="booking-management.html" class="nav-link">
                             <i class="fas fa-box"></i>
@@ -56,8 +50,6 @@
                             <span>Drivers</span>
                         </a>
                     </li>
-
-
                 </ul>
             </nav>
 
@@ -104,16 +96,6 @@
                         <h1 class="page-title">Bookings Management</h1>
                         <p class="page-subtitle">View and manage all vehicle bookings</p>
                     </div>
-                    <!--<div class="page-actions">
-                        <button class="btn btn-secondary">
-                            <i class="fas fa-calendar-alt"></i>
-                            Calendar View
-                        </button>
-                        <button class="btn btn-primary">
-                            <i class="fas fa-plus"></i>
-                            New Booking
-                        </button>
-                    </div>-->
                 </div>
 
                 <div class="filters-section">
@@ -137,347 +119,56 @@
 
                 </div>
 
-                <!--<div class="bookings-grid" id="bookingsGrid">
 
-                    <h1>Current Bookings</h1>
-                    <!-- Booking Card 1 - Active
-                    <div class="booking-card" data-status="active" >
-                        <div class="booking-header">
-                            <div class="booking-info">
-                                <h3 class="booking-id">Booking BK001</h3>
-                                <span class="booking-date">Booked on 2023-12-18</span>
-                                <span class="status-badge status-active">Active</span>
-                            </div>
-                            <div class="booking-amount">
-                                <span class="amount">Rs 20 000</span>
-                                <span class="payment-status paid">Payment: Paid</span>
-                            </div>
-                        </div>
-
-                        <div class="booking-details">
-                            <div class="detail-section">
-                                <div class="section-header">
-                                    <i class="fas fa-user"></i>
-                                    <span>Customer Details</span>
-                                </div>
-                                <div class="section-content">
-                                    <p class="customer-name">Ruwan</p>
-                                    <p class="customer-contact">
-                                        <i class="fas fa-phone"></i> +94-555-0123
-                                    </p>
-                                    <p class="customer-email">ruwan@email.com</p>
-                                </div>
-                            </div>
-
-                            <div class="detail-section">
-                                <div class="section-header">
-                                    <i class="fas fa-car"></i>
-                                    <span>Vehicle & Driver</span>
-                                </div>
-                                <div class="section-content">
-                                    <p class="vehicle-name">Toyota Prius 2020</p>
-                                    <p class="vehicle-plate">Plate: ABC-123</p>
-                                    <p class="driver-name">Driver: Mike Johnson</p>
-                                </div>
-                            </div>
-
-                            <div class="detail-section">
-                                <div class="section-header">
-                                    <i class="fas fa-route"></i>
-                                    <span>Trip Details</span>
-                                </div>
-                                <div class="section-content">
-                                    <p class="trip-date">2023-12-20 - 2023-12-22</p>
-                                    <p class="trip-time">09:00 - 17:00</p>
-                                    <p class="trip-route">
-                                        <i class="fas fa-map-marker-alt"></i> From: Downtown Hotel<br>
-                                        <i class="fas fa-flag-checkered"></i> To: Airport Terminal 1
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="booking-actions">
-                            <a href="customer-profile1.html" id="customerLink">
-                                <button class="btn btn-outline message">
-                                    <i class="fas fa-eye"></i>
-                                    View Customer
-                                </button>
-                            </a>
-                            <button class="btn btn-outline editBookingBtn" data-name="John Smith">
-                                <i class="fas fa-edit"></i>
-                                Edit Booking
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Booking Card 3 - Pending
-                    <div class="booking-card" data-status="pending">
-                        <div class="booking-header">
-                            <div class="booking-info">
-                                <h3 class="booking-id">Booking BK003</h3>
-                                <span class="booking-date">Booked on 2023-12-19</span>
-                                <span class="status-badge status-pending">Pending</span>
-                            </div>
-                            <div class="booking-amount">
-                                <span class="amount">Rs 40 000</span>
-                                <span class="payment-status pending">Payment: Pending</span>
-                            </div>
-                        </div>
-
-                        <div class="booking-details">
-                            <div class="detail-section">
-                                <div class="section-header">
-                                    <i class="fas fa-user"></i>
-                                    <span>Customer Details</span>
-                                </div>
-                                <div class="section-content">
-                                    <p class="customer-name">Mike Davis</p>
-                                    <p class="customer-contact">
-                                        <i class="fas fa-phone"></i> +94-555-0147
-                                    </p>
-                                    <p class="customer-email">mike@email.com</p>
-                                </div>
-                            </div>
-
-                            <div class="detail-section">
-                                <div class="section-header">
-                                    <i class="fas fa-car"></i>
-                                    <span>Vehicle & Driver</span>
-                                </div>
-                                <div class="section-content">
-                                    <p class="vehicle-name">Ford Explorer 2022</p>
-                                    <p class="vehicle-plate">Plate: DEF-789</p>
-                                    <p class="driver-name">Driver: Lisa Anderson</p>
-                                </div>
-                            </div>
-
-                            <div class="detail-section">
-                                <div class="section-header">
-                                    <i class="fas fa-route"></i>
-                                    <span>Trip Details</span>
-                                </div>
-                                <div class="section-content">
-                                    <p class="trip-date">2023-12-21 - 2023-12-24</p>
-                                    <p class="trip-time">10:00 - 16:00</p>
-                                    <p class="trip-route">
-                                        <i class="fas fa-map-marker-alt"></i> From: Train Station<br>
-                                        <i class="fas fa-flag-checkered"></i> To: Mountain Resort
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="booking-actions">
-                            <a href="customer-profile2.html" id="customerLink">
-                                <button class="btn btn-outline message">
-                                    <i class="fas fa-eye"></i>
-                                    View Customer
-                                </button>
-                            </a>
-                            <a href="driver-management.html" style="text-decoration: none;">
-                                <button class="btn btn-outline assignDriverBtn">
-                                    <i class="fas fa-users"></i>
-                                    Assign Driver
-                                </button>
-                            </a>
-                            <button class="btn btn-success">
-                                <i class="fas fa-check"></i>
-                                Confirm
-                            </button>
-                            <button class="btn btn-danger">
-                                <i class="fas fa-times"></i>
-                                Cancel
-                            </button>
-                        </div>
-                    </div>
-
-                    <h1>Past Bookings</h1>
-
-                    <!-- Booking Card 2 - Completed
-                    <div class="booking-card" data-status="completed" >
-                        <div class="booking-header">
-                            <div class="booking-info">
-                                <h3 class="booking-id">Booking BK002</h3>
-                                <span class="booking-date">Booked on 2023-12-17</span>
-                                <span class="status-badge status-completed">Completed</span>
-                            </div>
-                            <div class="booking-amount">
-                                <span class="amount">Rs 30 000</span>
-                                <span class="payment-status paid">Payment: Paid</span>
-                            </div>
-                        </div>
-
-                        <div class="booking-details">
-                            <div class="detail-section">
-                                <div class="section-header">
-                                    <i class="fas fa-user"></i>
-                                    <span>Customer Details</span>
-                                </div>
-                                <div class="section-content">
-                                    <p class="customer-name">Sarah Wilson</p>
-                                    <p class="customer-contact">
-                                        <i class="fas fa-phone"></i> +94-555-0789
-                                    </p>
-                                    <p class="customer-email">sarah@email.com</p>
-                                </div>
-                            </div>
-
-                            <div class="detail-section">
-                                <div class="section-header">
-                                    <i class="fas fa-car"></i>
-                                    <span>Vehicle & Driver</span>
-                                </div>
-                                <div class="section-content">
-                                    <p class="vehicle-name">Honda Civic</p>
-                                    <p class="vehicle-plate">Plate: XYZ-5678</p>
-                                    <p class="driver-name" style="background-color: rgb(7, 255, 7);">Vehicle Only Booking</p>
-                                </div>
-                            </div>
-
-                            <div class="detail-section">
-                                <div class="section-header">
-                                    <i class="fas fa-route"></i>
-                                    <span>Trip Details</span>
-                                </div>
-                                <div class="section-content">
-                                    <p class="trip-date">2023-12-19 - 2023-12-21</p>
-                                    <p class="trip-time">14:00 - 18:00</p>
-                                    <p class="trip-route">
-                                        <i class="fas fa-map-marker-alt"></i> From: City Center Mall<br>
-                                        <i class="fas fa-flag-checkered"></i> To: Business District
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="booking-actions">
-                            <a href="customer-profile2.html" id="customerLink">
-                                <button class="btn btn-outline message">
-                                    <i class="fas fa-comment"></i>
-                                    View Customer
-                                </button>
-                            </a>
-
-                        </div>
-                    </div>
-
-
-                </div>-->
             </div>
         </div>
     </div>
 
-    <!--<script src="../js/booking-management.js"></script>-->
+
 
     <script>
 
         let bookingInput = document.getElementById("searchInput");
 
-        function SearchBooking(e) {
-            e.preventDefault();
+        function LoadAllBookings() {
 
-            let bookingId = parseInt(bookingInput.value);
-
-            if (isNaN(bookingId) || bookingInput.value.trim() === "") {
-                alert("Please enter a valid booking ID");
-                return;
-            }
-
-            console.log("Searching for booking ID:", bookingId);
-
-            // Use absolute path from root
-            fetch('/displaybookings?bookingId=' + bookingId)
+            fetch(`/displaybookings`)
                 .then(response => {
-                    console.log("Response status:", response.status);
                     if (!response.ok) {
-                        throw new Error('Network response was not ok');
+                        throw new Error(`HTTP error! Status: ${response.status}`);
                     }
                     return response.json();
                 })
                 .then(data => {
-                    console.log("Received data:", data);
                     const bookingGrid = document.getElementById("bookingGrid");
                     bookingGrid.innerHTML = "";
 
-                    if(!data || Object.keys(data).length === 0){
-                        bookingGrid.innerHTML = "<p>Booking not found</p>";
+                    if (!Array.isArray(data)) {
+                        console.error("Expected an array from the server", data);
                         return;
                     }
 
-                    bookingGrid.innerHTML = `
-                    <div class="booking-card">
-                    <div class="booking-header">
-                        <div class="booking-info">
-                            <h3 class="booking-id">Booking ${data.bookingId}</h3>
-                            <span class="booking-date">Booked on ${data.bookedDateStr}</span>
-                            <span class="status-badge status-pending">${data.status}</span>
-                        </div>
-                        <div class="booking-amount">
-                            <span class="amount">Rs ${data.totalAmount}</span>
-                            <span class="payment-status ${data.paymentStatus.toLowerCase()}">Payment: ${data.paymentStatus}</span>
-                        </div>
-                    </div>
+                    data.forEach(booking => {
+                        const bookingCard = document.createElement("div");
+                        bookingCard.className = "booking-card";
 
-                    <div class="booking-details">
-                        <div class="detail-section">
-                            <div class="section-header">
-                                <i class="fas fa-user"></i>
-                                <span>Customer Details</span>
-                            </div>
-                            <div class="section-content">
-                                <p class="customer-name">${data.customerName}</p>
-                                <p class="customer-contact">
-                                    <i class="fas fa-phone"></i> ${data.customerPhoneNumber}
-                                </p>
-                                <p class="customer-email">${data.customerEmail}</p>
-                            </div>
-                        </div>
+                        bookingCard.innerHTML = `
+                            <p>Booking ID: ${booking.bookingId}</p>
+                            <p>Customer: ${booking.customerName}</p>
+                            <p>Vehicle: ${booking.vehicleBrand} ${booking.vehicleModel}</p>
+                            <p>Driver: ${booking.driverName}</p>
+                            <p>Status: ${booking.status}</p>
+                        `;
 
-                        <div class="detail-section">
-                            <div class="section-header">
-                                <i class="fas fa-car"></i>
-                                <span>Vehicle & Driver</span>
-                            </div>
-                            <div class="section-content">
-                                <p class="vehicle-name">${data.vehicleBrand || "N/A"} ${data.vehicleModel || ""}</p>
-                                <p class="vehicle-plate">Plate: ${data.numberPlate || "N/A"}</p>
-                                <p class="driver-name">Driver: ${data.driverName || "Not assigned"}</p>
-                            </div>
-                        </div>
-
-                        <div class="detail-section">
-                            <div class="section-header">
-                                <i class="fas fa-route"></i>
-                                <span>Trip Details</span>
-                            </div>
-                            <div class="section-content">
-                                <p class="trip-date">${data.tripStartDateStr} - ${data.tripEndDateStr}</p>
-                                <p class="trip-time">${data.startTimeStr} - ${data.endTimeStr}</p>
-                                <p class="trip-route">
-                                    <i class="fas fa-map-marker-alt"></i> From: ${data.pickupLocation}<br>
-                                    <i class="fas fa-flag-checkered"></i> To: ${data.dropLocation}
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                `;
+                        bookingGrid.appendChild(bookingCard);
+                    })
                 })
-                .catch(error => {
-                    console.error('Error fetching booking:', error);
-                    alert('Error fetching booking: ' + error.message);
-                });
         }
 
-        bookingInput.addEventListener("keypress", function(e) {
-            if (e.key === "Enter") {
-                SearchBooking(e);
-            }
-        });
+        document.addEventListener("DOMContentLoaded",LoadAllBookings);
     </script>
 
 
-    <!--<script src="../js/sidebar.js"></script>-->
+
 </body>
 </html>

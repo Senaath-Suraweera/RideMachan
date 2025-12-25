@@ -1,100 +1,118 @@
 package rentalcompany.management.controller;
 
+
 import common.util.DBConnection;
+import rentalcompany.management.model.RentalCompany;
 import rentalcompany.management.model.RentalCompanyBookings;
+
+import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 import java.sql.*;
 
 public class RentalCompanyBookingsDAO {
 
-    public static RentalCompanyBookings DisplayBookingAccordingTOId(int bookingId){
-        System.out.println("=== DisplayBookingAccordingTOId called with ID: " + bookingId + " ===");
+    public static List<RentalCompanyBookings> loadAllBookings() {
 
-        String sql = "SELECT * FROM companybookings WHERE booking_id=?";
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+        List<RentalCompanyBookings> AllBookings = new ArrayList<>();
+        String sql = "SELECT \n" +
+                "    companybookings.*, \n" +
+                "    customer.username AS customerName, \n" +
+                "    customer.mobilenumber, \n" +
+                "    customer.email, \n" +
+                "    vehicle.vehiclebrand, \n" +
+                "    vehicle.vehiclemodel, \n" +
+                "    vehicle.numberplatenumber, \n" +
+                "    driver.username AS driverName\n" +
+                "FROM companybookings\n" +
+                "LEFT JOIN customer ON companybookings.customerid = customer.customerid\n" +
+                "LEFT JOIN vehicle ON companybookings.vehicleid = vehicle.vehicleid\n" +
+                "LEFT JOIN driver ON companybookings.driverid = driver.driverid;\n";
 
-        try {
-            System.out.println("Step 1: Getting database connection...");
-            con = DBConnection.getConnection();
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
 
-            if (con == null) {
-                System.err.println("ERROR: Connection is NULL!");
-                return null;
-            }
-            System.out.println("Step 2: Connection successful!");
+            ResultSet rs = ps.executeQuery();
 
-            System.out.println("Step 3: Preparing statement...");
-            ps = con.prepareStatement(sql);
-            ps.setInt(1, bookingId);
-            System.out.println("Step 4: Executing query: " + sql);
-
-            rs = ps.executeQuery();
-            System.out.println("Step 5: Query executed!");
-
-            if (rs.next()) {
-                System.out.println("Step 6: Record found!");
+            while(rs.next()) {
                 RentalCompanyBookings booking = new RentalCompanyBookings();
 
-                booking.setBookingId(rs.getInt("booking_id"));
-                System.out.println("  - booking_id: " + booking.getBookingId());
+                int bookingId = rs.getInt("booking_id");
+                int companyId = rs.getInt("companyid");
+                String status = rs.getString("status");
+                double totalAmount = rs.getDouble("total_amount");
+                String paymentStatus = rs.getString("payment_status");
 
-                booking.setStatus(rs.getString("status"));
-                System.out.println("  - status: " + booking.getStatus());
+                int customerId = rs.getInt("customerid");
+                String customerName = rs.getString("customerName");
+                String customerPhoneNumber = rs.getString("mobilenumber");
+                String customerEmail = rs.getString("email");
 
-                booking.setTotalAmount(rs.getDouble("total_amount"));
-                System.out.println("  - total_amount: " + booking.getTotalAmount());
+                int vehicleId = rs.getInt("vehicleid");
+                String vehicleBrand = rs.getString("vehiclebrand");
+                String vehicleModel = rs.getString("vehiclemodel");
+                String numberPlate = rs.getString("numberplatenumber");
 
-                booking.setPaymentStatus(rs.getString("payment_status"));
-                System.out.println("  - payment_status: " + booking.getPaymentStatus());
+                int driverId = rs.getInt("driverid");
+                String driverName = rs.getString("driverName");
 
-                System.out.println("Step 7: Returning booking object");
-                return booking;
-            } else {
-                System.out.println("Step 6: No record found with booking_id = " + bookingId);
-                return null;
+                // Keep Dates as Date objects
+                Date bookedDate = rs.getDate("booked_Date");
+                Date tripStartDate = rs.getDate("trip_start_date");
+                Date tripEndDate = rs.getDate("trip_end_date");
+
+                Time startTime = rs.getTime("start_time");
+                Time endTime = rs.getTime("end_time");
+
+
+                booking.setStartTimeStr(startTime != null ? startTime.toString() : null);
+                booking.setEndTimeStr(endTime != null ? endTime.toString() : null);
+
+                String pickupLocation = rs.getString("pickup_location");
+                String dropLocation = rs.getString("drop_location");
+
+
+                booking.setBookingId(bookingId);
+                booking.setCompanyId(companyId);
+                booking.setStatus(status);
+                booking.setTotalAmount(totalAmount);
+                booking.setPaymentStatus(paymentStatus);
+
+                booking.setCustomerId(customerId);
+                booking.setCustomerName(customerName);
+                booking.setCustomerPhoneNumber(customerPhoneNumber);
+                booking.setCustomerEmail(customerEmail);
+
+                booking.setVehicleId(vehicleId);
+                booking.setVehicleBrand(vehicleBrand);
+                booking.setVehicleModel(vehicleModel);
+                booking.setNumberPlate(numberPlate);
+
+                booking.setDriverId(driverId);
+                booking.setDriverName(driverName);
+
+                booking.setBookedDate(bookedDate);
+                booking.setTripStartDate(tripStartDate);
+                booking.setTripEndDate(tripEndDate);
+
+                booking.setStartTimeStr(startTime != null ? startTime.toString() : null);
+                booking.setEndTimeStr(endTime != null ? endTime.toString() : null);
+
+                booking.setPickupLocation(pickupLocation);
+                booking.setDropLocation(dropLocation);
+
+
+
+                AllBookings.add(booking); //pushing every booking into AllBookings List
             }
 
-        } catch (NullPointerException e) {
-            System.err.println("ERROR: NullPointerException occurred!");
-            System.err.println("Message: " + e.getMessage());
-            e.printStackTrace();
-            return null;
-
-        } catch (SQLException e) {
-            System.err.println("ERROR: SQLException occurred!");
-            System.err.println("SQL State: " + e.getSQLState());
-            System.err.println("Error Code: " + e.getErrorCode());
-            System.err.println("Message: " + e.getMessage());
-            e.printStackTrace();
-            return null;
 
         } catch (Exception e) {
-            System.err.println("ERROR: Unexpected exception occurred!");
-            System.err.println("Exception type: " + e.getClass().getName());
-            System.err.println("Message: " + e.getMessage());
             e.printStackTrace();
-            return null;
-
-        } finally {
-            // Close resources
-            try {
-                if (rs != null) {
-                    rs.close();
-                    System.out.println("ResultSet closed");
-                }
-                if (ps != null) {
-                    ps.close();
-                    System.out.println("PreparedStatement closed");
-                }
-                if (con != null) {
-                    con.close();
-                    System.out.println("Connection closed");
-                }
-            } catch (SQLException e) {
-                System.err.println("ERROR closing resources: " + e.getMessage());
-            }
         }
+
+        return AllBookings;
     }
 }
