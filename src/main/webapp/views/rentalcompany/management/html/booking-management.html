@@ -129,7 +129,7 @@
     <script>
 
         let bookingInput = document.getElementById("searchInput");
-        let AllBookings = LoadAllBookings();
+        let AllBookings;
 
         async function LoadAllBookings() {
 
@@ -143,7 +143,7 @@
 
                 let data = await response.json();
 
-                //console.log(data);
+                console.log(data);
 
 
                 return data;
@@ -228,16 +228,35 @@
                         `;
 
                 bookingGrid.appendChild(bookingCard);
+
             })
 
+        }
 
+        function renderBookingByBookingId(bookingId) {
 
+            let filteredBookings = [];
+
+            for(let i=0; i<AllBookings.length; i++){
+
+                if(AllBookings[i].bookingId == bookingId) {
+                    filteredBookings.push(AllBookings[i]);
+                }
+
+            }
+
+            renderAllBookings(filteredBookings);
 
         }
 
         document.addEventListener("DOMContentLoaded", async function() {
             AllBookings = await LoadAllBookings();
             renderAllBookings(AllBookings)
+        });
+
+        document.addEventListener("input", function() {
+            let inputBookingId = bookingInput.value;
+            renderBookingByBookingId(inputBookingId);
         });
     </script>
 
