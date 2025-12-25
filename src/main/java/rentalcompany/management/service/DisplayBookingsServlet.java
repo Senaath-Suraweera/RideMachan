@@ -8,11 +8,10 @@ import rentalcompany.management.controller.RentalCompanyBookingsDAO;
 import com.google.gson.Gson;
 import java.io.IOException;
 import java.util.List;
-import java.util.ArrayList;
 
 
 @WebServlet("/displaybookings")
-public class DisplayBookings extends HttpServlet {
+public class DisplayBookingsServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
