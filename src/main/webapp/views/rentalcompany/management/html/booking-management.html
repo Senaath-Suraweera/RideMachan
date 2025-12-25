@@ -129,30 +129,48 @@
     <script>
 
         let bookingInput = document.getElementById("searchInput");
+        let AllBookings = LoadAllBookings();
 
-        function LoadAllBookings() {
+        async function LoadAllBookings() {
 
-            fetch(`/displaybookings`)
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! Status: ${response.status}`);
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    const bookingGrid = document.getElementById("bookingGrid");
-                    bookingGrid.innerHTML = "";
+            try {
 
-                    if (!Array.isArray(data)) {
-                        console.error("Expected an array from the server", data);
-                        return;
-                    }
+                let response = await fetch(`/displaybookings`);
 
-                    data.forEach(booking => {
-                        const bookingCard = document.createElement("div");
-                        bookingCard.className = "booking-card";
+                if(!response.ok){
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
 
-                        bookingCard.innerHTML = `
+                let data = await response.json();
+
+                //console.log(data);
+
+
+                return data;
+
+            }catch (err) {
+
+                console.log(err);
+
+            }
+        }
+
+        function renderAllBookings(bookings) {
+
+            const bookingGrid = document.getElementById("bookingGrid");
+            bookingGrid.innerHTML = "";
+
+            if (!Array.isArray(bookings)) {
+                console.error("Expected an array from the server", bookings);
+                return;
+            }
+
+            bookings.forEach(booking => {
+
+                const bookingCard = document.createElement("div");
+                bookingCard.className = "booking-card";
+
+                bookingCard.innerHTML = `
                             <div class="booking-header">
                                 <div class="booking-info">
                                     <h3 class="booking-id">Booking ${booking.bookingId}</h3>
@@ -209,12 +227,18 @@
                             </div>
                         `;
 
-                        bookingGrid.appendChild(bookingCard);
-                    })
-                })
+                bookingGrid.appendChild(bookingCard);
+            })
+
+
+
+
         }
 
-        document.addEventListener("DOMContentLoaded",LoadAllBookings);
+        document.addEventListener("DOMContentLoaded", async function() {
+            AllBookings = await LoadAllBookings();
+            renderAllBookings(AllBookings)
+        });
     </script>
 
 
