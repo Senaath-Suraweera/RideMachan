@@ -158,7 +158,9 @@
             <form
                 class="driver-form"
                 id="addDriverform"
+                method="post"
                 enctype="multipart/form-data"
+                action="/driver/add"
             >
                   <div class="form-row">
                       <div class="form-group">
@@ -184,12 +186,12 @@
                         <input type="email" name="email" required/>
                       </div>
                       <div class="form-group">
-                        <label>Mobile Number</label>
+                        <label>Password</label>
                         <input type="password" name="password" required/>
                       </div>
                       <div class="form-group">
                         <label>Confirm Password</label>
-                        <input type="password" name="confirmPassword" required/>
+                        <input type="password" name="confirmpassword" required/>
                       </div>
                       <div class="form-group">
                         <label>NIC Number</label>
@@ -210,7 +212,7 @@
                           <label>Driver's Licence Upload</label>
                           <input
                                   type="file"
-                                  name="nic"
+                                  name="driverlicence"
                                   accept=".jpg,.jpeg,.png,.pdf"
                                   required
                           />
@@ -239,7 +241,7 @@
                       >
                           Cancel
                       </button>
-                      <button type="submit" class="btn-primary">Add Driver</button>
+                      <button type="submit" class="btn-primary" id="add-driver-submit-button">Add Driver</button>
                   </div>
             </form>
         </div>
@@ -261,11 +263,39 @@
 
       function CLoseAddDrivermodel() {
           const AddDriverModel = document.getElementById("Add-Driver-Modal");
-          const CloseButoon = document.querySelector(".modal-close")
+          const CloseButoon = document.querySelector(".modal-close");
+          const SubmitButton = document.getElementById("add-driver-submit-button");
 
           CloseButoon.addEventListener("click", function() {
                 AddDriverModel.classList.remove("active");
           });
+
+          SubmitButton.addEventListener("click", function() {
+              AddDriverModel.classList.remove("active");
+          });
+      }
+
+      function DisplayWithAddedDriver() {
+
+            const addDriverForm = document.getElementById("addDriverform");
+
+            addDriverForm.addEventListener("submit", async function(e) {
+                e.preventDefault();
+
+                const formData = new FormData(addDriverForm);
+
+                const response = await fetch("/driver/add", {
+                    method:"POST",
+                    body:formData
+                });
+
+                if(response.ok) {
+                    AllDrivers = await LoadAllDrivers();
+                    renderAlldrivers(AllDrivers);
+                }
+
+            });
+
       }
 
       async function LoadAllDrivers() {
@@ -398,6 +428,8 @@
       OpenAddDrivermodel();
 
       CLoseAddDrivermodel();
+
+      DisplayWithAddedDriver();
 
 
     </script>

@@ -48,6 +48,23 @@ public class Driver {
         this.mobileNumber = mobileNumber;
     }
 
+    //for company drivers adding
+    public Driver(String username, String firstName, String lastName, String email,
+                  String mobileNumber, String description, String hashedpassword,String salt,
+                  String nicNumber, byte[] nicPdf, byte[] driversLicence, int companyId) {
+        this.username = username;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.mobileNumber = mobileNumber;
+        this.description = description;
+        this.hashedPassword = hashedpassword;
+        this.nicNumber = nicNumber;
+        this.nicPdf = nicPdf;
+        this.driversLicence = driversLicence;
+        this.companyId = companyId;
+    }
+
     // Getters & Setters
     public int getDriverId() { return driverId; }
     public void setDriverId(int driverId) { this.driverId = driverId; }
