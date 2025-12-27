@@ -39,6 +39,15 @@ public class Driver {
         this.password = password;
     }
 
+    //constructor for loadDriver
+    public Driver(int driverId, String firstName, String lastName, String email, String mobileNumber) {
+        this.driverId = driverId;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.mobileNumber = mobileNumber;
+    }
+
     // Getters & Setters
     public int getDriverId() { return driverId; }
     public void setDriverId(int driverId) { this.driverId = driverId; }

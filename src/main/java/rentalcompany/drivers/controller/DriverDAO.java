@@ -5,6 +5,8 @@ import common.util.PasswordServices;
 import rentalcompany.drivers.model.Driver;
 
 import java.sql.*;
+import java.util.List;
+import java.util.ArrayList;
 
 public class DriverDAO {
 
@@ -37,6 +39,42 @@ public class DriverDAO {
             e.printStackTrace();
         }
         return false;
+    }
+
+    public static List<Driver> loadAllDrivers() {
+
+        List<Driver> drivers = new ArrayList<>();
+        String sql = "SELECT * FROM Driver";
+
+
+        try(Connection con = DBConnection.getConnection();
+            PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ResultSet rs = ps.executeQuery();
+
+            while(rs.next()) {
+
+
+                Driver driver = new Driver(
+
+                        rs.getInt("driverid"),
+                        rs.getString("firstname"),
+                        rs.getString("lastname"),
+                        rs.getString("email"),
+                        rs.getString("mobilenumber")
+
+                );
+
+
+                drivers.add(driver);
+
+            }
+
+        }catch(Exception e) {
+            e.printStackTrace();
+        }
+
+        return drivers;
     }
 
     public static Driver loginDriver(String email, String password) {
