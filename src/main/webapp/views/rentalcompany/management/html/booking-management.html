@@ -170,12 +170,14 @@
                 const bookingCard = document.createElement("div");
                 bookingCard.className = "booking-card";
 
+                const statusClass = `status-${booking.status.toLowerCase()}`;
+
                 bookingCard.innerHTML = `
                             <div class="booking-header">
                                 <div class="booking-info">
                                     <h3 class="booking-id">Booking ${booking.bookingId}</h3>
                                     <span class="booking-date">Booked on ${booking.bookedDate}</span>
-                                    <span class="status-badge status-pending">${booking.status}</span>
+                                    <span class="status-badge ${statusClass}">${booking.status}</span>
                                 </div>
                                 <div class="booking-amount">
                                     <span class="amount">Rs ${booking.totalAmount}</span>
@@ -224,6 +226,14 @@
                                         </p>
                                     </div>
                                 </div>
+                            </div>
+                            <div class="booking-actions">
+                                <a href="customer-profile1.html" id="customerLink">
+                                    <button class="btn btn-outline">
+                                        <i class="fas fa-edit"></i>
+                                        View Customer
+                                    </button>
+                                </a>
                             </div>
                         `;
 
