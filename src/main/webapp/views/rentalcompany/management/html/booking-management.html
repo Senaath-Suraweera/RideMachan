@@ -415,6 +415,11 @@
 
             let selectedStatus = statusFilter.value;
 
+            if(selectedStatus == "all") {
+                filterBookingsByDate();
+                return;
+            }
+
             filterBookingsByTripStatus(selectedStatus);
 
         });
