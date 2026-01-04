@@ -128,7 +128,6 @@
 
     <script>
 
-        let bookingInput = document.getElementById("searchInput");
         let AllBookings;
 
         async function LoadAllBookings() {
@@ -150,7 +149,7 @@
 
             }catch (err) {
 
-                console.log(err);
+                //console.log(err);
 
             }
 
@@ -249,7 +248,7 @@
         }
 
 
-        //for differentiate Current and Past Bookings 
+        //for differentiate Current and Past Bookings
         function filterBookingsByDate() {
 
             const bookingGrid = document.getElementById("bookingGrid");
@@ -294,12 +293,8 @@
 
             let filteredBookings = [];
 
-            if (bookingId === "") {
-                filterBookingsByDate();
-                return;
-            }
 
-            for(let i=0; i<AllBookings.length; i++){
+            for(let i=0; i<AllBookings.length; i++) {
 
                 if(AllBookings[i].bookingId == bookingId) {
                     filteredBookings.push(AllBookings[i]);
@@ -311,15 +306,74 @@
 
         }
 
+        function filterBookingsByText(searchText) {
+
+            const bookingGrid = document.getElementById("bookingGrid");
+            bookingGrid.innerHTML = "";
+
+            let inputLower = searchText.toLowerCase();
+            let filteredBookings = [];
+
+            for(let i=0; i<AllBookings.length; i++) {
+
+                //DEBUGGING 1
+                console.log("Customer name:- ", AllBookings[i].customerName)
+                console.log("Search text:- ", inputLower)
+
+                let customerName = AllBookings[i].customerName || "";
+                let customerLower = customerName.toLowerCase().trim();
+                let vehicleBrand = AllBookings[i].vehicleBrand || "";
+                let vehicleModel = AllBookings[i].vehicleModel || "";
+                let vehicleLower = (vehicleBrand + " " + vehicleModel).toLowerCase().trim();
+
+                //DEBUGGING 2
+                console.log("Comparing:- ", customerLower, "with ",inputLower)
+                console.log("Match?:- ", customerLower.includes(inputLower))
+
+                if(customerLower.includes(inputLower) || vehicleLower.includes(inputLower)) {
+                    filteredBookings.push(AllBookings[i]);
+                }
+
+            }
+
+            console.log("Filtered bookings count:", filteredBookings.length);
+            console.log("About to render...");
+            renderBookings(filteredBookings);
+            console.log("Render complete!");
+
+
+
+        }
+
         document.addEventListener("DOMContentLoaded", async function() {
+
             AllBookings = await LoadAllBookings();
             filterBookingsByDate();
+
         });
 
         document.addEventListener("input", function() {
-            let inputBookingId = bookingInput.value;
-            filterBookingByBookingId(inputBookingId);
+
+            let bookingInput = document.getElementById("searchInput");
+            let inputValue = bookingInput.value;
+
+            inputValue = inputValue.trim();
+
+            console.log("Input value:", inputValue, "isNaN:", isNaN(inputValue));
+
+            if(inputValue === "") {
+                filterBookingsByDate();
+                return;
+            }
+
+            if(!isNaN(inputValue)) {
+                filterBookingByBookingId(inputValue);
+            }else {
+                filterBookingsByText(inputValue);
+            }
+
         });
+
     </script>
 
 
