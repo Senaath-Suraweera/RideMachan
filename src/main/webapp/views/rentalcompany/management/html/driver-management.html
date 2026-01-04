@@ -1,438 +1,238 @@
-<!DOCTYPE html>
-<html lang="en">
+  <!DOCTYPE html>
+  <html lang="en">
   <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Driver Management - Car Rental System</title>
+      <meta charset="UTF-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <title>Driver Management - Car Rental System</title>
 
-    <link rel="stylesheet" href="../css/driver-management.css" />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
-      rel="stylesheet"
-    />
-    <link
-            rel="stylesheet"
-            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-    />
+      <link rel="stylesheet" href="../css/driver-management.css" />
+      <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+
+      <script src="../js/driver-management.js" defer></script>
   </head>
   <body>
-    <div class="dashboard-container">
-      <!-- Sidebar -->
-      <aside class="sidebar">
-        <div class="logo-section">
-          <img
-            src="../assets/ridemachan-logo.png"
-            alt="RideMachan Logo"
-            class="logo"
-          />
-        </div>
+      <div class="dashboard-container">
 
-        <nav class="nav-menu">
-          <ul>
-            <li class="nav-item">
-              <a href="homepage.html" class="nav-link">
-                <i class="fas fa-home"></i>
-                <span>Dashboard</span>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a href="booking-management.html" class="nav-link">
-                <i class="fas fa-box"></i>
-                <span>Bookings</span>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a href="vehicle-fleet.html" class="nav-link">
-                <i class="fas fa-car"></i>
-                <span>Vehicle Fleet</span>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a href="maintenance-staff.html" class="nav-link">
-                <i class="fas fa-tools"></i>
-                <span>Maintenance Staff</span>
-              </a>
-            </li>
-            <li class="nav-item active">
-              <a href="driver-management.html" class="nav-link">
-                <i class="fas fa-users"></i>
-                <span>Drivers</span>
-              </a>
-            </li>
-          </ul>
-        </nav>
+          <!-- Sidebar -->
+          <aside class="sidebar">
+              <div class="logo-section">
+                  <img
+                    src="../assets/ridemachan-logo.png"
+                    alt="RideMachan Logo"
+                    class="logo"
+                  />
+              </div>
 
-        <div class="logout-section">
-          <a href="#" class="nav-link">
-            <i class="fas fa-sign-out"></i>
-            <span>Logout</span>
-          </a>
-        </div>
-      </aside>
+              <nav class="nav-menu">
+                  <ul>
+                      <li class="nav-item">
+                          <a href="homepage.html" class="nav-link">
+                              <i class="fas fa-home"></i>
+                              <span>Dashboard</span>
+                          </a>
+                      </li>
+                      <li class="nav-item">
+                          <a href="booking-management.html" class="nav-link">
+                              <i class="fas fa-box"></i>
+                              <span>Bookings</span>
+                          </a>
+                      </li>
+                      <li class="nav-item">
+                          <a href="vehicle-fleet.html" class="nav-link">
+                              <i class="fas fa-car"></i>
+                              <span>Vehicle Fleet</span>
+                          </a>
+                      </li>
+                      <li class="nav-item">
+                          <a href="maintenance-staff.html" class="nav-link">
+                              <i class="fas fa-tools"></i>
+                              <span>Maintenance Staff</span>
+                          </a>
+                      </li>
+                      <li class="nav-item active">
+                          <a href="driver-management.html" class="nav-link">
+                              <i class="fas fa-users"></i>
+                              <span>Drivers</span>
+                          </a>
+                      </li>
+                  </ul>
+              </nav>
 
-      <!-- Main Content -->
-      <div class="main-content">
-        <!-- Header -->
-        <header class="header">
-          <div class="header-left">
-            <div class="breadcrumb">
-              <i class="fas fa-th-large"></i>
-              <span>Company Dashboard</span>
-            </div>
-          </div>
-          <div class="header-right">
-            <div class="notification-icon">
-              <a href="notification.html">
-                <i class="fas fa-bell"></i>
-                <span class="notification-badge">1</span>
-              </a>
-            </div>
-            <div class="user-profile">
-              <div class="user-avatar">A</div>
-              <span>ABC Rentals</span>
-            </div>
-          </div>
-        </header>
+              <div class="logout-section">
+                  <a href="#" class="nav-link">
+                      <i class="fas fa-sign-out"></i>
+                      <span>Logout</span>
+                  </a>
+              </div>
+          </aside>
 
-        <!-- Page Content -->
-        <div class="page-content">
-          <div class="page-header">
-            <div class="page-title">
-              <h2>Driver Management</h2>
-              <p>Manage your drivers and view their activities</p>
-            </div>
-            <button class="btn-primary add-driver-btn" id="Add-Driver-Button">
-              <i class="fas fa-plus"></i>
-              Add Driver
-            </button>
-          </div>
-
-          <div class="driver-controls">
-            <div class="search-container">
-              <i class="fas fa-search search-icon"></i>
-              <input
-                type="text"
-                class="search-input"
-                placeholder="Search drivers by name or ID..."
-              />
-            </div>
-            <div class="filter-container">
-              <select class="filter-select">
-                <option value="all">All Drivers</option>
-                <option value="available">Available</option>
-                <option value="on-trip">On Trip</option>
-                <option value="offline">Offline</option>
-              </select>
-              <i class="fas fa-chevron-down filter-arrow"></i>
-            </div>
-          </div>
-
-          <div class="drivers-grid" id="driversGrid">
-            <!-- Driver cards will be populated by JavaScript -->
-          </div>
-        </div>
-      </div>
-    </div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    <div class="modal-overlay" id="Add-Driver-Modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>Add New Driver</h3>
-                <button class="modal-close">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <form
-                class="driver-form"
-                id="addDriverform"
-                method="post"
-                enctype="multipart/form-data"
-                action="/driver/add"
-            >
-                  <div class="form-row">
-                      <div class="form-group">
-                          <label>Username</label>
-                          <input type="text" name="username" required/>
-                      </div>
-                      <div class="form-group">
-                        <label>First Name</label>
-                        <input type="text" name="firstname" required/>
-                      </div>
-                      <div class="form-group">
-                        <label>Last Name</label>
-                        <input type="text" name="lastname" required/>
-                      </div>
-                      <div class="form-group">
-                        <label>Mobile Number</label>
-                        <input type="tel" name="mobilenumber" required/>
+          <!-- Main Content -->
+          <div class="main-content">
+              <!-- Header -->
+              <header class="header">
+                  <div class="header-left">
+                      <div class="breadcrumb">
+                          <i class="fas fa-th-large"></i>
+                          <span>Company Dashboard</span>
                       </div>
                   </div>
-                  <div class="form-row">
-                      <div class="form-group">
-                        <label>Email</label>
-                        <input type="email" name="email" required/>
+                  <div class="header-right">
+                      <div class="notification-icon">
+                          <a href="notification.html">
+                              <i class="fas fa-bell"></i>
+                              <span class="notification-badge">1</span>
+                          </a>
                       </div>
-                      <div class="form-group">
-                        <label>Password</label>
-                        <input type="password" name="password" required/>
-                      </div>
-                      <div class="form-group">
-                        <label>Confirm Password</label>
-                        <input type="password" name="confirmpassword" required/>
-                      </div>
-                      <div class="form-group">
-                        <label>NIC Number</label>
-                        <input type="text" name="nicnumber" required />
+                      <div class="user-profile">
+                          <div class="user-avatar">A</div>
+                          <span>ABC Rentals</span>
                       </div>
                   </div>
-                  <div class="form-row">
-                      <div class="form-group">
-                          <label>NIC Upload</label>
-                          <input
-                                type="file"
-                                name="nic"
-                                accept=".jpg,.jpeg,.png,.pdf"
-                                required
-                          />
+              </header>
+
+              <!-- Page Content -->
+              <div class="page-content">
+                  <div class="page-header">
+                      <div class="page-title">
+                          <h2>Driver Management</h2>
+                          <p>Manage your drivers and view their activities</p>
                       </div>
-                      <div class="form-group">
-                          <label>Driver's Licence Upload</label>
-                          <input
-                                  type="file"
-                                  name="driverlicence"
-                                  accept=".jpg,.jpeg,.png,.pdf"
-                                  required
-                          />
-                      </div>
-                      <div class="form-group" style="grid-column: span 2">
-                          <label>Description</label>
-                          <textarea
-                                  name="description"
-                                  placeholder="short description about the driver..."
-                                  style="
-                                    width: 100%;
-                                    height: 80px;
-                                    padding: 8px;
-                                    border: 2px solid #e1e5e9;
-                                    border-radius: 8px;
-                                  "
-                          ></textarea>
-                      </div>
-                  </div>
-                  <input type="hidden" name="company_id" value="1"/>
-                  <div class="form-actions">
-                      <button
-                          type="button"
-                          class="btn-secondary"
-                          onclick=""
-                      >
-                          Cancel
+                      <button class="btn-primary add-driver-btn" id="Add-Driver-Button">
+                          <i class="fas fa-plus"></i>
+                          Add Driver
                       </button>
-                      <button type="submit" class="btn-primary" id="add-driver-submit-button">Add Driver</button>
                   </div>
-            </form>
-        </div>
-    </div>
+
+                  <div class="driver-controls">
+                      <div class="search-container">
+                          <i class="fas fa-search search-icon"></i>
+                          <input
+                                type="text"
+                                class="search-input"
+                                placeholder="Search drivers by name or ID..."
+                          />
+                      </div>
+                      <div class="filter-container">
+                          <select class="filter-select">
+                              <option value="all">All Drivers</option>
+                              <option value="available">Available</option>
+                              <option value="on-trip">On Trip</option>
+                              <option value="offline">Offline</option>
+                          </select>
+                          <i class="fas fa-chevron-down filter-arrow"></i>
+                      </div>
+                  </div>
+
+                  <div class="drivers-grid" id="driversGrid">
+                      <!-- Driver cards will be populated by JavaScript -->
+                  </div>
+              </div>
+          </div>
+      </div>
 
 
-    <script>
-
-      let AllDrivers;
-
-      function OpenAddDrivermodel() {
-            const AddDriverButton = document.getElementById("Add-Driver-Button");
-            const AddDriverModel = document.getElementById("Add-Driver-Modal");
-
-            AddDriverButton.addEventListener("click",function() {
-                AddDriverModel.classList.add("active");
-            })
-      }
-
-      function CLoseAddDrivermodel() {
-          const AddDriverModel = document.getElementById("Add-Driver-Modal");
-          const CloseButoon = document.querySelector(".modal-close");
-          const SubmitButton = document.getElementById("add-driver-submit-button");
-
-          CloseButoon.addEventListener("click", function() {
-                AddDriverModel.classList.remove("active");
-          });
-
-          SubmitButton.addEventListener("click", function() {
-              AddDriverModel.classList.remove("active");
-          });
-      }
-
-      function DisplayWithAddedDriver() {
-
-            const addDriverForm = document.getElementById("addDriverform");
-
-            addDriverForm.addEventListener("submit", async function(e) {
-                e.preventDefault();
-
-                const formData = new FormData(addDriverForm);
-
-                const response = await fetch("/driver/add", {
-                    method:"POST",
-                    body:formData
-                });
-
-                if(response.ok) {
-                    AllDrivers = await LoadAllDrivers();
-                    renderAlldrivers(AllDrivers);
-                }
-
-            });
-
-      }
-
-      async function LoadAllDrivers() {
-
-          try {
-
-            let response = await fetch(`/displaydrivers`);
-
-            if(!response.ok) {
-              throw new Error(`HTTP error! Status: ${response.status}`);
-            }
 
 
-            let data = await response.json();
-
-            console.log(data);
-
-            return data;
-
-          }catch (err) {
-
-            console.log(err);
-
-          }
-
-      }
-
-
-      function renderAlldrivers(drivers) {
-
-          let driversGrid = document.getElementById("driversGrid");
-          driversGrid.innerHTML = "";
-
-          if (!Array.isArray(drivers)) {
-            console.error("Expected an array from the server", drivers);
-          }
-
-          drivers.forEach(driver => {
-
-              const driverCard = document.createElement("div");
-              driverCard.className = "driver-card";
-
-              driverCard.innerHTML = `<div class="driver-card">
-                                          <div class="driver-status status-${driver.status}">
-                                              ${driver.status}
-                                          </div>
-
-                                          <div class="driver-header">
-                                              <div class="driver-avatar">${driver.initials}</div>
-                                              <div class="driver-info">
-                                                  <h3>${driver.firstName}</h3>
-                                                  <p class="driver-id">Driver ID: ${driver.driverId}</p>
-                                              </div>
-                                          </div>
-
-                                          <div class="driver-rating">
-                                              <i class="fas fa-star rating-star"></i>
-                                              <span><strong>${driver.rating}</strong></span>
-                                              <span class="rating-text">(${driver.trips} trips)</span>
-                                          </div>
-
-                                          <div class="driver-details">
-                                              <div class="detail-item">
-                                                  <i class="fas fa-map-marker-alt detail-icon"></i>
-                                                  <span>Area: ${driver.area}</span>
-                                              </div>
-                                              <div class="detail-item">
-                                                  <i class="fas fa-phone detail-icon"></i>
-                                                  <span>${driver.mobileNumber}</span>
-                                              </div>
-                                              <div class="detail-item">
-                                                  <i class="fas fa-id-card detail-icon"></i>
-                                                  <span>License: ${driver.license}</span>
-                                              </div>
-                                              <div class="detail-item">
-                                                  <i class="fas fa-calendar detail-icon"></i>
-                                                  <span>Expires: ${driver.expiry}</span>
-                                              </div>
-                                          </div>
-
-                                          ${
-                                            driver.currentBooking
-                                                    ? `
-                                              <div class="current-booking">
-                                                  <div class="booking-header">
-                                                      <span class="booking-title">Current Booking</span>
-                                                      <span class="booking-id">${driver.currentBooking.id}</span>
-                                                  </div>
-                                                  <div class="booking-details">
-                                                      <span><i class="fas fa-clock"></i> ${driver.currentBooking.time}</span>
-                                                      <span><i class="fas fa-car"></i> ${driver.currentBooking.vehicle}</span>
-                                                  </div>
-                                                  <div class="booking-details">
-                                                      <span><i class="fas fa-user"></i> Customer: ${driver.currentBooking.customer}</span>
-                                                  </div>
-                                              </div>
-                                          `
-                                                    : ""
-                                    }
-
-                                          <div class="driver-actions">
-                                              <button class="action-btn" onclick="window.driverManager.messageDriver('${
-                                            driver.driverId
-                                    }')">
-                                                  <i class="fas fa-comment"></i>
-                                                  Message
-                                              </button>
-
-                                              <button class="action-btn primary" data-driver-id="${
-                                            driver.id
-                                    }">
-                                                  Assign Booking
-                                              </button>
-                                          </div>
-                                      </div>`;
-
-            driversGrid.appendChild(driverCard);
-
-
-          })
-
-      }
-
-
-      document.addEventListener("DOMContentLoaded", async function() {
-          AllDrivers = await LoadAllDrivers();
-          renderAlldrivers(AllDrivers);
-      });
-
-      OpenAddDrivermodel();
-
-      CLoseAddDrivermodel();
-
-      DisplayWithAddedDriver();
-
-
-    </script>
-
+      <!-- Add driver form -->
+      <div class="modal-overlay" id="Add-Driver-Modal">
+          <div class="modal-content">
+              <div class="modal-header">
+                  <h3>Add New Driver</h3>
+                  <button class="modal-close">
+                      <i class="fas fa-times"></i>
+                  </button>
+              </div>
+              <form
+                  class="driver-form"
+                  id="addDriverform"
+                  method="post"
+                  enctype="multipart/form-data"
+                  action="/driver/add"
+              >
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Username</label>
+                            <input type="text" name="username" required/>
+                        </div>
+                        <div class="form-group">
+                            <label>First Name</label>
+                            <input type="text" name="firstname" required/>
+                        </div>
+                        <div class="form-group">
+                            <label>Last Name</label>
+                            <input type="text" name="lastname" required/>
+                        </div>
+                        <div class="form-group">
+                            <label>Mobile Number</label>
+                            <input type="tel" name="mobilenumber" required/>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Email</label>
+                            <input type="email" name="email" required/>
+                        </div>
+                        <div class="form-group">
+                            <label>Password</label>
+                            <input type="password" name="password" required/>
+                        </div>
+                        <div class="form-group">
+                            <label>Confirm Password</label>
+                            <input type="password" name="confirmpassword" required/>
+                        </div>
+                        <div class="form-group">
+                            <label>NIC Number</label>
+                            <input type="text" name="nicnumber" required />
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                              <label>NIC Upload</label>
+                              <input
+                                    type="file"
+                                    name="nic"
+                                    accept=".jpg,.jpeg,.png,.pdf"
+                                    required
+                              />
+                        </div>
+                        <div class="form-group">
+                              <label>Driver's Licence Upload</label>
+                              <input
+                                    type="file"
+                                    name="driverlicence"
+                                    accept=".jpg,.jpeg,.png,.pdf"
+                                    required
+                              />
+                        </div>
+                        <div class="form-group" style="grid-column: span 2">
+                              <label>Description</label>
+                              <textarea
+                                      name="description"
+                                      placeholder="short description about the driver..."
+                                      style="
+                                        width: 100%;
+                                        height: 80px;
+                                        padding: 8px;
+                                        border: 2px solid #e1e5e9;
+                                        border-radius: 8px;
+                                      "
+                              ></textarea>
+                        </div>
+                    </div>
+                    <input type="hidden" name="company_id" value="1"/>
+                    <div class="form-actions">
+                        <button
+                            type="button"
+                            class="btn-secondary"
+                            onclick=""
+                        >
+                            Cancel
+                        </button>
+                        <button type="submit" class="btn-primary" id="add-driver-submit-button">Add Driver</button>
+                    </div>
+              </form>
+          </div>
+      </div>
   </body>
-</html>
+  </html>
