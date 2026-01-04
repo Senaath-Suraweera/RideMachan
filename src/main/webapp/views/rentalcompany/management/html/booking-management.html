@@ -106,10 +106,10 @@
                     <div class="filter-dropdown">
                         <select id="statusFilter">
                             <option value="all">All Bookings</option>
-                            <option value="active">Active</option>
-                            <option value="pending">Pending</option>
-                            <option value="completed">Completed</option>
-                            <option value="cancelled">Cancelled</option>
+                            <option value="Active">Active</option>
+                            <option value="Pending">Pending</option>
+                            <option value="Completed">Completed</option>
+                            <option value="Cancelled">Cancelled</option>
                         </select>
                         <i class="fas fa-filter"></i>
                     </div>
@@ -286,6 +286,7 @@
 
         }
 
+        //for search by booking id
         function filterBookingByBookingId(bookingId) {
 
             const bookingGrid = document.getElementById("bookingGrid");
@@ -306,6 +307,7 @@
 
         }
 
+        //for search by customer name or vehicleBrand or vehicleModel
         function filterBookingsByText(searchText) {
 
             const bookingGrid = document.getElementById("bookingGrid");
@@ -345,6 +347,39 @@
 
         }
 
+        //search pending,completed,active,cancelled bookings
+        function filterBookingsByTripStatus(status) {
+
+            const bookingGrid = document.getElementById("bookingGrid");
+            bookingGrid.innerHTML = "";
+
+            let filteredBookings = [];
+
+            for(let i=0; i<AllBookings.length; i++) {
+
+                //DEBUG 1
+                console.log("Trip status:- ", AllBookings[i].status)
+                console.log("selected trip status:- ", status)
+
+                let tripStatus =  AllBookings[i].status || "";
+
+                //DEBUG 2
+                console.log("Comparing:- ", tripStatus , "with ", status)
+                console.log("Match?:- ", tripStatus == status)
+
+                if(tripStatus == status) {
+                    filteredBookings.push(AllBookings[i]);
+                }
+
+            }
+
+            console.log("Filtered bookings count:", filteredBookings.length);
+            console.log("About to render...");
+            renderBookings(filteredBookings);
+            console.log("Render complete!");
+
+        }
+
         document.addEventListener("DOMContentLoaded", async function() {
 
             AllBookings = await LoadAllBookings();
@@ -371,6 +406,16 @@
             }else {
                 filterBookingsByText(inputValue);
             }
+
+        });
+
+        document.addEventListener("change", function() {
+
+            let statusFilter = document.getElementById("statusFilter");
+
+            let selectedStatus = statusFilter.value;
+
+            filterBookingsByTripStatus(selectedStatus);
 
         });
 
