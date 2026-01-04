@@ -153,17 +153,13 @@
                 console.log(err);
 
             }
+
         }
 
-        function renderAllBookings(bookings) {
+        function renderBookings(bookings) {
 
             const bookingGrid = document.getElementById("bookingGrid");
-            bookingGrid.innerHTML = "";
 
-            if (!Array.isArray(bookings)) {
-                console.error("Expected an array from the server", bookings);
-                return;
-            }
 
             bookings.forEach(booking => {
 
@@ -243,12 +239,63 @@
 
         }
 
-        function renderBookingByBookingId(bookingId) {
+        function addHeading(text) {
+
+            const bookingGrid = document.getElementById("bookingGrid");
+            const heading = document.createElement("h1");
+            heading.textContent = text;
+            bookingGrid.appendChild(heading);
+
+        }
+
+
+        //for differentiate Current and Past Bookings 
+        function filterBookingsByDate() {
+
+            const bookingGrid = document.getElementById("bookingGrid");
+            bookingGrid.innerHTML = "";
+
+            if (!Array.isArray(AllBookings)) {
+                console.error("Expected an array from the server", AllBookings);
+                return;
+            }
+
+            let filteredCurrentBookings = [];
+            let filteredPastBookings = [];
+
+            for(let i=0; i<AllBookings.length; i++) {
+
+                if(AllBookings[i].status === 'Completed') {
+                    filteredPastBookings.push(AllBookings[i]);
+                }else {
+                    filteredCurrentBookings.push(AllBookings[i]);
+                }
+
+            }
+
+            if(filteredCurrentBookings.length > 0) {
+                addHeading("Current Bookings");
+
+                renderBookings(filteredCurrentBookings);
+            }
+
+            if(filteredPastBookings.length > 0) {
+                addHeading("Past Bookings");
+
+                renderBookings(filteredPastBookings);
+            }
+
+        }
+
+        function filterBookingByBookingId(bookingId) {
+
+            const bookingGrid = document.getElementById("bookingGrid");
+            bookingGrid.innerHTML = "";
 
             let filteredBookings = [];
 
             if (bookingId === "") {
-                renderAllBookings(AllBookings);
+                filterBookingsByDate();
                 return;
             }
 
@@ -260,18 +307,18 @@
 
             }
 
-            renderAllBookings(filteredBookings);
+            renderBookings(filteredBookings);
 
         }
 
         document.addEventListener("DOMContentLoaded", async function() {
             AllBookings = await LoadAllBookings();
-            renderAllBookings(AllBookings)
+            filterBookingsByDate();
         });
 
         document.addEventListener("input", function() {
             let inputBookingId = bookingInput.value;
-            renderBookingByBookingId(inputBookingId);
+            filterBookingByBookingId(inputBookingId);
         });
     </script>
 
