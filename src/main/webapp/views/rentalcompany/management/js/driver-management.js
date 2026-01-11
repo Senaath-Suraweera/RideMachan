@@ -26,7 +26,7 @@ async function LoadAllDrivers() {
 
 }
 
-function OpenAddDrivermodel() {
+function OpenAddDriverModel() {
 
     const AddDriverButton = document.getElementById("Add-Driver-Button");
     const AddDriverModel = document.getElementById("Add-Driver-Modal");
@@ -39,13 +39,13 @@ function OpenAddDrivermodel() {
 
 }
 
-function CLoseAddDrivermodel() {
+function CLoseAddDriverModel() {
 
     const AddDriverModel = document.getElementById("Add-Driver-Modal");
-    const CloseButoon = document.querySelector(".modal-close");
+    const CloseButton = document.querySelector(".modal-close");
     const SubmitButton = document.getElementById("add-driver-submit-button");
 
-    CloseButoon.addEventListener("click", function() {
+    CloseButton.addEventListener("click", function() {
 
         AddDriverModel.classList.remove("active");
 
@@ -56,6 +56,12 @@ function CLoseAddDrivermodel() {
         AddDriverModel.classList.remove("active");
 
     });
+
+}
+
+function OpenMessagePopUp() {
+
+    const
 
 }
 
@@ -78,7 +84,7 @@ function DisplayWithAddedDriver() {
 
         if(response.ok) {
           AllDrivers = await LoadAllDrivers();
-          renderAlldrivers(AllDrivers);
+          renderDrivers(AllDrivers);
         }
 
     });
@@ -87,96 +93,43 @@ function DisplayWithAddedDriver() {
 
 
 
-function renderAlldrivers(drivers) {
+function renderDrivers(drivers) {
 
     let driversGrid = document.getElementById("driversGrid");
-    driversGrid.innerHTML = "";
 
-    if (!Array.isArray(drivers)) {
-        console.error("Expected an array from the server", drivers);
-    }
 
     drivers.forEach(driver => {
 
         const driverCard = document.createElement("div");
         driverCard.className = "driver-card";
 
-        driverCard.innerHTML = `<div class="driver-card">
-                                                  <div class="driver-status status-${driver.status}">
-                                                      ${driver.status}
-                                                  </div>
-    
-                                                  <div class="driver-header">
-                                                      <div class="driver-avatar">${driver.initials}</div>
-                                                      <div class="driver-info">
-                                                          <h3>${driver.firstName}</h3>
-                                                          <p class="driver-id">Driver ID: ${driver.driverId}</p>
-                                                      </div>
-                                                  </div>
-    
-                                                  <div class="driver-rating">
-                                                      <i class="fas fa-star rating-star"></i>
-                                                      <span><strong>${driver.rating}</strong></span>
-                                                      <span class="rating-text">(${driver.trips} trips)</span>
-                                                  </div>
-    
-                                                  <div class="driver-details">
-                                                      <div class="detail-item">
-                                                          <i class="fas fa-map-marker-alt detail-icon"></i>
-                                                          <span>Area: ${driver.area}</span>
-                                                      </div>
-                                                      <div class="detail-item">
-                                                          <i class="fas fa-phone detail-icon"></i>
-                                                          <span>${driver.mobileNumber}</span>
-                                                      </div>
-                                                      <div class="detail-item">
-                                                          <i class="fas fa-id-card detail-icon"></i>
-                                                          <span>License: ${driver.license}</span>
-                                                      </div>
-                                                      <div class="detail-item">
-                                                          <i class="fas fa-calendar detail-icon"></i>
-                                                          <span>Expires: ${driver.expiry}</span>
-                                                      </div>
-                                                  </div>
-    
-                                                  ${
-            driver.currentBooking
-                ? `
-                                                      <div class="current-booking">
-                                                          <div class="booking-header">
-                                                              <span class="booking-title">Current Booking</span>
-                                                              <span class="booking-id">${driver.currentBooking.id}</span>
-                                                          </div>
-                                                          <div class="booking-details">
-                                                              <span><i class="fas fa-clock"></i> ${driver.currentBooking.time}</span>
-                                                              <span><i class="fas fa-car"></i> ${driver.currentBooking.vehicle}</span>
-                                                          </div>
-                                                          <div class="booking-details">
-                                                              <span><i class="fas fa-user"></i> Customer: ${driver.currentBooking.customer}</span>
-                                                          </div>
-                                                      </div>
-                                                  `
-                : ""
-        }
-    
-                                                  <div class="driver-actions">
-                                                      <button class="action-btn" onclick="window.driverManager.messageDriver('${
-            driver.driverId
-        }')">
-                                                          <i class="fas fa-comment"></i>
-                                                          Message
-                                                      </button>
-    
-                                                      <button class="action-btn primary" data-driver-id="${
-            driver.id
-        }">
-                                                          Assign Booking
-                                                      </button>
-                                                  </div>
-                                              </div>`;
-
-        driversGrid.appendChild(driverCard);
-
+        driverCard.innerHTML = `
+                           <div class="driver-card">
+                                <div class="driver-status status-${driver.status}">
+                                    ${driver.status}
+                                </div>
+                                
+                                <div class="driver-header">
+                                    <div class="driver-info">
+                                        <h3>${driver.firstName} ${driver.lastName}</h3>
+                                        <p class="driver-id">Driver ID: ${driver.driverId}</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="driver-rating">
+                                    <i class="fas fa-star"></i>
+                                    <span><strong>${driver.rating}</strong></span>
+                                    <span class="rating-text">(${driver.trips} trips)</span>                                   
+                                </div>
+                                
+                                <div class="driver-details">
+                                    <div class="detail-item">
+                                        <i class="fas fa-map-marker-alt detail-icon"></i>
+                                        <span>Area: ${driver.area}</span>
+                                    </div>
+                                </div>
+                           </div> 
+                       `;
 
     })
 
@@ -186,12 +139,12 @@ function renderAlldrivers(drivers) {
 document.addEventListener("DOMContentLoaded", async function() {
 
     AllDrivers = await LoadAllDrivers();
-    renderAlldrivers(AllDrivers);
+    renderDrivers(AllDrivers);
 
 });
 
-OpenAddDrivermodel();
+OpenAddDriverModel();
 
-CLoseAddDrivermodel();
+CLoseAddDriverModel();
 
 DisplayWithAddedDriver();

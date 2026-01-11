@@ -15,6 +15,8 @@ public class Driver {
     private byte[] nicPdf;
     private byte[] driversLicence;
     private int companyId;
+    private String Area;
+    private String 
 
     // Constructor for registration
     public Driver(String username, String firstName, String lastName, String email,
