@@ -18,10 +18,21 @@ public class DisplayBookingsServlet extends HttpServlet {
 
 
         try {
+
+            HttpSession session = req.getSession();
+
+            if(session == null || session.getAttribute("companyId") == null) {
+                String requestedPage = req.getRequestURI();
+                resp.sendRedirect(req.getContextPath() + "companylogin.html?redirect=" + requestedPage);
+                return;
+            }
+
+            int companyId = (int) session.getAttribute("companyId");
+
+            List<RentalCompanyBookings> Bookings = RentalCompanyBookingsDAO.loadBookingsByCompanyId(companyId);
+
             resp.setContentType("application/json");
             resp.setCharacterEncoding("UTF-8");
-
-            List<RentalCompanyBookings> Bookings = RentalCompanyBookingsDAO.loadAllBookings();
 
 
             if (Bookings == null || Bookings.isEmpty()) {

@@ -2,6 +2,47 @@
 
 let AllBookings;
 
+async function initBookingPage() {
+    // Wait for login check
+    const loggedIn = await checkLogin();
+    if (!loggedIn) return; // Stop further execution if not logged in
+
+    // Only load bookings after login is verified
+    AllBookings = await LoadAllBookings();
+    filterBookingsByDate();
+}
+
+// Call immediately
+initBookingPage();
+
+// ============================================================
+// STEP 2: Function to check if user session exists
+// ============================================================
+async function checkLogin() {
+    try {
+        // Call backend servlet that checks session
+        const response = await fetch("/checklogin");
+        const result = await response.json();
+
+        if (result.status !== "loggedin") {
+            // User is NOT logged in → redirect to login page
+            // Pass the current page in "redirect" query param for post-login redirection
+            window.location.href = "/views/landing/companylogin.html?redirect=/views/rentalcompany/management/html/booking-management.html";
+            return false; // Stop further execution
+        }
+
+        // User is logged in → continue loading page
+        return true;
+
+    } catch (err) {
+        console.error("Login check failed:", err);
+        // On error → redirect to login anyway
+        window.location.href = "/views/landing/companylogin.html";
+        return false;
+    }
+}
+
+
 async function LoadAllBookings() {
 
     try {
@@ -252,12 +293,6 @@ function filterBookingsByTripStatus(status) {
 
 }
 
-document.addEventListener("DOMContentLoaded", async function() {
-
-    AllBookings = await LoadAllBookings();
-    filterBookingsByDate();
-
-});
 
 document.addEventListener("input", function() {
 

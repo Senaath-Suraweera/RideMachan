@@ -14,7 +14,7 @@ import java.sql.*;
 
 public class RentalCompanyBookingsDAO {
 
-    public static List<RentalCompanyBookings> loadAllBookings() {
+    public static List<RentalCompanyBookings> loadBookingsByCompanyId(int companyId) {
 
         List<RentalCompanyBookings> AllBookings = new ArrayList<>();
         String sql = "SELECT \n" +
@@ -29,10 +29,13 @@ public class RentalCompanyBookingsDAO {
                 "FROM companybookings\n" +
                 "LEFT JOIN customer ON companybookings.customerid = customer.customerid\n" +
                 "LEFT JOIN vehicle ON companybookings.vehicleid = vehicle.vehicleid\n" +
-                "LEFT JOIN driver ON companybookings.driverid = driver.driverid;\n";
+                "LEFT JOIN driver ON companybookings.driverid = driver.driverid;\n" +
+                "WHERE companybookings.companyid = ?;";
 
         try (Connection con = DBConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setInt(1, companyId);
 
             ResultSet rs = ps.executeQuery();
 
