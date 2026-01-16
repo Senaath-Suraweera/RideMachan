@@ -29,8 +29,8 @@ public class RentalCompanyBookingsDAO {
                 "FROM companybookings\n" +
                 "LEFT JOIN customer ON companybookings.customerid = customer.customerid\n" +
                 "LEFT JOIN vehicle ON companybookings.vehicleid = vehicle.vehicleid\n" +
-                "LEFT JOIN driver ON companybookings.driverid = driver.driverid;\n" +
-                "WHERE companybookings.companyid = ?;";
+                "LEFT JOIN driver ON companybookings.driverid = driver.driverid\n" +
+                "WHERE companybookings.companyid = ?";
 
         try (Connection con = DBConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {

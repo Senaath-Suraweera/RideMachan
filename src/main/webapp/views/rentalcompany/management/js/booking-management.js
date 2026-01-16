@@ -1,47 +1,42 @@
-
-
-let AllBookings;
-
-async function initBookingPage() {
-    // Wait for login check
-    const loggedIn = await checkLogin();
-    if (!loggedIn) return; // Stop further execution if not logged in
-
-    // Only load bookings after login is verified
-    AllBookings = await LoadAllBookings();
-    filterBookingsByDate();
-}
-
-// Call immediately
-initBookingPage();
-
-// ============================================================
-// STEP 2: Function to check if user session exists
-// ============================================================
 async function checkLogin() {
-    try {
-        // Call backend servlet that checks session
-        const response = await fetch("/checklogin");
-        const result = await response.json();
 
-        if (result.status !== "loggedin") {
-            // User is NOT logged in → redirect to login page
-            // Pass the current page in "redirect" query param for post-login redirection
-            window.location.href = "/views/landing/companylogin.html?redirect=/views/rentalcompany/management/html/booking-management.html";
-            return false; // Stop further execution
+    try {
+
+        const response = await fetch("/checklogin");
+        const data = await response.json();
+
+        if (!data.loggedIn) {
+
+            const modal = document.getElementById("loginModal");
+            modal.style.display = "flex";
+
+
+            document.getElementById("loginOkBtn").onclick = () => {
+
+                window.location.href = "/companylogin";
+
+            };
+
+            return false;
+
         }
 
-        // User is logged in → continue loading page
+        console.log("User is logged in.");
         return true;
 
     } catch (err) {
-        console.error("Login check failed:", err);
-        // On error → redirect to login anyway
-        window.location.href = "/views/landing/companylogin.html";
+
+        console.error("Error checking login:", err);
         return false;
+
     }
+
 }
 
+
+
+
+let AllBookings;
 
 async function LoadAllBookings() {
 
@@ -293,6 +288,28 @@ function filterBookingsByTripStatus(status) {
 
 }
 
+
+document.addEventListener("DOMContentLoaded", async function() {
+
+    try {
+
+        const loggedIn = await checkLogin();
+
+        if (!loggedIn) {
+            return;    // stop here if not logged in
+        }
+
+        AllBookings = await LoadAllBookings();
+        filterBookingsByDate();
+
+
+    } catch (err) {
+
+        console.error("Error during initialization:", err);
+
+    }
+
+});
 
 document.addEventListener("input", function() {
 
