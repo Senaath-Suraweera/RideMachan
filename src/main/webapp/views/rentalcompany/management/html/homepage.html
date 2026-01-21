@@ -4,8 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RideMachan - Dashboard</title>
+
     <link rel="stylesheet" href="../css/homepage.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+    <script src="../js/homepage.js" defer></script>
 </head>
 <body>
     <div class="dashboard-container">
@@ -14,7 +17,7 @@
             <div class="logo-section">
                 <img src="../assets/ridemachan-logo.png" alt="RideMachan Logo" class="logo">
             </div>
-            
+
             <nav class="nav-menu">
                 <ul>
                     <li class="nav-item active">
@@ -49,7 +52,7 @@
                     </li>
                 </ul>
             </nav>
-            
+
             <div class="logout-section">
                 <a href="#" class="nav-link">
                     <i class="fas fa-sign-out"></i>
@@ -80,216 +83,92 @@
                         <span>ABC Rentals</span>
                     </div>
                 </div>
-            </header> 
+            </header>
 
-            <!-- Dashboard Content
-            <div class="dashboard-content">
-                <div class="dashboard-header">
-                    <div class="dashboard-title">
-                        <h1>Dashboard</h1>
-                        <p>Welcome back, ABC Rentals</p>
+            <!-- Stats Cards -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon blue">
+                        <i class="fas fa-car"></i>
                     </div>
-                    <div class="dashboard-actions">
-                        <!--<button class="btn-secondary">
-                            <i class="fas fa-chart-bar"></i>
-                            View Reports
-                        </button>
-                        <a href="vehicle-fleet.html">
-                            <button class="btn-primary">
-                                <i class="fas fa-plus"></i>
-                                Add Vehicle
-                            </button>
-                        </a>
+                    <div class="stat-content">
+                        <div class="stat-label">Total Vehicles</div>
+                        <div class="stat-value">12</div>
                     </div>
-                </div> -->
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon green">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-label">Active Drivers</div>
+                        <div class="stat-value">8</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon orange">
+                        <i class="fas fa-calendar-check"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-label">Active Bookings</div>
+                        <div class="stat-value">24</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon purple">
+                        <i class="fas fa-rupee-sign"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-label">Monthly Revenue</div>
+                        <div class="stat-value">Rs12,345</div>
+                    </div>
+                </div>
+            </div>
 
-                <!-- Stats Cards -->
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-icon blue">
-                            <i class="fas fa-car"></i>
-                        </div>
-                        <div class="stat-content">
-                            <div class="stat-label">Total Vehicles</div>
-                            <div class="stat-value">12</div>
-                        </div>
+            <!-- Main Dashboard Grid -->
+            <div class="dashboard-grid">
+                <!-- Recent Bookings -->
+                <div class="dashboard-card recent-bookings">
+                    <div class="card-header">
+                        <h3><i class="fas fa-calendar-alt"></i> Recent Bookings</h3>
+                        <p>Latest booking activities</p>
                     </div>
-                    <div class="stat-card">
-                        <div class="stat-icon green">
-                            <i class="fas fa-users"></i>
+                    <div class="bookings-list">
+                        <div class="booking-item">
+                            <div class="booking-info">
+                                <div class="vehicle-name">Toyota Prius 2020</div>
+                                <div class="customer-name">John Smith</div>
+                                <div class="booking-date">2023-12-20 - 2023-12-22</div>
+                            </div>
+                            <div class="booking-status">
+                                <span class="status-badge active">Active</span>
+                                <div class="booking-price">Rs 7000</div>
+                            </div>
                         </div>
-                        <div class="stat-content">
-                            <div class="stat-label">Active Drivers</div>
-                            <div class="stat-value">8</div>
+                        <div class="booking-item">
+                            <div class="booking-info">
+                                <div class="vehicle-name">Honda Civic 2021</div>
+                                <div class="customer-name">Sarah Johnson</div>
+                                <div class="booking-date">2023-12-18 - 2023-12-21</div>
+                            </div>
+                            <div class="booking-status">
+                                <span class="status-badge completed">Completed</span>
+                                <div class="booking-price">Rs 5000</div>
+                            </div>
                         </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon orange">
-                            <i class="fas fa-calendar-check"></i>
-                        </div>
-                        <div class="stat-content">
-                            <div class="stat-label">Active Bookings</div>
-                            <div class="stat-value">24</div>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon purple">
-                            <i class="fas fa-rupee-sign"></i>
-                        </div>
-                        <div class="stat-content">
-                            <div class="stat-label">Monthly Revenue</div>
-                            <div class="stat-value">Rs12,345</div>
+                        <div class="booking-item">
+                            <div class="booking-info">
+                                <div class="vehicle-name">Ford Explorer 2022</div>
+                                <div class="customer-name">Mike Davis</div>
+                                <div class="booking-date">2023-12-21 - 2023-12-24</div>
+                            </div>
+                            <div class="booking-status">
+                                <span class="status-badge pending">Pending</span>
+                                <div class="booking-price">Rs 6000</div>
+                            </div>
                         </div>
                     </div>
                 </div>
-
-                <!-- Main Dashboard Grid -->
-                <div class="dashboard-grid">
-                    <!-- Recent Bookings -->
-                    <div class="dashboard-card recent-bookings">
-                        <div class="card-header">
-                            <h3><i class="fas fa-calendar-alt"></i> Recent Bookings</h3>
-                            <p>Latest booking activities</p>
-                        </div>
-                        <div class="bookings-list">
-                            <div class="booking-item">
-                                <div class="booking-info">
-                                    <div class="vehicle-name">Toyota Prius 2020</div>
-                                    <div class="customer-name">John Smith</div>
-                                    <div class="booking-date">2023-12-20 - 2023-12-22</div>
-                                </div>
-                                <div class="booking-status">
-                                    <span class="status-badge active">Active</span>
-                                    <div class="booking-price">Rs 7000</div>
-                                </div>
-                            </div>
-                            <div class="booking-item">
-                                <div class="booking-info">
-                                    <div class="vehicle-name">Honda Civic 2021</div>
-                                    <div class="customer-name">Sarah Johnson</div>
-                                    <div class="booking-date">2023-12-18 - 2023-12-21</div>
-                                </div>
-                                <div class="booking-status">
-                                    <span class="status-badge completed">Completed</span>
-                                    <div class="booking-price">Rs 5000</div>
-                                </div>
-                            </div>
-                            <div class="booking-item">
-                                <div class="booking-info">
-                                    <div class="vehicle-name">Ford Explorer 2022</div>
-                                    <div class="customer-name">Mike Davis</div>
-                                    <div class="booking-date">2023-12-21 - 2023-12-24</div>
-                                </div>
-                                <div class="booking-status">
-                                    <span class="status-badge pending">Pending</span>
-                                    <div class="booking-price">Rs 6000</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Quick Actions 
-                    <div class="dashboard-card quick-actions">
-                        <div class="card-header">
-                            <h3><i class="fas fa-bolt"></i> Quick Actions</h3>
-                            <p>Frequently used features</p>
-                        </div>
-                        <div class="actions-grid">
-                            <a href="fleet-calender.html">
-                                <div class="action-item">
-                                    <div class="action-icon blue">
-                                        <i class="fas fa-calendar"></i>
-                                    </div>
-                                    
-                                        <div class="action-content">
-                                            <div class="action-title">View Calendar</div>
-                                            <div class="action-subtitle">Check vehicle availability</div>
-                                        </div>
-                                    
-                                </div>
-                            </a>
-
-                            <a href="booking-management.html">
-                                <div class="action-item">
-                                    <div class="action-icon teal">
-                                        <i class="fas fa-bookmark"></i>
-                                    </div>
-                                    
-                                        <div class="action-content">
-                                            <div class="action-title">My Bookings</div>
-                                            <div class="action-subtitle">Manage current bookings</div>
-                                        </div>
-                                
-                                </div>
-                            </a>
-
-                            <a href="driver-management.html">
-                            <div class="action-item">
-                                <div class="action-icon blue">
-                                    <i class="fas fa-users"></i>
-                                </div>
-                                <div class="action-content">
-                                    <div class="action-title">View My Drivers</div>
-                                    <div class="action-subtitle">Driver management</div>
-                                </div>
-                            </div>
-                            </a>
-
-                            <a href="profile.html">
-                                <div class="action-item">
-                                    <div class="action-icon teal">
-                                        <i class="fas fa-edit"></i>
-                                    </div>
-                                    <div class="action-content">
-                                        <div class="action-title">Edit Profile</div>
-                                        <div class="action-subtitle">Update company information</div>
-                                    </div>
-                                </div>
-                            </a>
-
-                            
-                                <div class="action-item">
-                                    <a href="#">
-                                        <div class="action-icon blue">
-                                            <i class="fas fa-file-alt"></i>
-                                        </div>
-                                        <div class="action-content">
-                                            <div class="action-title">Legal Docs</div>
-                                            <div class="action-subtitle">Document management</div>
-                                        </div>
-                                    </a>
-                                </div>
-                            
-
-                            
-                                <div class="action-item">
-                                    <a href="maintenance-fleet.html">
-                                        <div class="action-icon teal">
-                                            <i class="fas fa-wrench"></i>
-                                        </div>
-                                        <div class="action-content">
-                                            <div class="action-title">Maintenance</div>
-                                            <div class="action-subtitle">Vehicle maintenance logs</div>
-                                        </div>
-                                    </a>
-                                </div>
-
-                                <div class="action-item">
-                                    
-                                        <a href="driver-management.html">
-                                            <div class="action-icon teal">
-                                                <i class="fas fa-wrench"></i>
-                                            </div>
-                                            <div class="action-content">
-                                                <div class="action-title">Register New Driver</div>
-                                            </div>
-                                        </a>
-                                    
-                                </div>
-                            </a>
-                        </div>
-                    </div>
-                </div>-->
 
                 <!-- Bottom Stats -->
                 <div class="bottom-stats">
@@ -313,7 +192,17 @@
         </main>
     </div>
 
-    <script src="../js/homepage.js"></script>
-    <script src="../js/sidebar.js"></script>
+
+
+
+    <div id="loginModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%;
+    background: rgba(0,0,0,0.5); justify-content:center; align-items:center; z-index:1000;">
+        <div style="background:white; padding:20px; border-radius:8px; text-align:center; width:300px;">
+            <p style="margin-bottom:20px;">Login First</p>
+            <button id="loginOkBtn" style="padding:8px 16px; cursor:pointer;">OK</button>
+        </div>
+    </div>
+
+
 </body>
 </html>
