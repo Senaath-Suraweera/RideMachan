@@ -91,6 +91,70 @@
 
   }
 
+  let recentBookings;
+
+  async function loadRecentBookings() {
+
+      try {
+
+          let response = await fetch(`/displayrecentbookings`, {
+              method: "POST",
+              headers: {
+                  "Content-Type": "application/json"
+              }
+          });
+
+          if(!response.ok){
+              throw new Error(`HTTP error! Status: ${response.status}`);
+          }
+
+          let data = await response.json();
+
+          console.log(data);
+
+
+          return data;
+
+      }catch (err) {
+
+          console.log(err);
+
+      }
+
+  }
+
+  function renderRecentBookings(bookings) {
+
+      const bookingList = document.getElementsByClassName("bookings-list")[0];
+
+      bookingList.innerHTML = "";
+
+      if(bookings && bookings.length > 0) {
+
+          bookings.forEach(b => {
+              bookingList.innerHTML += `
+                <div class="booking-item">
+                    <div class="booking-info">
+                        <div class="vehicle-name">${b.vehicleBrand || "Unknown Brand"} ${b.vehicleModel || ""}</div>
+                        <div class="customer-name">${b.customerName || "Unknown Customer"}</div>
+                        <div class="booking-date">${b.tripStartDate} - ${b.tripEndDate}</div>
+                    </div>
+                    <div class="booking-status">
+                        <span class="status-badge ${b.status.toLowerCase()}">${b.status}</span>
+                        <div class="booking-price">Rs ${b.totalAmount}</div>
+                    </div>
+                </div>
+            `;
+          });
+
+      }
+
+  }
+
+  function formatDate(dateStr) {
+
+
+  }
 
 
 
@@ -109,6 +173,12 @@
           if(stats) {
               renderStatistics(stats)
           }
+
+          recentBookings = await loadRecentBookings();
+
+          console.log("Recent Bookings:", recentBookings);
+
+          renderRecentBookings(recentBookings);
 
 
       } catch (err) {
