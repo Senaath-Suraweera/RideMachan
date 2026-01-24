@@ -192,4 +192,49 @@ public class VehicleDAO {
         }
         return list;
     }
+
+    public static Vehicle getOneVehicleById(int vehicleId) {
+
+        Vehicle v = null;
+        String sql = "SELECT * FROM Vehicle WHERE vehicleid = ?";
+
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setInt(1, vehicleId);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {   // only ONE row expected
+                v = new Vehicle();
+                v.setVehicleId(rs.getInt("vehicleid"));
+                v.setVehicleBrand(rs.getString("vehiclebrand"));
+                v.setVehicleModel(rs.getString("vehiclemodel"));
+                v.setNumberPlateNumber(rs.getString("numberplatenumber"));
+                v.setTareWeight(rs.getInt("tareweight"));
+                v.setColor(rs.getString("color"));
+                v.setNumberOfPassengers(rs.getInt("numberofpassengers"));
+                v.setEngineCapacity(rs.getInt("enginecapacity"));
+                v.setEngineNumber(rs.getString("enginenumber"));
+                v.setChasisNumber(rs.getString("chasisnumber"));
+                v.setDescription(rs.getString("description"));
+                v.setMilage(rs.getString("milage"));
+                v.setPricePerDay(rs.getDouble("price_per_day"));
+                v.setLocation(rs.getString("location"));
+                v.setFeatures(rs.getString("features"));
+
+                int companyId = rs.getInt("company_id");
+                v.setCompanyId(rs.wasNull() ? null : companyId);
+
+                int providerId = rs.getInt("provider_id");
+                v.setProviderId(rs.wasNull() ? null : providerId);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return v;
+    }
+
 }
+
+

@@ -22,6 +22,9 @@ public class Vehicle {
     private double pricePerDay;
     private String location;
     private String features;
+    private String vehicleCategory;
+    private String fuelType;
+    private String availabilityStatus;
 
 
     // Constructors
@@ -105,4 +108,13 @@ public class Vehicle {
 
     public String getFeatures() { return features; }
     public void setFeatures(String features) { this.features = features; }
+
+    public String getVehicleCategory() { return vehicleCategory; }
+    public void setVehicleCategory(String vehicleCategory) { this.vehicleCategory = vehicleCategory; }
+
+    public String getFuelType() { return fuelType; }
+    public void setFuelType(String fuelType) { this.fuelType = fuelType; }
+
+    public String getAvailabilityStatus() { return availabilityStatus; }
+    public void setAvailabilityStatus(String availabilityStatus) { this.availabilityStatus = availabilityStatus; }
 }

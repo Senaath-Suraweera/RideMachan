@@ -3,36 +3,33 @@
 =================== -->
 <div class="header">
   <div class="hi">
-    <h1>{{PAGE_TITLE}}</h1>
+    <!-- replaced placeholder with element expected by header.js -->
+    <h1 id="pageTitle">Dashboard</h1>
   </div>
 
   <div class="header-actions">
     <!-- Notifications -->
     <div class="notification" onclick="showNotifications()">
-      <a href="../pages/notifications.html"><i class="fas fa-bell"></i></a>
+      <i class="fas fa-bell"></i>
       <div class="badge" id="notificationCount">3</div>
     </div>
 
     <div class="notification" onclick="showMessages()">
-      <a href="../pages/messages.html"><i class="fas fa-envelope"></i></a>
+      <i class="fas fa-envelope"></i>
       <div class="badge" id="messageCount">5</div>
     </div>
 
     <!-- User Profile -->
-    <div class="user-profile" onclick="toggleProfileDropdown()">
+    <div class="user-profile" id="userProfile">
       <div class="profile-img" id="profileInitial">K</div>
       <div class="user-info">
         <div class="user-name" id="userName">Kamal</div>
       </div>
       <div class="profile-dropdown" id="profileDropdown">
         <a href="../pages/settings.html"><i class="fas fa-cog"></i> Settings</a>
-        <a href="../pages/bookings.html"
-          ><i class="fas fa-calendar"></i> My Bookings</a
-        >
-        <hr />
-        <a href="#" onclick="handleLogout()"
-          ><i class="fas fa-sign-out-alt"></i> Logout</a
-        >
+        <a href="../pages/bookings.html"><i class="fas fa-calendar"></i> My Bookings</a>
+        <hr>
+        <a href="#" onclick="handleLogout()"><i class="fas fa-sign-out-alt"></i> Logout</a>
       </div>
     </div>
   </div>
@@ -238,145 +235,4 @@
   }
 </style>
 
-<script>
-  // Header functionality
-  function initializeHeader() {
-    // Load user data and update header
-    loadUserData();
-
-    // Load notification counts
-    updateNotificationCounts();
-
-    // Close dropdown when clicking outside
-    document.addEventListener("click", function (event) {
-      const dropdown = document.getElementById("profileDropdown");
-      const profile = document.querySelector(".user-profile");
-
-      if (!profile.contains(event.target)) {
-        dropdown.classList.remove("show");
-      }
-    });
-  }
-
-  function loadUserData() {
-    // In a real application, this would fetch from an API
-    const userData = {
-      name: "Kamal Silva",
-      email: "kamal@example.com",
-      phone: "+94 77 123 4567",
-      initial: "K",
-    };
-
-    // Update header elements
-    document.getElementById("userName").textContent =
-      userData.name.split(" ")[0];
-    document.getElementById("profileInitial").textContent = userData.initial;
-    document.getElementById("welcomeMessage").textContent = `Welcome back ${
-      userData.name.split(" ")[0]
-    }`;
-  }
-
-  function updateNotificationCounts() {
-    // In a real application, this would fetch from an API
-    const counts = {
-      notifications: 3,
-      messages: 5,
-    };
-
-    document.getElementById("notificationCount").textContent =
-      counts.notifications;
-    document.getElementById("messageCount").textContent = counts.messages;
-
-    // Hide badges if count is 0
-    if (counts.notifications === 0) {
-      document.getElementById("notificationCount").style.display = "none";
-    }
-    if (counts.messages === 0) {
-      document.getElementById("messageCount").style.display = "none";
-    }
-  }
-
-  function toggleProfileDropdown() {
-    const dropdown = document.getElementById("profileDropdown");
-    dropdown.classList.toggle("show");
-  }
-
-  function showNotifications() {
-    // In a real application, this would show notifications panel or navigate to notifications page
-    window.location.href = "../pages/notifications.html";
-  }
-
-  function showMessages() {
-    // In a real application, this would show messages panel or navigate to messages page
-    window.location.href = "../pages/messages.html";
-  }
-
-  function handleLogout() {
-    if (confirm("Are you sure you want to logout?")) {
-      // Call backend servlet
-      fetch("/customer/logout", { method: "GET" })
-        .then((response) => {
-          // Follow redirect from servlet
-          if (response.redirected) {
-            window.location.href = response.url;
-          } else {
-            // Manual fallback
-            window.location.href = "/views/landing/index.html";
-          }
-        })
-        .catch((error) => {
-          console.error("Logout failed:", error);
-          window.location.href = "/views/landing/index.html";
-        });
-    }
-  }
-
-  function showLogoutMessage() {
-    // Create and show logout notification
-    const notification = document.createElement("div");
-    notification.className = "logout-notification";
-    notification.innerHTML = `
-        <div style="
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: var(--success);
-            color: white;
-            padding: 15px 20px;
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-            z-index: 9999;
-            animation: slideIn 0.3s ease;
-        ">
-            <i class="fas fa-check-circle"></i>
-            Logged out successfully!
-        </div>
-    `;
-
-    document.body.appendChild(notification);
-
-    // Remove notification after delay
-    setTimeout(() => {
-      notification.remove();
-    }, 1200);
-  }
-
-  // Initialize when DOM is loaded
-  document.addEventListener("DOMContentLoaded", initializeHeader);
-
-  // Add CSS animation for logout notification
-  const style = document.createElement("style");
-  style.textContent = `
-@keyframes slideIn {
-    from {
-        transform: translateX(100%);
-        opacity: 0;
-    }
-    to {
-        transform: translateX(0);
-        opacity: 1;
-    }
-}
-`;
-  document.head.appendChild(style);
-</script>
+<script src="../components/header.js"></script>

@@ -29,9 +29,9 @@
                 <div class="search-form">
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="vehicleType">Vehicle Type</label>
-                            <select class="form-control" id="vehicleType">
-                                <option value="">Select vehicle type</option>
+                            <label for="vehicleCategory">Vehicle Category</label>
+                            <select class="form-control" id="vehicleCategory">
+                                <option value="">Select vehicle Category</option>
                                 <option value="car">Car</option>
                                 <option value="suv">SUV</option>
                                 <option value="van">Van</option>
@@ -91,7 +91,7 @@
                 <h3 style="margin-bottom: 20px; color: var(--dark);">Filters</h3>
                 <div class="filters-grid">
                     <div class="filter-group">
-                        <label>Price Range</label>
+                        <label for="priceRange">Price Range</label>
                         <select class="filter-select" id="priceRange">
                             <option value="">Select</option>
                             <option value="0-5000">LKR 0 - 5,000</option>
@@ -99,17 +99,9 @@
                             <option value="10000+">LKR 10,000+</option>
                         </select>
                     </div>
+
                     <div class="filter-group">
-                        <label>Category</label>
-                        <select class="filter-select" id="category">
-                            <option value="">Select</option>
-                            <option value="economy">Economy</option>
-                            <option value="premium">Premium</option>
-                            <option value="luxury">Luxury</option>
-                        </select>
-                    </div>
-                    <div class="filter-group">
-                        <label>Company</label>
+                        <label for="companyFilter">Company</label>
                         <select class="filter-select" id="companyFilter">
                             <option value="">Select Company</option>
                             <option value="Premium Rentals">Premium Rentals</option>
@@ -121,7 +113,7 @@
                         </select>
                     </div>
                     <div class="filter-group">
-                        <label>Fuel Type</label>
+                        <label for="fuelType">Fuel Type</label>
                         <select class="filter-select" id="fuelType">
                             <option value="">Select</option>
                             <option value="petrol">Petrol</option>
@@ -130,7 +122,7 @@
                         </select>
                     </div>
                     <div class="filter-group">
-                        <label>No of Seats</label>
+                        <label for="seats">No of Seats</label>
                         <select class="filter-select" id="seats">
                             <option value="">Select</option>
                             <option value="2">2</option>
@@ -149,6 +141,9 @@
             </div>
         </div>
     </div>
+
+    <!-- Load searchVehicles.js -->
+    <script src="../js/searchVehicles.js"></script>
 
     <script>
         // Load external components
@@ -211,109 +206,11 @@
             
             document.getElementById('fromDateTime').value = now.toISOString().slice(0, 16);
             document.getElementById('toDateTime').value = tomorrow.toISOString().slice(0, 16);
-            
-            // Load initial vehicle data
-            renderVehicles(vehicleData);
         });
 
         // Current active tab
         let currentTab = 'vehicles';
 
-        // Sample vehicle data with Sri Lankan content
-        const vehicleData = [
-            {
-                id: 1,
-                name: "Honda Vezel",
-                price: 6500,
-                company: "Premium Rentals",
-                companyId: 1,
-                location: "Colombo 03",
-                rating: 4.7,
-                reviews: 47,
-                seats: 5,
-                features: ["GPS Navigation", "Bluetooth", "A/C", "Leather Seats"],
-                category: "premium",
-                fuel: "hybrid",
-                type: "suv"
-            },
-            {
-                id: 2,
-                name: "Toyota Axio",
-                price: 4500,
-                company: "City Car Rentals",
-                companyId: 2,
-                location: "Kandy",
-                rating: 4.5,
-                reviews: 32,
-                seats: 5,
-                features: ["A/C", "Bluetooth", "Power Steering"],
-                category: "economy",
-                fuel: "petrol",
-                type: "car"
-            },
-            {
-                id: 3,
-                name: "Suzuki Alto",
-                price: 3500,
-                company: "Budget Wheels",
-                companyId: 3,
-                location: "Galle",
-                rating: 4.2,
-                reviews: 18,
-                seats: 4,
-                features: ["A/C", "Power Steering"],
-                category: "economy",
-                fuel: "petrol",
-                type: "car"
-            },
-            {
-                id: 4,
-                name: "Toyota Hiace",
-                price: 8500,
-                company: "Lanka Van Hire",
-                companyId: 4,
-                location: "Negombo",
-                rating: 4.6,
-                reviews: 25,
-                seats: 14,
-                features: ["A/C", "GPS", "Spacious", "Bluetooth"],
-                category: "premium",
-                fuel: "diesel",
-                type: "van"
-            },
-            {
-                id: 5,
-                name: "BMW X3",
-                price: 12500,
-                company: "Luxury Rides LK",
-                companyId: 5,
-                location: "Colombo 07",
-                rating: 4.9,
-                reviews: 56,
-                seats: 5,
-                features: ["Premium Sound", "Sunroof", "GPS", "Leather Interior"],
-                category: "luxury",
-                fuel: "petrol",
-                type: "suv"
-            },
-            {
-                id: 6,
-                name: "Nissan Caravan",
-                price: 7500,
-                company: "Island Transport",
-                companyId: 6,
-                location: "Anuradhapura",
-                rating: 4.3,
-                reviews: 22,
-                seats: 9,
-                features: ["A/C", "GPS", "Spacious Luggage"],
-                category: "premium",
-                fuel: "diesel",
-                type: "van"
-            }
-        ];
-
-        let filteredVehicles = [...vehicleData];
 
         function switchTab(tab) {
             if (tab === 'drivers') {
@@ -344,208 +241,6 @@
             }
         }
 
-        function renderVehicles(vehicles) {
-            const resultsContainer = document.getElementById('searchResults');
-            resultsContainer.innerHTML = '';
-
-            if (vehicles.length === 0) {
-                resultsContainer.innerHTML = '<p style="text-align: center; color: var(--text-light); padding: 40px;">No vehicles found matching your criteria.</p>';
-                return;
-            }
-
-            vehicles.forEach(vehicle => {
-                const vehicleCard = document.createElement('div');
-                vehicleCard.className = 'vehicle-card';
-                vehicleCard.onclick = () => viewVehicle(vehicle.id);
-                
-                vehicleCard.innerHTML = `
-                    <div class="vehicle-image">
-                        <i class="fas fa-car"></i>
-                    </div>
-                    <div class="vehicle-info">
-                        <h4 onclick="viewVehicle(${vehicle.id})">${vehicle.name}</h4>
-                        <p class="price">LKR ${vehicle.price.toLocaleString()}/day</p>
-                        <p class="category" onclick="event.stopPropagation(); viewCompany(${vehicle.companyId})" style="cursor: pointer; color: var(--primary); text-decoration: underline;">${vehicle.company}</p>
-                        <p class="location">${vehicle.location}, Sri Lanka</p>
-                        <div class="rating">
-                            <div class="stars">
-                                ${generateStars(vehicle.rating)}
-                            </div>
-                            <span class="review-count">${vehicle.reviews} reviews</span>
-                        </div>
-                        <div class="seats-info">
-                            <i class="fas fa-users"></i>
-                            ${vehicle.seats} seats
-                        </div>
-                        <div class="features">
-                            ${vehicle.features.map(feature => `<span class="feature-tag">${feature}</span>`).join('')}
-                        </div>
-                    </div>
-                    <div class="vehicle-actions">
-                        <button class="message-btn" onclick="event.stopPropagation(); sendMessage(${vehicle.id})">Message</button>
-                    </div>
-                `;
-                
-                resultsContainer.appendChild(vehicleCard);
-            });
-        }
-
-        function generateStars(rating) {
-            let stars = '';
-            for (let i = 1; i <= 5; i++) {
-                if (i <= rating) {
-                    stars += '<i class="fas fa-star"></i>';
-                } else {
-                    stars += '<i class="far fa-star"></i>';
-                }
-            }
-            return stars;
-        }
-
-        function searchVehicles() {
-            const vehicleType = document.getElementById('vehicleType').value;
-            const pickupLocation = document.getElementById('pickupLocation').value;
-            
-            let results = vehicleData;
-            
-            if (vehicleType) {
-                results = results.filter(vehicle => vehicle.type === vehicleType);
-            }
-            
-            if (pickupLocation) {
-                results = results.filter(vehicle => 
-                    vehicle.location.toLowerCase().includes(pickupLocation.toLowerCase())
-                );
-            }
-            
-            filteredVehicles = results;
-            renderVehicles(filteredVehicles);
-        }
-
-        function applyFilters() {
-            const priceRange = document.getElementById('priceRange').value;
-            const category = document.getElementById('category').value;
-            const companyFilter = document.getElementById('companyFilter').value;
-            const fuelType = document.getElementById('fuelType').value;
-            const seats = document.getElementById('seats').value;
-            
-            let filtered = [...vehicleData];
-            
-            if (priceRange) {
-                const [min, max] = priceRange.split('-');
-                if (max === undefined) {
-                    filtered = filtered.filter(v => v.price >= parseInt(min.replace('+', '')));
-                } else {
-                    filtered = filtered.filter(v => v.price >= parseInt(min) && v.price <= parseInt(max));
-                }
-            }
-            
-            if (category) {
-                filtered = filtered.filter(v => v.category === category);
-            }
-
-            if (companyFilter) {
-                filtered = filtered.filter(v => v.company === companyFilter);
-            }
-            
-            if (fuelType) {
-                filtered = filtered.filter(v => v.fuel === fuelType);
-            }
-            
-            if (seats) {
-                if (seats === '7+') {
-                    filtered = filtered.filter(v => v.seats >= 7);
-                } else {
-                    filtered = filtered.filter(v => v.seats == parseInt(seats));
-                }
-            }
-            
-            filteredVehicles = filtered;
-            renderVehicles(filteredVehicles);
-        }
-
-        function viewVehicle(vehicleId) {
-            // Store vehicle data in sessionStorage for the profile page to use
-            const vehicle = vehicleData.find(v => v.id === vehicleId);
-            if (vehicle) {
-                // Store the vehicle data with localStorage methods - not for this artifact
-                try {
-                    sessionStorage.setItem('selectedVehicle', JSON.stringify(vehicle));
-                    sessionStorage.setItem('searchData', JSON.stringify({
-                        vehicleType: document.getElementById('vehicleType').value,
-                        pickupLocation: document.getElementById('pickupLocation').value,
-                        dropoffLocation: document.getElementById('dropoffLocation').value,
-                        fromDateTime: document.getElementById('fromDateTime').value,
-                        toDateTime: document.getElementById('toDateTime').value
-                    }));
-                } catch(e) {
-                    console.log('SessionStorage not available');
-                }
-                window.location.href = `vehicle-profile.html?id=${vehicleId}`;
-            }
-        }
-
-        function viewCompany(companyId) {
-            // Store the selected company ID in sessionStorage and navigate to company profile
-            try {
-                sessionStorage.setItem('selectedCompanyId', companyId.toString());
-            } catch(e) {
-                console.log('SessionStorage not available');
-            }
-            window.location.href = 'company-profile.html';
-        }
-
-        function sendMessage(vehicleId) {
-            const vehicle = vehicleData.find(v => v.id === vehicleId);
-            if (vehicle) {
-                const popup = document.createElement('div');
-                popup.className = 'popup-overlay';
-                popup.innerHTML = `
-                    <div class="popup-content">
-                        <div class="popup-header">
-                            <h3>Send Message</h3>
-                            <button class="close-btn" onclick="closePopup()">&times;</button>
-                        </div>
-                        <div class="popup-body">
-                            <p>Send a message to <strong>${vehicle.company}</strong> about their <strong>${vehicle.name}</strong>:</p>
-                            <textarea class="message-input" placeholder="Type your message here..." rows="4"></textarea>
-                        </div>
-                        <div class="popup-footer">
-                            <button class="btn btn-primary" onclick="sendMessageAction(${vehicle.id})">Send Message</button>
-                            <button class="btn btn-outline" onclick="closePopup()">Cancel</button>
-                        </div>
-                    </div>
-                `;
-                document.body.appendChild(popup);
-            }
-        }
-
-        function sendMessageAction(vehicleId) {
-            const messageInput = document.querySelector('.message-input');
-            if (messageInput && messageInput.value.trim()) {
-                alert('Message sent successfully!');
-                closePopup();
-            } else {
-                alert('Please enter a message before sending.');
-            }
-        }
-
-        function bookVehicle(vehicleId) {
-            const vehicle = vehicleData.find(v => v.id === vehicleId);
-            if (vehicle) {
-                alert(`Booking ${vehicle.name} - Redirecting to booking page...`);
-                closePopup();
-                // In a real app, you would redirect to booking page
-                // window.location.href = `booking.html?vehicleId=${vehicleId}`;
-            }
-        }
-
-        function closePopup() {
-            const popup = document.querySelector('.popup-overlay');
-            if (popup) {
-                popup.remove();
-            }
-        }
 
         // Header functionality (integrated from header.html)
         function initializeHeader() {
