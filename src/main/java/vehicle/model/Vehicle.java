@@ -22,7 +22,9 @@ public class Vehicle {
     private double pricePerDay;
     private String location;
     private String features;
-    private String vehicleCategory;
+
+    // Fields used by search/filter UI
+    private String vehicleType;
     private String fuelType;
     private String availabilityStatus;
 
@@ -109,8 +111,8 @@ public class Vehicle {
     public String getFeatures() { return features; }
     public void setFeatures(String features) { this.features = features; }
 
-    public String getVehicleCategory() { return vehicleCategory; }
-    public void setVehicleCategory(String vehicleCategory) { this.vehicleCategory = vehicleCategory; }
+    public String getVehicleType() { return vehicleType; }
+    public void setVehicleType(String vehicleType) { this.vehicleType = vehicleType; }
 
     public String getFuelType() { return fuelType; }
     public void setFuelType(String fuelType) { this.fuelType = fuelType; }

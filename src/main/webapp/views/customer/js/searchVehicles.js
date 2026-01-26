@@ -91,7 +91,7 @@ function displayVehicles(vehicles) {
                 <!-- Features -->
                 <div class="features">
                     <span class="feature-tag">${vehicle.fuelType || "Fuel"}</span>
-                    <span class="feature-tag">${vehicle.vehicleType || "Vehicle"}</span>
+                    <span class="feature-tag">${vehicle.vehicleCategory || "Vehicle"}</span>
                     ${vehicle.availabilityStatus === 'available' ? '<span class="feature-tag">Available</span>' : ''}
                 </div>
             </div>
@@ -144,18 +144,21 @@ function getCompanyName(companyId) {
 function searchVehicles() {
     const vehicleType = document.getElementById('vehicleType')?.value.toLowerCase();
     const pickupLocation = document.getElementById('pickupLocation')?.value.toLowerCase();
-
+    
     let results = [...allVehicles];
-
+    
     if (vehicleType) {
-        results = results.filter(vehicle =>
-            vehicle.vehicleType && vehicle.vehicleType.toLowerCase() === vehicleType
-        );
+        results = results.filter(vehicle => {
+            // Search by vehicle category (Car, SUV, Van) or by vehicle name (brand + model)
+            const vehicleName = `${vehicle.vehicleBrand} ${vehicle.vehicleModel}`.toLowerCase();
+            const category = (vehicle.vehicleCategory || '').toLowerCase();
+            return category === vehicleType || vehicleName.includes(vehicleType);
+        });
     }
-
+    
     // Note: Location filtering would need backend support
     // For now, we show all vehicles regardless of pickup location
-
+    
     filteredVehicles = results;
     displayVehicles(filteredVehicles);
 }
@@ -221,6 +224,36 @@ function applyFilters() {
     filteredVehicles = filtered;
     displayVehicles(filteredVehicles);
 }
+
+// ========================================
+// Clear All Filters
+// ========================================
+function clearAllFilters() {
+    // Reset all form dropdowns to their default values
+    const vehicleType = document.getElementById('vehicleType');
+    const pickupLocation = document.getElementById('pickupLocation');
+    const priceRange = document.getElementById('priceRange');
+    const fuelType = document.getElementById('fuelType');
+    const seats = document.getElementById('seats');
+    const vehicleCategoryFilter = document.getElementById('vehicleCategoryFilter');
+    const companyFilter = document.getElementById('companyFilter');
+
+    if (vehicleType) vehicleType.value = '';
+    if (pickupLocation) pickupLocation.value = '';
+    if (priceRange) priceRange.value = '';
+    if (fuelType) fuelType.value = '';
+    if (seats) seats.value = '';
+    if (vehicleCategoryFilter) vehicleCategoryFilter.value = '';
+    if (companyFilter) companyFilter.value = '';
+
+    // Reset filtered vehicles to show all vehicles
+    filteredVehicles = [...allVehicles];
+    displayVehicles(filteredVehicles);
+
+    // Show notification
+    showNotification('All filters cleared!', 'info');
+}
+
 
 // ========================================
 // View Vehicle Details

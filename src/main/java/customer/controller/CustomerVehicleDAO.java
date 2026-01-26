@@ -56,7 +56,7 @@ public class CustomerVehicleDAO {
         v.setPricePerDay(rs.getDouble("price_per_day"));
         v.setLocation(rs.getString("location"));
         v.setFeatures(rs.getString("features"));
-        v.setVehicleCategory(rs.getString("vehicle_category"));
+        v.setVehicleType(rs.getString("vehicle_type"));
         v.setFuelType(rs.getString("fuel_type"));
         v.setAvailabilityStatus(rs.getString("availability_status"));
 

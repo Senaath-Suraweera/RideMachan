@@ -105,8 +105,8 @@ public class VehicleDAO {
 
     public static boolean updateVehicle(Vehicle v) {
         String sql = "UPDATE Vehicle SET vehiclebrand=?, vehiclemodel=?, numberplatenumber=?, tareweight=?, color=?, " +
-                "numberofpassengers=?, enginecapacity=?, enginenumber=?, chasisnumber=?, description=?, milage=? , price_per_day=?,"+
-                "location=?,features=? WHERE vehicleid=?";
+                "numberofpassengers=?, enginecapacity=?, enginenumber=?, chasisnumber=?, description=?, milage=?, price_per_day=?, " +
+                "location=?, features=?, vehicle_type=?, fuel_type=?, availability_status=? WHERE vehicleid=?";
         try (Connection con = DBConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
 
@@ -121,10 +121,13 @@ public class VehicleDAO {
             ps.setString(9, v.getChasisNumber());
             ps.setString(10, v.getDescription());
             ps.setString(11, v.getMilage());
-            ps.setDouble(12,v.getPricePerDay());
-            ps.setString(13,v.getLocation());
-            ps.setString(14,v.getFeatures());
-            ps.setInt(15, v.getVehicleId());
+            ps.setDouble(12, v.getPricePerDay());
+            ps.setString(13, v.getLocation());
+            ps.setString(14, v.getFeatures());
+            ps.setString(15, v.getVehicleType());
+            ps.setString(16, v.getFuelType());
+            ps.setString(17, v.getAvailabilityStatus());
+            ps.setInt(18, v.getVehicleId());
 
 
             return ps.executeUpdate() > 0;

@@ -7,8 +7,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="../css/main.css" />
-    <link rel="stylesheet" href="../css/search.css" />
+    <link rel="stylesheet" href="../css/main.css?v=5" />
+    <link rel="stylesheet" href="../css/search.css?v=5" />
 </head>
 <body>
     <div class="container">
@@ -23,39 +23,31 @@
 
             <!-- Search Form -->
             <div class="search-form-container">
-                <h2 style="margin-bottom: 20px; color: var(--dark); font-size: 24px;">Find Your Perfect Vehicle</h2>
-                <p class="subtitle" style="margin-bottom: 25px;">Search through thousands of vehicles across Sri Lanka</p>
-                
+                <div class="form-header">
+                    <div class="form-title-section">
+                        <h2><i class="fas fa-search-location"></i> Find Your Perfect Vehicle</h2>
+                        <p class="subtitle">Search and filter through vehicles across Sri Lanka</p>
+                    </div>
+                </div>
+
                 <div class="search-form">
-                    <div class="form-row">
+                    <!-- Row 1 (2 columns) -->
+                    <div class="form-row-grid">
                         <div class="form-group">
-                            <label for="vehicleCategory">Vehicle Category</label>
-                            <select class="form-control" id="vehicleCategory">
-                                <option value="">Select vehicle Category</option>
+                            <label for="vehicleType"><i class="fas fa-car"></i> Vehicle Type</label>
+                            <select class="form-control" id="vehicleType">
+                                <option value="">All Types</option>
                                 <option value="car">Car</option>
                                 <option value="suv">SUV</option>
                                 <option value="van">Van</option>
                                 <option value="truck">Truck</option>
                             </select>
                         </div>
+
                         <div class="form-group">
-                            <label for="pickupLocation">From</label>
+                            <label for="pickupLocation"><i class="fas fa-map-marker-alt"></i> Pickup Location</label>
                             <select class="form-control" id="pickupLocation">
-                                <option value="">Pick up location</option>
-                                <option value="colombo">Colombo</option>
-                                <option value="kandy">Kandy</option>
-                                <option value="galle">Galle</option>
-                                <option value="negombo">Negombo</option>
-                                <option value="jaffna">Jaffna</option>
-                                <option value="trincomalee">Trincomalee</option>
-                                <option value="anuradhapura">Anuradhapura</option>
-                                <option value="matara">Matara</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="dropoffLocation">To</label>
-                            <select class="form-control" id="dropoffLocation">
-                                <option value="">Drop off location</option>
+                                <option value="">All Locations</option>
                                 <option value="colombo">Colombo</option>
                                 <option value="kandy">Kandy</option>
                                 <option value="galle">Galle</option>
@@ -68,71 +60,81 @@
                         </div>
                     </div>
 
-                    <div class="form-row">
+                    <!-- Row 2 (3 columns) -->
+                    <div class="form-row-grid three-columns">
                         <div class="form-group">
-                            <label for="fromDateTime">From Date & Time</label>
-                            <input type="datetime-local" class="form-control" id="fromDateTime">
+                            <label for="priceRange"><i class="fas fa-money-bill-wave"></i> Price Range</label>
+                            <select class="form-control" id="priceRange">
+                                <option value="">All Prices</option>
+                                <option value="0-5000">LKR 0 - 5,000</option>
+                                <option value="5000-10000">LKR 5,000 - 10,000</option>
+                                <option value="10000-15000">LKR 10,000 - 15,000</option>
+                                <option value="15000+">LKR 15,000+</option>
+                            </select>
                         </div>
+
                         <div class="form-group">
-                            <label for="toDateTime">To Date & Time</label>
-                            <input type="datetime-local" class="form-control" id="toDateTime">
+                            <label for="fuelType"><i class="fas fa-gas-pump"></i> Fuel Type</label>
+                            <select class="form-control" id="fuelType">
+                                <option value="">All Fuel Types</option>
+                                <option value="petrol">Petrol</option>
+                                <option value="diesel">Diesel</option>
+                                <option value="hybrid">Hybrid</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="seats"><i class="fas fa-users"></i> Seats</label>
+                            <select class="form-control" id="seats">
+                                <option value="">Any</option>
+                                <option value="2">2</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                                <option value="7">7</option>
+                                <option value="7+">7+</option>
+                            </select>
                         </div>
                     </div>
 
-                    <button class="search-btn" onclick="performSearch()" type="button">
-                        <i class="fas fa-search"></i>
-                        <span id="searchBtnText">Search Vehicles</span>
-                    </button>
-                </div>
-            </div>
+                    <!-- Row 3 (2 columns) -->
+                    <div class="form-row-grid">
+                        <div class="form-group">
+                            <label for="vehicleCategoryFilter"><i class="fas fa-layer-group"></i> Category</label>
+                            <select class="form-control" id="vehicleCategoryFilter">
+                                <option value="">All Categories</option>
+                                <option value="car">Car</option>
+                                <option value="suv">SUV</option>
+                                <option value="van">Van</option>
+                                <option value="truck">Truck</option>
+                            </select>
+                        </div>
 
-            <!-- Filters -->
-            <div class="filters-container">
-                <h3 style="margin-bottom: 20px; color: var(--dark);">Filters</h3>
-                <div class="filters-grid">
-                    <div class="filter-group">
-                        <label for="priceRange">Price Range</label>
-                        <select class="filter-select" id="priceRange">
-                            <option value="">Select</option>
-                            <option value="0-5000">LKR 0 - 5,000</option>
-                            <option value="5000-10000">LKR 5,000 - 10,000</option>
-                            <option value="10000+">LKR 10,000+</option>
-                        </select>
+                        <div class="form-group">
+                            <label for="companyFilter"><i class="fas fa-building"></i> Company</label>
+                            <select class="form-control" id="companyFilter">
+                                <option value="">All Companies</option>
+                                <option value="Premium Rentals">Premium Rentals</option>
+                                <option value="City Car Rentals">City Car Rentals</option>
+                                <option value="Budget Wheels">Budget Wheels</option>
+                                <option value="Lanka Van Hire">Lanka Van Hire</option>
+                                <option value="Luxury Rides LK">Luxury Rides LK</option>
+                                <option value="Island Transport">Island Transport</option>
+                            </select>
+                        </div>
                     </div>
 
-                    <div class="filter-group">
-                        <label for="companyFilter">Company</label>
-                        <select class="filter-select" id="companyFilter">
-                            <option value="">Select Company</option>
-                            <option value="Premium Rentals">Premium Rentals</option>
-                            <option value="City Car Rentals">City Car Rentals</option>
-                            <option value="Budget Wheels">Budget Wheels</option>
-                            <option value="Lanka Van Hire">Lanka Van Hire</option>
-                            <option value="Luxury Rides LK">Luxury Rides LK</option>
-                            <option value="Island Transport">Island Transport</option>
-                        </select>
-                    </div>
-                    <div class="filter-group">
-                        <label for="fuelType">Fuel Type</label>
-                        <select class="filter-select" id="fuelType">
-                            <option value="">Select</option>
-                            <option value="petrol">Petrol</option>
-                            <option value="diesel">Diesel</option>
-                            <option value="hybrid">Hybrid</option>
-                        </select>
-                    </div>
-                    <div class="filter-group">
-                        <label for="seats">No of Seats</label>
-                        <select class="filter-select" id="seats">
-                            <option value="">Select</option>
-                            <option value="2">2</option>
-                            <option value="4">4</option>
-                            <option value="5">5</option>
-                            <option value="7+">7+</option>
-                        </select>
+                    <!-- Actions -->
+                    <div class="form-actions">
+                        <button class="search-btn primary" onclick="performSearch(); applyFilters();" type="button">
+                            <i class="fas fa-search"></i>
+                            <span>Search</span>
+                        </button>
+                        <button class="search-btn secondary" onclick="clearAllFilters()" type="button">
+                            <i class="fas fa-times"></i>
+                            <span>Clear</span>
+                        </button>
                     </div>
                 </div>
-                <button class="apply-btn" onclick="applyFilters()" type="button">Apply Filters</button>
             </div>
 
             <!-- Search Results -->
@@ -199,13 +201,7 @@
                 if (typeof initializeHeader === 'function') initializeHeader();
             });
 
-            // Set default datetime values
-            const now = new Date();
-            const tomorrow = new Date(now);
-            tomorrow.setDate(tomorrow.getDate() + 1);
-            
-            document.getElementById('fromDateTime').value = now.toISOString().slice(0, 16);
-            document.getElementById('toDateTime').value = tomorrow.toISOString().slice(0, 16);
+            // NOTE: Date/time defaults removed because the search form no longer contains those fields.
         });
 
         // Current active tab

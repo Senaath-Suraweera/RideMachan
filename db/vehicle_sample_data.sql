@@ -11,10 +11,46 @@ USE `RideMachan`;
 -- First, add missing columns to Vehicle table (if not already added)
 -- Note: vehicle_type has been replaced with vehicle_category (Car/SUV/Van)
 -- vehicle_type is now computed as vehiclebrand + vehiclemodel in the application
-ALTER TABLE Vehicle
-    ADD COLUMN IF NOT EXISTS vehicle_category VARCHAR(20),
-    ADD COLUMN IF NOT EXISTS fuel_type VARCHAR(20),
-    ADD COLUMN IF NOT EXISTS availability_status VARCHAR(20) DEFAULT 'available';
+-- Note: If columns already exist, these statements will be ignored
+
+-- Add vehicle_category column
+SET @sql = (SELECT IF(
+    (SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS
+     WHERE TABLE_SCHEMA = 'RideMachan'
+     AND TABLE_NAME = 'Vehicle'
+     AND COLUMN_NAME = 'vehicle_category') = 0,
+    'ALTER TABLE Vehicle ADD COLUMN vehicle_category VARCHAR(20)',
+    'SELECT ''vehicle_category already exists'' AS message'
+));
+PREPARE stmt FROM @sql;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+
+-- Add fuel_type column
+SET @sql = (SELECT IF(
+    (SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS
+     WHERE TABLE_SCHEMA = 'RideMachan'
+     AND TABLE_NAME = 'Vehicle'
+     AND COLUMN_NAME = 'fuel_type') = 0,
+    'ALTER TABLE Vehicle ADD COLUMN fuel_type VARCHAR(20)',
+    'SELECT ''fuel_type already exists'' AS message'
+));
+PREPARE stmt FROM @sql;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+
+-- Add availability_status column
+SET @sql = (SELECT IF(
+    (SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS
+     WHERE TABLE_SCHEMA = 'RideMachan'
+     AND TABLE_NAME = 'Vehicle'
+     AND COLUMN_NAME = 'availability_status') = 0,
+    'ALTER TABLE Vehicle ADD COLUMN availability_status VARCHAR(20) DEFAULT ''available''',
+    'SELECT ''availability_status already exists'' AS message'
+));
+PREPARE stmt FROM @sql;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
 
 -- ====================================================================
 -- Insert Rental Companies FIRST (Required for Foreign Key Constraints)
