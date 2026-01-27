@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -142,46 +142,34 @@
             <form id="registerCompanyForm">
               <div class="modal-body">
                 <div class="form-row">
+                  <!-- companyname -->
                   <div class="form-group">
-                    <label class="form-label" for="rcName">Company name</label>
+                    <label class="form-label" for="rcCompanyName"
+                      >Company name</label
+                    >
                     <input
-                      id="rcName"
+                      id="rcCompanyName"
                       class="form-control"
                       required
                       placeholder="e.g., ABC Rentals"
                     />
                   </div>
 
+                  <!-- companyemail -->
                   <div class="form-group">
-                    <label class="form-label" for="rcLocation">Location</label>
+                    <label class="form-label" for="rcCompanyEmail"
+                      >Company email</label
+                    >
                     <input
-                      id="rcLocation"
+                      id="rcCompanyEmail"
                       class="form-control"
+                      type="email"
                       required
-                      placeholder="e.g., Colombo"
+                      placeholder="name@company.lk"
                     />
                   </div>
 
-                  <div class="form-group">
-                    <label class="form-label" for="rcFleet">Fleet size</label>
-                    <input
-                      id="rcFleet"
-                      class="form-control"
-                      type="number"
-                      min="0"
-                      placeholder="e.g., 25"
-                    />
-                  </div>
-
-                  <div class="form-group">
-                    <label class="form-label">Offers driver</label>
-                    <label class="checkbox-container">
-                      <input id="rcWithDriver" type="checkbox" />
-                      <span class="checkmark"></span>
-                      <span>Yes, we offer a driver</span>
-                    </label>
-                  </div>
-
+                  <!-- phone -->
                   <div class="form-group">
                     <label class="form-label" for="rcPhone">Phone</label>
                     <input
@@ -191,24 +179,124 @@
                     />
                   </div>
 
+                  <!-- registrationnumber -->
                   <div class="form-group">
-                    <label class="form-label" for="rcEmail">Email</label>
+                    <label class="form-label" for="rcRegNo"
+                      >Registration number</label
+                    >
                     <input
-                      id="rcEmail"
+                      id="rcRegNo"
                       class="form-control"
-                      type="email"
-                      placeholder="name@company.lk"
+                      placeholder="e.g., PV 12345 / BR 1234"
                     />
                   </div>
 
+                  <!-- taxid -->
+                  <div class="form-group">
+                    <label class="form-label" for="rcTaxId">Tax ID</label>
+                    <input
+                      id="rcTaxId"
+                      class="form-control"
+                      placeholder="e.g., VAT / TIN"
+                    />
+                  </div>
+
+                  <!-- street -->
+                  <div class="form-group">
+                    <label class="form-label" for="rcStreet">Street</label>
+                    <input
+                      id="rcStreet"
+                      class="form-control"
+                      placeholder="e.g., No 12, Galle Rd"
+                    />
+                  </div>
+
+                  <!-- city -->
+                  <div class="form-group">
+                    <label class="form-label" for="rcCity">City</label>
+                    <input
+                      id="rcCity"
+                      class="form-control"
+                      required
+                      placeholder="e.g., Colombo"
+                    />
+                  </div>
+
+                  <!-- description -->
                   <div class="form-group" style="grid-column: 1 / -1">
-                    <label class="form-label" for="rcDesc">Description</label>
+                    <label class="form-label" for="rcDescription"
+                      >Company description</label
+                    >
                     <textarea
-                      id="rcDesc"
+                      id="rcDescription"
                       class="form-control"
                       rows="3"
-                      placeholder="Short description"
+                      placeholder="Brief description about your company"
                     ></textarea>
+                  </div>
+
+                  <!-- terms -->
+                  <div class="form-group" style="grid-column: 1 / -1">
+                    <label class="form-label" for="rcTerms"
+                      >Terms & Conditions</label
+                    >
+                    <textarea
+                      id="rcTerms"
+                      class="form-control"
+                      rows="3"
+                      placeholder="Fuel policy, late return fees, etc."
+                    ></textarea>
+                  </div>
+
+                  <!-- certificate upload -->
+                  <div class="form-group" style="grid-column: 1 / -1">
+                    <label class="form-label" for="rcCertificate"
+                      >Business certificate (PDF/Image)</label
+                    >
+                    <input
+                      id="rcCertificate"
+                      class="form-control"
+                      type="file"
+                      accept=".pdf,image/*"
+                      required
+                    />
+                  </div>
+
+                  <!-- tax document upload -->
+                  <div class="form-group" style="grid-column: 1 / -1">
+                    <label class="form-label" for="rcTaxDoc"
+                      >Tax document (PDF/Image)</label
+                    >
+                    <input
+                      id="rcTaxDoc"
+                      class="form-control"
+                      type="file"
+                      accept=".pdf,image/*"
+                      required
+                    />
+                  </div>
+
+                  <!-- password (backend will hash + salt) -->
+                  <div class="form-group">
+                    <label class="form-label" for="rcPassword">Password</label>
+                    <input
+                      id="rcPassword"
+                      class="form-control"
+                      type="password"
+                      required
+                    />
+                  </div>
+
+                  <div class="form-group">
+                    <label class="form-label" for="rcPassword2"
+                      >Confirm password</label
+                    >
+                    <input
+                      id="rcPassword2"
+                      class="form-control"
+                      type="password"
+                      required
+                    />
                   </div>
                 </div>
               </div>

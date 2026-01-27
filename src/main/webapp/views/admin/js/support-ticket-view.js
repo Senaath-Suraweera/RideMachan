@@ -1,97 +1,8 @@
-// Support Tickets JS — adds ROLE TOGGLE (All → Driver → Customer) on top of your current logic
+// Support Tickets JS — now loads from backend (JS-only integration)
 class SupportTicketsManager {
   constructor() {
-    this.tickets = [
-      {
-        id: 1,
-        subject: "Vehicle breakdown during trip",
-        status: "pending",
-        role: "driver",
-        priority: "high",
-        dateCreated: "2024-01-15",
-        customerName: "John Smith",
-        description: "...",
-        bookingId: "BK-2024-0156",
-      },
-      {
-        id: 2,
-        subject: "Payment processing issue",
-        status: "resolved",
-        role: "customer",
-        priority: "medium",
-        dateCreated: "2024-01-14",
-        customerName: "Sarah Wilson",
-        description: "...",
-        bookingId: "BK-2024-0155",
-      },
-      {
-        id: 3,
-        subject: "App crashes on booking",
-        status: "ongoing",
-        role: "customer",
-        priority: "medium",
-        dateCreated: "2024-01-13",
-        customerName: "Mike Johnson",
-        description: "...",
-        bookingId: "BK-2024-0154",
-      },
-      {
-        id: 4,
-        subject: "Inappropriate customer behavior",
-        status: "pending",
-        role: "driver",
-        priority: "high",
-        dateCreated: "2024-01-12",
-        customerName: "David Lee",
-        description: "...",
-        bookingId: "BK-2024-0153",
-      },
-      {
-        id: 5,
-        subject: "Vehicle cleanliness complaint",
-        status: "resolved",
-        role: "customer",
-        priority: "low",
-        dateCreated: "2024-01-11",
-        customerName: "Emma Davis",
-        description: "...",
-        bookingId: "BK-2024-0152",
-      },
-      {
-        id: 6,
-        subject: "Billing discrepancy",
-        status: "ongoing",
-        role: "customer",
-        priority: "medium",
-        dateCreated: "2024-01-10",
-        customerName: "Alex Kumar",
-        description: "...",
-        bookingId: "BK-2024-0151",
-      },
-      {
-        id: 7,
-        subject: "GPS tracking not working",
-        status: "pending",
-        role: "driver",
-        priority: "medium",
-        dateCreated: "2024-01-09",
-        customerName: "Maria Santos",
-        description: "...",
-        bookingId: "BK-2024-0150",
-      },
-      {
-        id: 8,
-        subject: "Account verification issue",
-        status: "resolved",
-        role: "customer",
-        priority: "low",
-        dateCreated: "2024-01-08",
-        customerName: "James Wilson",
-        description: "...",
-        bookingId: "BK-2024-0149",
-      },
-    ];
-    this.filteredTickets = [...this.tickets];
+    this.tickets = [];
+    this.filteredTickets = [];
 
     // --- Role toggle state ---
     this.roleToggle = ""; // "" (All) | "driver" | "customer"
@@ -99,29 +10,124 @@ class SupportTicketsManager {
     this.init();
   }
 
+  // ---------- API ----------
+  async fetchTickets({ status = "", role = "", priority = "" } = {}) {
+    const params = new URLSearchParams();
+    if (status) params.set("status", status);
+    if (role) params.set("role", role);
+    if (priority) params.set("priority", priority);
+
+    const res = await fetch(`/support/tickets/list?${params.toString()}`, {
+      method: "GET",
+      headers: { Accept: "application/json" },
+    });
+
+    const data = await res.json();
+    if (!res.ok || data.status !== "success") {
+      throw new Error(data.message || "Failed to load tickets");
+    }
+
+    // Your backend returns { status: "success", tickets: [...] }
+    return data.tickets || [];
+  }
+
+  // ---------- Init ----------
   init() {
-    this.renderTickets();
-    this.renderStats();
-    this.updateRoleToggleButton();
+    this.bindUI();
+    this.loadAndRender(); // initial load
+  }
 
-    // close modal when clicking backdrop
-    window.addEventListener("click", (e) => {
-      const filterModal = document.getElementById("filterModal");
-      if (e.target === filterModal) this.closeFilterModal();
+  bindUI() {
+    // Filters
+    const statusFilter = document.getElementById("statusFilter");
+    const roleFilter = document.getElementById("roleFilter");
+    const priorityFilter = document.getElementById("priorityFilter");
+
+    [statusFilter, roleFilter, priorityFilter].forEach((el) => {
+      if (el) el.addEventListener("change", () => this.loadAndRender());
     });
 
-    // if user uses the Role dropdown, clear the toggle (to avoid conflicts)
-    const roleSel = document.getElementById("roleFilter");
-    roleSel?.addEventListener("change", () => {
-      this.roleToggle = "";
-      this.updateRoleToggleButton();
-    });
+    // Role Toggle buttons (if exists)
+    const btnAll = document.getElementById("roleToggleAll");
+    const btnDriver = document.getElementById("roleToggleDriver");
+    const btnCustomer = document.getElementById("roleToggleCustomer");
+
+    if (btnAll && btnDriver && btnCustomer) {
+      btnAll.addEventListener("click", () => {
+        this.roleToggle = "";
+        this.updateRoleToggleButton();
+        this.loadAndRender();
+      });
+      btnDriver.addEventListener("click", () => {
+        this.roleToggle = "driver";
+        this.updateRoleToggleButton();
+        this.loadAndRender();
+      });
+      btnCustomer.addEventListener("click", () => {
+        this.roleToggle = "customer";
+        this.updateRoleToggleButton();
+        this.loadAndRender();
+      });
+    }
+  }
+
+  updateRoleToggleButton() {
+    const setActive = (id, active) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.classList.toggle("active", !!active);
+    };
+    setActive("roleToggleAll", this.roleToggle === "");
+    setActive("roleToggleDriver", this.roleToggle === "driver");
+    setActive("roleToggleCustomer", this.roleToggle === "customer");
+  }
+
+  // Read dropdown filters
+  readUIFilters() {
+    return {
+      status: document.getElementById("statusFilter")?.value || "",
+      role: document.getElementById("roleFilter")?.value || "",
+      priority: document.getElementById("priorityFilter")?.value || "",
+    };
+  }
+
+  // ---------- Load + Render ----------
+  async loadAndRender() {
+    try {
+      const { status, role, priority } = this.readUIFilters();
+
+      // roleToggle (driver/customer) overrides dropdown role if set
+      const roleParam = this.roleToggle || role;
+
+      // Fetch from backend (backend also supports filtering)
+      this.tickets = await this.fetchTickets({
+        status,
+        role: roleParam,
+        priority,
+      });
+
+      // Keep in filteredTickets (since we already applied server filters)
+      this.filteredTickets = [...this.tickets];
+
+      this.renderTickets();
+      this.renderStats();
+    } catch (err) {
+      console.error(err);
+      this.tickets = [];
+      this.filteredTickets = [];
+      this.renderTickets();
+      this.renderStats();
+      alert(err.message || "Failed to load tickets");
+    }
   }
 
   // ---------- Rendering ----------
   renderTickets() {
     const tbody = document.querySelector(".tickets-table tbody");
+    if (!tbody) return;
+
     tbody.innerHTML = "";
+
     this.filteredTickets.forEach((t) => tbody.appendChild(this.row(t)));
   }
 
@@ -143,148 +149,65 @@ class SupportTicketsManager {
 
   row(t) {
     const tr = document.createElement("tr");
-    tr.addEventListener("click", () => this.openTicketView(t.id));
+    tr.addEventListener("click", () => this.openTicketView(t.ticketId));
     tr.innerHTML = `
-      <td>#${t.id}</td>
-      <td>${escapeHTML(t.subject)}</td>
+      <td>#${t.ticketId}</td>
+      <td>${escapeHTML(t.subject || "")}</td>
       <td><span class="status-badge status-${t.status}">${this.statusText(
       t.status
     )}</span></td>
-      <td>${this.cap(t.role)}</td>
-      <td class="priority-${t.priority}">${t.priority.toUpperCase()}</td>
+      <td>${this.cap(t.actorType || t.role || "")}</td>
+      <td class="priority-${t.priority}">${String(
+      t.priority || ""
+    ).toUpperCase()}</td>
       <td>
         <button class="btn-icon" title="Open" onclick="viewTicket(${
-          t.id
+          t.ticketId
         });event.stopPropagation();">👁️</button>
       </td>`;
     return tr;
   }
 
   openTicketView(id) {
-    const ticketParam = `TKT-2024-${String(id).padStart(3, "0")}`;
+    // Keep your existing format (backend parses last number anyway)
+    const year = new Date().getFullYear();
+    const ticketParam = `TKT-${year}-${String(id).padStart(3, "0")}`;
     location.href = `support-ticket.html?id=${encodeURIComponent(ticketParam)}`;
   }
 
-  // ---------- Filters ----------
-  // Read current dropdown values
-  readUIFilters() {
-    return {
-      s: document.getElementById("statusFilter")?.value || "", // "pending"|"ongoing"|"resolved"|""
-      r: document.getElementById("roleFilter")?.value || "", // "customer"|"driver"|"company"|""
-      p: document.getElementById("priorityFilter")?.value || "", // "low"|"medium"|"high"|""
-    };
-  }
-
-  // Centralized filter computation (includes role toggle)
-  computeFilteredTickets({ s, r, p }) {
-    const role = this.roleToggle || r; // toggle overrides dropdown when set
-    return this.tickets.filter(
-      (t) =>
-        (!s || t.status === s) &&
-        (!role || t.role === role) &&
-        (!p || t.priority === p)
-    );
-  }
-
-  applyTicketFilters() {
-    this.filteredTickets = this.computeFilteredTickets(this.readUIFilters());
-    this.renderTickets();
-  }
-
-  clearTicketFilters() {
-    const ids = ["statusFilter", "roleFilter", "priorityFilter"];
-    ids.forEach((id) => {
-      const el = document.getElementById(id);
-      if (el) el.value = "";
-    });
-    this.roleToggle = ""; // also clear the toggle
-    this.updateRoleToggleButton();
-    this.filteredTickets = [...this.tickets];
-    this.renderTickets();
-  }
-
-  // ---------- Role Toggle ----------
-  toggleRole() {
-    const cycle = ["", "driver", "customer"]; // All → Driver → Customer
-    const next = cycle[(cycle.indexOf(this.roleToggle) + 1) % cycle.length];
-    this.roleToggle = next;
-
-    // Clear role dropdown to avoid clashes; toggle is the source of truth while active
-    const roleSel = document.getElementById("roleFilter");
-    if (roleSel) roleSel.value = "";
-
-    this.updateRoleToggleButton();
-
-    // Recompute with current dropdowns (status/priority) + toggle
-    this.filteredTickets = this.computeFilteredTickets(this.readUIFilters());
-    this.renderTickets();
-  }
-
-  updateRoleToggleButton() {
-    const btn = document.getElementById("roleToggleBtn");
-    if (!btn) return;
-    btn.textContent = `Role: ${
-      this.roleToggle ? this.cap(this.roleToggle) : "All"
-    }`;
-    btn.setAttribute("aria-pressed", this.roleToggle ? "true" : "false");
-  }
-
-  // ---------- Modal (unchanged) ----------
-  toggleFilter() {
-    const m = document.getElementById("filterModal");
-    if (!m) return;
-    m.style.display = "flex";
-    m.classList.add("show");
-    document.body.style.overflow = "hidden";
-  }
-  closeFilterModal() {
-    const m = document.getElementById("filterModal");
-    if (!m) return;
-    m.style.display = "none";
-    m.classList.remove("show");
-    document.body.style.overflow = "";
-  }
-
-  // ---------- utils ----------
   statusText(s) {
-    return (
-      { pending: "Pending", ongoing: "In Progress", resolved: "Resolved" }[s] ||
-      s
-    );
+    return s === "pending"
+      ? "Pending"
+      : s === "ongoing"
+      ? "Ongoing"
+      : s === "resolved"
+      ? "Resolved"
+      : s === "closed"
+      ? "Closed"
+      : s;
   }
+
   cap(s) {
+    if (!s) return "";
     return s.charAt(0).toUpperCase() + s.slice(1);
   }
 }
 
-function viewTicket(id) {
-  window.supportTicketsManager?.openTicketView(id);
-}
-function toggleFilter() {
-  window.supportTicketsManager?.toggleFilter();
-}
-function applyTicketFilters() {
-  window.supportTicketsManager?.applyTicketFilters();
-}
-function clearTicketFilters() {
-  window.supportTicketsManager?.clearTicketFilters();
-}
-function closeFilterModal() {
-  window.supportTicketsManager?.closeFilterModal();
-}
+// Helper for inline button
+window.viewTicket = function (id) {
+  const mgr = window.__ticketsMgr;
+  if (mgr) mgr.openTicketView(id);
+};
 
-// NEW: Role toggle bridge for the button
-function toggleRole() {
-  window.supportTicketsManager?.toggleRole();
-}
-
-function escapeHTML(s) {
-  return String(s)
+function escapeHTML(str) {
+  return String(str)
     .replaceAll("&", "&amp;")
     .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;");
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-  window.supportTicketsManager = new SupportTicketsManager();
+window.addEventListener("DOMContentLoaded", () => {
+  window.__ticketsMgr = new SupportTicketsManager();
 });

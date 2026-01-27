@@ -1,84 +1,26 @@
-// rental-companies.js — list, filters, + register company modal
-
-const DEFAULT_COMPANIES = [
-  {
-    id: 1,
-    name: "ABC Rentals",
-    rating: 4.7,
-    reviews: 128,
-    location: "Colombo",
-    offersDriver: true,
-    fleets: 56,
-    phone: "+94 11 234 5678",
-    email: "contact@abcrentals.lk",
-    description:
-      "Well-maintained fleet, popular for city trips and airport runs.",
-  },
-  {
-    id: 2,
-    name: "Hill Country Motors",
-    rating: 4.3,
-    reviews: 64,
-    location: "Kandy",
-    offersDriver: false,
-    fleets: 22,
-    phone: "+94 81 555 0192",
-    email: "info@hillcountry.lk",
-    description: "Great for hill country routes. Self-drive specialists.",
-  },
-  {
-    id: 3,
-    name: "Beachside Wheels",
-    rating: 4.5,
-    reviews: 91,
-    location: "Galle",
-    offersDriver: true,
-    fleets: 34,
-    phone: "+94 91 222 3344",
-    email: "hello@beachsidewheels.lk",
-    description: "Premium SUVs and vans for coastal trips.",
-  },
-  {
-    id: 4,
-    name: "Negombo Express",
-    rating: 3.9,
-    reviews: 37,
-    location: "Negombo",
-    offersDriver: true,
-    fleets: 18,
-    phone: "+94 31 222 1188",
-    email: "support@negomboexpress.lk",
-    description: "Airport transfer experts with 24/7 availability.",
-  },
-  {
-    id: 5,
-    name: "Central Auto Hire",
-    rating: 4.9,
-    reviews: 210,
-    location: "Colombo",
-    offersDriver: true,
-    fleets: 80,
-    phone: "+94 11 777 0000",
-    email: "team@centralauto.lk",
-    description: "Largest fleet, enterprise accounts, and VIP support.",
-  },
-];
+// rental-companies.js — list, filters, + register company modal (NOW uses backend)
 
 class RentalCompaniesApp {
   constructor() {
-    this.companies = [...DEFAULT_COMPANIES];
-    this.filteredCompanies = [...this.companies];
+    this.companies = [];
+    this.filteredCompanies = [];
     this.minRating = 0;
+
+    // backend endpoint created in your servlet
+    this.API_LIST = "/admin/rentalcompanies";
+
     this.init();
   }
 
-  init() {
+  async init() {
     this.bindElements();
-    this.populateLocationFilter();
     this.initializeRatingFilter();
     this.bindEventListeners();
+    this.bindRegisterCompanyModal();
+
+    await this.loadCompanies();
+    this.populateLocationFilter();
     this.applyFilters();
-    this.bindRegisterCompanyModal(); // NEW
   }
 
   bindElements() {
@@ -104,16 +46,65 @@ class RentalCompaniesApp {
     this.resetBtn = document.getElementById("btnReset");
   }
 
+  async loadCompanies() {
+    this.countEl.textContent = "Loading companies...";
+
+    try {
+      const res = await fetch(this.API_LIST, {
+        method: "GET",
+        headers: { Accept: "application/json" },
+      });
+
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+      const data = await res.json();
+      if (
+        !data ||
+        data.status !== "success" ||
+        !Array.isArray(data.companies)
+      ) {
+        throw new Error("Unexpected response from server");
+      }
+
+      // server already returns fields matching UI:
+      // id, name, rating, reviews, location, offersDriver, fleets, phone, email, description
+      this.companies = data.companies.map((c) => ({
+        id: Number(c.id),
+        name: c.name || "",
+        rating: Number(c.rating || 0),
+        reviews: Number(c.reviews || 0),
+        location: c.location || "",
+        offersDriver: Boolean(c.offersDriver),
+        fleets: Number(c.fleets || 0),
+        phone: c.phone || "",
+        email: c.email || "",
+        description: c.description || "",
+      }));
+
+      this.filteredCompanies = [...this.companies];
+      this.updateCount();
+    } catch (err) {
+      console.error("Failed to load companies:", err);
+      this.companies = [];
+      this.filteredCompanies = [];
+      this.grid.innerHTML =
+        '<div class="no-results">Failed to load companies from server.</div>';
+      this.countEl.textContent = "0 companies";
+    }
+  }
+
   populateLocationFilter() {
     const locations = [
-      ...new Set(this.companies.map((c) => c.location)),
+      ...new Set(this.companies.map((c) => c.location).filter(Boolean)),
     ].sort();
+
     // ensure "All" stays on top; we clear and rebuild
     this.locationEl.innerHTML = "";
     const all = document.createElement("option");
     all.value = "";
     all.textContent = "All";
     this.locationEl.appendChild(all);
+
     locations.forEach((loc) => {
       const opt = document.createElement("option");
       opt.value = loc;
@@ -135,7 +126,7 @@ class RentalCompaniesApp {
       });
     });
     this.ratingEl.addEventListener("mouseleave", () =>
-      this.updateRatingDisplay()
+      this.updateRatingDisplay(),
     );
   }
 
@@ -143,6 +134,7 @@ class RentalCompaniesApp {
     const stars = this.ratingEl.querySelectorAll(".star");
     stars.forEach((star, i) => star.classList.toggle("active", i < rating));
   }
+
   updateRatingDisplay() {
     this.highlightStars(this.minRating);
   }
@@ -164,17 +156,22 @@ class RentalCompaniesApp {
       e.preventDefault();
       this.applyFilters();
     });
+
     this.resetBtn.addEventListener("click", (e) => {
       e.preventDefault();
       this.resetFilters();
     });
   }
 
-  /* ===== Register Company modal ===== */
+  /* ===== Register Company modal (unchanged; uses your existing signup endpoint) ===== */
   bindRegisterCompanyModal() {
-    const open = () => this.modal.classList.add("show");
+    const open = () => {
+      this.modal.classList.add("show");
+      this.modal.setAttribute("aria-hidden", "false");
+    };
     const close = () => {
       this.modal.classList.remove("show");
+      this.modal.setAttribute("aria-hidden", "true");
       this.formRegister.reset();
     };
 
@@ -185,39 +182,85 @@ class RentalCompaniesApp {
       if (e.target === this.modal) close();
     });
 
-    this.formRegister?.addEventListener("submit", (e) => {
+    this.formRegister?.addEventListener("submit", async (e) => {
       e.preventDefault();
-      const name = document.getElementById("rcName").value.trim();
-      const location = document.getElementById("rcLocation").value.trim();
-      const fleets =
-        this.parseNumber(document.getElementById("rcFleet").value) || 0;
-      const offersDriver = document.getElementById("rcWithDriver").checked;
-      const phone = document.getElementById("rcPhone").value.trim();
-      const email = document.getElementById("rcEmail").value.trim();
-      const description = document.getElementById("rcDesc").value.trim();
 
-      if (!name || !location) {
-        alert("Please fill at least Company name and Location.");
+      const companyname =
+        document.getElementById("rcCompanyName")?.value?.trim() || "";
+      const companyemail =
+        document.getElementById("rcCompanyEmail")?.value?.trim() || "";
+      const phone = document.getElementById("rcPhone")?.value?.trim() || "";
+      const registrationnumber =
+        document.getElementById("rcRegNo")?.value?.trim() || "";
+      const taxid = document.getElementById("rcTaxId")?.value?.trim() || "";
+      const street = document.getElementById("rcStreet")?.value?.trim() || "";
+      const city = document.getElementById("rcCity")?.value?.trim() || "";
+      const description =
+        document.getElementById("rcDescription")?.value?.trim() || "";
+      const terms = document.getElementById("rcTerms")?.value?.trim() || "";
+      const password = document.getElementById("rcPassword")?.value || "";
+      const password2 = document.getElementById("rcPassword2")?.value || "";
+
+      const certificateInput = document.getElementById("rcCertificate");
+      const taxDocInput = document.getElementById("rcTaxDoc");
+      const certificateFile = certificateInput?.files?.[0];
+      const taxDocFile = taxDocInput?.files?.[0];
+
+      if (!companyname || !companyemail || !city) {
+        alert("Please fill Company name, Company email, and City.");
+        return;
+      }
+      if (password.length < 6) {
+        alert("Password must be at least 6 characters.");
+        return;
+      }
+      if (password !== password2) {
+        alert("Passwords do not match.");
+        return;
+      }
+      if (!certificateFile || !taxDocFile) {
+        alert("Please upload BOTH Business certificate and Tax document.");
         return;
       }
 
-      const newCompany = {
-        id: Date.now(),
-        name,
-        rating: 0,
-        reviews: 0,
-        location,
-        offersDriver,
-        fleets,
-        phone,
-        email,
-        description,
-      };
+      const fd = new FormData();
+      fd.append("companyname", companyname);
+      fd.append("email", companyemail);
+      fd.append("phone", phone);
+      fd.append("registrationnumber", registrationnumber);
+      fd.append("taxid", taxid);
+      fd.append("street", street);
+      fd.append("city", city);
+      fd.append("description", description);
+      fd.append("terms", terms);
+      fd.append("password", password);
+      fd.append("certificate", certificateFile);
+      fd.append("taxdocument", taxDocFile);
 
-      this.companies.unshift(newCompany); // add to top
-      this.populateLocationFilter(); // refresh locations
-      this.applyFilters(); // re-render grid
-      close();
+      try {
+        const res = await fetch("/rentalcompanies/signup", {
+          method: "POST",
+          body: fd,
+        });
+
+        if (!res.ok) {
+          const ct = res.headers.get("content-type") || "";
+          const msg = ct.includes("application/json")
+            ? (await res.json().catch(() => ({}))).message
+            : await res.text().catch(() => "");
+          throw new Error(msg || `Signup failed (HTTP ${res.status})`);
+        }
+
+        alert("Company registration submitted successfully!");
+        close();
+
+        // refresh list after signup (in case your admin auto-creates company)
+        await this.loadCompanies();
+        this.populateLocationFilter();
+        this.applyFilters();
+      } catch (err) {
+        alert(err?.message || "Signup failed");
+      }
     });
   }
 
@@ -234,21 +277,27 @@ class RentalCompaniesApp {
     };
 
     this.filteredCompanies = this.companies.filter((c) => {
+      const desc = (c.description || "").toLowerCase();
+
       if (
         filters.name &&
         !c.name.toLowerCase().includes(filters.name) &&
-        !c.description.toLowerCase().includes(filters.name)
+        !desc.includes(filters.name)
       )
         return false;
+
       if (filters.location && c.location !== filters.location) return false;
       if (filters.withDriver && !c.offersDriver) return false;
+
       if (filters.fleetMin !== null && c.fleets < filters.fleetMin)
         return false;
       if (filters.fleetMax !== null && c.fleets > filters.fleetMax)
         return false;
+
       if (filters.reviewsMin !== null && c.reviews < filters.reviewsMin)
         return false;
       if (filters.minRating > 0 && c.rating < filters.minRating) return false;
+
       return true;
     });
 
@@ -288,29 +337,24 @@ class RentalCompaniesApp {
     const initials = this.getInitials(company.name);
     const stars = this.renderStars(company.rating);
     return `
-    <div class="company-card" data-company-id="${
-      company.id
-    }" onclick="app.viewCompany(${company.id})">
-      <div class="company-avatar"><span class="avatar-text">${initials}</span></div>
-      <div class="company-info">
-        <h3 class="company-name">${this.escapeHtml(company.name)}</h3>
-        <div class="company-meta">
-          <div class="meta-item">📍 ${this.escapeHtml(company.location)}</div>
-          <div class="meta-item">👨‍✈️ ${
-            company.offersDriver ? "Driver available" : "Self-drive only"
-          }</div>
-          <div class="meta-item">🚗 ${company.fleets} vehicles</div>
-        </div>
-        <p class="company-desc">${this.escapeHtml(
-          company.description || ""
-        )}</p>
-        <div class="company-rating">
-          <div class="rating-stars">${stars}</div>
-          <span class="rating-value">${Number(company.rating).toFixed(1)}</span>
-          <span class="review-count">(${company.reviews})</span>
+      <div class="company-card" data-company-id="${company.id}" onclick="app.viewCompany(${company.id})">
+        <div class="company-avatar"><span class="avatar-text">${initials}</span></div>
+        <div class="company-info">
+          <h3 class="company-name">${this.escapeHtml(company.name)}</h3>
+          <div class="company-meta">
+            <div class="meta-item">📍 ${this.escapeHtml(company.location)}</div>
+            <div class="meta-item">👨‍✈️ ${company.offersDriver ? "Driver available" : "Self-drive only"}</div>
+            <div class="meta-item">🚗 ${company.fleets} vehicles</div>
+          </div>
+          <p class="company-desc">${this.escapeHtml(company.description || "")}</p>
+          <div class="company-rating">
+            <div class="rating-stars">${stars}</div>
+            <span class="rating-value">${Number(company.rating || 0).toFixed(1)}</span>
+            <span class="review-count">(${company.reviews || 0})</span>
+          </div>
         </div>
       </div>
-    </div>`;
+    `;
   }
 
   updateCount() {
@@ -334,20 +378,18 @@ class RentalCompaniesApp {
 
   viewCompany(id) {
     const c = this.companies.find((x) => x.id === id);
-    if (!c) return;
-    sessionStorage.setItem(
-      "selectedCompany",
-      JSON.stringify({ id: c.id, name: c.name })
-    );
-    const url = new URL("rental-company-view.html", location.href);
-    url.searchParams.set("id", String(c.id));
-    url.searchParams.set("name", c.name);
-    location.href = url.toString();
-  }
 
-  messageCompany(id) {
-    const c = this.companies.find((x) => x.id === id);
-    alert(`Starting conversation with ${c ? c.name : "Unknown Company"}`);
+    // optional cache (used only if needed)
+    if (c) {
+      sessionStorage.setItem(
+        "selectedCompany",
+        JSON.stringify({ id: c.id, name: c.name }),
+      );
+    }
+
+    const url = new URL("rental-company-view.html", location.href);
+    url.searchParams.set("id", String(id));
+    location.href = url.toString();
   }
 
   // utils
@@ -355,26 +397,31 @@ class RentalCompaniesApp {
     const n = parseFloat(v);
     return Number.isNaN(n) ? null : n;
   }
+
   getInitials(name) {
-    return name
+    return String(name || "")
       .split(" ")
+      .filter(Boolean)
       .map((w) => w[0])
       .join("")
       .toUpperCase()
       .slice(0, 2);
   }
+
   renderStars(r) {
-    const full = Math.floor(r || 0);
+    const full = Math.floor(Number(r || 0));
     return Array.from(
       { length: 5 },
-      (_, i) => `<span class="star ${i < full ? "active" : ""}">⭐</span>`
+      (_, i) => `<span class="star ${i < full ? "active" : ""}">⭐</span>`,
     ).join("");
   }
+
   escapeHtml(t) {
     const d = document.createElement("div");
     d.textContent = t;
     return d.innerHTML;
   }
+
   debounce(fn, wait) {
     let t;
     return (...a) => {

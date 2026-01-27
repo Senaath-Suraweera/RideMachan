@@ -1,84 +1,178 @@
-// Support Ticket View — loads by ?id=..., allows edits, persists to sessionStorage
+// Support Ticket View — now loads/saves via backend servlets (JS-only integration)
 (function () {
   const $ = (s, r = document) => r.querySelector(s);
   const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
 
-  // ----- Seed data (replace with API) -----
-  const TICKETS = {
-    "TKT-2024-001": {
-      id: "TKT-2024-001",
-      priority: "High",
-      status: "In Progress",
-      dateCreated: "2024-01-15 10:30 AM",
-      userRole: "Customer",
-      bookingId: "BK-2024-0156",
-      desc: "Vehicle breakdown issue - Engine overheating during rental period. Customer was traveling from Colombo to Kandy when the issue occurred. Requesting immediate assistance and possible vehicle replacement.",
-      images: [
-        { name: "engine-issue-1.jpg" },
-        { name: "dashboard-warning.jpg" },
-      ],
-      adminNotes:
-        "Initial assessment completed. Contacted roadside assistance. Customer has been relocated to temporary accommodation. Replacement vehicle being arranged.",
-      customer: {
-        name: "John Perera",
-        email: "john.perera@email.com",
-        phone: "+94 77 123 4567",
-        rentals: 12,
-      },
-    },
-  };
-
   // ----- State -----
-  let ticket = null;
+  let ticket = null; // local view model
+  let ticketIdNumeric = null; // numeric id used for updates/uploads
 
-  // ----- Init -----
-  document.addEventListener("DOMContentLoaded", () => {
-    if (document.querySelector(".sidebar"))
-      document.body.classList.add("with-sidebar");
+  // ----- Utils -----
+  function qp(name) {
+    return new URLSearchParams(location.search).get(name);
+  }
 
-    const id = new URLSearchParams(location.search).get("id") || "TKT-2024-001";
-    ticket = loadTicket(id) || TICKETS[id];
-    if (!ticket) {
-      renderEmpty(`Ticket not found for id ${id}`);
+  function escapeHTML(str) {
+    return String(str)
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
+
+  function toast(msg) {
+    const el = $("#toast");
+    if (!el) {
+      alert(msg);
       return;
     }
+    el.textContent = msg;
+    el.classList.add("show");
+    setTimeout(() => el.classList.remove("show"), 1800);
+  }
 
-    populate(ticket);
-    bindEvents();
-  });
+  // Map backend ticket -> frontend ticket object (keep your UI fields)
+  function mapBackendToUI(data) {
+    const t = data.ticket;
+    const imageIds = data.imageIds || [];
+
+    // Build images array expected by renderImages()
+    const images = imageIds.map((id) => ({
+      imageId: id,
+      name: `image_${id}.jpg`,
+      url: `/support/ticket/image/get?imageId=${id}`,
+    }));
+
+    return {
+      id: `TKT-${new Date().getFullYear()}-${String(t.ticketId).padStart(
+        3,
+        "0"
+      )}`, // display
+      ticketId: t.ticketId, // numeric
+      subject: t.subject || "",
+      priority: t.priority || "Low",
+      status: t.status || "Open",
+      dateCreated: t.createdAt || "",
+      userRole: t.actorType || "",
+      bookingId: t.bookingId || "",
+      desc: t.description || "",
+      images,
+      adminNotes: t.adminNotes || "",
+      // if you later return customer info from backend, fill here:
+      customer: t.customer || null,
+    };
+  }
+
+  // ----- API calls -----
+  async function apiGetTicket(idParam) {
+    const res = await fetch(
+      `/support/ticket/get?id=${encodeURIComponent(idParam)}`,
+      {
+        method: "GET",
+        headers: { Accept: "application/json" },
+      }
+    );
+    const data = await res.json();
+    if (!res.ok || data.status !== "success") {
+      throw new Error(data.message || "Ticket load failed");
+    }
+    return data;
+  }
+
+  async function apiUpdateTicket(payload) {
+    const res = await fetch(`/support/ticket/update`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+    const data = await res.json();
+    if (!res.ok || data.status !== "success") {
+      throw new Error(data.message || "Update failed");
+    }
+    return data;
+  }
+
+  async function apiUploadImages(ticketId, files) {
+    const fd = new FormData();
+    fd.append("ticketId", String(ticketId));
+    files.forEach((f) => fd.append("images", f));
+
+    const res = await fetch(`/support/ticket/image/upload`, {
+      method: "POST",
+      body: fd,
+    });
+    const data = await res.json();
+    if (!res.ok || data.status !== "success") {
+      throw new Error(data.message || "Image upload failed");
+    }
+    return data.imageIds || [];
+  }
+
+  async function apiDeleteImage(imageId) {
+    const res = await fetch(`/support/ticket/image/delete`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      body: JSON.stringify({ imageId }),
+    });
+    const data = await res.json();
+    if (!res.ok || data.status !== "success") {
+      throw new Error(data.message || "Delete failed");
+    }
+    return true;
+  }
 
   // ----- Render -----
-  function populate(t) {
-    // header
-    $("#ticketId").textContent = t.id;
-    setPriorityBadge(t.priority);
-    setStatusBadge(t.status);
+  function render() {
+    if (!ticket) return;
 
-    // meta
-    $("#dateCreated").textContent = t.dateCreated;
-    $("#userRole").textContent = t.userRole;
-    $("#bookingId").textContent = t.bookingId;
+    $("#ticketId") && ($("#ticketId").textContent = ticket.id);
+    $("#ticketSubject") &&
+      ($("#ticketSubject").textContent = ticket.subject || "");
+    $("#dateCreated") &&
+      ($("#dateCreated").textContent = ticket.dateCreated || "");
+    $("#roleValue") && ($("#roleValue").textContent = ticket.userRole || "");
+    $("#bookingIdValue") &&
+      ($("#bookingIdValue").textContent = ticket.bookingId || "");
 
-    // left panels
-    $("#descriptionInput").value = t.desc || "";
-    $("#adminNotesInput").value = t.adminNotes || "";
-    renderImages(t.images || []);
+    // selects
+    if ($("#prioritySelect")) $("#prioritySelect").value = ticket.priority;
+    if ($("#statusSelect")) $("#statusSelect").value = ticket.status;
 
-    // right side
-    $("#prioritySelect").value = t.priority;
-    $("#statusSelect").value = t.status;
+    // textareas
+    $("#descriptionInput") &&
+      ($("#descriptionInput").value = ticket.desc || "");
+    $("#adminNotesInput") &&
+      ($("#adminNotesInput").value = ticket.adminNotes || "");
 
-    // customer
-    $("#custName").textContent = t.customer?.name || "—";
-    $("#custEmail").textContent = t.customer?.email || "—";
-    $("#custPhone").textContent = t.customer?.phone || "—";
-    $("#custRentals").textContent =
-      (t.customer?.rentals ?? "—") +
-      (t.customer?.rentals != null ? " rentals" : "");
+    setPriorityBadge(ticket.priority);
+    setStatusBadge(ticket.status);
+    renderImages(ticket.images || []);
+
+    renderCustomer(ticket.customer);
+  }
+
+  function renderCustomer(c) {
+    // If your HTML has customer fields, fill them safely
+    // If not present, this does nothing.
+    if (!c) return;
+    $("#customerName") && ($("#customerName").textContent = c.name || "");
+    $("#customerEmail") && ($("#customerEmail").textContent = c.email || "");
+    $("#customerPhone") && ($("#customerPhone").textContent = c.phone || "");
+    $("#customerRentals") &&
+      ($("#customerRentals").textContent = String(c.rentals ?? ""));
   }
 
   function renderImages(list) {
     const grid = $("#imagesGrid");
+    if (!grid) return;
+
     grid
       .querySelectorAll(".image-card[data-kind='img']")
       .forEach((n) => n.remove());
@@ -94,36 +188,47 @@
         }" onerror="this.replaceWith(document.createTextNode('🖼️'))"></div>
         <div class="image-name">${escapeHTML(img.name || "image")}</div>
       `;
-      card.querySelector(".remove").addEventListener("click", () => {
-        ticket.images.splice(idx, 1);
-        renderImages(ticket.images);
-        saveTicket(ticket);
-        toast("Image removed");
+
+      card.querySelector(".remove").addEventListener("click", async () => {
+        try {
+          // If it has imageId -> delete from DB
+          if (img.imageId) {
+            await apiDeleteImage(img.imageId);
+          }
+          ticket.images.splice(idx, 1);
+          renderImages(ticket.images);
+          toast("Image removed");
+        } catch (e) {
+          console.error(e);
+          toast(e.message || "Failed to remove image");
+        }
       });
+
       grid.insertBefore(card, $("#addImageCard"));
     });
   }
 
   function setPriorityBadge(p) {
     const el = $("#priorityBadge");
+    if (!el) return;
     el.textContent = p;
     el.className =
-      "badge " +
-      (p === "Low"
-        ? "pri-low"
-        : p === "Medium"
-        ? "pri-medium"
+      "priority-badge " +
+      (p === "Urgent"
+        ? "p-urgent"
         : p === "High"
-        ? "pri-high"
-        : p === "Urgent"
-        ? "pri-urgent"
-        : "");
+        ? "p-high"
+        : p === "Medium"
+        ? "p-medium"
+        : "p-low");
   }
+
   function setStatusBadge(s) {
     const el = $("#statusBadge");
+    if (!el) return;
     el.textContent = s;
     el.className =
-      "badge " +
+      "status-badge " +
       (s === "Open"
         ? "st-open"
         : s === "In Progress"
@@ -137,93 +242,112 @@
 
   // ----- Events -----
   function bindEvents() {
-    $("#prioritySelect").addEventListener("change", (e) => {
+    $("#prioritySelect")?.addEventListener("change", (e) => {
       ticket.priority = e.target.value;
       setPriorityBadge(ticket.priority);
     });
-    $("#statusSelect").addEventListener("change", (e) => {
+
+    $("#statusSelect")?.addEventListener("change", (e) => {
       ticket.status = e.target.value;
       setStatusBadge(ticket.status);
     });
 
-    $("#saveBtn").addEventListener("click", () => {
-      ticket.desc = $("#descriptionInput").value.trim();
-      ticket.adminNotes = $("#adminNotesInput").value.trim();
-      saveTicket(ticket);
-      toast("Ticket saved");
-    });
+    $("#saveBtn")?.addEventListener("click", async () => {
+      try {
+        ticket.desc = $("#descriptionInput")?.value.trim() || "";
+        ticket.adminNotes = $("#adminNotesInput")?.value.trim() || "";
 
-    $("#imageInput").addEventListener("change", async (e) => {
-      const files = Array.from(e.target.files || []);
-      if (!files.length) return;
-      for (const f of files) {
-        // For demo we keep just the name; you can also store base64 for persistence
-        ticket.images.push({ name: f.name, url: URL.createObjectURL(f) });
+        // Your update servlet expects ALL fields (as-is approach)
+        await apiUpdateTicket({
+          ticketId: ticketIdNumeric,
+          subject: ticket.subject,
+          description: ticket.desc,
+          adminNotes: ticket.adminNotes,
+          status: ticket.status, // DB enum values
+          priority: ticket.priority, // DB enum values
+          bookingId: ticket.bookingId || null,
+        });
+
+        toast("Ticket updated");
+      } catch (e) {
+        console.error(e);
+        toast(e.message || "Update failed");
       }
-      renderImages(ticket.images);
-      saveTicket(ticket);
-      e.target.value = "";
     });
 
-    $("#addImageCard").addEventListener("click", () =>
-      $("#imageInput").click()
+    $("#imageInput")?.addEventListener("change", async (e) => {
+      try {
+        const files = Array.from(e.target.files || []);
+        if (!files.length) return;
+
+        // Upload immediately
+        const newIds = await apiUploadImages(ticketIdNumeric, files);
+
+        // Add to UI list
+        newIds.forEach((id) => {
+          ticket.images.unshift({
+            imageId: id,
+            name: `image_${id}.jpg`,
+            url: `/support/ticket/image/get?imageId=${id}`,
+          });
+        });
+
+        renderImages(ticket.images);
+        toast("Image uploaded");
+      } catch (err) {
+        console.error(err);
+        toast(err.message || "Upload failed");
+      } finally {
+        e.target.value = "";
+      }
+    });
+
+    $("#addImageCard")?.addEventListener("click", () =>
+      $("#imageInput")?.click()
     );
 
-    $("#actionEmail").addEventListener("click", () => {
+    $("#actionEmail")?.addEventListener("click", () => {
       const email = ticket.customer?.email || "";
       window.location.href = `mailto:${email}?subject=Regarding Ticket ${encodeURIComponent(
         ticket.id
       )}`;
     });
-    $("#actionFollowup").addEventListener("click", () => {
+
+    $("#actionFollowup")?.addEventListener("click", () => {
       toast("Follow-up scheduled (demo)");
     });
-    $("#actionEscalate").addEventListener("click", () => {
-      toast("Escalated to manager (demo)");
+    $("#actionEscalate")?.addEventListener("click", () => {
+      toast("Escalated (demo)");
     });
-    $("#actionClose").addEventListener("click", () => {
+    $("#actionClose")?.addEventListener("click", () => {
       ticket.status = "Closed";
       $("#statusSelect").value = "Closed";
       setStatusBadge("Closed");
-      saveTicket(ticket);
-      toast("Ticket closed");
+      toast("Marked Closed (click Save to persist)");
     });
   }
 
-  // ----- Storage -----
-  function keyFor(id) {
-    return `rm_ticket_${id}`;
-  }
-  function loadTicket(id) {
+  // ----- Boot -----
+  async function boot() {
     try {
-      return JSON.parse(sessionStorage.getItem(keyFor(id)));
-    } catch {
-      return null;
+      bindEvents();
+
+      const id = qp("id");
+      if (!id) {
+        toast("Missing ticket id");
+        return;
+      }
+
+      const data = await apiGetTicket(id);
+      ticket = mapBackendToUI(data);
+      ticketIdNumeric = ticket.ticketId;
+
+      render();
+    } catch (e) {
+      console.error(e);
+      toast(e.message || "Failed to load ticket");
     }
   }
-  function saveTicket(t) {
-    sessionStorage.setItem(keyFor(t.id), JSON.stringify(t));
-  }
 
-  // ----- Utils -----
-  function renderEmpty(msg) {
-    $(
-      ".main-content"
-    ).innerHTML = `<div class="card" style="text-align:center"><p>${escapeHTML(
-      msg
-    )}</p><p><a href="support-ticket-view.html">Back to tickets</a></p></div>`;
-  }
-  function escapeHTML(s) {
-    return String(s)
-      .replaceAll("&", "&amp;")
-      .replaceAll("<", "&lt;")
-      .replaceAll(">", "&gt;");
-  }
-  function toast(message) {
-    const el = document.createElement("div");
-    el.textContent = message;
-    el.style.cssText = `position:fixed;right:16px;bottom:16px;background:#0f172a;color:#fff;padding:10px 14px;border-radius:10px;box-shadow:0 12px 30px rgba(0,0,0,.25);z-index:2000;`;
-    document.body.appendChild(el);
-    setTimeout(() => el.remove(), 1600);
-  }
+  window.addEventListener("DOMContentLoaded", boot);
 })();

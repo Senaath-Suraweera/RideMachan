@@ -36,6 +36,9 @@ public class RentalCompanySignupServlet extends HttpServlet {
             String taxId = request.getParameter("taxid");
             String street = request.getParameter("street");
             String city = request.getParameter("city");
+            String description = request.getParameter("description");
+            String terms = request.getParameter("terms");
+
             String password = request.getParameter("password");
 
             // Handle uploaded documents
@@ -55,6 +58,8 @@ public class RentalCompanySignupServlet extends HttpServlet {
             String certificatePath = UPLOAD_DIR + "/" + certificateFileName;
             String taxDocumentPath = UPLOAD_DIR + "/" + taxFileName;
 
+
+
             // Password hashing
             String salt = PasswordServices.generateSalt();
             String hashed = PasswordServices.hashPassword(password, salt);
@@ -71,6 +76,9 @@ public class RentalCompanySignupServlet extends HttpServlet {
             company.setTaxDocumentPath(taxDocumentPath);
             company.setHashedPassword(hashed);
             company.setSalt(salt);
+            company.setDescription(description);
+            company.setTerms(terms);
+
 
             RentalCompanyDAO dao = new RentalCompanyDAO();
             if (dao.addCompany(company)) {
