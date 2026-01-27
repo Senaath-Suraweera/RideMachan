@@ -76,11 +76,21 @@
     grid-template-columns: repeat(2, 1fr) !important;
     gap: 22px !important;
     margin-bottom: 22px;
+    align-items: start;
 }
 
 /* 3 column grid */
 .form-row-grid.three-columns {
     grid-template-columns: repeat(3, 1fr) !important;
+}
+
+/* Stacked form groups (for right column with multiple filters) */
+.form-group-stacked {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    height: 100%;
+    justify-content: flex-start;
 }
 
 /* =========================
@@ -102,6 +112,7 @@
     display: flex;
     align-items: center;
     gap: 8px;
+    margin-bottom: 0;
 }
 
 .form-group label i {
@@ -118,6 +129,8 @@
     background: #fff;
     cursor: pointer;
     transition: 0.3s ease;
+    height: 52px;
+    box-sizing: border-box;
 }
 
 .form-control:hover {
@@ -184,6 +197,171 @@
    RESPONSIVE DESIGN
    ========================= */
 
+/* Price Range Slider Styles */
+.price-slider-group {
+    grid-column: span 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.price-slider-container {
+    background: #fff;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.price-labels {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    font-size: 12px;
+    color: #6b7280;
+}
+
+.price-min-label,
+.price-max-label {
+    font-weight: 500;
+    color: #9ca3af;
+}
+
+.price-value-from,
+.price-value-to {
+    background: #2563eb;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-weight: 700;
+    font-size: 13px;
+}
+
+/* Slider Wrapper */
+.slider-wrapper {
+    position: relative;
+    height: 40px;
+    margin-bottom: 20px;
+}
+
+.slider-track {
+    position: absolute;
+    width: 100%;
+    height: 6px;
+    background: #e5e7eb;
+    border-radius: 3px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.slider-range {
+    position: absolute;
+    height: 6px;
+    background: #2563eb;
+    border-radius: 3px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.slider-input {
+    position: absolute;
+    width: 100%;
+    height: 6px;
+    background: transparent;
+    pointer-events: none;
+    top: 50%;
+    transform: translateY(-50%);
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+.slider-input::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: #2563eb;
+    cursor: pointer;
+    pointer-events: auto;
+    border: 4px solid white;
+    box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
+    transition: all 0.3s ease;
+}
+
+.slider-input::-webkit-slider-thumb:hover {
+    transform: scale(1.2);
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.5);
+}
+
+.slider-input::-moz-range-thumb {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: #2563eb;
+    cursor: pointer;
+    pointer-events: auto;
+    border: 4px solid white;
+    box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
+    transition: all 0.3s ease;
+}
+
+.slider-input::-moz-range-thumb:hover {
+    transform: scale(1.2);
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.5);
+}
+
+/* Price Inputs */
+.price-inputs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin-bottom: 0;
+}
+
+.price-input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.price-input-group label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #374151;
+    text-transform: none;
+    letter-spacing: 0;
+    margin-bottom: 4px;
+}
+
+.price-input {
+    width: 100%;
+    padding: 10px 12px;
+    font-size: 14px;
+    border-radius: 8px;
+    border: 2px solid #e5e7eb;
+    background: #f9fafb;
+    transition: all 0.3s ease;
+    text-align: center;
+    font-weight: 600;
+}
+
+.price-input:focus {
+    outline: none;
+    border-color: #2563eb;
+    background: #fff;
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+}
+
+
+/* =========================
+   RESPONSIVE DESIGN
+   ========================= */
+
 /* Tablets */
 @media (max-width: 992px) {
     .form-row-grid.three-columns {
@@ -197,6 +375,26 @@
     .form-row-grid,
     .form-row-grid.three-columns {
         grid-template-columns: 1fr;
+    }
+
+    .price-slider-group {
+        grid-column: span 1;
+    }
+
+    .price-slider-container {
+        padding: 20px;
+    }
+
+    .price-labels {
+        font-size: 12px;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .price-value-from,
+    .price-value-to {
+        font-size: 14px;
+        padding: 6px 12px;
     }
 
     .form-actions {

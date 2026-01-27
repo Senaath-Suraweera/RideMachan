@@ -5,22 +5,175 @@ let allVehicles = [];
 let filteredVehicles = [];
 
 // ========================================
+// Populate Filter Dropdowns from Vehicle Data
+// ========================================
+function populateFilterOptions() {
+    console.log('populateFilterOptions called');
+    console.log('allVehicles:', allVehicles);
+    console.log('allVehicles length:', allVehicles.length);
+
+    if (!allVehicles || allVehicles.length === 0) {
+        console.warn('No vehicles to populate filters');
+        return;
+    }
+
+    // Log a sample vehicle to see its structure
+    if (allVehicles.length > 0) {
+        console.log('Sample vehicle:', allVehicles[0]);
+    }
+
+    // Extract unique vehicle types (categories)
+    const vehicleTypes = [...new Set(allVehicles
+        .map(v => v.vehicleType)
+        .filter(Boolean)
+        .map(type => type.trim())
+    )].sort();
+    console.log('Extracted vehicleTypes:', vehicleTypes);
+
+    // Extract unique locations
+    const locations = [...new Set(allVehicles
+        .map(v => v.location)
+        .filter(Boolean)
+        .map(loc => loc.trim())
+    )].sort();
+    console.log('Extracted locations:', locations);
+
+    // Extract unique fuel types
+    const fuelTypes = [...new Set(allVehicles
+        .map(v => v.fuelType)
+        .filter(Boolean)
+        .map(fuel => fuel.trim())
+    )].sort();
+    console.log('Extracted fuelTypes:', fuelTypes);
+
+    // Extract unique seat counts
+    const seatCounts = [...new Set(allVehicles
+        .map(v => v.numberOfPassengers)
+        .filter(seats => seats && seats > 0)
+    )].sort((a, b) => a - b);
+    console.log('Extracted seatCounts:', seatCounts);
+
+    // Populate Vehicle Type dropdown
+    const vehicleTypeSelect = document.getElementById('vehicleType');
+    if (vehicleTypeSelect) {
+        // Keep the "All Types" option
+        vehicleTypeSelect.innerHTML = '<option value="">All Types</option>';
+        vehicleTypes.forEach(type => {
+            const option = document.createElement('option');
+            option.value = type.toLowerCase();
+            option.textContent = type;
+            vehicleTypeSelect.appendChild(option);
+        });
+    }
+
+    // Populate Pickup Location dropdown
+    const pickupLocationSelect = document.getElementById('pickupLocation');
+    if (pickupLocationSelect) {
+        pickupLocationSelect.innerHTML = '<option value="">All Locations</option>';
+        locations.forEach(location => {
+            const option = document.createElement('option');
+            option.value = location.toLowerCase();
+            option.textContent = location;
+            pickupLocationSelect.appendChild(option);
+        });
+    }
+
+    // Populate Fuel Type dropdown
+    const fuelTypeSelect = document.getElementById('fuelType');
+    if (fuelTypeSelect) {
+        fuelTypeSelect.innerHTML = '<option value="">All Fuel Types</option>';
+        fuelTypes.forEach(fuel => {
+            const option = document.createElement('option');
+            option.value = fuel.toLowerCase();
+            option.textContent = fuel;
+            fuelTypeSelect.appendChild(option);
+        });
+    }
+
+    // Populate Seats dropdown
+    const seatsSelect = document.getElementById('seats');
+    if (seatsSelect) {
+        seatsSelect.innerHTML = '<option value="">Any</option>';
+        seatCounts.forEach(seats => {
+            const option = document.createElement('option');
+            option.value = seats;
+            option.textContent = seats;
+            seatsSelect.appendChild(option);
+        });
+        // Add "7+" option if there are vehicles with 7+ seats
+        const maxSeats = Math.max(...seatCounts);
+        if (maxSeats >= 7) {
+            const option = document.createElement('option');
+            option.value = '7+';
+            option.textContent = '7+';
+            seatsSelect.appendChild(option);
+        }
+    }
+}
+
+// ========================================
 // Fetch Vehicles from Backend on Load
 // ========================================
 async function loadVehicles() {
-    try {
-        const response = await fetch("/customer/search/vehicle");
-        if (!response.ok) throw new Error("Failed to fetch vehicles");
+    console.log('=== loadVehicles() called ===');
 
-        const data = await response.json();
-        allVehicles = data;
-        filteredVehicles = [...allVehicles];
+    // Determine the base URL dynamically
+    const contextPath = window.location.pathname.substring(0, window.location.pathname.indexOf('/', 1));
+    const baseUrl = `${window.location.origin}${contextPath}`;
+    const endpoints = [
+        `${baseUrl}/customer/search/vehicle`,
+        '/customer/search/vehicle',
+        `${window.location.origin}/customer/search/vehicle`,
+        '../../../customer/search/vehicle',
+        '/RideMachan-1.0-SNAPSHOT/customer/search/vehicle'
+    ];
 
-        displayVehicles(filteredVehicles);
-    } catch (error) {
-        console.error("Error loading vehicles:", error);
-        showError("Failed to load vehicles. Please try again later.");
+    console.log('Context path:', contextPath);
+    console.log('Base URL:', baseUrl);
+    console.log('Current location:', window.location.href);
+    console.log('Will try endpoints:', endpoints);
+
+    let lastError = null;
+
+    for (const endpoint of endpoints) {
+        try {
+            console.log(`Trying endpoint: ${endpoint}`);
+            const response = await fetch(endpoint);
+            console.log(`Response status for ${endpoint}:`, response.status);
+
+            if (response.ok) {
+                const data = await response.json();
+                console.log('✅ SUCCESS! Data received from:', endpoint);
+                console.log('Raw data received:', data);
+                console.log('Data type:', typeof data);
+                console.log('Is array:', Array.isArray(data));
+                console.log('Data length:', data ? data.length : 'null/undefined');
+
+                allVehicles = data;
+                filteredVehicles = [...allVehicles];
+
+                console.log('allVehicles set to:', allVehicles);
+                console.log('filteredVehicles set to:', filteredVehicles);
+
+                // Populate filter dropdowns with unique values from backend
+                populateFilterOptions();
+
+                displayVehicles(filteredVehicles);
+                return; // Success, exit function
+            } else {
+                console.log(`❌ Failed with status ${response.status} for: ${endpoint}`);
+                lastError = new Error(`HTTP ${response.status}`);
+            }
+        } catch (error) {
+            console.log(`❌ Error with endpoint ${endpoint}:`, error.message);
+            lastError = error;
+        }
     }
+
+    // If we get here, all endpoints failed
+    console.error("=== ALL ENDPOINTS FAILED ===");
+    console.error("Last error:", lastError);
+    showError("Failed to load vehicles. Please check if the server is running and the endpoint is correct.");
 }
 
 // ========================================
@@ -91,7 +244,7 @@ function displayVehicles(vehicles) {
                 <!-- Features -->
                 <div class="features">
                     <span class="feature-tag">${vehicle.fuelType || "Fuel"}</span>
-                    <span class="feature-tag">${vehicle.vehicleCategory || "Vehicle"}</span>
+                    <span class="feature-tag">${vehicle.vehicleType || "Vehicle"}</span>
                     ${vehicle.availabilityStatus === 'available' ? '<span class="feature-tag">Available</span>' : ''}
                 </div>
             </div>
@@ -151,7 +304,7 @@ function searchVehicles() {
         results = results.filter(vehicle => {
             // Search by vehicle category (Car, SUV, Van) or by vehicle name (brand + model)
             const vehicleName = `${vehicle.vehicleBrand} ${vehicle.vehicleModel}`.toLowerCase();
-            const category = (vehicle.vehicleCategory || '').toLowerCase();
+            const category = (vehicle.vehicleType || '').toLowerCase();
             return category === vehicleType || vehicleName.includes(vehicleType);
         });
     }
@@ -167,26 +320,37 @@ function searchVehicles() {
 // Apply Filters
 // ========================================
 function applyFilters() {
-    const priceRange = document.getElementById('priceRange')?.value;
+    const vehicleType = document.getElementById('vehicleType')?.value.toLowerCase();
+    const pickupLocation = document.getElementById('pickupLocation')?.value.toLowerCase();
     const category = document.getElementById('category')?.value;
     const companyFilter = document.getElementById('companyFilter')?.value;
     const fuelType = document.getElementById('fuelType')?.value.toLowerCase();
     const seats = document.getElementById('seats')?.value;
 
+    // Get price range from slider
+    const priceMin = parseInt(document.getElementById('priceMin')?.value || 0);
+    const priceMax = parseInt(document.getElementById('priceMax')?.value || 100000);
+
     let filtered = [...allVehicles];
 
-    // Price Range Filter
-    if (priceRange) {
-        const [min, max] = priceRange.split('-');
-        if (max === undefined) {
-            // Handle "10000+" format
-            filtered = filtered.filter(v => v.pricePerDay >= parseInt(min.replace('+', '')));
-        } else {
-            filtered = filtered.filter(v =>
-                v.pricePerDay >= parseInt(min) && v.pricePerDay <= parseInt(max)
-            );
-        }
+    // Vehicle Type Filter
+    if (vehicleType) {
+        filtered = filtered.filter(v =>
+            v.vehicleType && v.vehicleType.toLowerCase() === vehicleType
+        );
     }
+
+    // Pickup Location Filter
+    if (pickupLocation) {
+        filtered = filtered.filter(v =>
+            v.location && v.location.toLowerCase().includes(pickupLocation)
+        );
+    }
+
+    // Price Range Filter (using slider values)
+    filtered = filtered.filter(v =>
+        v.pricePerDay >= priceMin && v.pricePerDay <= priceMax
+    );
 
     // Company Filter
     if (companyFilter) {
@@ -232,7 +396,6 @@ function clearAllFilters() {
     // Reset all form dropdowns to their default values
     const vehicleType = document.getElementById('vehicleType');
     const pickupLocation = document.getElementById('pickupLocation');
-    const priceRange = document.getElementById('priceRange');
     const fuelType = document.getElementById('fuelType');
     const seats = document.getElementById('seats');
     const vehicleCategoryFilter = document.getElementById('vehicleCategoryFilter');
@@ -240,11 +403,32 @@ function clearAllFilters() {
 
     if (vehicleType) vehicleType.value = '';
     if (pickupLocation) pickupLocation.value = '';
-    if (priceRange) priceRange.value = '';
     if (fuelType) fuelType.value = '';
     if (seats) seats.value = '';
     if (vehicleCategoryFilter) vehicleCategoryFilter.value = '';
     if (companyFilter) companyFilter.value = '';
+
+    // Reset price slider
+    const priceMin = document.getElementById('priceMin');
+    const priceMax = document.getElementById('priceMax');
+    const priceFromInput = document.getElementById('priceFromInput');
+    const priceToInput = document.getElementById('priceToInput');
+    const priceValueFrom = document.getElementById('priceValueFrom');
+    const priceValueTo = document.getElementById('priceValueTo');
+
+    if (priceMin) priceMin.value = 0;
+    if (priceMax) priceMax.value = 100000;
+    if (priceFromInput) priceFromInput.value = 0;
+    if (priceToInput) priceToInput.value = 100000;
+    if (priceValueFrom) priceValueFrom.textContent = '0';
+    if (priceValueTo) priceValueTo.textContent = '100,000';
+
+    // Update slider visual
+    const sliderRange = document.getElementById('sliderRange');
+    if (sliderRange) {
+        sliderRange.style.left = '0%';
+        sliderRange.style.width = '100%';
+    }
 
     // Reset filtered vehicles to show all vehicles
     filteredVehicles = [...allVehicles];
@@ -406,8 +590,136 @@ function showNotification(message, type = 'info') {
 }
 
 // ========================================
+// Price Range Slider Functionality
+// ========================================
+function initializePriceSlider() {
+    const priceMin = document.getElementById('priceMin');
+    const priceMax = document.getElementById('priceMax');
+    const priceFromInput = document.getElementById('priceFromInput');
+    const priceToInput = document.getElementById('priceToInput');
+    const priceValueFrom = document.getElementById('priceValueFrom');
+    const priceValueTo = document.getElementById('priceValueTo');
+    const sliderRange = document.getElementById('sliderRange');
+
+    if (!priceMin || !priceMax || !priceFromInput || !priceToInput) {
+        console.log('Price slider elements not found, skipping initialization');
+        return;
+    }
+
+    // Update slider range display
+    function updateSliderRange() {
+        const minVal = parseInt(priceMin.value);
+        const maxVal = parseInt(priceMax.value);
+        const minPercent = (minVal / priceMin.max) * 100;
+        const maxPercent = (maxVal / priceMax.max) * 100;
+
+        sliderRange.style.left = minPercent + '%';
+        sliderRange.style.width = (maxPercent - minPercent) + '%';
+    }
+
+    // Update all displays
+    function updateDisplays(minVal, maxVal) {
+        priceValueFrom.textContent = formatPrice(minVal);
+        priceValueTo.textContent = formatPrice(maxVal);
+        priceFromInput.value = minVal;
+        priceToInput.value = maxVal;
+        updateSliderRange();
+    }
+
+    // Format price with comma separator
+    function formatPrice(price) {
+        return parseInt(price).toLocaleString();
+    }
+
+    // Range slider input events
+    priceMin.addEventListener('input', function() {
+        let minVal = parseInt(this.value);
+        let maxVal = parseInt(priceMax.value);
+
+        if (minVal >= maxVal - 1000) {
+            minVal = maxVal - 1000;
+            this.value = minVal;
+        }
+
+        updateDisplays(minVal, maxVal);
+    });
+
+    priceMax.addEventListener('input', function() {
+        let minVal = parseInt(priceMin.value);
+        let maxVal = parseInt(this.value);
+
+        if (maxVal <= minVal + 1000) {
+            maxVal = minVal + 1000;
+            this.value = maxVal;
+        }
+
+        updateDisplays(minVal, maxVal);
+    });
+
+    // Text input events
+    priceFromInput.addEventListener('change', function() {
+        let minVal = parseInt(this.value) || 0;
+        let maxVal = parseInt(priceToInput.value);
+
+        if (minVal < 0) minVal = 0;
+        if (minVal > 100000) minVal = 100000;
+        if (minVal >= maxVal - 1000) minVal = maxVal - 1000;
+
+        priceMin.value = minVal;
+        updateDisplays(minVal, maxVal);
+    });
+
+    priceToInput.addEventListener('change', function() {
+        let minVal = parseInt(priceFromInput.value);
+        let maxVal = parseInt(this.value) || 100000;
+
+        if (maxVal < 0) maxVal = 0;
+        if (maxVal > 100000) maxVal = 100000;
+        if (maxVal <= minVal + 1000) maxVal = minVal + 1000;
+
+        priceMax.value = maxVal;
+        updateDisplays(minVal, maxVal);
+    });
+
+    // Initialize display
+    updateDisplays(0, 100000);
+}
+
+// ========================================
 // Initialize on Page Load
 // ========================================
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM Content Loaded - Initializing search page...');
     loadVehicles();
+    initializePriceSlider();
 });
+
+// ========================================
+// Manual Test Functions (for debugging)
+// ========================================
+window.testEndpoint = async function(url) {
+    console.log('Testing endpoint:', url);
+    try {
+        const response = await fetch(url);
+        console.log('Status:', response.status);
+        const data = await response.json();
+        console.log('Data:', data);
+        return data;
+    } catch (error) {
+        console.error('Error:', error);
+        return null;
+    }
+};
+
+window.reloadVehicles = function() {
+    console.log('Manually reloading vehicles...');
+    loadVehicles();
+};
+
+window.checkGlobals = function() {
+    console.log('allVehicles:', allVehicles);
+    console.log('filteredVehicles:', filteredVehicles);
+    console.log('allVehicles length:', allVehicles.length);
+};
+
+
