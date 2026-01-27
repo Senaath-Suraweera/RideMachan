@@ -412,7 +412,7 @@ class RentalCompaniesApp {
     const full = Math.floor(Number(r || 0));
     return Array.from(
       { length: 5 },
-      (_, i) => `<span class="star ${i < full ? "active" : ""}">⭐</span>`,
+      (_, i) => `<span class="star ${i < full ? "active" : ""}"></span>`,
     ).join("");
   }
 
