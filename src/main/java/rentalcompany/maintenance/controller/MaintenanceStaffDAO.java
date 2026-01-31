@@ -8,7 +8,7 @@ import java.sql.*;
 public class MaintenanceStaffDAO {
 
     public boolean addStaff(MaintenanceStaff staff) {
-        String sql = "INSERT INTO MaintenanceStaff (username, firstname, lastname, email, hashedpassword, salt, mobilenumber, company_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO maintenancestaff (username, firstname, lastname, email, hashedpassword, salt, mobilenumber, company_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         try (Connection con = DBConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setString(1, staff.getUsername());
