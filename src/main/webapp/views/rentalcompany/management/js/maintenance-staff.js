@@ -38,6 +38,56 @@ async function checkLogin() {
 
 }
 
+async function loadStaffStatistics() {
+
+    try {
+
+        const response = await fetch("/displaystaffstatistics", {method: "POST"});
+        console.log(response);
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+
+        const data = await response.json();
+
+        console.log(data);
+
+
+        return data;
+
+    }catch (err) {
+
+        console.log(err);
+
+    }
+
+}
+
+function renderStaffStatistics(stats) {
+
+    const statsGrid = document.getElementsByClassName("stats-grid")[0];
+    statsGrid.innerHTML = "";
+
+    function createStatsCard(statusClass, label, value) {
+        return `
+            <div class="stat-card ${statusClass}">
+                <div class="stat-number">${value}</div>
+                <div class="stat-label">${label}</div>
+            </div>
+        `;
+    }
+
+    statsGrid.innerHTML += createStatsCard("", "Total Staff", stats.totalStaff || 0);
+    statsGrid.innerHTML += createStatsCard("available", "Available", stats.availableStaff || 0);
+    statsGrid.innerHTML += createStatsCard("on-job", "On Job", stats.onJobStaff || 0);
+    statsGrid.innerHTML += createStatsCard("offline", "Offline", stats.offlineStaff || 0);
+    statsGrid.innerHTML += createStatsCard("vehicles", "Total Vehicles", stats.totalVehicles || 0);
+
+}
+
+
 async function loadAllMaintenanceStaff() {
 
     try {
@@ -91,8 +141,7 @@ function renderMaintenanceStaff(maintenanceStaffs) {
                                   <h3 class="staff-name">${maintenanceStaff.firstname + " " + maintenanceStaff.lastname}</h3>
                                   <p class="staff-id">Staff ID: ${maintenanceStaff.staffId}</p>
                                   <p class="staff-specialization">${maintenanceStaff.specialization}</p>
-                                  <div class="staff-rating">
-                                      <i class="fas fa-star"></i>
+                                  <div class="staff-jobs">
                                       <span class="job-count">(${maintenanceStaff.completedJobs} jobs)</span>
                                   </div>
                               </div>
@@ -184,8 +233,16 @@ async function addMaintenanceStaff() {
     if(result.status === "success") {
         alert("Staff added successfully!");
         closeAddStaffModal();
+
         AllMaintenaceStaff = await loadAllMaintenanceStaff();
         renderMaintenanceStaff(AllMaintenaceStaff);
+
+        const stats = await loadStaffStatistics();
+
+        if (stats) {
+            renderStaffStatistics(stats);
+        }
+
     }else{
         alert("Error: " + result.message);
     }
@@ -205,6 +262,12 @@ document.addEventListener("DOMContentLoaded", async function() {
 
         AllMaintenaceStaff = await loadAllMaintenanceStaff();
         renderMaintenanceStaff(AllMaintenaceStaff);
+
+        const stats = await loadStaffStatistics();
+
+        if (stats) {
+            renderStaffStatistics(stats);
+        }
 
 
     } catch (err) {

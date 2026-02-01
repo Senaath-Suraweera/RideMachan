@@ -97,4 +97,68 @@ public class MaintenanceStaffDAO {
         }
         return null;
     }
+
+    public static int getTotalStaffCount(int companyId) {
+
+        String sql = "SELECT COUNT(*) FROM maintenanceStaff WHERE company_id = ?";
+
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setInt(1, companyId);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                return rs.getInt(1); // Get the count from the query
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
+
+    }
+
+    public static int getAvailableStaffCount(int companyId) {
+
+        String sql = "SELECT COUNT(*) FROM maintenanceStaff WHERE company_id = ? AND status = 'available'";
+
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setInt(1, companyId);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                return rs.getInt(1); // Get the count from the query
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
+
+    }
+
+    public static int getOnJobStaffCount(int companyId) {
+
+        String sql = "SELECT COUNT(*) FROM maintenanceStaff WHERE company_id = ? AND status = 'on Job'";
+
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setInt(1, companyId);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                return rs.getInt(1); // Get the count from the query
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
+
+    }
+
 }
