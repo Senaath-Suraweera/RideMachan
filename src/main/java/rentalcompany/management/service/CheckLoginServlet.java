@@ -24,7 +24,9 @@ public class CheckLoginServlet extends HttpServlet {
         HttpSession session = request.getSession(false);
 
         if (session != null && session.getAttribute("rentalcompany") != null) {
-            out.println("{\"loggedIn\":true}");
+            int companyId = (int) session.getAttribute("companyId");
+
+            out.print("{\"loggedIn\":true,\"companyId\":" + companyId + "}");
         } else {
             out.println("{\"loggedIn\":false}");
         }

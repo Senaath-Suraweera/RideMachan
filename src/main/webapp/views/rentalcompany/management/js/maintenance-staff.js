@@ -118,6 +118,7 @@ async function loadAllMaintenanceStaff() {
 function renderMaintenanceStaff(maintenanceStaffs) {
 
     const staffGrid = document.getElementsByClassName("staff-grid")[0];
+    staffGrid.innerHTML = "";
 
     maintenanceStaffs.forEach(maintenanceStaff => {
 
@@ -182,6 +183,93 @@ function renderMaintenanceStaff(maintenanceStaffs) {
     })
 
 }
+
+//for search by staff id
+function filterStaffByStaffId(staffId) {
+
+    const staffGrid = document.getElementsByClassName("staff-grid")[0];
+    staffGrid.innerHTML = "";
+
+    let filteredStaff = [];
+
+
+    for(let i=0; i<AllMaintenaceStaff.length; i++) {
+
+        if(AllMaintenaceStaff[i].staffId == staffId) {
+            filteredStaff.push(AllMaintenaceStaff[i]);
+        }
+
+    }
+
+    renderMaintenanceStaff(filteredStaff);
+
+}
+
+// Search staff by name or specialization
+function filterStaffByText(searchText) {
+
+    const staffGrid = document.getElementsByClassName("staff-grid")[0];
+    staffGrid.innerHTML = "";
+
+    let inputLower = searchText.toLowerCase().trim();
+    let filteredStaff = [];
+
+    for(let i=0; i<AllMaintenaceStaff.length; i++) {
+
+        let staff = AllMaintenaceStaff[i];
+
+
+        let staffName = (staff.firstname + " " + staff.lastname).toLowerCase().trim();
+        let specialization = (staff.specialization || "").toLowerCase().trim();
+
+
+        if (staffName.includes(inputLower) || specialization.includes(inputLower)) {
+            filteredStaff.push(staff);
+        }
+
+    }
+
+    console.log("Filtered staff count:", filteredStaff.length);
+    renderMaintenanceStaff(filteredStaff);
+
+}
+
+//search Available,On Job,available staff
+function filterStaffByStaffStatus(status) {
+
+    const staffGrid = document.getElementsByClassName("staff-grid")[0];
+    staffGrid.innerHTML = "";
+
+    let filteredStaff = [];
+
+    let selectedStatus = status.toLowerCase().trim();
+    AllMaintenaceStaff[i].status = AllMaintenaceStaff[i].status.toLowerCase().trim();
+
+    for(let i=0; i<AllMaintenaceStaff.length; i++) {
+
+        //DEBUG 1
+        console.log("staff status:- ", AllMaintenaceStaff[i].status)
+        console.log("selected staff status:- ", status)
+
+        let staffStatus =  AllMaintenaceStaff[i].status || "";
+
+        //DEBUG 2
+        console.log("Comparing:- ", staffStatus , "with ", status)
+        console.log("Match?:- ", staffStatus == selectedStatus)
+
+        if(staffStatus == status) {
+            filteredStaff.push(AllMaintenaceStaff[i]);
+        }
+
+    }
+
+    console.log("Filtered staff count:", filteredStaff.length);
+    console.log("About to render...");
+    renderMaintenanceStaff(filteredStaff);
+    console.log("Render complete!");
+
+}
+
 
 
 function openAddStaffModal() {
@@ -291,5 +379,45 @@ document.getElementById("addStaffForm").addEventListener("submit",async function
     e.preventDefault();
 
     await addMaintenanceStaff();
+
+});
+
+
+document.addEventListener("input", async function() {
+
+    let staffInput = document.getElementById("staffSearch");
+    let inputValue = staffInput.value;
+
+    inputValue = inputValue.trim();
+
+    console.log("Input value:", inputValue, "isNaN:", isNaN(inputValue));
+
+    if(inputValue === "") {
+        AllMaintenaceStaff = await loadAllMaintenanceStaff();
+        renderMaintenanceStaff(AllMaintenaceStaff);
+        return;
+    }
+
+    if(!isNaN(inputValue)) {
+        filterStaffByStaffId(inputValue);
+    }else {
+        filterStaffByText(inputValue);
+    }
+
+});
+
+document.addEventListener("change", async function() {
+
+    let statusFilter = document.getElementById("staffFilter");
+
+    let selectedStatus = statusFilter.value;
+
+    if(selectedStatus == "all") {
+        AllMaintenaceStaff = await loadAllMaintenanceStaff();
+        renderMaintenanceStaff(AllMaintenaceStaff);
+        return;
+    }
+
+    filterStaffByStaffStatus(selectedStatus);
 
 });
