@@ -46,11 +46,14 @@ public class MaintenanceStaffSignupServlet extends HttpServlet {
             String contactNumber = json.get("contactNumber").getAsString();
             int companyId = json.get("companyId").getAsInt();
 
+            String specialization = json.get("specialization").getAsString();
+            float yearsOfExperience = json.get("yearsOfExperience").getAsFloat();
+
             String salt = PasswordServices.generateSalt();
             String hashed = PasswordServices.hashPassword(password, salt);
 
             MaintenanceStaff staff = new MaintenanceStaff(username, firstname, lastname, email,
-                    hashed, salt, contactNumber, companyId);
+                    hashed, salt, contactNumber, companyId, specialization, yearsOfExperience);
 
             MaintenanceStaffDAO dao = new MaintenanceStaffDAO();
             boolean added = dao.addStaff(staff);
