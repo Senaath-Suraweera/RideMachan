@@ -12,7 +12,8 @@ public class VehicleDAO {
     public static boolean addVehicle(Vehicle v) {
         String sql = "INSERT INTO Vehicle (vehiclebrand, vehiclemodel, numberplatenumber, tareweight, color, " +
                 "numberofpassengers, enginecapacity, enginenumber, chasisnumber, registrationdocumentation, " +
-                "vehicleimages, description, milage, price_per_day, location , features ,company_id, provider_id) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+                "vehicleimages, description, milage, price_per_day, location, features, vehicle_type, fuel_type, " +
+                "availability_status, company_id, provider_id) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
         try (Connection con = DBConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
 
@@ -32,14 +33,17 @@ public class VehicleDAO {
             ps.setDouble(14, v.getPricePerDay());
             ps.setString(15, v.getLocation());
             ps.setString(16, v.getFeatures());
+            ps.setString(17, v.getVehicleType());
+            ps.setString(18, v.getFuelType());
+            ps.setString(19, v.getAvailabilityStatus() != null ? v.getAvailabilityStatus() : "available");
             if (v.getCompanyId() != null)
-                ps.setInt(17, v.getCompanyId());
+                ps.setInt(20, v.getCompanyId());
             else
-                ps.setNull(17, Types.INTEGER);
+                ps.setNull(20, Types.INTEGER);
             if (v.getProviderId() != null)
-                ps.setInt(18, v.getProviderId());
+                ps.setInt(21, v.getProviderId());
             else
-                ps.setNull(18, Types.INTEGER);
+                ps.setNull(21, Types.INTEGER);
 
             return ps.executeUpdate() > 0;
         } catch (Exception e) {
@@ -80,6 +84,9 @@ public class VehicleDAO {
                 v.setPricePerDay(rs.getDouble("price_per_day"));
                 v.setLocation(rs.getString("location"));
                 v.setFeatures(rs.getString("features"));
+                v.setVehicleType(rs.getString("vehicle_type"));
+                v.setFuelType(rs.getString("fuel_type"));
+                v.setAvailabilityStatus(rs.getString("availability_status"));
                 v.setMilage(rs.getString("milage"));
                 int companyId = rs.getInt("company_id");
                 if (rs.wasNull()) {
@@ -174,6 +181,9 @@ public class VehicleDAO {
                 v.setPricePerDay(rs.getDouble("price_per_day"));
                 v.setLocation(rs.getString("location"));
                 v.setFeatures(rs.getString("features"));
+                v.setVehicleType(rs.getString("vehicle_type"));
+                v.setFuelType(rs.getString("fuel_type"));
+                v.setAvailabilityStatus(rs.getString("availability_status"));
                 int companyId = rs.getInt("company_id");
                 if (rs.wasNull()) {
                     v.setCompanyId(null);
@@ -199,7 +209,10 @@ public class VehicleDAO {
     public static Vehicle getOneVehicleById(int vehicleId) {
 
         Vehicle v = null;
-        String sql = "SELECT * FROM Vehicle WHERE vehicleid = ?";
+        String sql = "SELECT v.*, rc.companyname " +
+                     "FROM Vehicle v " +
+                     "LEFT JOIN RentalCompany rc ON v.company_id = rc.companyid " +
+                     "WHERE v.vehicleid = ?";
 
         try (Connection con = DBConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
@@ -224,6 +237,9 @@ public class VehicleDAO {
                 v.setPricePerDay(rs.getDouble("price_per_day"));
                 v.setLocation(rs.getString("location"));
                 v.setFeatures(rs.getString("features"));
+                v.setVehicleType(rs.getString("vehicle_type"));
+                v.setFuelType(rs.getString("fuel_type"));
+                v.setAvailabilityStatus(rs.getString("availability_status"));
 
                 int companyId = rs.getInt("company_id");
                 v.setCompanyId(rs.wasNull() ? null : companyId);

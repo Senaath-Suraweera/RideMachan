@@ -119,13 +119,3 @@ CREATE TABLE IF NOT EXISTS `Vehicle` (
         ON UPDATE CASCADE
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-ALTER TABLE Vehicle
-    ADD COLUMN price_per_day DECIMAL(10,2) NOT NULL,
-    ADD COLUMN location VARCHAR(100) NOT NULL,
-    ADD COLUMN features TEXT,
-    ADD COLUMN vehicle_category VARCHAR(20),
-    ADD COLUMN fuel_type VARCHAR(20),
-    ADD COLUMN availability_status VARCHAR(20) DEFAULT 'available';
-
-
-

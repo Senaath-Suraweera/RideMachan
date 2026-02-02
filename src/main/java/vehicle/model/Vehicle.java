@@ -28,6 +28,9 @@ public class Vehicle {
     private String fuelType;
     private String availabilityStatus;
 
+    // Company name for display purposes
+    private String companyName;
+
 
     // Constructors
     public Vehicle() {}
@@ -119,4 +122,8 @@ public class Vehicle {
 
     public String getAvailabilityStatus() { return availabilityStatus; }
     public void setAvailabilityStatus(String availabilityStatus) { this.availabilityStatus = availabilityStatus; }
+
+    public String getCompanyName() { return companyName; }
+    public void setCompanyName(String companyName) { this.companyName = companyName; }
 }
+
