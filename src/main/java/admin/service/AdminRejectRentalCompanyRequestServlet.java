@@ -1,6 +1,7 @@
 package admin.service;
 
 import common.util.DBConnection;
+import common.util.GmailSender;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -30,7 +31,6 @@ public class AdminRejectRentalCompanyRequestServlet extends HttpServlet {
         int colon = body.indexOf(":", idx);
         if (colon < 0) return null;
         String tail = body.substring(colon + 1).trim();
-        // crude parse for "..."
         int q1 = tail.indexOf("\"");
         if (q1 < 0) return null;
         int q2 = tail.indexOf("\"", q1 + 1);
@@ -69,28 +69,60 @@ public class AdminRejectRentalCompanyRequestServlet extends HttpServlet {
         String reason = extractReason(readBody(req));
         if (reason != null && reason.length() > 255) reason = reason.substring(0, 255);
 
-        String sql = "UPDATE RentalCompanyRegistrationRequest " +
+        String selectReq = "SELECT companyemail, companyname FROM RentalCompanyRegistrationRequest WHERE request_id=?";
+
+        String update = "UPDATE RentalCompanyRegistrationRequest " +
                 "SET status='REJECTED', reviewed_at=NOW(), reviewed_by_adminid=?, reject_reason=? " +
                 "WHERE request_id=? AND status='PENDING'";
 
-        try (Connection con = DBConnection.getConnection();
-             PreparedStatement ps = con.prepareStatement(sql)) {
+        String requestEmail = null;
+        String requestCompanyName = null;
 
-            if (adminId == null) ps.setNull(1, Types.INTEGER);
-            else ps.setInt(1, adminId);
+        try (Connection con = DBConnection.getConnection()) {
 
-            if (reason == null || reason.trim().isEmpty()) ps.setNull(2, Types.VARCHAR);
-            else ps.setString(2, reason);
+            // fetch email/name for notification (can fetch before update)
+            try (PreparedStatement psSel = con.prepareStatement(selectReq)) {
+                psSel.setInt(1, requestId);
+                try (ResultSet rs = psSel.executeQuery()) {
+                    if (rs.next()) {
+                        requestEmail = rs.getString("companyemail");
+                        requestCompanyName = rs.getString("companyname");
+                    }
+                }
+            }
 
-            ps.setInt(3, requestId);
+            try (PreparedStatement ps = con.prepareStatement(update)) {
+                if (adminId == null) ps.setNull(1, Types.INTEGER);
+                else ps.setInt(1, adminId);
 
-            int updated = ps.executeUpdate();
-            if (updated == 0) {
-                json(resp, 404, "{\"ok\":false,\"message\":\"Request not found or not pending\"}");
-                return;
+                if (reason == null || reason.trim().isEmpty()) ps.setNull(2, Types.VARCHAR);
+                else ps.setString(2, reason);
+
+                ps.setInt(3, requestId);
+
+                int updated = ps.executeUpdate();
+                if (updated == 0) {
+                    json(resp, 404, "{\"ok\":false,\"message\":\"Request not found or not pending\"}");
+                    return;
+                }
+            }
+
+            // Send email after DB update
+            try {
+                if (requestEmail != null && !requestEmail.trim().isEmpty()) {
+                    GmailSender.sendRentalCompanyRequestStatusEmail(
+                            requestEmail.trim(),
+                            requestCompanyName,
+                            false,
+                            reason
+                    );
+                }
+            } catch (Exception mailEx) {
+                mailEx.printStackTrace();
             }
 
             json(resp, 200, "{\"ok\":true,\"message\":\"Rejected\"}");
+
         } catch (Exception e) {
             e.printStackTrace();
             json(resp, 500, "{\"ok\":false,\"message\":\"Server error\"}");

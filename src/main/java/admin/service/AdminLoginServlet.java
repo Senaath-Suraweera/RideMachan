@@ -32,6 +32,11 @@ public class AdminLoginServlet extends HttpServlet {
                 session.setAttribute("admin", admin);
                 session.setAttribute("actorType", "ADMIN");
                 session.setAttribute("actorId" , admin.getAdminId());
+                System.out.println("logged in as Admin");
+                System.out.println("email: " + email);
+                System.out.println("password: " + password);
+                System.out.println("actor : " + session.getAttribute("actorType"));
+                System.out.println("actorId : " + session.getAttribute("actorId"));
                 response.sendRedirect("/views/admin/dashboard.html");
                 return;
             }

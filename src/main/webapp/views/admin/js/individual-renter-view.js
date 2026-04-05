@@ -1,307 +1,352 @@
 (function () {
+  const API_BASE = "http://localhost:8080";
+  const API = `${API_BASE}/api/admin/vehicle-providers`;
+
   const $ = (s) => document.querySelector(s);
   const esc = (s) =>
     String(s ?? "")
       .replaceAll("&", "&amp;")
       .replaceAll("<", "&lt;")
       .replaceAll(">", "&gt;");
+
   const q = new URLSearchParams(location.search);
-  const id = Number(q.get("id"));
+  const providerId = Number(q.get("id"));
 
-  // ---------- Storage helpers ----------
-  const KEY = (id) => `renter_${id}`;
-  function loadRenter(id) {
-    // 1) sessionStorage selection (from list page)
-    try {
-      const raw = sessionStorage.getItem("selectedRenter");
-      const fromSession = raw ? JSON.parse(raw) : null;
-      if (fromSession && Number(fromSession.id) === id) return fromSession;
-    } catch {}
-    // 2) localStorage persisted copy
-    try {
-      const raw = localStorage.getItem(KEY(id));
-      if (raw) return JSON.parse(raw);
-    } catch {}
-    // 3) fallback stub (ensures page works directly)
-    return {
-      id,
-      name: "Unknown Renter",
-      location: "—",
-      phone: "—",
-      email: "—",
-      rating: 0,
-      reviews: 0,
-      status: "pending",
-      description: "Renter details not found in session; using fallback.",
-      vehicles: [],
-    };
-  }
-  function saveRenter(r) {
-    try {
-      sessionStorage.setItem("selectedRenter", JSON.stringify(r));
-    } catch {}
-    try {
-      localStorage.setItem(KEY(r.id), JSON.stringify(r));
-    } catch {}
+  let provider = null;
+  let vehicles = [];
+  let editVehicleId = null;
+
+  // ---------------- API helpers ----------------
+  async function apiJson(url, method = "GET", bodyObj) {
+    const opts = { method, headers: { "Content-Type": "application/json" } };
+    if (bodyObj !== undefined) opts.body = JSON.stringify(bodyObj);
+
+    const res = await fetch(url, opts);
+
+    // Try to parse JSON even on errors, because backend returns JSON errors
+    const payload = await res.json().catch(() => ({}));
+
+    if (!res.ok) {
+      throw new Error(
+        payload.error || payload.message || `Request failed (${res.status})`,
+      );
+    }
+
+    return payload;
   }
 
-  // ---------- State ----------
-  let renter = null;
-  let editVehicleId = null; // null => add, else edit that id
+  async function loadProvider() {
+    // Provider details
+    const providerResp = await apiJson(`${API}/${providerId}`);
+    provider = providerResp.data || providerResp;
 
-  // ---------- UI render ----------
-  function initials(n) {
-    return String(n)
-      .trim()
-      .split(/\s+/)
-      .map((p) => p[0] || "")
-      .join("")
-      .slice(0, 2)
-      .toUpperCase();
+    // Vehicles for this provider
+    try {
+      const vehiclesResp = await apiJson(`${API}/${providerId}/vehicles`);
+      vehicles = Array.isArray(vehiclesResp)
+        ? vehiclesResp
+        : Array.isArray(vehiclesResp.data)
+          ? vehiclesResp.data
+          : [];
+    } catch (e) {
+      console.warn("Failed to load vehicles:", e);
+      vehicles = [];
+    }
+
+    renderAll();
   }
 
-  function renderProfile(r) {
+  // ---------------- UI helpers ----------------
+  function formatDate(dateStr) {
+    if (!dateStr) return "—";
+    try {
+      const date = new Date(dateStr);
+      return date.toLocaleDateString();
+    } catch {
+      return dateStr;
+    }
+  }
+
+  function renderProfile() {
     const root = $("#renterProfile");
-    if (!root) return;
+    if (!root || !provider) return;
+
+    // Backend returns: { id, name, email, phone, location, status, joinDate }
+    const fullName = provider.name || provider.username || "—";
+    const location = provider.location || provider.city || "—";
+    const joinDate = formatDate(provider.joinDate || provider.created_at);
+    const phone = provider.phone || provider.phonenumber || "—";
+    const email = provider.email || "—";
+    const status = String(provider.status || "pending").toLowerCase();
+
+    const initial = (fullName.trim()[0] || "?").toUpperCase();
+
     root.innerHTML = `
       <div class="profile-header">
-        <div class="profile-avatar"><span>${esc(
-          initials(r.name || "")
-        )}</span></div>
+        <div class="profile-avatar">
+          <span>${esc(initial)}</span>
+        </div>
         <div class="profile-basic">
-          <h2>${esc(r.name || "—")}</h2>
+          <h2>${esc(fullName)}</h2>
           <div class="profile-meta">
-            <span>📍 ${esc(r.location || "—")}</span>
-            <span>⭐ ${(Number(r.rating) || 0).toFixed(1)} (${
-      Number(r.reviews) || 0
-    } reviews)</span>
+            <span>📍 ${esc(location)}</span>
+            <span>🗓️ Joined: ${esc(joinDate)}</span>
           </div>
-          <div class="profile-desc">${esc(r.description || "")}</div>
+          <div class="profile-desc" style="color:#6b7280;">
+            Vehicle Provider (Individual Renter)
+          </div>
         </div>
         <div class="profile-contact">
-          <div>📞 ${esc(r.phone || "—")}</div>
-          <div>📧 ${esc(r.email || "—")}</div>
-          <div class="status-badge ${
-            r.status === "pending" ? "status-pending" : ""
-          }">${esc(String(r.status || "—").toUpperCase())}</div>
+          <div>📞 ${esc(phone)}</div>
+          <div>📧 ${esc(email)}</div>
+          <div class="status-badge ${status === "pending" ? "status-pending" : ""}">
+            ${esc(status.toUpperCase())}
+          </div>
         </div>
       </div>
     `;
+
+    // Toggle Ban/Unban label
+    const banBtn = $("#banUserBtn");
+    if (banBtn)
+      banBtn.textContent = status === "suspended" ? "Unban User" : "Ban User";
   }
 
-  function renderVehicles(r) {
+  function renderVehicles() {
     const grid = $("#vehiclesGrid");
     if (!grid) return;
-    const list = Array.isArray(r.vehicles) ? r.vehicles : [];
-    if (!list.length) {
-      grid.innerHTML = `<div style="padding:12px;color:#6b7280;">No vehicles listed for this renter.</div>`;
+
+    if (!vehicles.length) {
+      grid.innerHTML = `<div style="padding:12px;color:#6b7280;">No vehicles listed for this provider.</div>`;
       return;
     }
+
     grid.innerHTML = "";
-    list.forEach((v) => {
+    vehicles.forEach((v) => {
       const card = document.createElement("div");
       card.className = "vehicle-card";
+      card.dataset.vehicleId = v.vehicleid || v.id;
+
+      // Backend returns: { id, make, model, regNo, seats, pricePerDay, rentalCompany }
+      const make = v.make || v.vehiclebrand || "—";
+      const model = v.model || v.vehiclemodel || "—";
+      const regNo = v.regNo || v.numberplatenumber || "—";
+      const seats = v.seats ?? v.numberofpassengers ?? "—";
+      const pricePerDay = v.pricePerDay ?? v.daily_rate ?? 0;
+
+      const companyName = v.rentalCompany || v.companyName || "Not assigned";
+
       card.innerHTML = `
-        <h4>${esc(v.make)} ${esc(v.model)} • ${esc(v.year)}</h4>
+        <h4>${esc(make)} ${esc(model)}</h4>
         <div class="vehicle-meta">
-          <span>Reg: ${esc(v.regNo)}</span>
-          <span>Seats: ${esc(v.seats)}</span>
-          <span>Fuel: ${esc(v.fuelType)}</span>
-          <span>Gear: ${esc(v.transmission)}</span>
-          <span>Rate: Rs. ${Number(v.dailyRate).toLocaleString()}</span>
-          <span>Rented under: <strong>${esc(v.rentalCompany)}</strong></span>
+          <span>Reg: ${esc(regNo)}</span>
+          <span>Seats: ${esc(seats)}</span>
+          <span>Price/Day: Rs. ${Number(pricePerDay || 0).toLocaleString()}</span>
+          <span>Rented under: <strong>${esc(companyName)}</strong></span>
         </div>
         <div class="vehicle-actions">
-          <button class="btn btn-outline" data-view="${esc(v.id)}">View</button>
-          <button class="btn btn-secondary" data-edit="${esc(
-            v.id
-          )}">Edit</button>
+          <button class="btn btn-secondary" data-action="view">View</button>
+          <button class="btn btn-primary" data-action="edit">Edit</button>
+          <button class="btn btn-danger" data-action="delete">Delete</button>
         </div>
       `;
       grid.appendChild(card);
     });
   }
 
-  // ---------- Modals: View ----------
-  function showVehicleModal(v, r) {
-    const modal = $("#vehicleModal");
-    const title = $("#vehicleModalTitle");
-    const body = $("#vehicleModalBody");
-    if (!modal || !title || !body) return;
+  function renderAll() {
+    renderProfile();
+    renderVehicles();
+  }
 
-    title.textContent = `${v.make} ${v.model} (${v.year})`;
+  // ---------------- Modals ----------------
+  function openVehicleModal(v) {
+    const modal = $("#vehicleModal");
+    const body = $("#vehicleModalBody");
+    if (!modal || !body) return;
+
+    const make = v.make || v.vehiclebrand || "—";
+    const model = v.model || v.vehiclemodel || "—";
+    const regNo = v.regNo || v.numberplatenumber || "—";
+    const seats = v.seats ?? v.numberofpassengers ?? "—";
+    const pricePerDay = v.pricePerDay ?? v.daily_rate ?? 0;
+
+    const companyName = v.rentalCompany || v.companyName || "Not assigned";
+
     body.innerHTML = `
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-        <div>
-          <h4 style="margin:0 0 8px;font-size:16px;">Vehicle Info</h4>
-          <div>Registration: <strong>${esc(v.regNo)}</strong></div>
-          <div>Fuel: <strong>${esc(v.fuelType)}</strong></div>
-          <div>Transmission: <strong>${esc(v.transmission)}</strong></div>
-          <div>Seats: <strong>${esc(v.seats)}</strong></div>
-          <div>Daily Rate: <strong>Rs. ${Number(
-            v.dailyRate
-          ).toLocaleString()}</strong></div>
-        </div>
-        <div>
-          <h4 style="margin:0 0 8px;font-size:16px;">Rented Under</h4>
-          <div>Rental Company: <strong>${esc(v.rentalCompany)}</strong></div>
-          <div>Renter: <strong>${esc(r.name)}</strong></div>
-          <div>Location: <strong>${esc(r.location || "—")}</strong></div>
-          <div>Contact: <strong>${esc(r.phone || "—")}</strong></div>
-        </div>
-      </div>
-      <div style="margin-top:12px;display:flex;justify-content:flex-end;gap:8px;">
-        <button class="btn btn-secondary" data-edit-from-view="${esc(
-          v.id
-        )}">Edit</button>
+      <div style="display:grid;gap:10px;">
+        <div><strong>Make:</strong> ${esc(make)}</div>
+        <div><strong>Model:</strong> ${esc(model)}</div>
+        <div><strong>Reg No:</strong> ${esc(regNo)}</div>
+        <div><strong>Seats:</strong> ${esc(seats)}</div>
+        <div><strong>Price per day:</strong> Rs. ${Number(pricePerDay || 0).toLocaleString()}</div>
+        <div><strong>Rental Company:</strong> ${esc(companyName)}</div>
       </div>
     `;
+
     modal.classList.add("show");
-    modal.style.display = "flex";
-    document.body.style.overflow = "hidden";
+    modal.setAttribute("aria-hidden", "false");
   }
+
   window.closeVehicleModal = function () {
     const modal = $("#vehicleModal");
-    modal?.classList.remove("show");
-    modal.style.display = "none";
-    document.body.style.overflow = "";
+    if (!modal) return;
+    modal.classList.remove("show");
+    modal.setAttribute("aria-hidden", "true");
   };
 
-  // ---------- Modals: Add/Edit Form ----------
-  function openVehicleForm(mode = "add", v = null) {
-    editVehicleId = mode === "edit" ? String(v.id) : null;
-    $("#vehicleFormTitle").textContent =
-      mode === "edit" ? "Edit Vehicle" : "Add Vehicle";
-
-    // Prefill
-    $("#vf_id").value = v?.id ?? "";
-    $("#vf_make").value = v?.make ?? "";
-    $("#vf_model").value = v?.model ?? "";
-    $("#vf_year").value = v?.year ?? "";
-    $("#vf_reg").value = v?.regNo ?? "";
-    $("#vf_rate").value = v?.dailyRate ?? "";
-    $("#vf_fuel").value = v?.fuelType ?? "";
-    $("#vf_trans").value = v?.transmission ?? "";
-    $("#vf_seats").value = v?.seats ?? "";
-    $("#vf_company").value = v?.rentalCompany ?? "";
-
+  function openVehicleForm(vOrNull) {
     const modal = $("#vehicleFormModal");
-    modal.classList.add("show");
-    modal.style.display = "flex";
-    document.body.style.overflow = "hidden";
-  }
-  window.closeVehicleForm = function () {
-    const modal = $("#vehicleFormModal");
-    modal?.classList.remove("show");
-    modal.style.display = "none";
-    document.body.style.overflow = "";
-    $("#vehicleForm")?.reset();
-    editVehicleId = null;
-  };
-
-  function collectVehicleFromForm() {
+    const title = $("#vehicleFormTitle");
+    const btn = $("#vehicleFormSubmitBtn");
     const form = $("#vehicleForm");
-    if (!form.reportValidity()) return null;
+    if (!modal || !title || !btn || !form) return;
 
-    const data = {
-      id: $("#vf_id").value.trim(),
-      make: $("#vf_make").value.trim(),
-      model: $("#vf_model").value.trim(),
-      year: Number($("#vf_year").value),
-      regNo: $("#vf_reg").value.trim(),
-      dailyRate: Number($("#vf_rate").value),
-      fuelType: $("#vf_fuel").value,
-      transmission: $("#vf_trans").value,
-      seats: Number($("#vf_seats").value),
-      rentalCompany: $("#vf_company").value.trim(),
+    const isEdit = !!vOrNull;
+    editVehicleId = isEdit ? Number(vOrNull.vehicleid || vOrNull.id) : null;
+    title.textContent = isEdit ? "Edit Vehicle" : "Add Vehicle";
+
+    if (isEdit) {
+      $("#vf_make").value = vOrNull.make || vOrNull.vehiclebrand || "";
+      $("#vf_model").value = vOrNull.model || vOrNull.vehiclemodel || "";
+      $("#vf_reg").value = vOrNull.regNo || vOrNull.numberplatenumber || "";
+      $("#vf_seats").value = vOrNull.seats ?? vOrNull.numberofpassengers ?? "";
+      $("#vf_rate").value = vOrNull.pricePerDay ?? vOrNull.daily_rate ?? "";
+
+      // company id is NOT returned by backend in current vehicles list.
+      // Keep it blank unless your backend includes it.
+      const companyIdEl = $("#vf_companyId");
+      if (companyIdEl)
+        companyIdEl.value = vOrNull.companyId || vOrNull.company_id || "";
+    } else {
+      form.reset();
+      const companyIdEl = $("#vf_companyId");
+      if (companyIdEl) companyIdEl.value = "";
+    }
+
+    btn.onclick = async () => {
+      try {
+        await submitVehicleForm();
+        closeVehicleForm();
+        await loadProvider();
+      } catch (e) {
+        console.error(e);
+        alert(e.message);
+      }
     };
 
-    // Generate id if adding new
-    if (!data.id) data.id = `V-${id}-${Date.now().toString().slice(-6)}`;
-    return data;
+    modal.classList.add("show");
+    modal.setAttribute("aria-hidden", "false");
   }
 
-  function upsertVehicle(vehicle) {
-    renter.vehicles = Array.isArray(renter.vehicles) ? renter.vehicles : [];
-    const idx = renter.vehicles.findIndex(
-      (v) => String(v.id) === String(vehicle.id)
-    );
-    if (idx >= 0) {
-      renter.vehicles[idx] = vehicle; // update
-    } else {
-      renter.vehicles.push(vehicle); // add
+  window.closeVehicleForm = function () {
+    const modal = $("#vehicleFormModal");
+    if (!modal) return;
+    modal.classList.remove("show");
+    modal.setAttribute("aria-hidden", "true");
+  };
+
+  async function submitVehicleForm() {
+    const make = $("#vf_make").value.trim();
+    const model = $("#vf_model").value.trim();
+    const regNo = $("#vf_reg").value.trim();
+    const seats = Number($("#vf_seats").value);
+    const pricePerDay = Number($("#vf_rate").value);
+
+    const companyIdRaw = ($("#vf_companyId")?.value || "").trim();
+    const companyId = companyIdRaw ? Number(companyIdRaw) : null;
+
+    if (
+      !make ||
+      !model ||
+      !regNo ||
+      !Number.isFinite(seats) ||
+      seats <= 0 ||
+      !Number.isFinite(pricePerDay)
+    ) {
+      throw new Error("Please fill all required fields correctly.");
     }
-    saveRenter(renter);
-    renderVehicles(renter);
-    toast(idx >= 0 ? "Vehicle updated." : "Vehicle added.");
+
+    // ✅ MUST match servlet expected keys:
+    const payload = { make, model, regNo, seats, pricePerDay, companyId };
+
+    if (!editVehicleId) {
+      await apiJson(`${API}/${providerId}/vehicles`, "POST", payload);
+    } else {
+      await apiJson(
+        `${API}/${providerId}/vehicles/${editVehicleId}`,
+        "PUT",
+        payload,
+      );
+    }
   }
 
-  // ---------- Utilities ----------
-  function toast(msg) {
-    const el = document.createElement("div");
-    el.textContent = msg;
-    el.style.cssText =
-      "position:fixed;right:16px;bottom:16px;background:#2c3e50;color:#fff;padding:10px 14px;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,.2);z-index:1001;";
-    document.body.appendChild(el);
-    setTimeout(() => el.remove(), 2200);
+  // ---------------- Ban / Unban User ----------------
+  async function banUser() {
+    const status = String(provider?.status || "pending").toLowerCase();
+    const isSuspended = status === "suspended";
+
+    const action = isSuspended ? "unban" : "ban";
+    const verb = isSuspended ? "unban" : "ban";
+
+    if (!confirm(`Are you sure you want to ${verb} this provider?`)) return;
+
+    try {
+      await apiJson(`${API}/${providerId}/${action}`, "PUT");
+      alert(`Provider has been ${isSuspended ? "unbanned" : "banned"}.`);
+      await loadProvider();
+    } catch (e) {
+      console.error(e);
+      alert(`Failed to ${verb} provider: ${e.message}`);
+    }
   }
 
-  // ---------- Event wiring ----------
-  document.addEventListener("DOMContentLoaded", () => {
-    if (!Number.isFinite(id)) {
-      $(
-        "#renterProfile"
-      ).innerHTML = `<p style="margin:0;color:#374151;">Missing renter id.</p>`;
+  // ---------------- events ----------------
+  function bind() {
+    $("#backToRentersBtn")?.addEventListener("click", () => {
+      window.location.href = "individual-renters.html";
+    });
+
+    $("#banUserBtn")?.addEventListener("click", banUser);
+
+    $("#addVehicleBtn")?.addEventListener("click", () => openVehicleForm(null));
+
+    document.addEventListener("click", async (e) => {
+      const card = e.target.closest(".vehicle-card");
+      if (!card) return;
+
+      const id = Number(card.dataset.vehicleId);
+      const v = vehicles.find((x) => Number(x.vehicleid || x.id) === id);
+      if (!v) return;
+
+      const action = e.target.getAttribute("data-action");
+      if (action === "view") openVehicleModal(v);
+      if (action === "edit") openVehicleForm(v);
+      if (action === "delete") {
+        if (!confirm("Delete this vehicle?")) return;
+        try {
+          await apiJson(`${API}/${providerId}/vehicles/${id}`, "DELETE");
+          await loadProvider();
+        } catch (err) {
+          console.error(err);
+          alert(err.message);
+        }
+      }
+    });
+  }
+
+  // ---------------- init ----------------
+  (async function init() {
+    if (!providerId) {
+      alert("Missing provider id in URL");
       return;
     }
-    renter = loadRenter(id);
-    renderProfile(renter);
-    renderVehicles(renter);
-
-    // Add Vehicle button
-    $("#addVehicleBtn")?.addEventListener("click", () =>
-      openVehicleForm("add")
-    );
-
-    // Save form
-    $("#vehicleFormSubmitBtn")?.addEventListener("click", () => {
-      const v = collectVehicleFromForm();
-      if (!v) return;
-      upsertVehicle(v);
-      closeVehicleForm();
-    });
-
-    // Clicks inside vehicle grid (view/edit)
-    $("#vehiclesGrid")?.addEventListener("click", (e) => {
-      const viewBtn = e.target.closest("[data-view]");
-      if (viewBtn) {
-        const vid = viewBtn.getAttribute("data-view");
-        const v = renter.vehicles.find((x) => String(x.id) === String(vid));
-        if (v) showVehicleModal(v, renter);
-        return;
-      }
-      const editBtn = e.target.closest("[data-edit]");
-      if (editBtn) {
-        const vid = editBtn.getAttribute("data-edit");
-        const v = renter.vehicles.find((x) => String(x.id) === String(vid));
-        if (v) openVehicleForm("edit", v);
-      }
-    });
-
-    // Edit from inside the view modal
-    $("#vehicleModalBody")?.addEventListener("click", (e) => {
-      const editFromView = e.target.closest("[data-edit-from-view]");
-      if (!editFromView) return;
-      const vid = editFromView.getAttribute("data-edit-from-view");
-      const v = renter.vehicles.find((x) => String(x.id) === String(vid));
-      closeVehicleModal();
-      if (v) openVehicleForm("edit", v);
-    });
-
-    document
-      .getElementById("backToRentersBtn")
-      ?.addEventListener("click", () => {
-        window.location.href = "individual-renters.html";
-      });
-  });
+    bind();
+    try {
+      await loadProvider();
+    } catch (e) {
+      console.error(e);
+      alert(`Failed to load provider: ${e.message}`);
+    }
+  })();
 })();

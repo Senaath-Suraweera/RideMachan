@@ -121,7 +121,9 @@ body {
   border-radius: 12px;
   padding: 0;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
   overflow: hidden;
   cursor: pointer;
 }
@@ -496,7 +498,9 @@ body {
   font-size: 26px;
   color: #fff;
   cursor: pointer;
-  transition: transform 0.2s ease, color 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    color 0.2s ease;
 }
 
 .modal-close:hover {
@@ -534,7 +538,9 @@ body {
   border-radius: 6px;
   font-size: 14px;
   background-color: #fff;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .form-control:focus {
@@ -582,4 +588,14 @@ textarea.form-control {
   .modal-footer .btn {
     width: 100%;
   }
+}
+
+.vehicle-status.unavailable {
+  background: #fdecea;
+  color: #c62828;
+}
+
+.vehicle-status.maintenance {
+  background: #e3f2fd;
+  color: #1565c0;
 }

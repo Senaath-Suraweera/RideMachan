@@ -32,7 +32,9 @@ public class VehicleProviderLoginServlet extends HttpServlet {
             if (provider != null) {
                 HttpSession session = request.getSession();
                 session.setAttribute("provider", provider);
+                session.setAttribute("actorType", "PROVIDER");
                 session.setAttribute("providerId", provider.getProviderId());
+                session.setAttribute("actorId", provider.getProviderId());
                 session.setAttribute("companyId", provider.getCompanyId());
                 response.getWriter().write("{\"status\":\"success\",\"message\":\"Login successful\"}");
             } else {

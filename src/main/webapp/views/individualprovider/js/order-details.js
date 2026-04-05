@@ -1,197 +1,109 @@
-// Order Details JavaScript
-document.addEventListener("DOMContentLoaded", function () {
+// order-details.js (API-connected)
+
+document.addEventListener("DOMContentLoaded", () => {
   initializeOrderDetails();
-  loadOrderData();
-  initializeActions();
-  updateTimestamps();
 });
 
-// Initialize order details page
+const API_BASE = window.API_BASE || "";
+
+async function fetchJson(url, options = {}) {
+  const res = await fetch(url, {
+    headers: { "Content-Type": "application/json" },
+    ...options,
+  });
+  const text = await res.text();
+  let data = null;
+  try {
+    data = text ? JSON.parse(text) : null;
+  } catch (e) {}
+  if (!res.ok)
+    throw new Error((data && data.error) || `Request failed (${res.status})`);
+  return data;
+}
+
 function initializeOrderDetails() {
   const urlParams = new URLSearchParams(window.location.search);
-  const orderId = urlParams.get("id") || "BK001";
+  const bookingId = urlParams.get("id");
 
-  loadOrderFromStorage(orderId);
-  startRealTimeUpdates();
-}
-
-// Load order data
-function loadOrderData() {
-  console.log("Loading order data...");
-}
-
-// Load order from storage or URL
-function loadOrderFromStorage(orderId) {
-  // Expanded order dataset
-  const orderData = {
-    BK001: {
-      id: "BK001",
-      customer: {
-        name: "John Smith",
-        email: "john.smith@email.com",
-        phone: "+94 77 123 4567",
-        license: "B1234567",
-        avatar: "JS",
-        rating: 4.8,
-        rides: 23,
-      },
-      vehicle: {
-        name: "Toyota Camry 2023",
-        plate: "CAB-1234",
-        type: "Sedan",
-        color: "Silver",
-        odometer: "45,230 km",
-      },
-      booking: {
-        duration: "3 Days",
-        pickupDateTime: "Dec 15, 2024 at 10:00 AM",
-        pickupLocation: "Bandaranaike International Airport",
-        returnDateTime: "Dec 18, 2024 at 6:00 PM",
-        returnLocation: "Bandaranaike International Airport",
-      },
-      driver: {
-        name: "Michael Johnson",
-        license: "D7890123",
-        phone: "+94 71 234 5678",
-        rating: 4.9,
-        trips: 156,
-      },
-      status: "pickup-ready",
-      payment: {
-        total: 23000,
-        earnings: 20240,
-        method: "Visa ending in 4567",
-        transactionId: "TXN-20241215-001",
-      },
-    },
-    BK002: {
-      id: "BK002",
-      customer: {
-        name: "Sarah Wilson",
-        email: "sarah.wilson@email.com",
-        phone: "+94 76 987 6543",
-        license: "B9876543",
-        avatar: "SW",
-        rating: 4.6,
-        rides: 15,
-      },
-      vehicle: {
-        name: "Honda Civic 2022",
-        plate: "XYZ-5678",
-        type: "Sedan",
-        color: "White",
-        odometer: "32,150 km",
-      },
-      booking: {
-        duration: "5 Days",
-        pickupDateTime: "Dec 16, 2024 at 2:00 PM",
-        pickupLocation: "Galle Face Hotel",
-        returnDateTime: "Dec 21, 2024 at 5:00 PM",
-        returnLocation: "Galle Face Hotel",
-      },
-      driver: null, // no driver assigned
-      status: "in-progress",
-      payment: {
-        total: 28000,
-        earnings: 23800,
-        method: "MasterCard ending in 1234",
-        transactionId: "TXN-20241216-002",
-      },
-    },
-    BK003: {
-      id: "BK003",
-      customer: {
-        name: "David Brown",
-        email: "david.brown@email.com",
-        phone: "+94 72 555 6789",
-        license: "B5556789",
-        avatar: "DB",
-        rating: 4.7,
-        rides: 19,
-      },
-      vehicle: {
-        name: "BMW X5 2023",
-        plate: "BXX-9090",
-        type: "SUV",
-        color: "Black",
-        odometer: "28,900 km",
-      },
-      booking: {
-        duration: "2 Days",
-        pickupDateTime: "Dec 17, 2024 at 9:00 AM",
-        pickupLocation: "Galle City Center",
-        returnDateTime: "Dec 19, 2024 at 6:00 PM",
-        returnLocation: "Galle City Center",
-      },
-      driver: {
-        name: "Alex Fernando",
-        license: "D3332211",
-        phone: "+94 70 987 6543",
-        rating: 4.5,
-        trips: 98,
-      },
-      status: "accepted",
-      payment: {
-        total: 18000,
-        earnings: 16200,
-        method: "Amex ending in 7890",
-        transactionId: "TXN-20241217-003",
-      },
-    },
-  };
-
-  const order = orderData[orderId];
-  if (order) {
-    populateOrderData(order);
-  } else {
-    console.error("No order data found for ID:", orderId);
+  if (!bookingId) {
     document.getElementById("orderTitle").textContent = "Order Not Found";
+    return;
+  }
+
+  loadOrderFromApi(bookingId);
+}
+
+async function loadOrderFromApi(bookingId) {
+  try {
+    const data = await fetchJson(
+      `${API_BASE}/api/provider/bookings/${encodeURIComponent(bookingId)}`,
+    );
+    populateOrderData(data);
+  } catch (err) {
+    console.error(err);
+    document.getElementById("orderTitle").textContent = "Order Not Found";
+    alert(err.message);
   }
 }
 
-// Populate order data in the UI
 function populateOrderData(order) {
-  document.getElementById(
-    "orderIdDisplay"
-  ).textContent = `Booking ID: ${order.id}`;
+  document.getElementById("orderIdDisplay").textContent =
+    `Booking ID: ${order.displayId || "BK" + order.bookingId}`;
   updateStatusBadge(order.status);
 
-  document.getElementById("customerName").textContent = order.customer.name;
-  document.getElementById("customerEmail").textContent = order.customer.email;
-  document.getElementById("customerPhone").textContent = order.customer.phone;
-  document.getElementById("customerLicense").textContent =
-    order.customer.license;
-  document.getElementById("customerAvatar").textContent = order.customer.avatar;
+  // Customer
+  const c = order.customer || {};
+  document.getElementById("customerName").textContent = c.name || "N/A";
+  document.getElementById("customerEmail").textContent = c.email || "N/A";
+  document.getElementById("customerPhone").textContent = c.phone || "N/A";
 
-  document.getElementById("vehicleName").textContent = order.vehicle.name;
-  document.getElementById("vehiclePlate").textContent = order.vehicle.plate;
-  document.getElementById("vehicleType").textContent = order.vehicle.type;
-  document.getElementById("vehicleColor").textContent = order.vehicle.color;
-  document.getElementById("vehicleOdometer").textContent =
-    order.vehicle.odometer;
+  // Prefer NIC/Passport based on type, but show license as well
+  const license =
+    c.customerType === "FOREIGN"
+      ? c.internationalDriversLicenseNumber || c.driversLicenseNumber || "N/A"
+      : c.driversLicenseNumber || "N/A";
+  document.getElementById("customerLicense").textContent = license;
 
-  document.getElementById("bookingDuration").textContent =
-    order.booking.duration;
+  document.getElementById("customerAvatar").textContent = initials(
+    c.name || "NA",
+  );
+
+  // Vehicle
+  const v = order.vehicle || {};
+  document.getElementById("vehicleName").textContent = v.name || "N/A";
+  document.getElementById("vehiclePlate").textContent = v.plate || "N/A";
+  document.getElementById("vehicleType").textContent = v.type || "N/A";
+  document.getElementById("vehicleColor").textContent = v.color || "N/A";
+  document.getElementById("vehicleOdometer").textContent = v.odometer || "N/A";
+
+  // Booking
+  const b = order.booking || {};
+  const start = b.tripStartDate || "N/A";
+  const end = b.tripEndDate || "N/A";
+  document.getElementById("bookingDuration").textContent = durationText(
+    b.tripStartDate,
+    b.tripEndDate,
+  );
+
   document.getElementById("pickupDateTime").textContent =
-    order.booking.pickupDateTime;
+    `${start}${b.startTime ? " at " + b.startTime : ""}`;
   document.getElementById("pickupLocation").textContent =
-    order.booking.pickupLocation;
-  document.getElementById("returnDateTime").textContent =
-    order.booking.returnDateTime;
-  document.getElementById("returnLocation").textContent =
-    order.booking.returnLocation;
+    b.pickupLocation || "N/A";
 
+  document.getElementById("returnDateTime").textContent =
+    `${end}${b.endTime ? " at " + b.endTime : ""}`;
+  document.getElementById("returnLocation").textContent =
+    b.dropLocation || "N/A";
+
+  // Driver (optional)
   if (order.driver) {
-    document.getElementById("driverName").textContent = order.driver.name;
-    document.querySelector(
-      ".driver-license"
-    ).textContent = `License: ${order.driver.license}`;
-    document.querySelector(
-      ".driver-rating"
-    ).textContent = `★ ${order.driver.rating} (${order.driver.trips} trips)`;
-    document.querySelector(
-      ".driver-contact span"
-    ).textContent = `📞 ${order.driver.phone}`;
+    document.getElementById("driverSection").style.display = "block";
+    document.getElementById("driverName").textContent =
+      order.driver.name || "N/A";
+    document.querySelector(".driver-license").textContent =
+      `License: ${order.driver.licenseNumber || "N/A"}`;
+    document.querySelector(".driver-contact span").textContent =
+      `📞 ${order.driver.phone || "N/A"}`;
   } else {
     document.getElementById("driverSection").style.display = "none";
   }
@@ -199,12 +111,12 @@ function populateOrderData(order) {
   updateProgressTimeline(order.status);
 }
 
-// Status badge logic
+// ---------- Status UI ----------
 function updateStatusBadge(status) {
   const badge = document.getElementById("orderStatusBadge");
   badge.className = "order-status";
 
-  switch (status) {
+  switch ((status || "").toLowerCase()) {
     case "pickup-ready":
       badge.textContent = "Ready for Pickup";
       badge.classList.add("status-ongoing");
@@ -231,7 +143,6 @@ function updateStatusBadge(status) {
   }
 }
 
-// Progress timeline updater
 function updateProgressTimeline(status) {
   const steps = document.querySelectorAll(".progress-step");
   steps.forEach((step) => {
@@ -239,42 +150,138 @@ function updateProgressTimeline(status) {
     step.classList.add("pending");
   });
 
-  const stepOrder = ["accepted", "paid", "pickup", "dropoff"];
-  let currentStepIndex = -1;
+  const st = (status || "").toLowerCase();
 
-  switch (status) {
-    case "accepted":
-      currentStepIndex = 0;
-      break;
-    case "pickup-ready":
-    case "in-progress":
-      currentStepIndex = 2;
-      break;
-    case "completed":
-      currentStepIndex = 3;
-      break;
-    default:
-      currentStepIndex = 1;
+  const accepted = document.querySelector(`[data-step="accepted"]`);
+  const paid = document.querySelector(`[data-step="paid"]`);
+  const pickup = document.querySelector(`[data-step="pickup"]`);
+  const dropoff = document.querySelector(`[data-step="dropoff"]`);
+
+  if (accepted) accepted.classList.add("completed");
+
+  // we don’t have a separate “paid” status; mark paid as completed if paymentStatus is paid (UI still ok)
+  if (paid) paid.classList.add("completed");
+
+  if (st === "accepted") {
+    if (pickup) pickup.classList.add("pending");
+    if (dropoff) dropoff.classList.add("pending");
+    return;
   }
 
-  stepOrder.forEach((stepName, index) => {
-    const stepElement = document.querySelector(`[data-step="${stepName}"]`);
-    if (stepElement) {
-      if (index < currentStepIndex) stepElement.classList.add("completed");
-      else if (index === currentStepIndex) stepElement.classList.add("active");
-    }
-  });
+  if (st === "pickup-ready" || st === "in-progress") {
+    if (pickup) pickup.classList.add("active");
+    if (dropoff) dropoff.classList.add("pending");
+    return;
+  }
+
+  if (st === "completed") {
+    if (pickup) pickup.classList.add("completed");
+    if (dropoff) dropoff.classList.add("completed");
+    return;
+  }
 }
 
-// Dummy handlers
-function initializeActions() {
-  console.log("Action handlers initialized");
-}
-function updateTimestamps() {}
-function startRealTimeUpdates() {}
+// ---------- Actions required by HTML buttons ----------
 function goBack() {
   window.history.back();
 }
+
 function printOrder() {
   window.print();
 }
+
+function updateOrderStatus() {
+  // open modal
+  const m = document.getElementById("statusUpdateModal");
+  if (m) m.classList.add("active");
+}
+
+function closeStatusModal() {
+  const m = document.getElementById("statusUpdateModal");
+  if (m) m.classList.remove("active");
+}
+
+async function confirmStatusUpdate() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const bookingId = urlParams.get("id");
+  const newStatus = document.getElementById("newStatus")?.value;
+
+  if (!bookingId || !newStatus) return;
+
+  try {
+    await fetchJson(
+      `${API_BASE}/api/provider/bookings/${encodeURIComponent(bookingId)}/status`,
+      {
+        method: "PUT",
+        body: JSON.stringify({ status: newStatus }),
+      },
+    );
+
+    closeStatusModal();
+    await loadOrderFromApi(bookingId);
+    alert("Status updated!");
+  } catch (err) {
+    console.error(err);
+    alert(err.message);
+  }
+}
+
+function markAsCompleted() {
+  // quick action -> set status completed
+  document.getElementById("newStatus").value = "completed";
+  confirmStatusUpdate();
+}
+
+function contactCustomer() {
+  alert("Contact feature can be wired to your chat/call module.");
+}
+
+function contactDriver() {
+  alert("Contact driver feature can be wired to your chat/call module.");
+}
+
+function sendMessage() {
+  alert("Message feature can be wired to your chat module.");
+}
+
+function reportIssue() {
+  alert("Report issue can be wired to SupportTicket module.");
+}
+
+function viewVehicleDetails() {
+  alert("Vehicle details page can be wired if you want.");
+}
+
+function downloadDocument() {
+  alert("Document download endpoint not implemented here.");
+}
+
+// helpers
+function initials(name) {
+  const parts = String(name).trim().split(/\s+/);
+  const a = parts[0]?.[0] || "N";
+  const b = parts[1]?.[0] || "A";
+  return (a + b).toUpperCase();
+}
+
+function durationText(start, end) {
+  if (!start || !end) return "N/A";
+  const s = new Date(start);
+  const e = new Date(end);
+  const days = Math.round((e - s) / (1000 * 60 * 60 * 24)) + 1;
+  return `${days} Days`;
+}
+
+// export globals for onclick handlers in HTML
+window.goBack = goBack;
+window.printOrder = printOrder;
+window.updateOrderStatus = updateOrderStatus;
+window.closeStatusModal = closeStatusModal;
+window.confirmStatusUpdate = confirmStatusUpdate;
+window.markAsCompleted = markAsCompleted;
+window.contactCustomer = contactCustomer;
+window.contactDriver = contactDriver;
+window.sendMessage = sendMessage;
+window.reportIssue = reportIssue;
+window.viewVehicleDetails = viewVehicleDetails;
+window.downloadDocument = downloadDocument;

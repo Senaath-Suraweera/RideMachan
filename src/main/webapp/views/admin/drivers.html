@@ -22,66 +22,113 @@
         </header>
 
         <!-- Search and Filter Section (mirrors Customers) -->
-        <section class="search-filter-section">
-          <h3 class="section-title">Search & Filter Drivers</h3>
-
+        <div class="filters-container">
+          <!-- Row 1 -->
           <div class="filter-row">
-            <div class="form-group">
-              <label class="form-label">Driver Name</label>
+            <div class="filter-group">
+              <label class="filter-label" for="driverNameFilter"
+                >Driver name</label
+              >
               <input
                 id="driverNameFilter"
-                class="form-control"
+                class="filter-input"
                 type="text"
-                placeholder="Enter name"
+                placeholder="e.g., Maria Fernando"
               />
             </div>
 
-            <div class="form-group">
-              <label class="form-label">License Number</label>
+            <div class="filter-group">
+              <label class="filter-label" for="driverLicenseFilter"
+                >License / NIC</label
+              >
               <input
-                id="licenseFilter"
-                class="form-control"
+                id="driverLicenseFilter"
+                class="filter-input"
                 type="text"
-                placeholder="Enter license no."
+                placeholder="e.g., B2345678 or 912345678V"
               />
             </div>
 
-            <div class="form-group">
-              <label class="form-label">Sort Order</label>
-              <select id="sortOrder" class="form-select">
-                <option value="ascending">Ascending</option>
-                <option value="descending">Descending</option>
+            <div class="filter-group">
+              <label class="filter-label" for="companyFilter">Company</label>
+              <select id="companyFilter" class="filter-select">
+                <option value="">All companies</option>
               </select>
             </div>
 
-            <div class="form-group">
-              <label class="form-label">Minimum Rating</label>
-              <div
-                class="rating-stars"
-                id="ratingFilter"
-                aria-label="Minimum rating"
-              >
-                <span class="star" data-value="1">⭐</span>
-                <span class="star" data-value="2">⭐</span>
-                <span class="star" data-value="3">⭐</span>
-                <span class="star" data-value="4">⭐</span>
-                <span class="star" data-value="5">⭐</span>
-              </div>
-              <small class="rating-text"
-                >Click a star to set the minimum rating</small
-              >
+            <div class="filter-group">
+              <label class="filter-label" for="statusFilter">Status</label>
+              <select id="statusFilter" class="filter-select">
+                <option value="">All statuses</option>
+                <option value="Available">Available</option>
+                <option value="Busy">Busy</option>
+                <option value="Offline">Offline</option>
+              </select>
             </div>
           </div>
 
-          <div class="search-actions">
-            <button class="btn btn-primary" onclick="searchDrivers()">
-              Search
-            </button>
-            <button class="btn btn-secondary" onclick="clearFilters()">
-              Clear Filters
-            </button>
+          <!-- Row 2 -->
+          <div class="filter-row">
+            <div class="filter-group">
+              <label class="filter-label" for="locationFilter">Location</label>
+              <input
+                id="locationFilter"
+                class="filter-input"
+                type="text"
+                placeholder="e.g., Negombo"
+              />
+            </div>
+
+            <div class="filter-group">
+              <label class="filter-label" for="minRidesFilter">Min rides</label>
+              <input
+                id="minRidesFilter"
+                class="filter-input"
+                type="number"
+                min="0"
+                step="1"
+                placeholder="0"
+              />
+            </div>
+
+            <div class="filter-group">
+              <label class="filter-label" for="sortOrder">Sort</label>
+              <select id="sortOrder" class="filter-select">
+                <option value="ascending">Name (A → Z)</option>
+                <option value="descending">Name (Z → A)</option>
+              </select>
+            </div>
+
+            <div class="filter-group">
+              <label class="filter-label">Min rating</label>
+              <div class="rating-stars" id="ratingFilter">
+                <span class="star" data-value="1">★</span>
+                <span class="star" data-value="2">★</span>
+                <span class="star" data-value="3">★</span>
+                <span class="star" data-value="4">★</span>
+                <span class="star" data-value="5">★</span>
+                <span class="rating-text" id="ratingText">Any</span>
+              </div>
+            </div>
+
+            <div class="search-actions">
+              <button
+                class="btn btn-primary"
+                type="button"
+                onclick="searchDrivers()"
+              >
+                Search
+              </button>
+              <button
+                class="btn btn-secondary"
+                type="button"
+                onclick="clearFilters()"
+              >
+                Clear
+              </button>
+            </div>
           </div>
-        </section>
+        </div>
 
         <!-- Drivers List -->
         <section class="drivers-section">

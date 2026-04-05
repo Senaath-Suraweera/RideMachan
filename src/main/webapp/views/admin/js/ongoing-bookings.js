@@ -1,43 +1,245 @@
-// Complete Ongoing Bookings JavaScript with Order Details Navigation
-document.addEventListener("DOMContentLoaded", function () {
-  initializeFilters();
-  initializeBookingCards();
-  initializeDateInputs();
-  initializeSort();
-  addViewDetailsButtons();
-  enhanceBookingCardInteractions();
-  restoreNavigationState();
+// ongoing-bookings.js (API wired)
+// Uses: GET /api/admin/customer-bookings/{customerId}/ongoing
+// Navigates to: order-details.html?customerId=...&id=BK001
+
+document.addEventListener("DOMContentLoaded", async () => {
+  wireUI();
+  await loadBookings("ongoing");
 });
 
-// Initialize filter functionality
-function initializeFilters() {
-  const vehicleTypeFilter = document.getElementById("vehicleTypeFilter");
-  const locationFilter = document.getElementById("locationFilter");
-  const fromDate = document.getElementById("fromDate");
-  const toDate = document.getElementById("toDate");
-  const checkboxes = document.querySelectorAll(
-    '.filter-options input[type="checkbox"]'
-  );
-
-  // Add event listeners for real-time filtering
-  vehicleTypeFilter.addEventListener("change", applyFilters);
-  locationFilter.addEventListener("input", applyFilters);
-  fromDate.addEventListener("change", applyFilters);
-  toDate.addEventListener("change", applyFilters);
-
-  checkboxes.forEach((checkbox) => {
-    checkbox.addEventListener("change", applyFilters);
-  });
+function getQueryParam(name) {
+  return new URLSearchParams(window.location.search).get(name);
 }
 
-// Initialize booking card interactions with navigation
+function apiBase() {
+  return "/api/admin/customer-bookings";
+}
+
+function wireUI() {
+  document
+    .getElementById("vehicleTypeFilter")
+    ?.addEventListener("change", applyFilters);
+  document
+    .getElementById("locationFilter")
+    ?.addEventListener("input", applyFilters);
+  document.getElementById("fromDate")?.addEventListener("change", applyFilters);
+  document.getElementById("toDate")?.addEventListener("change", applyFilters);
+
+  document
+    .querySelectorAll('.filter-options input[type="checkbox"]')
+    .forEach((cb) => {
+      cb.addEventListener("change", applyFilters);
+    });
+
+  document
+    .getElementById("sortSelect")
+    ?.addEventListener("change", applySorting);
+}
+
+let ALL_BOOKINGS = []; // raw API array
+
+async function loadBookings(scope) {
+  const customerId = getQueryParam("customerId");
+  const container = document.querySelector(".bookings-container");
+  if (!container) return;
+
+  if (!customerId) {
+    container.innerHTML = `<div style="padding:16px;color:#b91c1c;">Missing customerId in URL.</div>`;
+    return;
+  }
+
+  container.innerHTML = `<div style="padding:16px;color:#6b7280;">Loading bookings...</div>`;
+
+  try {
+    const url = `${apiBase()}/${encodeURIComponent(customerId)}/${scope}`;
+    const res = await fetch(url, { credentials: "include" });
+
+    const text = await res.text();
+    const data = text ? JSON.parse(text) : {};
+
+    if (!res.ok) {
+      container.innerHTML = `<div style="padding:16px;color:#b91c1c;">${escapeHtml(
+        data.error || `Failed (HTTP ${res.status})`,
+      )}</div>`;
+      return;
+    }
+
+    ALL_BOOKINGS = Array.isArray(data.bookings) ? data.bookings : [];
+    renderBookings(ALL_BOOKINGS);
+    applyFilters(); // apply current UI filters on top
+  } catch (e) {
+    console.error(e);
+    container.innerHTML = `<div style="padding:16px;color:#b91c1c;">Failed to load bookings. Check servlet mapping + admin session.</div>`;
+  }
+}
+
+function renderBookings(list) {
+  const container = document.querySelector(".bookings-container");
+  container.innerHTML = "";
+
+  if (!list.length) {
+    container.innerHTML = `<div style="padding:16px;color:#6b7280;">No ongoing bookings found.</div>`;
+    return;
+  }
+
+  list.forEach((b) => {
+    const card = createBookingCard(b);
+    container.appendChild(card);
+  });
+
+  // card interactions
+  initializeBookingCards();
+  addViewDetailsButtons();
+  enhanceBookingCardInteractions();
+}
+
+function createBookingCard(b) {
+  const bookingId = b.bookingId || "BK000";
+  const status = String(b.status || "").toLowerCase();
+  const pay = String(b.paymentStatus || "").toLowerCase();
+
+  const customerName = getQueryParam("customerName") || "Customer";
+
+  const companyName = b.company?.companyName || "Rental Company";
+  const driverName = b.driver?.name || null;
+
+  const vehicleName = b.vehicle?.name || "Vehicle";
+  const vehicleType = b.vehicle?.type || "";
+  const location =
+    b.pickupLocation || b.vehicle?.location || b.company?.city || "—";
+
+  const durationDays = b.durationDays != null ? `${b.durationDays} days` : "—";
+
+  const badge = statusBadgeText(status, pay);
+  const badgeClass = statusBadgeClass(status, pay);
+
+  // status dots (for filters)
+  const dots = [];
+  if (status && status !== "pending")
+    dots.push(`<span class="status-dot accepted">● Accepted</span>`);
+  if (pay === "paid") dots.push(`<span class="status-dot paid">● Paid</span>`);
+
+  // picked up heuristic
+  if (isPickedUp(b.tripStartDate))
+    dots.push(`<span class="status-dot pickup">● Pick-up</span>`);
+
+  const card = document.createElement("div");
+  card.className = "booking-card";
+  card.dataset.status = pay || status || "";
+
+  card.innerHTML = `
+    <div class="booking-header">
+      <div class="booking-id">
+        <h3>Booking ID: ${escapeHtml(bookingId)}</h3>
+        <span class="customer-name"> ${escapeHtml(customerName)}</span>
+      </div>
+      <div class="booking-status ${badgeClass}">${escapeHtml(badge)}</div>
+    </div>
+
+    <div class="booking-content">
+      <div class="booking-left">
+        <div class="vehicle-image">
+          <span class="vehicle-icon"></span>
+          <div class="image-placeholder">Image of Vehicle</div>
+        </div>
+
+        <div class="rental-info">
+          <div class="rental-company">
+            <strong>Rental Company</strong>
+            <span>${escapeHtml(companyName)}</span>
+          </div>
+
+          ${
+            driverName
+              ? `<div class="driver-info">
+                   <strong>Driver</strong>
+                   <span> ${escapeHtml(driverName)}</span>
+                 </div>`
+              : ""
+          }
+
+          <div class="location-info">
+            <strong>Location</strong>
+            <span>📍 ${escapeHtml(location)}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="booking-right">
+        <div class="vehicle-details">
+          <strong>Vehicle</strong>
+          <span> ${escapeHtml(vehicleName)} ${vehicleType ? `(${escapeHtml(vehicleType)})` : ""}</span>
+        </div>
+        <div class="duration-info">
+          <strong>Duration</strong>
+          <span> ${escapeHtml(durationDays)}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="booking-footer">
+      <div class="status-indicators">
+        ${dots.join("")}
+      </div>
+      <div class="booking-actions">
+        <span class="action-label">Pick-up</span>
+        <span class="action-label">Drop-off</span>
+      </div>
+    </div>
+  `;
+
+  return card;
+}
+
+function statusBadgeText(status, pay) {
+  if (status === "cancelled") return "Cancelled";
+  if (status === "completed") return "Completed";
+  if (status === "in-progress" || status === "ongoing") return "In Progress";
+  if (pay === "paid") return "Paid";
+  if (status === "accepted") return "Accepted";
+  return status ? titleCase(status) : "Ongoing";
+}
+
+function statusBadgeClass(status, pay) {
+  if (status === "cancelled") return "cancelled";
+  if (status === "completed") return "completed";
+  if (status === "in-progress" || status === "ongoing") return "in-progress";
+  if (pay === "paid") return "paid";
+  if (status === "accepted") return "accepted";
+  return "in-progress";
+}
+
+function isPickedUp(tripStartDate) {
+  if (!tripStartDate) return false;
+  try {
+    const d = new Date(tripStartDate);
+    const now = new Date();
+    return d <= now;
+  } catch {
+    return false;
+  }
+}
+
+function titleCase(s) {
+  return String(s)
+    .split("-")
+    .map((p) => (p ? p[0].toUpperCase() + p.slice(1) : ""))
+    .join(" ");
+}
+
+function escapeHtml(s) {
+  return String(s ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;");
+}
+
+/* ---------------- Existing UI functions (modified to work with dynamic cards) ---------------- */
+
 function initializeBookingCards() {
   const bookingCards = document.querySelectorAll(".booking-card");
-
   bookingCards.forEach((card) => {
-    // Add click handler for card - navigate to order details
     card.addEventListener("click", function (e) {
-      // Don't navigate if clicking on buttons or action areas
       if (
         e.target.closest("button") ||
         e.target.closest(".booking-actions") ||
@@ -45,12 +247,10 @@ function initializeBookingCards() {
       ) {
         return;
       }
-
       const bookingId = extractBookingId(card);
       navigateToOrderDetails(bookingId);
     });
 
-    // Add hover effect
     card.addEventListener("mouseenter", function () {
       this.style.cursor = "pointer";
       this.style.transform = "translateY(-2px)";
@@ -65,245 +265,26 @@ function initializeBookingCards() {
   });
 }
 
-// Initialize date inputs
-function initializeDateInputs() {
-  const today = new Date().toISOString().split("T")[0];
-  document.getElementById("fromDate").value = today;
-
-  const nextWeek = new Date();
-  nextWeek.setDate(nextWeek.getDate() + 7);
-  document.getElementById("toDate").value = nextWeek
-    .toISOString()
-    .split("T")[0];
-}
-
-// Initialize sort functionality
-function initializeSort() {
-  const sortSelect = document.getElementById("sortSelect");
-  sortSelect.addEventListener("change", applySorting);
-}
-
-// Apply filters function
-function applyFilters() {
-  const vehicleType = document.getElementById("vehicleTypeFilter").value;
-  const location = document
-    .getElementById("locationFilter")
-    .value.toLowerCase();
-  const fromDate = document.getElementById("fromDate").value;
-  const toDate = document.getElementById("toDate").value;
-
-  const withDriver = document.getElementById("withDriver").checked;
-  const accepted = document.getElementById("accepted").checked;
-  const pickedUp = document.getElementById("pickedUp").checked;
-  const paid = document.getElementById("paid").checked;
-
-  const bookingCards = document.querySelectorAll(".booking-card");
-
-  bookingCards.forEach((card) => {
-    let shouldShow = true;
-
-    // Vehicle type filter
-    if (vehicleType !== "Select type") {
-      const vehicleText = card
-        .querySelector(".vehicle-details span")
-        .textContent.toLowerCase();
-      if (!vehicleText.includes(vehicleType.toLowerCase())) {
-        shouldShow = false;
-      }
-    }
-
-    // Location filter
-    if (location) {
-      const cardLocation = card
-        .querySelector(".location-info span")
-        .textContent.toLowerCase();
-      if (!cardLocation.includes(location)) {
-        shouldShow = false;
-      }
-    }
-
-    // Status filters
-    const cardStatus = card.dataset.status;
-    const statusIndicators = card.querySelectorAll(".status-dot");
-
-    if (
-      accepted &&
-      !Array.from(statusIndicators).some((dot) =>
-        dot.textContent.includes("Accepted")
-      )
-    ) {
-      shouldShow = false;
-    }
-
-    if (
-      paid &&
-      cardStatus !== "paid" &&
-      !Array.from(statusIndicators).some((dot) =>
-        dot.textContent.includes("Paid")
-      )
-    ) {
-      shouldShow = false;
-    }
-
-    if (
-      pickedUp &&
-      !Array.from(statusIndicators).some((dot) =>
-        dot.textContent.includes("Pick-up")
-      )
-    ) {
-      shouldShow = false;
-    }
-
-    if (withDriver) {
-      const driverInfo = card.querySelector(".driver-info");
-      if (!driverInfo) {
-        shouldShow = false;
-      }
-    }
-
-    // Apply filter with animation
-    if (shouldShow) {
-      card.style.display = "block";
-      card.classList.remove("filtered-out");
-      card.classList.add("filtered-in");
-    } else {
-      card.classList.remove("filtered-in");
-      card.classList.add("filtered-out");
-      setTimeout(() => {
-        if (card.classList.contains("filtered-out")) {
-          card.style.display = "none";
-        }
-      }, 300);
-    }
-  });
-
-  updateResultsCount();
-}
-
-// Apply sorting
-function applySorting() {
-  const sortValue = document.getElementById("sortSelect").value;
-  const bookingsContainer = document.querySelector(".bookings-container");
-  const bookingCards = Array.from(
-    bookingsContainer.querySelectorAll(".booking-card")
-  );
-
-  bookingCards.sort((a, b) => {
-    switch (sortValue) {
-      case "📈 Ascending":
-        return a
-          .querySelector(".booking-id h3")
-          .textContent.localeCompare(
-            b.querySelector(".booking-id h3").textContent
-          );
-      case "📊 Descending":
-        return b
-          .querySelector(".booking-id h3")
-          .textContent.localeCompare(
-            a.querySelector(".booking-id h3").textContent
-          );
-      case "📅 Date (Newest)":
-        // In a real app, you'd sort by actual booking dates
-        return b
-          .querySelector(".booking-id h3")
-          .textContent.localeCompare(
-            a.querySelector(".booking-id h3").textContent
-          );
-      case "📅 Date (Oldest)":
-        return a
-          .querySelector(".booking-id h3")
-          .textContent.localeCompare(
-            b.querySelector(".booking-id h3").textContent
-          );
-      case "💰 Price (High to Low)":
-        // Would need price data in the cards for real sorting
-        return Math.random() - 0.5; // Random for demo
-      case "💰 Price (Low to High)":
-        return Math.random() - 0.5; // Random for demo
-      default:
-        return 0;
-    }
-  });
-
-  // Re-append sorted cards
-  bookingCards.forEach((card) => bookingsContainer.appendChild(card));
-}
-
-// Extract booking ID from card
 function extractBookingId(card) {
   const bookingIdElement = card.querySelector(".booking-id h3");
   if (bookingIdElement) {
-    // Extract ID from "Booking ID: BK001" format
     const fullText = bookingIdElement.textContent;
     const match = fullText.match(/Booking ID:\s*(.+)/);
-    return match ? match[1].trim() : "BK001";
+    return match ? match[1].trim() : "BK000";
   }
-  return "BK001"; // Default fallback
+  return "BK000";
 }
 
-// Navigate to order details page
 function navigateToOrderDetails(bookingId) {
-  // Add loading state
-  showLoadingState();
-
-  // Store current page state
+  const customerId = getQueryParam("customerId");
   sessionStorage.setItem("previousPage", "ongoing-bookings");
   sessionStorage.setItem("scrollPosition", window.scrollY);
 
-  // Navigate to order details with booking ID
-  setTimeout(() => {
-    window.location.href = `order-details.html?id=${bookingId}`;
-  }, 300);
+  window.location.href = `order-details.html?customerId=${encodeURIComponent(customerId || "")}&id=${encodeURIComponent(bookingId)}`;
 }
 
-// Show loading state when navigating
-function showLoadingState() {
-  const loadingOverlay = document.createElement("div");
-  loadingOverlay.id = "navigationLoading";
-  loadingOverlay.innerHTML = `
-        <div style="
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(255, 255, 255, 0.9);
-            z-index: 9999;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-direction: column;
-        ">
-            <div style="
-                width: 40px;
-                height: 40px;
-                border: 3px solid #e8eaed;
-                border-top: 3px solid #1abc9c;
-                border-radius: 50%;
-                animation: spin 1s linear infinite;
-                margin-bottom: 16px;
-            "></div>
-            <div style="
-                font-size: 14px;
-                color: #5f6368;
-                font-weight: 500;
-            ">Loading order details...</div>
-        </div>
-        <style>
-            @keyframes spin {
-                0% { transform: rotate(0deg); }
-                100% { transform: rotate(360deg); }
-            }
-        </style>
-    `;
-
-  document.body.appendChild(loadingOverlay);
-}
-
-// Add "View Details" buttons to existing booking cards
 function addViewDetailsButtons() {
   const bookingCards = document.querySelectorAll(".booking-card");
-
   bookingCards.forEach((card) => {
     const actionsArea = card.querySelector(".booking-actions");
     if (actionsArea && !actionsArea.querySelector(".view-details-btn")) {
@@ -316,78 +297,36 @@ function addViewDetailsButtons() {
         const bookingId = extractBookingId(card);
         navigateToOrderDetails(bookingId);
       };
-
       actionsArea.appendChild(viewDetailsBtn);
     }
   });
 }
 
-// Enhanced booking card interactions with better visual feedback
 function enhanceBookingCardInteractions() {
+  if (document.getElementById("bookingEnhanceStyle")) return;
   const style = document.createElement("style");
+  style.id = "bookingEnhanceStyle";
   style.textContent = `
-        .booking-card {
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .booking-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(
-                90deg,
-                transparent,
-                rgba(26, 188, 156, 0.1),
-                transparent
-            );
-            transition: left 0.6s;
-        }
-        
-        .booking-card:hover::before {
-            left: 100%;
-        }
-        
-        .booking-card:active {
-            transform: translateY(1px);
-        }
-        
-        .view-details-btn {
-            opacity: 0;
-            transform: translateY(10px);
-            transition: all 0.3s ease;
-        }
-        
-        .booking-card:hover .view-details-btn {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    `;
-
+    .booking-card { position: relative; overflow: hidden; }
+    .booking-card::before {
+      content:'';
+      position:absolute; top:0; left:-100%;
+      width:100%; height:100%;
+      background:linear-gradient(90deg,transparent,rgba(26,188,156,0.1),transparent);
+      transition:left 0.6s;
+    }
+    .booking-card:hover::before { left:100%; }
+    .booking-card:active { transform: translateY(1px); }
+    .view-details-btn { opacity:0; transform: translateY(10px); transition: all 0.3s ease; }
+    .booking-card:hover .view-details-btn { opacity:1; transform: translateY(0); }
+  `;
   document.head.appendChild(style);
 }
 
-// Restore navigation state when returning from order details
-function restoreNavigationState() {
-  const previousPage = sessionStorage.getItem("previousPage");
-  const scrollPosition = sessionStorage.getItem("scrollPosition");
-
-  if (previousPage === "ongoing-bookings" && scrollPosition) {
-    setTimeout(() => {
-      window.scrollTo(0, parseInt(scrollPosition));
-    }, 100);
-    sessionStorage.removeItem("previousPage");
-    sessionStorage.removeItem("scrollPosition");
-  }
-}
-
-// Toggle filters visibility
 function toggleFilters() {
   const filterOptions = document.querySelector(".filter-options");
   const button = event.target;
+  if (!filterOptions) return;
 
   if (filterOptions.style.display === "none") {
     filterOptions.style.display = "flex";
@@ -398,294 +337,81 @@ function toggleFilters() {
   }
 }
 
-// Update results count
-function updateResultsCount() {
-  const visibleCards = document.querySelectorAll(
-    '.booking-card:not([style*="display: none"])'
-  ).length;
-  const totalCards = document.querySelectorAll(".booking-card").length;
+function applyFilters() {
+  const vehicleType =
+    document.getElementById("vehicleTypeFilter")?.value || "Select type";
+  const location = (
+    document.getElementById("locationFilter")?.value || ""
+  ).toLowerCase();
+  const fromDate = document.getElementById("fromDate")?.value || "";
+  const toDate = document.getElementById("toDate")?.value || "";
 
-  console.log(`Showing ${visibleCards} of ${totalCards} bookings`);
-}
+  const withDriver = document.getElementById("withDriver")?.checked;
+  const accepted = document.getElementById("accepted")?.checked;
+  const pickedUp = document.getElementById("pickedUp")?.checked;
+  const paid = document.getElementById("paid")?.checked;
 
-// Open booking details modal (enhanced with navigation option)
-function openBookingDetails(bookingId, cardElement) {
-  const modal = document.getElementById("bookingDetailsModal");
-  const modalContent = document.getElementById("bookingModalContent");
+  const cards = document.querySelectorAll(".booking-card");
 
-  // Extract data from the card
-  const customerName = cardElement.querySelector(".customer-name").textContent;
-  const vehicleDetails = cardElement.querySelector(
-    ".vehicle-details span"
-  ).textContent;
-  const rentalCompany = cardElement.querySelector(
-    ".rental-company span"
-  ).textContent;
-  const location = cardElement.querySelector(".location-info span").textContent;
-  const duration =
-    cardElement.querySelector(".duration-info span")?.textContent || "N/A";
-  const status = cardElement.querySelector(".booking-status").textContent;
-  const statusIndicators = Array.from(
-    cardElement.querySelectorAll(".status-dot")
-  ).map((dot) => dot.textContent);
+  cards.forEach((card) => {
+    let shouldShow = true;
 
-  // Create modal content with enhanced details and navigation option
-  modalContent.innerHTML = `
-        <div class="booking-details">
-            <div class="detail-section">
-                <h3>${bookingId}</h3>
-                <p><strong>Customer:</strong> ${customerName}</p>
-                <p><strong>Status:</strong> <span class="status-badge status-${status
-                  .toLowerCase()
-                  .replace(" ", "-")}">${status}</span></p>
-                <div style="margin-top: 16px;">
-                    <button class="btn btn-primary" onclick="navigateToOrderDetails('${bookingId.replace(
-                      "Booking ID: ",
-                      ""
-                    )}')">
-                        📋 View Full Order Details
-                    </button>
-                </div>
-            </div>
-            
-            <div class="detail-grid">
-                <div class="detail-item">
-                    <strong>Vehicle:</strong>
-                    <span>${vehicleDetails}</span>
-                </div>
-                <div class="detail-item">
-                    <strong>Rental Company:</strong>
-                    <span>${rentalCompany}</span>
-                </div>
-                <div class="detail-item">
-                    <strong>Location:</strong>
-                    <span>${location}</span>
-                </div>
-                <div class="detail-item">
-                    <strong>Duration:</strong>
-                    <span>${duration}</span>
-                </div>
-            </div>
-            
-            <div class="status-timeline">
-                <h4>Booking Progress</h4>
-                <div class="timeline">
-                    ${statusIndicators
-                      .map(
-                        (indicator) => `
-                        <div class="timeline-item ${
-                          indicator.includes("●") ? "completed" : ""
-                        }">
-                            ${indicator}
-                        </div>
-                    `
-                      )
-                      .join("")}
-                </div>
-            </div>
-            
-            <div class="quick-actions" style="margin-top: 20px; display: flex; gap: 12px; flex-wrap: wrap;">
-                <button class="btn btn-secondary btn-sm" onclick="contactCustomer()">
-                    📞 Contact Customer
-                </button>
-                <button class="btn btn-secondary btn-sm" onclick="updateBookingStatus()">
-                    📝 Update Status
-                </button>
-            </div>
-        </div>
-        
-        <style>
-            .booking-details {
-                font-family: inherit;
-            }
-            
-            .detail-section {
-                margin-bottom: 24px;
-                padding-bottom: 16px;
-                border-bottom: 1px solid #e8eaed;
-            }
-            
-            .detail-section h3 {
-                color: #202124;
-                margin-bottom: 12px;
-            }
-            
-            .detail-grid {
-                display: grid;
-                grid-template-columns: 1fr 1fr;
-                gap: 16px;
-                margin-bottom: 24px;
-            }
-            
-            .detail-item {
-                display: flex;
-                flex-direction: column;
-                gap: 4px;
-            }
-            
-            .detail-item strong {
-                color: #5f6368;
-                font-size: 12px;
-                text-transform: uppercase;
-                letter-spacing: 0.5px;
-            }
-            
-            .detail-item span {
-                color: #202124;
-                font-weight: 500;
-            }
-            
-            .status-timeline {
-                margin-bottom: 24px;
-            }
-            
-            .status-timeline h4 {
-                color: #202124;
-                margin-bottom: 12px;
-            }
-            
-            .timeline {
-                display: flex;
-                flex-direction: column;
-                gap: 8px;
-            }
-            
-            .timeline-item {
-                padding: 8px 12px;
-                border-radius: 6px;
-                background: #f8f9fa;
-                font-size: 14px;
-            }
-            
-            .timeline-item.completed {
-                background: #e8f5e8;
-                color: #2e7d32;
-            }
-            
-            @media (max-width: 768px) {
-                .detail-grid {
-                    grid-template-columns: 1fr;
-                }
-                
-                .quick-actions {
-                    flex-direction: column;
-                }
-            }
-        </style>
-    `;
-
-  modal.classList.add("active");
-  document.body.style.overflow = "hidden";
-}
-
-// Close booking details modal
-function closeBookingModal() {
-  const modal = document.getElementById("bookingDetailsModal");
-  modal.classList.remove("active");
-  document.body.style.overflow = "";
-}
-
-// Update booking status
-function updateBookingStatus() {
-  // In a real app, this would update the booking status on the server
-  alert("Booking status updated successfully!");
-  closeBookingModal();
-}
-
-// Contact customer
-function contactCustomer() {
-  alert("Calling customer...");
-}
-
-// Load more bookings
-function loadMoreBookings() {
-  const button = event.target;
-  button.textContent = "Loading...";
-  button.disabled = true;
-
-  // Simulate loading more bookings
-  setTimeout(() => {
-    button.textContent = "Load More Bookings";
-    button.disabled = false;
-    alert("No more bookings to load");
-  }, 2000);
-}
-
-// Search functionality (triggered by search button)
-function performSearch() {
-  applyFilters();
-
-  // Add visual feedback
-  const searchButton = event.target;
-  const originalText = searchButton.textContent;
-  searchButton.textContent = "🔄 Searching...";
-  searchButton.disabled = true;
-
-  setTimeout(() => {
-    searchButton.textContent = originalText;
-    searchButton.disabled = false;
-  }, 1000);
-}
-
-// Close modal when clicking outside
-document.addEventListener("click", function (e) {
-  const modal = document.getElementById("bookingDetailsModal");
-  if (e.target === modal) {
-    closeBookingModal();
-  }
-});
-
-// Close modal with escape key
-document.addEventListener("keydown", function (e) {
-  if (e.key === "Escape") {
-    closeBookingModal();
-  }
-});
-
-// Real-time status updates simulation
-function simulateRealTimeUpdates() {
-  setInterval(() => {
-    const bookingCards = document.querySelectorAll(".booking-card");
-
-    // Randomly update a booking status (for demo purposes)
-    if (Math.random() > 0.95) {
-      // 5% chance every interval
-      const randomCard =
-        bookingCards[Math.floor(Math.random() * bookingCards.length)];
-      const statusElement = randomCard.querySelector(".booking-status");
-
-      // Example status progression
-      if (statusElement.textContent === "Accepted") {
-        statusElement.textContent = "In Progress";
-        statusElement.className = "booking-status in-progress";
-        randomCard.dataset.status = "in-progress";
-
-        // Add pickup status indicator
-        const statusIndicators = randomCard.querySelector(".status-indicators");
-        const pickupStatus = document.createElement("span");
-        pickupStatus.className = "status-dot pickup";
-        pickupStatus.textContent = "● Pick-up";
-        statusIndicators.appendChild(pickupStatus);
-
-        // Flash animation
-        randomCard.style.borderLeft = "4px solid #1abc9c";
-        setTimeout(() => {
-          randomCard.style.borderLeft = "";
-        }, 2000);
-      }
+    // Vehicle type
+    if (vehicleType !== "Select type") {
+      const vehicleText = (
+        card.querySelector(".vehicle-details span")?.textContent || ""
+      ).toLowerCase();
+      if (!vehicleText.includes(vehicleType.toLowerCase())) shouldShow = false;
     }
-  }, 5000); // Check every 5 seconds
+
+    // Location
+    if (location) {
+      const cardLocation = (
+        card.querySelector(".location-info span")?.textContent || ""
+      ).toLowerCase();
+      if (!cardLocation.includes(location)) shouldShow = false;
+    }
+
+    // Date range (we can only read from embedded bookingId card? -> skip if not set)
+    // If you want strict date filtering, we need dates printed on cards. For now: ignore.
+
+    const indicators = Array.from(card.querySelectorAll(".status-dot")).map(
+      (d) => d.textContent,
+    );
+
+    if (accepted && !indicators.some((t) => t.includes("Accepted")))
+      shouldShow = false;
+    if (paid && !indicators.some((t) => t.includes("Paid"))) shouldShow = false;
+    if (pickedUp && !indicators.some((t) => t.includes("Pick-up")))
+      shouldShow = false;
+
+    if (withDriver) {
+      const driverInfo = card.querySelector(".driver-info");
+      if (!driverInfo) shouldShow = false;
+    }
+
+    card.style.display = shouldShow ? "block" : "none";
+  });
 }
 
-// Initialize real-time updates
-setTimeout(simulateRealTimeUpdates, 10000); // Start after 10 seconds
+function applySorting() {
+  const sortValue =
+    document.getElementById("sortSelect")?.value || "Descending";
+  const container = document.querySelector(".bookings-container");
+  if (!container) return;
 
-// Export functions for global access
-window.applyFilters = applyFilters;
-window.toggleFilters = toggleFilters;
-window.loadMoreBookings = loadMoreBookings;
-window.closeBookingModal = closeBookingModal;
-window.updateBookingStatus = updateBookingStatus;
-window.contactCustomer = contactCustomer;
-window.navigateToOrderDetails = navigateToOrderDetails;
-window.extractBookingId = extractBookingId;
+  const cards = Array.from(container.querySelectorAll(".booking-card"));
+
+  cards.sort((a, b) => {
+    const aId = a.querySelector(".booking-id h3")?.textContent || "";
+    const bId = b.querySelector(".booking-id h3")?.textContent || "";
+
+    if (sortValue.includes("Ascending")) return aId.localeCompare(bId);
+    if (sortValue.includes("Descending")) return bId.localeCompare(aId);
+
+    // Dates + prices would need printed values; keep ID sort fallback
+    return bId.localeCompare(aId);
+  });
+
+  cards.forEach((c) => container.appendChild(c));
+}

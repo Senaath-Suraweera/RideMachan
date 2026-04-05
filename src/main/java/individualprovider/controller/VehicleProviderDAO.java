@@ -9,20 +9,31 @@ import java.sql.*;
 public class VehicleProviderDAO {
 
     public static boolean insertProvider(VehicleProvider provider) {
-        String sql = "INSERT INTO VehicleProvider (username, email, hashedpassword, salt, company_id, " +
-                "firstname, lastname, phonenumber, housenumber, street, city, zipcode) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO VehicleProvider " +
+                "(username, email, hashedpassword, salt, company_id, firstname, lastname, phonenumber, housenumber, street, city, zipcode) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection con = DBConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
 
+            // Required: password must be provided
+            String rawPassword = provider.getPassword();
+            if (rawPassword == null || rawPassword.trim().isEmpty()) {
+                throw new IllegalArgumentException("Password is required");
+            }
+
             String salt = PasswordServices.generateSalt();
-            String hashedPassword = PasswordServices.hashPassword(provider.getPassword(), salt);
+            String hashedPassword = PasswordServices.hashPassword(rawPassword, salt);
 
             ps.setString(1, provider.getUsername());
             ps.setString(2, provider.getEmail());
             ps.setString(3, hashedPassword);
             ps.setString(4, salt);
-            ps.setInt(5, provider.getCompanyId());
+
+            // company_id is nullable (independent provider)
+            Integer companyId = provider.getCompanyId() > 0 ? provider.getCompanyId() : null;
+            ps.setObject(5, companyId, Types.INTEGER);
+
             ps.setString(6, provider.getFirstName());
             ps.setString(7, provider.getLastName());
             ps.setString(8, provider.getPhoneNumber());

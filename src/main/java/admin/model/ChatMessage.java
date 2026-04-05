@@ -3,12 +3,13 @@ package admin.model;
 public class ChatMessage {
     private int messageId;
     private int conversationId;
-
     private String senderType;
     private int senderId;
-
     private String content;
     private String sentAt;
+
+    // --- Convenience: sender display name (populated by controller) ---
+    private String senderName;
 
     public int getMessageId() { return messageId; }
     public void setMessageId(int messageId) { this.messageId = messageId; }
@@ -27,4 +28,7 @@ public class ChatMessage {
 
     public String getSentAt() { return sentAt; }
     public void setSentAt(String sentAt) { this.sentAt = sentAt; }
+
+    public String getSenderName() { return senderName; }
+    public void setSenderName(String senderName) { this.senderName = senderName; }
 }

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -44,6 +44,89 @@
         </div>
         <div class="modal-body">
           <form id="registerVehicleForm" enctype="multipart/form-data">
+            <!-- NEW REQUIRED FIELD -->
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Price Per Day (Rs.)</label>
+                <input
+                  type="number"
+                  step="0.01"
+                  name="price_per_day"
+                  class="form-control"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Location</label>
+                <input type="text" name="location" class="form-control" />
+              </div>
+            </div>
+
+            <!-- NEW FIELDS -->
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Vehicle Type</label>
+                <input
+                  type="text"
+                  name="vehicle_type"
+                  class="form-control"
+                  placeholder="Car / SUV / Van..."
+                />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Fuel Type</label>
+                <input
+                  type="text"
+                  name="fuel_type"
+                  class="form-control"
+                  placeholder="Petrol / Diesel / Hybrid..."
+                />
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Manufacture Year</label>
+                <input
+                  type="number"
+                  name="manufacture_year"
+                  class="form-control"
+                />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Transmission</label>
+                <input
+                  type="text"
+                  name="transmission"
+                  class="form-control"
+                  placeholder="Automatic / Manual"
+                />
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Availability Status</label>
+                <select name="availability_status" class="form-control">
+                  <option value="available" selected>available</option>
+                  <option value="unavailable">unavailable</option>
+                  <option value="maintenance">maintenance</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Features</label>
+                <input
+                  type="text"
+                  name="features"
+                  class="form-control"
+                  placeholder="AC, Bluetooth, Camera..."
+                />
+              </div>
+            </div>
+
+            <hr />
+
+            <!-- EXISTING FIELDS -->
             <div class="form-row">
               <div class="form-group">
                 <label class="form-label">Vehicle Brand</label>
@@ -168,6 +251,7 @@
             </div>
           </form>
         </div>
+
         <div class="modal-footer">
           <button class="btn btn-secondary" onclick="closeRegisterModal()">
             Cancel
@@ -184,17 +268,109 @@
     </div>
 
     <!-- Update Vehicle Modal -->
-    <!-- Update Vehicle Modal -->
     <div class="modal-overlay" id="updateVehicleModal">
       <div class="modal">
         <div class="modal-header">
           <h2>Update Vehicle</h2>
           <button class="modal-close" onclick="closeUpdateModal()">×</button>
         </div>
+
         <div class="modal-body">
           <form id="updateVehicleForm" enctype="multipart/form-data">
             <input type="hidden" id="updateVehicleId" name="vehicleid" />
 
+            <!-- NEW FIELDS -->
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Price Per Day (Rs.)</label>
+                <input
+                  type="number"
+                  step="0.01"
+                  id="updatePricePerDay"
+                  name="price_per_day"
+                  class="form-control"
+                />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Location</label>
+                <input
+                  type="text"
+                  id="updateLocation"
+                  name="location"
+                  class="form-control"
+                />
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Vehicle Type</label>
+                <input
+                  type="text"
+                  id="updateVehicleType"
+                  name="vehicle_type"
+                  class="form-control"
+                />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Fuel Type</label>
+                <input
+                  type="text"
+                  id="updateFuelType"
+                  name="fuel_type"
+                  class="form-control"
+                />
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Manufacture Year</label>
+                <input
+                  type="number"
+                  id="updateManufactureYear"
+                  name="manufacture_year"
+                  class="form-control"
+                />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Transmission</label>
+                <input
+                  type="text"
+                  id="updateTransmission"
+                  name="transmission"
+                  class="form-control"
+                />
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Availability Status</label>
+                <select
+                  id="updateAvailabilityStatus"
+                  name="availability_status"
+                  class="form-control"
+                >
+                  <option value="available">available</option>
+                  <option value="unavailable">unavailable</option>
+                  <option value="maintenance">maintenance</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Features</label>
+                <input
+                  type="text"
+                  id="updateFeatures"
+                  name="features"
+                  class="form-control"
+                />
+              </div>
+            </div>
+
+            <hr />
+
+            <!-- EXISTING FIELDS -->
             <div class="form-row">
               <div class="form-group">
                 <label class="form-label">Vehicle Brand</label>
@@ -328,6 +504,9 @@
                   class="form-control"
                   accept=".pdf"
                 />
+                <small class="muted"
+                  >Leave empty to keep current document.</small
+                >
               </div>
               <div class="form-group">
                 <label class="form-label">Vehicle Image</label>
@@ -338,10 +517,12 @@
                   class="form-control"
                   accept="image/*"
                 />
+                <small class="muted">Leave empty to keep current image.</small>
               </div>
             </div>
           </form>
         </div>
+
         <div class="modal-footer">
           <button class="btn btn-secondary" onclick="closeUpdateModal()">
             Cancel

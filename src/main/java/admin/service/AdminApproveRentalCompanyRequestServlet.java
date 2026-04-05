@@ -1,6 +1,7 @@
 package admin.service;
 
 import common.util.DBConnection;
+import common.util.GmailSender;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -41,13 +42,16 @@ public class AdminApproveRentalCompanyRequestServlet extends HttpServlet {
         if (adminIdStr != null && !adminIdStr.trim().isEmpty()) adminId = Integer.parseInt(adminIdStr);
 
         Connection con = null;
+
+        String requestEmail = null;
+        String requestCompanyName = null;
+
         try {
             con = DBConnection.getConnection();
             con.setAutoCommit(false);
 
             String select = "SELECT * FROM RentalCompanyRegistrationRequest WHERE request_id=? AND status='PENDING' FOR UPDATE";
 
-            // UPDATED: includes description, terms
             String insertCompany = "INSERT INTO RentalCompany " +
                     "(companyname, companyemail, phone, registrationnumber, taxid, street, city, certificatepath, taxdocumentpath, description, terms, hashedpassword, salt) " +
                     "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)";
@@ -68,6 +72,10 @@ public class AdminApproveRentalCompanyRequestServlet extends HttpServlet {
                         return;
                     }
 
+                    // capture for email
+                    requestEmail = rs.getString("companyemail");
+                    requestCompanyName = rs.getString("companyname");
+
                     try (PreparedStatement psIns = con.prepareStatement(insertCompany, Statement.RETURN_GENERATED_KEYS)) {
                         psIns.setString(1, rs.getString("companyname"));
                         psIns.setString(2, rs.getString("companyemail"));
@@ -78,11 +86,8 @@ public class AdminApproveRentalCompanyRequestServlet extends HttpServlet {
                         psIns.setString(7, rs.getString("city"));
                         psIns.setString(8, rs.getString("certificatepath"));
                         psIns.setString(9, rs.getString("taxdocumentpath"));
-
-                        // NEW
                         psIns.setString(10, rs.getString("description"));
                         psIns.setString(11, rs.getString("terms"));
-
                         psIns.setString(12, rs.getString("hashedpassword"));
                         psIns.setString(13, rs.getString("salt"));
 
@@ -110,6 +115,21 @@ public class AdminApproveRentalCompanyRequestServlet extends HttpServlet {
             }
 
             con.commit();
+
+            // Send email AFTER commit (so approval is final even if email fails)
+            try {
+                if (requestEmail != null && !requestEmail.trim().isEmpty()) {
+                    GmailSender.sendRentalCompanyRequestStatusEmail(
+                            requestEmail.trim(),
+                            requestCompanyName,
+                            true,
+                            null
+                    );
+                }
+            } catch (Exception mailEx) {
+                mailEx.printStackTrace();
+            }
+
             json(resp, 200, "{\"ok\":true,\"message\":\"Approved\",\"companyid\":" + companyId + "}");
 
         } catch (SQLIntegrityConstraintViolationException dup) {

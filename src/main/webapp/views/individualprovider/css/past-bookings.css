@@ -1,57 +1,68 @@
-/* Ongoing Bookings Specific Styles */
+/* =========================================================
+   Past Bookings — Theme-aligned (matches styles.css + Order Details)
+   Paste-replace entire past-bookings.css
+   ========================================================= */
+
 .page-header {
   margin-bottom: 12px;
 }
 
 .page-header h1 {
-  font-size: 32px;
-  font-weight: 600;
-  color: #202124;
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--dark, #1a1a2e);
   margin: 0;
 }
 
 .page-subtitle {
-  font-size: 16px;
-  color: #5f6368;
-  margin-bottom: 30px;
+  font-size: 14px;
+  color: #6b7280;
+  margin-bottom: 20px;
+  font-weight: 600;
 }
 
-/* Filter Section */
+/* ---------------- Filter Section ---------------- */
 .search-filter-section {
-  background: white;
-  border-radius: 12px;
-  padding: 24px;
-  margin-bottom: 24px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  background: #fff;
+  border-radius: var(--radius, 10px);
+  padding: 20px;
+  margin-bottom: 22px;
+  box-shadow: var(--shadow-sm, 0 4px 6px -1px rgba(0, 0, 0, 0.1));
+  border: 1px solid rgba(0, 0, 0, 0.03);
 }
 
 .filter-row {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 20px;
-  margin-bottom: 20px;
+  gap: 16px;
+  margin-bottom: 14px;
 }
 
 .filter-options {
   display: flex;
   flex-wrap: wrap;
-  gap: 24px;
-  margin-bottom: 20px;
+  gap: 16px;
+  margin-bottom: 14px;
+  padding: 12px 12px;
+  background: #f8fafc;
+  border-radius: 12px;
+  border: 1px solid var(--border, #e9ecef);
 }
 
 .checkbox-label {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 8px;
-  font-size: 14px;
-  color: #202124;
+  font-size: 13px;
+  color: #111827;
   cursor: pointer;
+  font-weight: 650;
 }
 
 .checkbox-label input[type="checkbox"] {
   width: 16px;
   height: 16px;
-  accent-color: #1abc9c;
+  accent-color: var(--primary, #3a0ca3);
 }
 
 .filter-actions {
@@ -59,129 +70,147 @@
   justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
-  gap: 16px;
+  gap: 12px;
 }
 
 .sort-controls {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
+  flex-wrap: wrap;
 }
 
 .filter-toggle {
-  background: #f1f3f4 !important;
-  color: #5f6368 !important;
-  border: 1px solid #dadce0 !important;
+  background: rgba(67, 97, 238, 0.06) !important;
+  color: #3a0ca3 !important;
+  border: 1px solid rgba(67, 97, 238, 0.18) !important;
 }
 
-/* Bookings Container */
+.filter-toggle:hover {
+  background: rgba(67, 97, 238, 0.1) !important;
+}
+
+/* ---------------- Bookings Container ---------------- */
 .bookings-container {
-  margin-bottom: 32px;
+  margin-bottom: 28px;
 }
 
 .booking-card {
-  background: white;
-  border-radius: 12px;
-  padding: 24px;
-  margin-bottom: 20px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  background: #fff;
+  border-radius: var(--radius, 10px);
+  padding: 20px;
+  margin-bottom: 18px;
+  box-shadow: var(--shadow-sm, 0 4px 6px -1px rgba(0, 0, 0, 0.1));
+  border: 1px solid rgba(0, 0, 0, 0.03);
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
   cursor: pointer;
 }
 
 .booking-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.12);
 }
 
 .booking-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 20px;
+  gap: 12px;
+  margin-bottom: 16px;
 }
 
 .booking-id h3 {
-  font-size: 20px;
-  font-weight: 600;
-  color: #202124;
+  font-size: 18px;
+  font-weight: 900;
+  color: #111827;
   margin: 0 0 4px 0;
 }
 
 .customer-name {
-  font-size: 14px;
-  color: #5f6368;
-  display: flex;
+  font-size: 13px;
+  color: #6b7280;
+  display: inline-flex;
   align-items: center;
   gap: 6px;
+  font-weight: 650;
 }
 
+/* Status badge */
 .booking-status {
-  padding: 6px 16px;
-  border-radius: 20px;
+  padding: 6px 12px;
+  border-radius: 999px;
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 800;
   text-transform: uppercase;
+  border: 1px solid rgba(0, 0, 0, 0.04);
+  line-height: 1;
+  white-space: nowrap;
 }
 
 .booking-status.paid {
-  background: #e8f5e8;
-  color: #2e7d32;
+  background: rgba(16, 185, 129, 0.15);
+  color: #059669;
+  border-color: rgba(16, 185, 129, 0.22);
 }
 
 .booking-status.in-progress {
-  background: #e3f2fd;
-  color: #1976d2;
+  background: rgba(72, 149, 239, 0.15);
+  color: #2563eb;
+  border-color: rgba(72, 149, 239, 0.22);
 }
 
 .booking-status.accepted {
-  background: #fff3e0;
-  color: #f57c00;
+  background: rgba(248, 150, 30, 0.15);
+  color: #d97706;
+  border-color: rgba(248, 150, 30, 0.22);
 }
 
+/* ---------------- Booking Content ---------------- */
 .booking-content {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 32px;
-  margin-bottom: 20px;
+  gap: 24px;
+  margin-bottom: 14px;
 }
 
 .booking-left {
   display: flex;
-  gap: 20px;
+  gap: 16px;
+  align-items: flex-start;
 }
 
 .vehicle-image {
   position: relative;
-  width: 80px;
-  height: 60px;
-  background: #f8f9fa;
-  border-radius: 8px;
+  width: 110px;
+  height: 76px;
+  background: #f8fafc;
+  border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  overflow: hidden;
+  border: 1px solid var(--border, #e9ecef);
 }
 
 .vehicle-icon {
-  font-size: 24px;
+  font-size: 22px;
+  opacity: 0.35;
 }
 
 .image-placeholder {
-  position: absolute;
-  bottom: -20px;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 10px;
-  color: #5f6368;
-  white-space: nowrap;
+  font-size: 11px;
+  color: #6b7280;
+  font-weight: 700;
 }
 
 .rental-info,
 .booking-right {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
 }
 
 .rental-info > div,
@@ -193,249 +222,63 @@
 
 .rental-info strong,
 .booking-right strong {
-  font-size: 12px;
-  color: #5f6368;
-  font-weight: 500;
+  font-size: 11px;
+  color: #6b7280;
+  font-weight: 800;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.4px;
 }
 
 .rental-info span,
 .booking-right span {
   font-size: 14px;
-  color: #202124;
-  font-weight: 500;
-  display: flex;
+  color: #111827;
+  font-weight: 650;
+  display: inline-flex;
   align-items: center;
   gap: 6px;
 }
 
+/* ---------------- Footer ---------------- */
 .booking-footer {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding-top: 20px;
-  border-top: 1px solid #e8eaed;
-}
-
-.status-indicators {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
-
-.status-dot {
-  font-size: 12px;
-  font-weight: 500;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.status-dot.accepted {
-  color: #2e7d32;
-}
-
-.status-dot.paid {
-  color: #1976d2;
-}
-
-.status-dot.pickup {
-  color: #f57c00;
+  gap: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border, #e9ecef);
+  flex-wrap: wrap;
 }
 
 .booking-actions {
   display: flex;
-  gap: 16px;
-}
-
-.action-label {
-  font-size: 12px;
-  color: #5f6368;
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-/* Load More Section */
-.load-more-section {
-  text-align: center;
-  margin-top: 32px;
-}
-
-/* Modal Styles */
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  z-index: 2000;
-  display: none;
+  gap: 10px;
   align-items: center;
-  justify-content: center;
-  padding: 20px;
 }
 
-.modal-overlay.active {
-  display: flex;
-}
-
-.modal {
-  background: white;
-  border-radius: 12px;
-  width: 100%;
-  max-width: 700px;
-  max-height: 90vh;
-  overflow-y: auto;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-}
-
-.modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 24px;
-  border-bottom: 1px solid #e8eaed;
-}
-
-.modal-header h2 {
-  font-size: 24px;
-  font-weight: 600;
-  color: #202124;
-  margin: 0;
-}
-
-.modal-close {
-  background: none;
-  border: none;
-  font-size: 24px;
-  color: #5f6368;
-  cursor: pointer;
-  padding: 4px;
-  border-radius: 4px;
-}
-
-.modal-close:hover {
-  background: #f1f3f4;
-}
-
-.modal-body {
-  padding: 24px;
-}
-
-.modal-footer {
-  display: flex;
-  justify-content: flex-end;
-  gap: 12px;
-  padding: 24px;
-  border-top: 1px solid #e8eaed;
-}
-
-/* Filter Animation */
-.booking-card.filtered-out {
-  opacity: 0;
-  transform: scale(0.95);
-  transition: all 0.3s ease;
-}
-
-.booking-card.filtered-in {
-  opacity: 1;
-  transform: scale(1);
-  transition: all 0.3s ease;
-}
-
-/* Responsive Design */
-@media (max-width: 1024px) {
+/* ---------------- Responsive ---------------- */
+@media (max-width: 900px) {
   .booking-content {
     grid-template-columns: 1fr;
-    gap: 20px;
-  }
-
-  .booking-left {
-    flex-direction: column;
-    gap: 16px;
-  }
-
-  .vehicle-image {
-    align-self: flex-start;
   }
 }
 
-@media (max-width: 768px) {
-  .filter-actions {
-    flex-direction: column;
-    align-items: stretch;
+@media (max-width: 600px) {
+  .search-filter-section {
+    padding: 16px;
   }
 
-  .sort-controls {
-    justify-content: space-between;
-  }
-
-  .filter-options {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
+  .booking-card {
+    padding: 16px;
   }
 
   .booking-header {
     flex-direction: column;
-    gap: 12px;
     align-items: flex-start;
   }
 
-  .booking-footer {
-    flex-direction: column;
-    gap: 16px;
-    align-items: flex-start;
-  }
-
-  .status-indicators {
-    flex-wrap: wrap;
-  }
-
-  .booking-actions {
-    width: 100%;
-    justify-content: space-between;
-  }
-
-  .modal {
-    margin: 10px;
-  }
-}
-
-@media (max-width: 480px) {
-  .filter-row {
-    grid-template-columns: 1fr;
-  }
-
-  .filter-options {
-    grid-template-columns: 1fr;
-  }
-
-  .booking-left {
-    gap: 12px;
-  }
-
-  .rental-info,
-  .booking-right {
-    gap: 8px;
-  }
-
-  .modal-header {
-    padding: 16px;
-  }
-
-  .modal-body {
-    padding: 16px;
-  }
-
-  .modal-footer {
-    padding: 16px;
-    flex-direction: column;
-  }
-
-  .modal-footer .btn {
-    width: 100%;
+  .vehicle-image {
+    width: 100px;
+    height: 70px;
   }
 }
