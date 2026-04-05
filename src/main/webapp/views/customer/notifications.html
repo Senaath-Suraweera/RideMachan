@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <!-- ===================
+                 Meta & Stylesheets
+        =================== -->
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Notifications - Ride Machan</title>
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+        />
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
+        />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+            rel="stylesheet"
+        />
+        <link rel="stylesheet" href="notifications.css" />
+    </head>
+    <body>
+        <div class="container">
+            <!-- ===================
+                     Sidebar Navigation
+            =================== -->
+            <div class="sidebar">
+                <div class="logo">
+                    <img src="logo.png" alt="Logo" class="logo">
+                </div>
+                <div class="nav-menu">
+                    <!-- Home Section -->
+
+                    <div class="nav-item">
+                        <i class="fas fa-car"></i>
+                        <a href="home.html"><span>Home</span></a>
+                        
+                    </div>
+                    
+                    <div class="nav-item">
+                        <i class="fas fa-car"></i>
+                        <a href="search.html"><span>Search</span></a>
+                    </div>
+                
+                    <div class="nav-item">
+                        <i class="fas fa-box"></i>
+                        <a href="booking.html"><span>Bookings</span></a>
+                    </div>
+
+                    <div class="nav-item">
+                        <i class="fas fa-cog"></i>
+                        <a href="settings.html"><span>Settings</span></a>
+                    </div>
+                    <div class="nav-item active">
+                        <i class="fas fa-bell"></i>
+                        <a href="notifications.html"><span>Notifications</span></a>
+                    </div>
+                    <div class="logout">
+                        <i class="fas fa-sign-out"></i>
+                        <span>Logout</span>
+                    </div>
+                </div>
+            </div>
+            <!-- ===================
+                     Header Section
+            =================== -->
+            <div class="header">
+                <div class="hi">
+                    <h1>Notifications</h1>
+                    <p class="subtitle">Stay updated with your bookings and activities</p>
+                </div>
+                <div class="header-actions">
+                    <!-- Notifications -->
+                    <div class="notification">
+                        <a href="#"><i class="fas fa-bell"></i></a>
+                        <div class="badge">3</div>
+                    </div>
+                    <div class="notification">
+                        <a href="#"><i class="fas fa-envelope"></i></a>
+                        <div class="badge">5</div>
+                    </div>
+                    <!-- User Profile -->
+                    <div class="user-profile">
+                        <div class="profile-img">K</div>
+                        <div class="user-info">
+                            <div class="user-name">Kamal</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===================
+                     Main Content - Notifications
+            =================== -->
+            <div class="main-content">
+                <!-- Notification Stats -->
+                <div class="notification-stats">
+                    <div class="stat-item">
+                        <div class="stat-icon pending">
+                            <i class="fas fa-bell"></i>
+                        </div>
+                        <div class="stat-info">
+                            <div class="stat-number">5</div>
+                            <div class="stat-label">Pending</div>
+                        </div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-icon read">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="stat-info">
+                            <div class="stat-number">2</div>
+                            <div class="stat-label">Read</div>
+                        </div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-icon confirmed">
+                            <i class="fas fa-circle-check"></i>
+                        </div>
+                        <div class="stat-info">
+                            <div class="stat-number">12</div>
+                            <div class="stat-label">Confirmed</div>
+                        </div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-icon draft">
+                            <i class="fas fa-file-lines"></i>
+                        </div>
+                        <div class="stat-info">
+                            <div class="stat-number">3</div>
+                            <div class="stat-label">Draft</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Notifications List -->
+                <div class="notifications-container">
+                    <div class="notification-item confirmed">
+                        <div class="notification-icon">
+                            <i class="fas fa-circle-check"></i>
+                        </div>
+                        <div class="notification-content">
+                            <h4>Booking Confirmed - Mercedes C-Class</h4>
+                            <p>Your luxury car is now booked for tomorrow Pickup: Jan 15, 2024 at 9:00 AM from Colombo Fort. Driver: Chaminda Perera | 4.8 ★ Rating</p>
+                        </div>
+                        <div class="notification-meta">
+                            <span class="time">25 minutes ago</span>
+                            <button class="action-btn"><i class="fas fa-ellipsis-vertical"></i></button>
+                        </div>
+                    </div>
+
+                    <div class="notification-item pending">
+                        <div class="notification-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="notification-content">
+                            <h4>Payment Required - LKR 15,500</h4>
+                            <p>Payment for BMW X3 is ready processed via due pickup for BGG2. Please pay to your dest. Payment ID#P1: 2024-4706</p>
+                        </div>
+                        <div class="notification-meta">
+                            <span class="time">1 hour ago</span>
+                            <button class="action-btn"><i class="fas fa-ellipsis-vertical"></i></button>
+                        </div>
+                    </div>
+
+                    <div class="notification-item warning">
+                        <div class="notification-icon">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <div class="notification-content">
+                            <h4>Vehicle Return Due Tomorrow</h4>
+                            <p>Toyota Prius (LKB-5247) return scheduled at Good Mews, Kandy at 2:00 PM. Extend here to 5:30 PM. Late Fee: LKR W50hour</p>
+                        </div>
+                        <div class="notification-meta">
+                            <span class="time">4 hours ago</span>
+                            <button class="action-btn"><i class="fas fa-ellipsis-vertical"></i></button>
+                        </div>
+                    </div>
+
+                    <div class="notification-item info">
+                        <div class="notification-icon">
+                            <i class="fas fa-info-circle"></i>
+                        </div>
+                        <div class="notification-content">
+                            <h4>Driver Update - Next Destination</h4>
+                            <p>Hi, I'm in Galle now. I can reach Kandy area, Give Road. Will be there in 15 Min thanks for the transportation. "Previous Weight</p>
+                        </div>
+                        <div class="notification-meta">
+                            <span class="time">8 hours ago</span>
+                            <button class="action-btn"><i class="fas fa-ellipsis-vertical"></i></button>
+                        </div>
+                    </div>
+
+                    <div class="notification-item info">
+                        <div class="notification-icon">
+                            <i class="fas fa-info-circle"></i>
+                        </div>
+                        <div class="notification-content">
+                            <h4>Trip Completed - Rate Your Experience</h4>
+                            <p>Colombo to Galle road trip has been completed successfully. Driver LKR 8,500. Please rate your experience and driver performance.</p>
+                        </div>
+                        <div class="notification-meta">
+                            <span class="time">1 day ago</span>
+                            <button class="action-btn"><i class="fas fa-ellipsis-vertical"></i></button>
+                        </div>
+                    </div>
+
+                    <div class="notification-item warning">
+                        <div class="notification-icon">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <div class="notification-content">
+                            <h4>Document Verification Required</h4>
+                            <p>Your driving license is due to expire. New license required licence in 10 days. pending previous licence submit.</p>
+                        </div>
+                        <div class="notification-meta">
+                            <span class="time">2 days ago</span>
+                            <button class="action-btn"><i class="fas fa-ellipsis-vertical"></i></button>
+                        </div>
+                    </div>
+
+                    <div class="notification-item confirmed">
+                        <div class="notification-icon">
+                            <i class="fas fa-circle-check"></i>
+                        </div>
+                        <div class="notification-content">
+                            <h4>Weekend Special - 35% Off</h4>
+                            <p>Book any Eco for this weekend and get 35% off with the Exchange codes perfect rating 5 TM, Use code: WKD35CK</p>
+                        </div>
+                        <div class="notification-meta">
+                            <span class="time">2 days ago</span>
+                            <button class="action-btn"><i class="fas fa-ellipsis-vertical"></i></button>
+                        </div>
+                    </div>
+
+                    <div class="notification-item confirmed">
+                        <div class="notification-icon">
+                            <i class="fas fa-circle-check"></i>
+                        </div>
+                        <div class="notification-content">
+                            <h4>Freelance Coach Approved</h4>
+                            <p>Your application has for new charge in SriLanka KG has been is per the tax New approved... Previous: LKR 12,000 will be credited in 2-3 Days.</p>
+                        </div>
+                        <div class="notification-meta">
+                            <span class="time">3 days ago</span>
+                            <button class="action-btn"><i class="fas fa-ellipsis-vertical"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <!-- ===================
+                 Meta & Stylesheets
+        =================== -->
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Settings - Ride Machan</title>
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+        />
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
+        />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+            rel="stylesheet"
+        />
+        <link rel="stylesheet" href="settings.css" />
+    </head>
+    <body>
+        <div class="container">
+            <!-- ===================
+                     Sidebar Navigation
+            =================== -->
+            <div class="sidebar">
+                <div class="logo">
+                    <img src="logo.png" alt="Ride Machan Logo" class="logo">
+                </div>
+                <div class="nav-menu">
+                    <!-- Home Section -->
+
+                    <div class="nav-item">
+                        <i class="fas fa-car"></i>
+                        <a href="home.html"><span>Home</span></a>
+                        
+                    </div>
+                    
+                    <div class="nav-item">
+                        <i class="fas fa-car"></i>
+                        <a href="search.html"><span>Search</span></a>
+                    </div>
+                
+                    <div class="nav-item">
+                        <i class="fas fa-box"></i>
+                        <a href="booking.html"><span>Bookings</span></a>
+                    </div>
+
+                    <div class="nav-item active">
+                        <i class="fas fa-cog"></i>
+                        <a href="settings.html"><span>Settings</span></a>
+                    </div>
+                    <div class="nav-item">
+                        <i class="fas fa-bell"></i>
+                        <a href="notifications.html"><span>Notifications</span></a>
+                    </div>
+                    <div class="logout">
+                        <i class="fas fa-sign-out"></i>
+                        <span>Logout</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===================
+                     Header Section
+            =================== -->
+            <div class="header">
+                <div class="hi">
+                    <h1>Settings</h1>
+                    <p class="subtitle">Manage your account preferences</p>
+                </div>
+                <div class="header-actions">
+                    <!-- Notifications -->
+                    <div class="notification">
+                        <a href="#"><i class="fas fa-bell"></i></a>
+                        <div class="badge">3</div>
+                    </div>
+                    <div class="notification">
+                        <a href="#"><i class="fas fa-envelope"></i></a>
+                        <div class="badge">5</div>
+                    </div>
+                    <!-- User Profile -->
+                    <div class="user-profile">
+                        <div class="profile-img">K</div>
+                        <div class="user-info">
+                            <div class="user-name">Kamal</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===================
+                     Main Content
+            =================== -->
+            <div class="main-content">
+                <div class="settings-container">
+                    <!-- Profile Information Section -->
+                    <div class="settings-card">
+                        <div class="card-header">
+                            <div class="card-title">
+                                <i class="fas fa-user"></i>
+                                <h3>Profile Information</h3>
+                            </div>
+                            <button class="btn btn-outline btn-sm update-profile-btn">
+                                <i class="fas fa-edit"></i>
+                                Update Profile
+                            </button>
+                        </div>
+                        <div class="card-content">
+                            <div class="profile-avatar">
+                                <div class="avatar-circle">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                <div class="avatar-info">
+                                    <h4>Kamal Perera</h4>
+                                    <p>Profile Name</p>
+                                </div>
+                            </div>
+                            
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label>First Name</label>
+                                    <input type="text" value="Kamla" readonly>
+                                </div>
+                                <div class="form-group">
+                                    <label>Last Name</label>
+                                    <input type="text" value="Perera" readonly>
+                                </div>
+                                <div class="form-group">
+                                    <label>Phone Number</label>
+                                    <input type="text" value="077 934 2871" readonly>
+                                </div>
+                                <div class="form-group">
+                                    <label>Email</label>
+                                    <input type="email" value="kamal@gmail.com" readonly>
+                                </div>
+                                <div class="form-group">
+                                    <label>GST Address</label>
+                                    <input type="text" value="123 Main Street, Colombo" readonly>
+                                </div>
+                                <div class="form-group">
+                                    <label>Location</label>
+                                    <input type="text" value="colombo 5, colombo" readonly>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Change Password Section -->
+                    <div class="settings-card">
+                        <div class="card-header">
+                            <div class="card-title">
+                                <i class="fas fa-lock"></i>
+                                <h3>Change Password</h3>
+                            </div>
+                        </div>
+                        <div class="card-content">
+                            <div class="form-grid password-grid">
+                                <div class="form-group full-width">
+                                    <label>Old Password</label>
+                                    <input type="password" placeholder="Enter your current password">
+                                </div>
+                                <div class="form-group full-width">
+                                    <label>New Password</label>
+                                    <input type="password" placeholder="Enter your new password">
+                                </div>
+                                <div class="form-group full-width">
+                                    <label>Confirm New Password</label>
+                                    <input type="password" placeholder="Confirm your new password">
+                                </div>
+                            </div>
+                            <button class="btn btn-primary update-password-btn">
+                                <i class="fas fa-key"></i>
+                                Update Password
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Notifications Section -->
+                    <div class="settings-card">
+                        <div class="card-header">
+                            <div class="card-title">
+                                <i class="fas fa-bell"></i>
+                                <h3>Notifications</h3>
+                            </div>
+                        </div>
+                        <div class="card-content">
+                            <div class="notification-item">
+                                <div class="notification-info">
+                                    <h4>New Bookings</h4>
+                                    <p>Get notified when you receive new booking requests</p>
+                                </div>
+                                <div class="toggle-switch">
+                                    <input type="checkbox" id="new-bookings" checked>
+                                    <label for="new-bookings" class="switch"></label>
+                                </div>
+                            </div>
+                            <div class="notification-item">
+                                <div class="notification-info">
+                                    <h4>Confirmations</h4>
+                                    <p>Get notified about booking confirmations</p>
+                                </div>
+                                <div class="toggle-switch">
+                                    <input type="checkbox" id="confirmations" checked>
+                                    <label for="confirmations" class="switch"></label>
+                                </div>
+                            </div>
+                            <div class="notification-item">
+                                <div class="notification-info">
+                                    <h4>Due Payment</h4>
+                                    <p>Get notified about pending payments</p>
+                                </div>
+                                <div class="toggle-switch">
+                                    <input type="checkbox" id="due-payment">
+                                    <label for="due-payment" class="switch"></label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            // Toggle switch functionality
+            document.querySelectorAll('.toggle-switch input').forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    console.log(`${this.id} is now ${this.checked ? 'enabled' : 'disabled'}`);
+                });
+            });
+
+            // Update profile button
+            document.querySelector('.update-profile-btn').addEventListener('click', function() {
+                const inputs = document.querySelectorAll('.form-grid input');
+                const isReadonly = inputs[0].hasAttribute('readonly');
+                
+                inputs.forEach(input => {
+                    if (isReadonly) {
+                        input.removeAttribute('readonly');
+                        input.classList.add('editable');
+                    } else {
+                        input.setAttribute('readonly', '');
+                        input.classList.remove('editable');
+                    }
+                });
+                
+                this.innerHTML = isReadonly ? 
+                    '<i class="fas fa-save"></i> Save Profile' : 
+                    '<i class="fas fa-edit"></i> Update Profile';
+            });
+
+            // Update password button
+            document.querySelector('.update-password-btn').addEventListener('click', function() {
+                const passwordInputs = document.querySelectorAll('.password-grid input');
+                let allFilled = true;
+                
+                passwordInputs.forEach(input => {
+                    if (!input.value.trim()) {
+                        allFilled = false;
+                    }
+                });
+                
+                if (allFilled) {
+                    alert('Password updated successfully!');
+                    passwordInputs.forEach(input => input.value = '');
+                } else {
+                    alert('Please fill in all password fields.');
+                }
+            });
+        </script>
+    </body>
+</html>
