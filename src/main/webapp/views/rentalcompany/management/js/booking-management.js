@@ -172,7 +172,7 @@ function filterBookingsByDate() {
 
     for(let i=0; i<AllBookings.length; i++) {
 
-        if(AllBookings[i].status === 'Completed') {
+        if(AllBookings[i].status.toLowerCase() === 'completed') {
             filteredPastBookings.push(AllBookings[i]);
         }else {
             filteredCurrentBookings.push(AllBookings[i]);
@@ -269,13 +269,13 @@ function filterBookingsByTripStatus(status) {
         console.log("Trip status:- ", AllBookings[i].status)
         console.log("selected trip status:- ", status)
 
-        let tripStatus =  AllBookings[i].status || "";
+        let tripStatus =  AllBookings[i].status.toLowerCase() || "";
 
         //DEBUG 2
-        console.log("Comparing:- ", tripStatus , "with ", status)
-        console.log("Match?:- ", tripStatus == status)
+        console.log("Comparing:- ", tripStatus , "with ", status.toLowerCase())
+        console.log("Match?:- ", tripStatus == status.toLowerCase())
 
-        if(tripStatus == status) {
+        if(tripStatus == status.toLowerCase()) {
             filteredBookings.push(AllBookings[i]);
         }
 

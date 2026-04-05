@@ -4,6 +4,7 @@ import java.io.InputStream;
 
 public class Vehicle {
     private int vehicleId;
+    private String status;
     private String vehicleBrand;
     private String vehicleModel;
     private String numberPlateNumber;
@@ -19,6 +20,8 @@ public class Vehicle {
     private String milage;
     private Integer companyId;
     private Integer providerId;
+    private int pricePerDay;
+    private String location;
 
     // Constructors
     public Vehicle() {}
@@ -26,7 +29,7 @@ public class Vehicle {
     public Vehicle(String vehicleBrand, String vehicleModel, String numberPlateNumber, int tareWeight,
                    String color, int numberOfPassengers, int engineCapacity, String engineNumber,
                    String chasisNumber, InputStream registrationDocumentation, InputStream vehicleImages,
-                   String description, String milage, Integer companyId, Integer providerId) {
+                   String description, String milage, Integer companyId, Integer providerId,int pricePerDay, String location) {
         this.vehicleBrand = vehicleBrand;
         this.vehicleModel = vehicleModel;
         this.numberPlateNumber = numberPlateNumber;
@@ -42,11 +45,16 @@ public class Vehicle {
         this.milage = milage;
         this.companyId = companyId;
         this.providerId = providerId;
+        this.pricePerDay = pricePerDay;
+        this.location = location;
     }
 
     // Getters and Setters
     public int getVehicleId() { return vehicleId; }
     public void setVehicleId(int vehicleId) { this.vehicleId = vehicleId; }
+
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
 
     public String getVehicleBrand() { return vehicleBrand; }
     public void setVehicleBrand(String vehicleBrand) { this.vehicleBrand = vehicleBrand; }
@@ -92,4 +100,10 @@ public class Vehicle {
 
     public Integer getProviderId() { return providerId; }
     public void setProviderId(Integer providerId) { this.providerId = providerId; }
+
+    public int getPricePerDay() { return pricePerDay; }
+    public void setPricePerDay(int pricePerDay) { this.pricePerDay = pricePerDay; }
+
+    public String getLocation() { return location; }
+    public void setLocation(String location) { this.location = location; }
 }

@@ -19,7 +19,7 @@ public class DisplayBookingsServlet extends HttpServlet {
 
         try {
 
-            HttpSession session = req.getSession();
+            HttpSession session = req.getSession(false);
 
             if(session == null || session.getAttribute("companyId") == null) {
                 String requestedPage = req.getRequestURI();
@@ -44,9 +44,12 @@ public class DisplayBookingsServlet extends HttpServlet {
 
 
             resp.getWriter().write(json);
+
         }catch(Exception e) {
+
             e.printStackTrace(); // check server logs
             resp.getWriter().write("{\"error\":\""+e.getMessage()+"\"}");
+
         }
 
     }

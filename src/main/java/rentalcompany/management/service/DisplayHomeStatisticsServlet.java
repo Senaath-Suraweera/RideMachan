@@ -3,19 +3,14 @@ package rentalcompany.management.service;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
-import rentalcompany.management.model.RentalCompanyBookings;
 import rentalcompany.management.controller.RentalCompanyBookingsDAO;
 import rentalcompany.drivers.controller.DriverDAO;
-import com.google.gson.Gson;
-import rentalcompany.management.controller.RentalCompanyBookingsDAO;
-import rentalcompany.management.model.RentalCompanyBookings;
 
 import java.io.IOException;
-import java.util.List;
 
 
 @WebServlet("/displaystatistics")
-public class DisplayStatisticsServlet extends HttpServlet {
+public class DisplayHomeStatisticsServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {

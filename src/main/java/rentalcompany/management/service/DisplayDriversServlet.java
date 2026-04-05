@@ -20,11 +20,20 @@ public class DisplayDriversServlet extends HttpServlet {
 
         try {
 
+            HttpSession session = req.getSession(false);
+
+            if(session == null || session.getAttribute("companyId") == null) {
+                String requestedPage = req.getRequestURI();
+                resp.sendRedirect(req.getContextPath() + "companylogin.html?redirect=" + requestedPage);
+                return;
+            }
+
+            int companyId = (int) session.getAttribute("companyId");
+
+            List<Driver> drivers = DriverDAO.loadAllDriversByCompanyId(companyId);
+
             resp.setContentType("application/json");
             resp.setCharacterEncoding("UTF-8");
-
-            List<Driver> drivers = DriverDAO.loadAllDrivers();
-
 
 
             String json = new Gson().toJson(drivers);

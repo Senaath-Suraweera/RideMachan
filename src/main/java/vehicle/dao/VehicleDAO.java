@@ -12,7 +12,7 @@ public class VehicleDAO {
     public static boolean addVehicle(Vehicle v) {
         String sql = "INSERT INTO Vehicle (vehiclebrand, vehiclemodel, numberplatenumber, tareweight, color, " +
                 "numberofpassengers, enginecapacity, enginenumber, chasisnumber, registrationdocumentation, " +
-                "vehicleimages, description, milage, company_id, provider_id) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+                "vehicleimages, description, milage, company_id, provider_id,price_per_day,location) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
         try (Connection con = DBConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
 
@@ -37,6 +37,10 @@ public class VehicleDAO {
                 ps.setInt(15, v.getProviderId());
             else
                 ps.setNull(15, Types.INTEGER);
+
+
+            ps.setInt(16, v.getPricePerDay());
+            ps.setString(17, v.getLocation());
 
             return ps.executeUpdate() > 0;
         } catch (Exception e) {
@@ -64,6 +68,7 @@ public class VehicleDAO {
             while (rs.next()) {
                 Vehicle v = new Vehicle();
                 v.setVehicleId(rs.getInt("vehicleid"));
+                v.setStatus(rs.getString("availability_status"));
                 v.setVehicleBrand(rs.getString("vehiclebrand"));
                 v.setVehicleModel(rs.getString("vehiclemodel"));
                 v.setNumberPlateNumber(rs.getString("numberplatenumber"));
@@ -153,5 +158,105 @@ public class VehicleDAO {
             e.printStackTrace();
         }
         return list;
+    }
+
+    public static int getTotalVehiclesCount(int companyId) {
+
+        int totalVehiclesCount = 0;
+
+        String sql = "SELECT COUNT(*) FROM vehicle WHERE company_id = ?";
+
+        try(Connection con = DBConnection.getConnection();
+            PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setInt(1, companyId);
+
+            ResultSet rs = ps.executeQuery();
+
+            if(rs.next()) {
+                totalVehiclesCount = rs.getInt(1);
+            }
+
+        }catch(Exception e) {
+            e.printStackTrace();
+        }
+
+
+        return totalVehiclesCount;
+
+    }
+
+    public static int getAvailableVehiclesCount(int companyId) {
+
+        int availableVehiclesCount = 0;
+
+        String sql = "SELECT COUNT(*) FROM vehicle WHERE company_id = ? AND availability_status = 'available'";
+
+        try(Connection con = DBConnection.getConnection();
+            PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setInt(1, companyId);
+
+            ResultSet rs = ps.executeQuery();
+
+            if(rs.next()) {
+                availableVehiclesCount = rs.getInt(1);
+            }
+
+        }catch(Exception e) {
+            e.printStackTrace();
+        }
+
+
+        return availableVehiclesCount;
+
+    }
+
+    public static int getOnTripVehiclesCount(int companyId) {
+
+        int onTripVehiclesCount = 0;
+
+        String sql = "SELECT COUNT(*) FROM vehicle WHERE company_id = ? AND availability_status = 'ontrip'";
+
+        try(Connection con = DBConnection.getConnection();
+            PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setInt(1, companyId);
+
+            ResultSet rs = ps.executeQuery();
+
+            if(rs.next()) {
+                onTripVehiclesCount = rs.getInt(1);
+            }
+
+        }catch(Exception e) {
+            e.printStackTrace();
+        }
+
+
+        return onTripVehiclesCount;
+
+    }
+
+    public static int getIdOfVehicle(String numberplatenumber) {
+
+        int vehicleId = -1; // default if not found
+        String sql = "SELECT vehicleid FROM vehicle WHERE numberplatenumber = ?";
+
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setString(1, numberplatenumber);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                vehicleId = rs.getInt("vehicleid");
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return vehicleId;
     }
 }

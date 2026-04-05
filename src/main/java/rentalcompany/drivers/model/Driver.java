@@ -1,5 +1,7 @@
 package rentalcompany.drivers.model;
 
+import java.util.Date;
+
 public class Driver {
     private int driverId;
     private String username;
@@ -12,19 +14,36 @@ public class Driver {
     private String hashedPassword;
     private String salt;
     private String nicNumber;
+    private String driverLicenceNumber;
+    private Date licenceExpiration;
     private byte[] nicPdf;
     private byte[] driversLicence;
     private int companyId;
-    private String Area;
-    private String 
+    private int rating;
+    private String status;
+    private String area;
+    private String homeAddress;
+    private String companyName;
+    private Date joinedDate;
+    private String shiftTime;
+    private String reportingManager;
+    private String profilePicture;
+
+
+    // Default constructor
+    public Driver() {
+
+    }
 
     // Constructor for registration
-    public Driver(String username, String firstName, String lastName, String email,
-                  String mobileNumber, String description, String password,
-                  String nicNumber, byte[] nicPdf, byte[] driversLicence, int companyId) {
+    public Driver(String username, String firstName, String lastName, String area, String email,
+                  String mobileNumber, String description, String password, String nicNumber,
+                  byte[] nicPdf, byte[] driversLicence, int companyId, String licenceNumber, Date licenceExpiration) {
+
         this.username = username;
         this.firstName = firstName;
         this.lastName = lastName;
+        this.area = area;
         this.email = email;
         this.mobileNumber = mobileNumber;
         this.description = description;
@@ -33,6 +52,9 @@ public class Driver {
         this.nicPdf = nicPdf;
         this.driversLicence = driversLicence;
         this.companyId = companyId;
+        this.driverLicenceNumber = licenceNumber;
+        this.licenceExpiration = licenceExpiration;
+
     }
 
     // Constructor for login
@@ -41,30 +63,17 @@ public class Driver {
         this.password = password;
     }
 
-    //constructor for loadDriver
-    public Driver(int driverId, String firstName, String lastName, String email, String mobileNumber) {
+    //constructor for Load CompanyDrivers
+    public Driver(int driverId, String firstName, String lastName, String status, int rating, String area, String driverLicenceNumber, String mobileNumber, Date licenceExpiration) {
         this.driverId = driverId;
         this.firstName = firstName;
         this.lastName = lastName;
-        this.email = email;
+        this.status = status;
+        this.rating = rating;
+        this.area = area;
+        this.driverLicenceNumber = driverLicenceNumber;
         this.mobileNumber = mobileNumber;
-    }
-
-    //for company drivers adding
-    public Driver(String username, String firstName, String lastName, String email,
-                  String mobileNumber, String description, String hashedpassword,String salt,
-                  String nicNumber, byte[] nicPdf, byte[] driversLicence, int companyId) {
-        this.username = username;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.email = email;
-        this.mobileNumber = mobileNumber;
-        this.description = description;
-        this.hashedPassword = hashedpassword;
-        this.nicNumber = nicNumber;
-        this.nicPdf = nicPdf;
-        this.driversLicence = driversLicence;
-        this.companyId = companyId;
+        this.licenceExpiration = licenceExpiration;
     }
 
     // Getters & Setters
@@ -101,6 +110,12 @@ public class Driver {
     public String getNicNumber() { return nicNumber; }
     public void setNicNumber(String nicNumber) { this.nicNumber = nicNumber; }
 
+    public String getDriverLicenceNumber() { return driverLicenceNumber; }
+    public void setDriverLicenceNumber(String driverLicenceNumber) { this.driverLicenceNumber = driverLicenceNumber; }
+
+    public Date getLicenceExpiration() { return licenceExpiration; }
+    public void setLicenceExpiration(Date licenceExpiration) { this.licenceExpiration = licenceExpiration; }
+
     public byte[] getNicPdf() { return nicPdf; }
     public void setNicPdf(byte[] nicPdf) { this.nicPdf = nicPdf; }
 
@@ -109,4 +124,44 @@ public class Driver {
 
     public int getCompanyId() { return companyId; }
     public void setCompanyId(int companyId) { this.companyId = companyId; }
+
+    public int getRating() { return rating; }
+    public void setRating(int rating) { this.rating = rating; }
+
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
+
+    public String getArea() { return area; }
+    public void setArea(String area) { this.area = area; }
+
+    public String getHomeAddress() { return homeAddress; }
+    public void setHomeAddress(String homeAddress) { this.homeAddress = homeAddress; }
+
+    public String getCompanyName() { return companyName; }
+    public void setCompanyName(String companyName) { this.companyName = companyName; }
+
+    public Date getJoinedDate() { return joinedDate; }
+    public void setJoinedDate(Date joinedDate) { this.joinedDate = joinedDate; }
+
+    public String getShiftTime() { return shiftTime; }
+    public void setShiftTime(String shiftTime) { this.shiftTime = shiftTime; }
+
+    public String getReportingManager() { return reportingManager; }
+    public void setReportingManager(String reportingManager) { this.reportingManager = reportingManager; }
+
+    public String getProfilePicture() { return profilePicture; }
+    public void setProfilePicture(String profilePicture) { this.profilePicture = profilePicture; }
+
+    public String getFullName() {
+        if (firstName != null && lastName != null) {
+            return firstName + " " + lastName;
+        } else if (firstName != null) {
+            return firstName;
+        } else if (lastName != null) {
+            return lastName;
+        } else {
+            return username;
+        }
+    }
+
 }

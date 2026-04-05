@@ -12,8 +12,7 @@ import jakarta.servlet.http.*;
 
 import rentalcompany.maintenance.controller.MaintenanceStaffDAO;
 import rentalcompany.maintenance.model.MaintenanceStaff;
-import rentalcompany.management.controller.RentalCompanyBookingsDAO;
-import rentalcompany.management.model.RentalCompanyBookings;
+
 
 @WebServlet(name = "DisplayMaintenanceStaffServlet", urlPatterns = {"/display/maintenancestaff"})
 public class DisplayMaintenanceStaffServlet extends HttpServlet {

@@ -1,811 +1,667 @@
-// API Configuration
-const API_BASE_URL = "http://localhost:8080/maintenance"; // Adjust this to your backend URL
-const MAINTENANCE_STAFF_ID = 3; // Hardcoded session staff ID
+async function checkLogin() {
 
-// Calendar variables
-let currentDate = new Date();
-let selectedDate = null;
-let maintenanceData = {}; // Will be populated from backend
+    try {
 
-// Initialize the application
-document.addEventListener("DOMContentLoaded", () => {
-  initializeCalendar();
-  setupEventListeners();
-  setupUserMenu();
-  setupSearch();
-  setupModal();
-});
+        const response = await fetch("/checklogin");
+        const data = await response.json();
 
-// Initialize calendar
-async function initializeCalendar() {
-  await loadMonthEvents();
-  await displayTodaysTasks();
-  updateCurrentMonthDisplay();
-}
+        if (!data.loggedIn) {
 
-// Load events from backend for current month
-async function loadMonthEvents() {
-  const year = currentDate.getFullYear();
-  const month = currentDate.getMonth();
+            const modal = document.getElementById("loginModal");
+            modal.style.display = "flex";
 
-  const startDate = `${year}-${String(month + 1).padStart(2, "0")}-01`;
-  const lastDay = new Date(year, month + 1, 0).getDate();
-  const endDate = `${year}-${String(month + 1).padStart(2, "0")}-${lastDay}`;
 
-  try {
-    const response = await fetch(
-      `${API_BASE_URL}/listEvents?startDate=${startDate}&endDate=${endDate}`
-    );
+            document.getElementById("loginOkBtn").onclick = () => {
 
-    if (!response.ok) {
-      throw new Error("Failed to fetch events");
+                window.location.href = "/login";
+
+            };
+
+            return false;
+
+        }
+
+        console.log("User is logged in.");
+        return true;
+
+    } catch (err) {
+
+        console.error("Error checking login:", err);
+        return false;
+
     }
 
-    const data = await response.json();
+}
 
-    // Check if response is an error
-    if (data.status === "error") {
-      console.error("API Error:", data.message);
-      maintenanceData = {};
-      return;
+let AllEvents;
+let currentYear = 2026;
+let currentMonth = 3;
+
+
+async function LoadCalenderEvents() {
+
+    try {
+
+        const response = await fetch("/maintenance/listEvents");
+
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        let events = await response.json();
+
+        console.log("Events:", events);
+
+        return events;
+
+    } catch (err) {
+
+        console.log(err);
+
     }
 
-    // Store the events data
-    maintenanceData = data;
-
-    // Render the calendar with the new data
-    renderCalendar();
-  } catch (error) {
-    console.error("Error loading events:", error);
-    maintenanceData = {};
-  }
 }
 
-// Render calendar dates
-function renderCalendar() {
-  const calendarDates = document.getElementById("calendarDates");
-  calendarDates.innerHTML = "";
+async function AddCalenderEvents() {
 
-  const year = currentDate.getFullYear();
-  const month = currentDate.getMonth();
+    try {
 
-  // First day of the month
-  const firstDay = new Date(year, month, 1);
-  const lastDay = new Date(year, month + 1, 0);
-  const prevLastDay = new Date(year, month, 0);
+        const addEventForm = document.getElementById("addEventForm");
 
-  const firstDayIndex = firstDay.getDay();
-  const lastDateNum = lastDay.getDate();
-  const prevLastDateNum = prevLastDay.getDate();
-  const nextDays = 7 - lastDay.getDay() - 1;
+        const data = {
+            vehicle_id: document.getElementById("vehicleId").value,
+            service_type: document.getElementById("serviceType").value,
+            status: "scheduled",
+            description: document.getElementById("description").value,
+            maintenance_id: 1,
+            scheduled_date: document.getElementById("eventDate").value,
+            scheduled_time: document.getElementById("eventTime").value,
+            service_bay: document.getElementById("serviceBay").value,
+            estimated_duration: document.getElementById("estimatedDuration").value,
+            assigned_technician: document.getElementById("technician").value
+        };
 
-  // Previous month days
-  for (let i = firstDayIndex; i > 0; i--) {
-    const dateCell = createDateCell(
-      prevLastDateNum - i + 1,
-      year,
-      month - 1,
-      "prev-month"
-    );
-    calendarDates.appendChild(dateCell);
-  }
+        const response = await fetch("/maintenance/addEvent", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(data)
+        });
 
-  // Current month days
-  for (let i = 1; i <= lastDateNum; i++) {
-    const dateCell = createDateCell(i, year, month, "current-month");
-    calendarDates.appendChild(dateCell);
-  }
+        const result = await response.json();
 
-  // Next month days
-  for (let i = 1; i <= nextDays; i++) {
-    const dateCell = createDateCell(i, year, month + 1, "next-month");
-    calendarDates.appendChild(dateCell);
-  }
+        if (result.status === "success") {
+
+            alert("Event added successfully!");
+            closeAddAppointementModel();
+
+            AllEvents = await LoadCalenderEvents();
+            renderEvents(AllEvents);
+
+        } else {
+
+            alert("Error: " + result.message);
+
+        }
+
+    } catch (err) {
+
+        console.log(err);
+
+    }
+
 }
 
-// Create a date cell
-function createDateCell(day, year, month, className) {
-  const dateCell = document.createElement("div");
-  dateCell.classList.add("date-cell", className);
+async function UpdateCalenderEvents(event, newStatus) {
 
-  const dateString = formatDateString(year, month, day);
-  const today = formatDateString(
-    new Date().getFullYear(),
-    new Date().getMonth(),
-    new Date().getDate()
-  );
+    try {
 
-  if (dateString === today && className === "current-month") {
-    dateCell.classList.add("current-day");
-  }
+        const response = await fetch("/maintenance/updateEvent?updateType=status&eventid=" + event.id + "&status=" + newStatus, {
 
-  const dateNumber = document.createElement("div");
-  dateNumber.classList.add("date-number");
-  dateNumber.textContent = day;
-  dateCell.appendChild(dateNumber);
+            method: "POST"
 
-  // Add events for this date
-  if (maintenanceData[dateString] && maintenanceData[dateString].length > 0) {
+        });
+
+        const result = await response.json();
+        console.log(result);
+
+
+        if (result.status === "success") {
+
+            showNotification(`Event updated to "${newStatus.toUpperCase()}"`, "success");
+
+
+            AllEvents = await LoadCalenderEvents();
+            renderCalender();
+            renderEvents(AllEvents);
+
+        } else {
+
+            showNotification(`Error: ${result.message}`, "error");
+
+        }
+
+    } catch (err) {
+
+        console.error("Error updating event:", err);
+        showNotification("Error updating event", "error");
+
+    }
+
+}
+
+async function EditCalenderEvents() {
+
+
+
+}
+
+async function DeleteCalenderEvents(event) {
+
+    if (!event || !event.maintenance_id) {
+        showNotification("Event data is missing", "error");
+        return;
+    }
+
+    const confirmDelete = confirm(`Are you sure you want to delete the event for vehicle ${event.vehicleId}?`);
+    if (!confirmDelete) return;
+
+    try {
+        const response = await fetch("/maintenance/deleteEvent", {
+
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ eventid: event.maintenance_id })
+
+        });
+
+        const result = await response.json();
+
+        if (result.status === "success") {
+
+            showNotification(`Event for ${event.vehicleId} deleted successfully!`, "success");
+
+
+            AllEvents = await LoadCalenderEvents();
+            renderCalender();
+            renderEvents(AllEvents);
+
+        } else {
+
+            showNotification("Error: " + result.message, "error");
+
+        }
+
+    } catch (err) {
+
+        console.error("Error deleting event:", err);
+        showNotification("Error deleting event", "error");
+
+    }
+
+}
+
+function showNotification(message, type = "info") {
+
+
+    const notification = document.createElement("div");
+    notification.className = `notification notification-${type}`;
+
+
+    notification.innerHTML = `
+
+                <i class="fas fa-${
+                    type === "success" ? "check-circle" : "exclamation-circle"
+                }"></i>
+                <span>${message}</span>
+                
+            `;
+
+
+    document.body.appendChild(notification);
+
+
+    setTimeout(() => {
+        notification.classList.add("show");
+    }, 10);
+
+
+    setTimeout(() => {
+
+        notification.classList.remove("show");
+
+        setTimeout(() => {
+
+            notification.remove();
+
+        }, 300);
+
+    }, 3000);
+
+}
+
+function openAddAppointementModel() {
+
+    let AddCalenderEventModel = document.getElementById("addEventModal");
+    AddCalenderEventModel.classList.add("active");
+
+}
+
+function closeAddAppointementModel() {
+
+    let AddCalenderEventModel = document.getElementById("addEventModal");
+    AddCalenderEventModel.classList.remove("active");
+    const form = document.getElementById("addEventForm");
+    form.reset();
+
+}
+
+
+
+function renderEvents(events) {
+
+    const container = document.getElementById("eventsContainer");
+    if (!container) return; // safety check
+
+    container.innerHTML = "";
+
+    if (!events || events.length === 0) {
+        container.innerHTML = "<p>No events found</p>";
+        return;
+    }
+
+    events.forEach(event => {
+        const div = document.createElement("div");
+        div.classList.add("event-card");
+
+        div.innerHTML = `
+            <h4>${event.vehicleId} (${event.model})</h4>
+            <p>Service: ${event.service}</p>
+            <p>Date: ${event.scheduled_date} ${event.scheduled_time}</p>
+            <p>Bay: ${event.bay}</p>
+            <p>Technician: ${event.assignedTechnician}</p>
+            <p>Description: ${event.description}</p>
+        `;
+
+        container.appendChild(div);
+    });
+
+}
+
+function renderCalender() {
+
+    let calenderDates = document.getElementById("calendarDates");
+    calenderDates.innerHTML = "";
+
+    let daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate(); //return last date of month
+
+    for(let day=1; day<= daysInMonth; day++){
+
+        let cell = document.createElement("div");
+        cell.classList.add("date-cell");
+
+        cell.innerHTML = `<strong>${day}</strong>`;
+
+        let dateString = `${currentYear}-${String(currentMonth + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;;
+
+        displayScheduleVehiclesNumberPlates(cell, dateString);
+
+        calenderDates.appendChild(cell);
+
+    }
+
+    const monthNames = [
+        "January", "February", "March", "April", "May", "June",
+        "July", "August", "September", "October", "November", "December"
+    ];
+
+    document.getElementById("currentMonth").innerText = `${monthNames[currentMonth]} ${currentYear}`;
+
+}
+
+function displayScheduleVehiclesNumberPlates(cell,dateString) {
+
+    if (!AllEvents || AllEvents.length === 0) {
+        return;
+    }
+
     const eventsContainer = document.createElement("div");
     eventsContainer.classList.add("date-events");
 
-    maintenanceData[dateString].forEach((event) => {
-      const eventIndicator = document.createElement("div");
-      eventIndicator.classList.add("event-indicator", event.status);
-      eventIndicator.textContent = event.vehicleId;
-      eventIndicator.addEventListener("click", (e) => {
-        e.stopPropagation();
-        showVehicleDetails(event);
-      });
-      eventsContainer.appendChild(eventIndicator);
-    });
+    for (let i = 0; i < AllEvents.length; i++) {
 
-    dateCell.appendChild(eventsContainer);
-  }
+        const event = AllEvents[i];
 
-  // Click handler for the date
-  dateCell.addEventListener("click", () => {
-    if (className !== "current-month") {
-      // Navigate to that month
-      if (className === "prev-month") {
-        currentDate.setMonth(currentDate.getMonth() - 1);
-      } else {
-        currentDate.setMonth(currentDate.getMonth() + 1);
-      }
-      loadMonthEvents();
-      updateCurrentMonthDisplay();
-    }
-    selectDate(dateString);
-  });
+        if (event.scheduled_date === dateString) {
 
-  return dateCell;
-}
+            const eventIndicator = document.createElement("div");
+            eventIndicator.classList.add("event-indicator", event.status || "scheduled");
 
-// Format date string (YYYY-MM-DD)
-function formatDateString(year, month, day) {
-  const m = month + 1;
-  const d = day;
-  return `${year}-${m.toString().padStart(2, "0")}-${d
-    .toString()
-    .padStart(2, "0")}`;
-}
+            eventIndicator.textContent = event.vehicleId;
 
-// Update current month display
-function updateCurrentMonthDisplay() {
-  const monthNames = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
-  ];
+            eventIndicator.addEventListener("click", () => {
 
-  const monthDisplay = document.getElementById("currentMonth");
-  monthDisplay.textContent = `${
-    monthNames[currentDate.getMonth()]
-  } ${currentDate.getFullYear()}`;
-}
+                showVehicleDetails(event);
 
-// Select a date
-function selectDate(dateString) {
-  selectedDate = dateString;
-}
+            });
 
-// Display today's tasks
-async function displayTodaysTasks() {
-  const today = formatDateString(
-    new Date().getFullYear(),
-    new Date().getMonth(),
-    new Date().getDate()
-  );
+            eventsContainer.appendChild(eventIndicator);
 
-  // Update date display
-  const todayDateSpan = document.getElementById("todayDate");
-  const dateObj = new Date();
-  todayDateSpan.textContent = dateObj.toLocaleDateString("en-US", {
-    weekday: "long",
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
-
-  try {
-    // Fetch today's events from backend
-    const response = await fetch(`${API_BASE_URL}/listEvents?date=${today}`);
-
-    if (!response.ok) {
-      throw new Error("Failed to fetch today's tasks");
-    }
-
-    const todayTasks = await response.json();
-
-    // Check for API error
-    if (todayTasks.status === "error") {
-      console.error("API Error:", todayTasks.message);
-      displayEmptyTasks();
-      return;
-    }
-
-    const tasksList = document.getElementById("todayTasksList");
-
-    // Update stats
-    const scheduledCount = todayTasks.filter(
-      (t) => t.status === "scheduled"
-    ).length;
-    const progressCount = todayTasks.filter(
-      (t) => t.status === "in-progress"
-    ).length;
-    const completedCount = todayTasks.filter(
-      (t) => t.status === "completed"
-    ).length;
-
-    document.getElementById("scheduledCount").textContent = scheduledCount;
-    document.getElementById("progressCount").textContent = progressCount;
-    document.getElementById("completedCount").textContent = completedCount;
-
-    // Display tasks
-    tasksList.innerHTML = "";
-    if (todayTasks.length === 0) {
-      displayEmptyTasks();
-    } else {
-      todayTasks.forEach((task) => {
-        tasksList.appendChild(createTaskCard(task));
-      });
-    }
-  } catch (error) {
-    console.error("Error loading today's tasks:", error);
-    displayEmptyTasks();
-  }
-}
-
-// Display empty tasks message
-function displayEmptyTasks() {
-  const tasksList = document.getElementById("todayTasksList");
-  tasksList.innerHTML = `
-    <div style="text-align: center; padding: 40px; color: var(--muted-foreground); grid-column: 1 / -1;">
-      <i class="fas fa-calendar-check" style="font-size: 48px; margin-bottom: 16px; opacity: 0.3;"></i>
-      <p>No appointments scheduled for today</p>
-    </div>
-  `;
-
-  // Update stats to zero
-  document.getElementById("scheduledCount").textContent = 0;
-  document.getElementById("progressCount").textContent = 0;
-  document.getElementById("completedCount").textContent = 0;
-}
-
-// Create task card
-function createTaskCard(task) {
-  const card = document.createElement("div");
-  card.classList.add("task-card", task.status);
-  card.addEventListener("click", () => showVehicleDetails(task));
-
-  card.innerHTML = `
-    <div class="task-card-header">
-      <div class="task-time">
-        <i class="fas fa-clock"></i>
-        <span>${task.time}</span>
-      </div>
-      <span class="task-status ${task.status}">
-        ${task.status.replace("-", " ")}
-      </span>
-    </div>
-    <div class="task-vehicle">${task.vehicleId}</div>
-    <div class="task-service">${task.service}</div>
-    <div class="task-bay">
-      <i class="fas fa-warehouse"></i>
-      ${task.bay}
-    </div>
-  `;
-
-  return card;
-}
-
-// Show vehicle details in panel
-function showVehicleDetails(appointment) {
-  const panel = document.getElementById("vehicleDetailsPanel");
-  const content = document.getElementById("panelContent");
-
-  content.innerHTML = `
-    <div class="vehicle-info-content">
-      <div class="status-large ${appointment.status}">
-        ${appointment.status.replace("-", " ")}
-      </div>
-
-      <div class="vehicle-header">
-        <div class="vehicle-icon-large">
-          <i class="fas fa-car"></i>
-        </div>
-        <div>
-          <div class="vehicle-id-large">${appointment.vehicleId}</div>
-          <div class="vehicle-model">${appointment.model}</div>
-        </div>
-      </div>
-
-      <div class="appointment-details-section">
-        <div class="section-title">
-          <i class="fas fa-info-circle"></i>
-          Appointment Details
-        </div>
-        
-        <div class="detail-row">
-          <span class="detail-label">Time</span>
-          <span class="detail-value">${appointment.time}</span>
-        </div>
-        
-        <div class="detail-row">
-          <span class="detail-label">Bay</span>
-          <span class="detail-value">${appointment.bay}</span>
-        </div>
-        
-        <div class="detail-row">
-          <span class="detail-label">Duration</span>
-          <span class="detail-value">${appointment.estimatedDuration}</span>
-        </div>
-        
-        <div class="detail-row">
-          <span class="detail-label">Technician</span>
-          <span class="detail-value">${appointment.assignedTechnician}</span>
-        </div>
-      </div>
-
-      <div class="appointment-details-section">
-        <div class="section-title">
-          <i class="fas fa-wrench"></i>
-          Service Type
-        </div>
-        <div class="description-box">
-          <strong>${appointment.service}</strong>
-        </div>
-      </div>
-
-      <div class="appointment-details-section">
-        <div class="section-title">
-          <i class="fas fa-clipboard"></i>
-          Description
-        </div>
-        <div class="description-box">
-          ${appointment.description}
-        </div>
-      </div>
-
-      <div class="action-buttons">
-        ${
-          appointment.status === "scheduled"
-            ? `<button class="btn btn-success" onclick="updateStatus(${appointment.id}, 'in-progress')">
-                <i class="fas fa-play"></i> Start Service
-               </button>`
-            : ""
         }
-        ${
-          appointment.status === "in-progress"
-            ? `<button class="btn btn-success" onclick="updateStatus(${appointment.id}, 'completed')">
-                <i class="fas fa-check"></i> Mark Complete
-               </button>`
-            : ""
-        }
-        <button class="btn btn-secondary" onclick="editAppointment(${
-          appointment.id
-        })">
-          <i class="fas fa-edit"></i> Edit
-        </button>
-        <button class="btn btn-danger" onclick="deleteAppointment(${
-          appointment.id
-        })">
-          <i class="fas fa-trash"></i> Delete
-        </button>
-      </div>
-    </div>
-  `;
 
-  // Scroll to panel on mobile
-  if (window.innerWidth <= 1200) {
-    panel.scrollIntoView({ behavior: "smooth" });
-  }
-}
-
-// Update appointment status
-async function updateStatus(appointmentId, newStatus) {
-  try {
-    const response = await fetch(
-      `${API_BASE_URL}/updateEvent?updateType=status`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-        body: `eventid=${appointmentId}&status=${newStatus}`,
-      }
-    );
-
-    const result = await response.json();
-
-    if (result.status === "success") {
-      // Show success message
-      showNotification("Status updated successfully!", "success");
-
-      // Refresh displays
-      await loadMonthEvents();
-      await displayTodaysTasks();
-
-      // Update the detail panel with new status
-      const event = await getEventById(appointmentId);
-      if (event) {
-        showVehicleDetails(event);
-      }
-    } else {
-      showNotification("Failed to update status: " + result.message, "error");
-    }
-  } catch (error) {
-    console.error("Error updating status:", error);
-    showNotification("Error updating status", "error");
-  }
-}
-
-// Get event by ID
-async function getEventById(eventId) {
-  try {
-    const response = await fetch(
-      `${API_BASE_URL}/listEvents?eventId=${eventId}`
-    );
-    const event = await response.json();
-
-    if (event.status === "error") {
-      return null;
     }
 
-    return event;
-  } catch (error) {
-    console.error("Error fetching event:", error);
-    return null;
-  }
+    if (eventsContainer.children.length > 0) {
+
+        cell.appendChild(eventsContainer);
+
+    }
+
 }
 
-// Delete appointment
-async function deleteAppointment(appointmentId) {
-  if (!confirm("Are you sure you want to delete this appointment?")) {
-    return;
-  }
+function showVehicleDetails(event) {
 
-  try {
-    const response = await fetch(`${API_BASE_URL}/deleteEvent`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-      body: `eventid=${appointmentId}`,
+    let panel = document.getElementById("vehicleDetailsPanel");
+    let content = document.getElementById("panelContent");
+
+    content.innerHTML = "";
+
+    content.innerHTML = `
+
+                <div class="vehicle-info-content">
+                    <div class="status-large ${event.status}">
+                        ${event.status.replace("-", " ")}
+                    </div>
+            
+                    <div class="vehicle-header">
+                        <div class="vehicle-icon-large">
+                            <i class="fas fa-car"></i>
+                        </div>
+                        <div>
+                            <div class="vehicle-id-large">${event.vehicleId}</div>
+                            <div class="vehicle-model">${event.model}</div>
+                        </div>
+                    </div>
+            
+                    <div class="appointment-details-section">
+                        <div class="section-title">
+                            <i class="fas fa-info-circle"></i>
+                            Appointment Details
+                        </div>
+                        
+                        <div class="detail-row">
+                            <span class="detail-label">Time</span>
+                            <span class="detail-value">${event.time}</span>
+                        </div>
+                        
+                        <div class="detail-row">
+                            <span class="detail-label">Bay</span>
+                            <span class="detail-value">${event.bay}</span>
+                        </div>
+                        
+                        <div class="detail-row">
+                            <span class="detail-label">Duration</span>
+                            <span class="detail-value">${event.estimatedDuration}</span>
+                        </div>
+                        
+                        <div class="detail-row">
+                            <span class="detail-label">Technician</span>
+                            <span class="detail-value">${event.assignedTechnician}</span>
+                        </div>
+                    </div>
+            
+                    <div class="appointment-details-section">
+                        <div class="section-title">
+                            <i class="fas fa-wrench"></i>
+                            Service Type
+                        </div>
+                        <div class="description-box">
+                            <strong>${event.service}</strong>
+                        </div>
+                    </div>
+            
+                    <div class="appointment-details-section">
+                        <div class="section-title">
+                            <i class="fas fa-clipboard"></i>
+                            Description
+                        </div>
+                        <div class="description-box">
+                            ${event.description}
+                        </div>
+                    </div>
+            
+                    <div class="action-buttons" id="actionButtonsContainer">
+                        <!-- Buttons will be added here -->
+                    </div>
+                </div>
+           `;
+
+
+    const actionsContainer = document.getElementById("actionButtonsContainer");
+
+
+    if (event.status === "scheduled") {
+
+        const startBtn = document.createElement("button");
+        startBtn.classList.add("btn", "btn-success");
+        startBtn.innerHTML = `<i class="fas fa-play"></i> Start Service`;
+        startBtn.addEventListener("click", async () => {
+
+            await UpdateCalenderEvents(event, "in-progress");
+
+
+        });
+
+        actionsContainer.appendChild(startBtn);
+
+    }
+
+
+    if (event.status === "in-progress") {
+
+        const completeBtn = document.createElement("button");
+        completeBtn.classList.add("btn", "btn-success");
+        completeBtn.innerHTML = `<i class="fas fa-check"></i> Mark Complete`;
+        completeBtn.addEventListener("click", async () => {
+
+            await UpdateCalenderEvents(event, "completed");
+
+
+        });
+        actionsContainer.appendChild(completeBtn);
+
+    }
+
+
+    const editBtn = document.createElement("button");
+    editBtn.classList.add("btn", "btn-secondary");
+    editBtn.innerHTML = `<i class="fas fa-edit"></i> Edit`;
+    editBtn.addEventListener("click", () => {
+
+        editAppointment(event.maintenance_id);
+
+
     });
+    actionsContainer.appendChild(editBtn);
 
-    const result = await response.json();
 
-    if (result.status === "success") {
-      showNotification("Appointment deleted successfully!", "success");
+    const deleteBtn = document.createElement("button");
+    deleteBtn.classList.add("btn", "btn-danger");
+    deleteBtn.innerHTML = `<i class="fas fa-trash"></i> Delete`;
+    deleteBtn.addEventListener("click", async () => {
 
-      // Close the detail panel
-      closeDetailPanel();
+        await DeleteCalenderEvents(event);
 
-      // Refresh displays
-      await loadMonthEvents();
-      await displayTodaysTasks();
-    } else {
-      showNotification(
-        "Failed to delete appointment: " + result.message,
-        "error"
-      );
-    }
-  } catch (error) {
-    console.error("Error deleting appointment:", error);
-    showNotification("Error deleting appointment", "error");
-  }
-}
+    });
+    actionsContainer.appendChild(deleteBtn);
 
-// Edit appointment (opens modal with data)
-async function editAppointment(appointmentId) {
-  try {
-    const event = await getEventById(appointmentId);
 
-    if (!event) {
-      showNotification("Event not found", "error");
-      return;
+
+    panel.classList.add("open");
+
+    if (window.innerWidth <= 1200) {
+
+        panel.scrollIntoView({ behavior: "smooth" });
+
     }
 
-    // Open modal with event data
-    const modal = document.getElementById("addEventModal");
-    modal.classList.add("active");
-
-    // Fill form with existing data
-    // Extract only YYYY-MM-DD if scheduled_date includes time
-    const dateOnly = event.scheduled_date
-      ? event.scheduled_date.split(" ")[0]
-      : "";
-    document.getElementById("eventDate").value = dateOnly;
-
-    // Extract only HH:MM if time contains seconds
-    const timeOnly = event.scheduled_time
-      ? event.scheduled_time.substring(0, 5)
-      : "";
-    document.getElementById("eventTime").value = timeOnly;
-
-    document.getElementById("vehicleId").value = event.vehicle_id;
-    document.getElementById("vehicleModel").value = event.model;
-    document.getElementById("serviceBay").value = event.bay;
-    document.getElementById("estimatedDuration").value =
-      event.estimatedDuration;
-    document.getElementById("serviceType").value = event.service;
-    document.getElementById("technician").value = event.assignedTechnician;
-    document.getElementById("description").value = event.description;
-
-    // Store event ID for update
-    document.getElementById("addEventForm").dataset.editingId = appointmentId;
-
-    // Change modal title
-    document.querySelector(".modal-header h2").innerHTML =
-      '<i class="fas fa-edit"></i> Edit Appointment';
-  } catch (error) {
-    console.error("Error loading event for edit:", error);
-    showNotification("Error loading event details", "error");
-  }
 }
 
-// Close detail panel
-function closeDetailPanel() {
-  const content = document.getElementById("panelContent");
-  content.innerHTML = `
-    <div class="empty-state">
-      <i class="fas fa-car"></i>
-      <p>Select an appointment to view vehicle details</p>
-    </div>
-  `;
-}
-
-// Setup event listeners
-function setupEventListeners() {
-  // Month navigation
-  document.getElementById("prevMonth").addEventListener("click", async () => {
-    currentDate.setMonth(currentDate.getMonth() - 1);
-    await loadMonthEvents();
-    updateCurrentMonthDisplay();
-  });
-
-  document.getElementById("nextMonth").addEventListener("click", async () => {
-    currentDate.setMonth(currentDate.getMonth() + 1);
-    await loadMonthEvents();
-    updateCurrentMonthDisplay();
-  });
-
-  // Close panel button
-  document
-    .getElementById("closePanel")
-    .addEventListener("click", closeDetailPanel);
-}
-
-// Setup modal functionality
-function setupModal() {
-  const modal = document.getElementById("addEventModal");
-  const addEventBtn = document.getElementById("addEventBtn");
-  const closeModalBtn = document.getElementById("closeModal");
-  const cancelBtn = document.getElementById("cancelBtn");
-  const form = document.getElementById("addEventForm");
-
-  // Open modal
-  addEventBtn.addEventListener("click", () => {
-    modal.classList.add("active");
-    form.reset();
-    delete form.dataset.editingId;
-
-    // Reset modal title
-    document.querySelector(".modal-header h2").innerHTML =
-      '<i class="fas fa-calendar-plus"></i> Add New Appointment';
-
-    // Set default date to today or selected date
-    const dateInput = document.getElementById("eventDate");
-    if (selectedDate) {
-      dateInput.value = selectedDate;
-    } else {
-      const today = new Date().toISOString().split("T")[0];
-      dateInput.value = today;
-    }
-  });
-
-  // Close modal functions
-  const closeModal = () => {
-    modal.classList.remove("active");
-    form.reset();
-    delete form.dataset.editingId;
-
-    // Reset modal title
-    document.querySelector(".modal-header h2").innerHTML =
-      '<i class="fas fa-calendar-plus"></i> Add New Appointment';
-  };
-
-  closeModalBtn.addEventListener("click", closeModal);
-  cancelBtn.addEventListener("click", closeModal);
-
-  // Close modal when clicking outside
-  modal.addEventListener("click", (e) => {
-    if (e.target === modal) {
-      closeModal();
-    }
-  });
-
-  // Handle form submission
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
-
-    // Get form values
-    const formData = new FormData(form);
-    const isEditing = form.dataset.editingId;
-
-    const eventData = {
-      vehicle_id: 18,
-      service_type: formData.get("serviceType"),
-      status: "scheduled",
-      description: formData.get("description"),
-      maintenance_id: MAINTENANCE_STAFF_ID,
-      scheduled_date: formData.get("eventDate"),
-      scheduled_time: formData.get("eventTime"),
-      service_bay: formData.get("serviceBay"),
-      estimated_duration: formData.get("estimatedDuration"),
-      assigned_technician: formData.get("technician"),
-    };
+document.addEventListener("DOMContentLoaded", async function () {
 
     try {
-      let response;
 
-      if (isEditing) {
-        // Update existing event
-        eventData.eventid = parseInt(isEditing);
+        /*const loggedIn = await checkLogin();
 
-        response = await fetch(`${API_BASE_URL}/updateEvent`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(eventData),
-        });
-      } else {
-        // Create new event
-        response = await fetch(`${API_BASE_URL}/addEvent`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(eventData),
-        });
-      }
+        if (!loggedIn) {
+          return;    // stop here if not logged in
+        }*/
 
-      const result = await response.json();
+        AllEvents = await LoadCalenderEvents();
+        renderEvents(AllEvents);
+        renderCalender();
 
-      if (result.status === "success") {
-        showNotification(
-          isEditing
-            ? "Appointment updated successfully!"
-            : "Appointment added successfully!",
-          "success"
-        );
 
-        // Close modal
-        closeModal();
+    } catch (err) {
 
-        // Refresh displays
-        await loadMonthEvents();
-        await displayTodaysTasks();
-      } else {
-        showNotification(
-          "Failed to save appointment: " + result.message,
-          "error"
-        );
-      }
-    } catch (error) {
-      console.error("Error saving appointment:", error);
-      showNotification("Error saving appointment", "error");
+        console.error("Error during initialization:", err);
+
     }
-  });
-}
 
-// Show notification
-function showNotification(message, type = "info") {
-  // Create notification element
-  const notification = document.createElement("div");
-  notification.className = `notification notification-${type}`;
-  notification.innerHTML = `
-    <i class="fas fa-${
-      type === "success" ? "check-circle" : "exclamation-circle"
-    }"></i>
-    <span>${message}</span>
-  `;
+});
 
-  // Add to body
-  document.body.appendChild(notification);
+document.getElementById("addEventBtn").addEventListener("click",function() {
 
-  // Show notification
-  setTimeout(() => {
-    notification.classList.add("show");
-  }, 10);
+    openAddAppointementModel();
 
-  // Remove after 3 seconds
-  setTimeout(() => {
-    notification.classList.remove("show");
-    setTimeout(() => {
-      notification.remove();
-    }, 300);
-  }, 3000);
-}
+});
 
-// Setup user menu
-function setupUserMenu() {
-  const userProfile = document.querySelector(".user-profile");
+document.getElementById("addEventForm").addEventListener("submit",async function(e) {
 
-  if (!userProfile) return;
+    e.preventDefault();
 
-  const dropdownMenu = document.createElement("div");
-  dropdownMenu.style.cssText = `
-    position: absolute; top: 60px; right: 0;
-    background-color: #fff; border: 1px solid #ccc;
-    border-radius: 5px; width: 150px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-    display: none; z-index: 1000;
-    font-family: sans-serif;
-  `;
+    await AddCalenderEvents();
 
-  const profileItem = document.createElement("div");
-  profileItem.textContent = "Profile";
-  profileItem.style.cssText = "padding: 10px; cursor: pointer;";
-  profileItem.addEventListener("click", () => {
-    window.location.href = "staffprofile.html";
-  });
-  dropdownMenu.appendChild(profileItem);
+});
 
-  const logoutItem = document.createElement("div");
-  logoutItem.textContent = "Logout";
-  logoutItem.style.cssText = "padding: 10px; cursor: pointer;";
-  logoutItem.addEventListener("click", () => {
-    if (confirm("Are you sure you want to logout?")) {
-      window.location.href = "login.html";
+
+document.getElementById("prevMonth").addEventListener("click", () => {
+
+    currentMonth--;
+
+    if (currentMonth < 0) {
+
+        currentMonth = 11;
+        currentYear--;
+
     }
-  });
-  dropdownMenu.appendChild(logoutItem);
 
-  userProfile.style.position = "relative";
-  userProfile.appendChild(dropdownMenu);
+    renderCalender();
 
-  userProfile.addEventListener("click", (e) => {
-    e.stopPropagation();
-    dropdownMenu.style.display =
-      dropdownMenu.style.display === "block" ? "none" : "block";
-  });
+});
 
-  document.addEventListener("click", () => {
-    dropdownMenu.style.display = "none";
-  });
-}
 
-// Setup search functionality
-function setupSearch() {
-  const searchInput = document.getElementById("searchInput");
+document.getElementById("nextMonth").addEventListener("click", () => {
 
-  if (searchInput) {
-    searchInput.addEventListener("keypress", function (e) {
-      if (e.key === "Enter") {
-        const regNumber = searchInput.value.trim();
-        if (regNumber) {
-          window.location.href = `vehiclerecords.html?reg=${encodeURIComponent(
-            regNumber
-          )}`;
-        }
-      }
-    });
-  }
-}
+    currentMonth++;
 
-// Make functions globally accessible
-window.updateStatus = updateStatus;
-window.editAppointment = editAppointment;
-window.deleteAppointment = deleteAppointment;
+    if (currentMonth > 11) {
+
+        currentMonth = 0;
+        currentYear++;
+
+    }
+
+    renderCalender();
+
+});
+
+
+document.getElementById("closePanel").addEventListener("click", () => {
+
+    const panel = document.getElementById("vehicleDetailsPanel");
+    panel.classList.remove("open");
+
+});
+
+
+
+
+
+
+
+
+/*
+
+function createDummyDataInput() {
+
+    return {
+        assignedvehicles: [
+            {
+                numberplate: "ABC-1234",
+                type: "Sedan",
+                brand: "Toyota",
+                model: "Prius",
+                year: 2020,
+                status: "Available",
+                lastServiceDate: "2024-04-12",
+                nextServiceDate: "2024-05-12"
+            },
+            {
+                numberplate: "XYZ-5678",
+                type: "Sedan",
+                brand: "Honda",
+                model: "Civic",
+                year: 2019,
+                status: "Under Maintenance",
+                lastServiceDate: "2024-07-12",
+                nextServiceDate: "2024-05-14"
+            },
+            {
+                numberplate: "DEF-9012",
+                type: "Sedan",
+                brand: "Nissan",
+                model: "Leaf",
+                year: 2021,
+                status: "Available",
+                lastServiceDate: "2024-04-02",
+                nextServiceDate: "2024-05-30"
+            },
+            {
+                numberplate: "GHI-3456",
+                type: "Hatchback",
+                brand: "Suzuki",
+                model: "Wagon R",
+                year: 2018,
+                status: "Under Maintenance",
+                lastServiceDate: "2024-04-18",
+                nextServiceDate: "2024-05-20"
+            },
+            {
+                numberplate: "JKL-7890",
+                type: "SUV",
+                brand: "BMW",
+                model: "X1",
+                year: 2022,
+                status: "Under Maintenance",
+                lastServiceDate: "2024-04-21",
+                nextServiceDate: "2024-05-23"
+            },
+            {
+                numberplate: "MNO-1234",
+                type: "Sedan",
+                brand: "Hyundai",
+                model: "Elantra",
+                year: 2020,
+                status: "Available",
+                lastServiceDate: "2024-04-15",
+                nextServiceDate: "2024-05-19"
+            }
+        ]
+    };
+
+}*/

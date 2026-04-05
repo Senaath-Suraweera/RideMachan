@@ -36,6 +36,7 @@ public class DriverLoginServlet extends HttpServlet {
             String password = json.get("password").getAsString();
 
             if (email == null || password == null) {
+                System.out.println("hi");
                 response.getWriter().write("{\"status\":\"error\",\"message\":\"Missing credentials\"}");
                 return;
             }
@@ -44,7 +45,10 @@ public class DriverLoginServlet extends HttpServlet {
 
             if (driver != null) {
                 HttpSession session = request.getSession();
+                session.setAttribute("driverId", driver.getDriverId());
+                session.setAttribute("actorType", "DRIVER");
                 session.setAttribute("driver", driver);
+                System.out.println("Logged in as Driver with Id: " + session.getAttribute("driverId"));
                 response.getWriter().write("{\"status\":\"success\",\"message\":\"Login successful\"}");
             } else {
                 response.getWriter().write("{\"status\":\"error\",\"message\":\"Invalid username or password\"}");

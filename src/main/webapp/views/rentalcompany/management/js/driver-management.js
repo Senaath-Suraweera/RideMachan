@@ -62,6 +62,63 @@ async function LoadAllDrivers() {
 
 }
 
+async function AssignBooking(driverId) {
+
+    try {
+
+        const bookingId = document.getElementById("bookingIdInput").value.trim();
+        const pickupLocation = document.getElementById("pickupLocationInput").value.trim();
+        const dropoffLocation = document.getElementById("dropoffLocationInput").value.trim();
+
+        if (!bookingId || !pickupLocation || !dropoffLocation) {
+            alert("Please fill all fields!");
+            return;
+        }
+
+
+        const payload = {
+            driverId,
+            bookingId,
+            pickupLocation,
+            dropoffLocation
+        };
+
+
+        let response = await fetch("/assignbookingdriver", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(payload)
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        console.log("Booking assigned:", data);
+
+        alert("Booking assigned successfully!");
+
+
+        document.getElementById("assignBookingModal").remove();
+
+
+        AllDrivers = await LoadAllDrivers();
+        renderdrivers(AllDrivers);
+
+        return data;
+
+    } catch (err) {
+
+        console.error("Error assigning booking:", err);
+        alert("Failed to assign booking. See console for details.");
+
+    }
+
+}
+
 function renderdrivers(drivers) {
 
     let driversGrid = document.getElementById("driversGrid");
@@ -116,7 +173,7 @@ function renderdrivers(drivers) {
     
                                     ${driver.currentBooking    ?
 
-            `
+                                                            `
                                                                <div class="current-booking">
                                                                    <div class="booking-header">
                                                                        <span class="booking-title">Current Booking</span>
@@ -130,7 +187,7 @@ function renderdrivers(drivers) {
                                                                        <span><i class="fas fa-user"></i> Customer: ${driver.currentBooking.customer}</span>
                                                                    </div>
                                                                </div>
-                                                                `
+                                                            `
                                                               : ""
         }
     
@@ -139,7 +196,7 @@ function renderdrivers(drivers) {
                                            <i class="fas fa-comment"></i>
                                            Message
                                        </button>    
-                                       <button class="action-btn primary" data-driver-id="${driver.driverId}">
+                                       <button class="action-btn primary" data-driver-id="${driver.driverId}" onclick="openAssignBookingModel('${driver.driverId}')">
                                            Assign Booking
                                        </button>
                                    </div>
@@ -152,26 +209,85 @@ function renderdrivers(drivers) {
 
 }
 
-function OpenAddDrivermodel() {
 
-    const AddDriverModel = document.getElementById("Add-Driver-Modal");
-    AddDriverModel.style.display = "block";
-    AddDriverModel.style.overflow = "hidden";
-    document.body.style.overflow = "hidden";
+function openAssignBookingModel(driverId) {
+
+
+    const existingModal = document.getElementById("assignBookingModal");
+    if(existingModal) existingModal.remove();
+
+    let assignBookingModel = document.createElement("div");
+    assignBookingModel.id = "assignBookingModal";
+    assignBookingModel.style.position = "fixed";
+    assignBookingModel.style.top = "0";
+    assignBookingModel.style.left = "0";
+    assignBookingModel.style.width = "100%";
+    assignBookingModel.style.height = "100%";
+    assignBookingModel.style.background = "rgba(0,0,0,0.5)";
+    assignBookingModel.style.display = "flex";
+    assignBookingModel.style.justifyContent = "center";
+    assignBookingModel.style.alignItems = "center";
+    assignBookingModel.style.zIndex = "1000";
+
+    assignBookingModel.innerHTML = `
+        <div style="
+            background:white; 
+            padding:30px 40px; 
+            border-radius:12px; 
+            width:400px; 
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3); 
+            display:flex; 
+            flex-direction:column;
+            align-items:center;
+        ">
+            <h3 style="margin-bottom:20px;">Assign Booking</h3>
+
+            <div class="form-row" style="width:100%; display:flex; flex-direction:column; gap:15px;">                                   
+                <div class="form-group" style="display:flex; flex-direction:column; width:100%;">
+                    <label>Booking Id</label>
+                    <input type="number" name="bookingid" required style="padding:8px; border-radius:5px; border:1px solid #ccc;"/>
+                </div>
+                <div class="form-group" style="display:flex; flex-direction:column; width:100%;">
+                    <label>Pickup Location</label>
+                    <input type="text" name="pickuplocation" required style="padding:8px; border-radius:5px; border:1px solid #ccc;"/>
+                </div>
+                <div class="form-group" style="display:flex; flex-direction:column; width:100%;">
+                    <label>Drop Off Location</label>
+                    <input type="text" name="dropofflocation" required style="padding:8px; border-radius:5px; border:1px solid #ccc;"/>
+                </div>
+            </div>
+
+            <div style="margin-top:25px; display:flex; gap:10px; width:100%; justify-content:flex-end;">
+                <button onclick="document.getElementById('assignBookingModal').remove()" 
+                    style="padding:8px 15px; border:none; border-radius:6px; cursor:pointer; background:#ccc; color:#000;">
+                    Cancel
+                </button>
+                <button onclick="AssignBooking('${driverId}')" style="padding:8px 15px; border:none; border-radius:6px; cursor:pointer; background:linear-gradient(135deg, #3a0ca3, #4361ee); color:white;">
+                    Assign
+                </button>
+            </div>
+        </div>
+    `;
+
+    document.body.appendChild(assignBookingModel);
 
 }
 
-function CLoseAddDrivermodel() {
+
+
+function OpenAddDriverModel() {
+
+    const AddDriverModel = document.getElementById("Add-Driver-Modal");
+    AddDriverModel.classList.add("active");
+
+}
+
+function CLoseAddDriverModel() {
 
     let AddDriverModel = document.getElementById("Add-Driver-Modal");
-    AddDriverModel.style.display = "none";
-    document.body.style.overflow = "auto";
+    AddDriverModel.classList.remove("active");
     const form = document.getElementById("addDriverform");
     form.reset();
-
-
-
-
 
 }
 
@@ -188,10 +304,12 @@ async function addDriver() {
 
     });
 
+
+
     if(response.ok) {
 
         alert("Driver added successfully!");
-        CLoseAddDrivermodel();
+        CLoseAddDriverModel();
 
         AllDrivers = await LoadAllDrivers();
         renderdrivers(AllDrivers);
@@ -229,10 +347,9 @@ document.addEventListener("DOMContentLoaded", async function() {
 
 document.addEventListener("input", async function() {
 
-    let driverSearchInput = document.getElementsByClassName("search-input")[0];
-    let inputValue = driverSearchInput.value;
+    let driverInput = document.getElementsByClassName("search-input")[0];
+    let inputValue = driverInput.value.trim();
 
-    inputValue = driverSearchInput.trim();
 
     console.log("Input value:", inputValue, "isNaN:", isNaN(inputValue));
 
@@ -243,7 +360,7 @@ document.addEventListener("input", async function() {
     }
 
     if(!isNaN(inputValue)) {
-        filterDriverByDriverId(inputValue);
+        filterDriversByDriverId(inputValue);
     }else {
         filterDriversByText(inputValue);
     }
@@ -252,7 +369,7 @@ document.addEventListener("input", async function() {
 
 document.getElementById("Add-Driver-Button").addEventListener("click",function() {
 
-    openAddStaffModal();
+    OpenAddDriverModel();
 
 })
 
@@ -278,8 +395,101 @@ document.getElementById("addDriverform").addEventListener("submit",async functio
 
 
 
-//OpenAddDrivermodel();
 
-//CLoseAddDrivermodel();
 
-//DisplayWithAddedDriver();
+
+
+
+
+
+
+//for search by staff id
+function filterDriversByDriverId(driverId) {
+
+    const driverGrid = document.getElementsByClassName("drivers-grid")[0];
+    driverGrid.innerHTML = "";
+
+    let filteredDrivers = [];
+
+
+    for(let i=0; i<AllDrivers.length; i++) {
+
+        if(AllDrivers[i].driverId == driverId) {
+            filteredDrivers.push(AllDrivers[i]);
+        }
+
+    }
+
+    renderdrivers(filteredDrivers);
+
+}
+
+// Search driver by name
+function filterDriversByText(searchText) {
+
+    const driverGrid = document.getElementsByClassName("drivers-grid")[0];
+    driverGrid.innerHTML = "";
+
+    let inputLower = searchText.toLowerCase().trim();
+    let filteredDrivers = [];
+
+    for(let i=0; i<AllDrivers.length; i++) {
+
+        let driver = AllDrivers[i];
+        let driverName =
+            (driver.firstName + " " + driver.lastName)
+                .toLowerCase()
+                .trim();
+
+        if (driverName.includes(inputLower)) {
+            filteredDrivers.push(driver);
+        }
+
+    }
+
+    console.log("Filtered driver count:", filteredDrivers.length);
+    renderdrivers(filteredDrivers);
+
+}
+
+//search available,on-trip,offline drivers
+function filterDriversByDriverStatus(status) {
+
+    const driverGrid = document.getElementsByClassName("drivers-grid")[0];
+    driverGrid.innerHTML = "";
+
+    let filteredDrivers = [];
+
+    let selectedStatus = status.toLowerCase().trim();
+
+
+    for(let i=0; i<AllDrivers.length; i++) {
+
+        let driverStatus =
+            (AllDrivers[i].status || "").toLowerCase().trim();
+
+        //DEBUG 1
+        console.log("driver status:- ", AllDrivers[i].status)
+        console.log("selected driver status:- ", selectedStatus)
+
+
+
+        //DEBUG 2
+        console.log("Comparing:- ", AllDrivers[i].status , "with ", selectedStatus)
+        console.log("Match?:- ", AllDrivers[i].status == selectedStatus)
+
+        if(driverStatus === selectedStatus) {
+            filteredDrivers.push(AllDrivers[i]);
+        }
+
+    }
+
+    console.log("Filtered drivers count:", filteredDrivers.length);
+    console.log("About to render...");
+    renderdrivers(filteredDrivers);
+    console.log("Render complete!");
+
+}
+
+
+

@@ -161,4 +161,141 @@ public class MaintenanceStaffDAO {
 
     }
 
+
+    public static int getOverdueMaintenanceCount(int staffId) {
+
+        String sql = "SELECT COUNT(*) FROM maintenanceJobs WHERE assignedStaffId = ? AND status = 'overdue'";
+
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setInt(1, staffId);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                return rs.getInt(1); // Get the count from the query
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
+
+    }
+
+
+    public static int getTodayCompletedJobsCount(int staffId) {
+
+        String sql = "SELECT COUNT(*) FROM maintenanceJobs WHERE assignedStaffId = ? AND status = 'overdue'";
+
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setInt(1, staffId);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                return rs.getInt(1); // Get the count from the query
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
+
+    }
+
+
+    public static int getLinkedCount(int staffId) {
+
+        String sql = "SELECT COUNT(*) FROM maintenanceJobs " +
+                     "WHERE assignedStaffId = ? AND status = 'completed' AND completedDate = CURDATE()";
+
+
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setInt(1, staffId);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
+
+    }
+
+
+    public static int getPendingMaintenanceJobsCount(int staffId) {
+
+        String sql = "SELECT COUNT(*) FROM maintenanceJobs " +
+                "WHERE assignedStaffId = ? AND status = 'pending'";
+
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setInt(1, staffId);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
+
+    }
+
+    public static float calculateMaintenanceStaffPercentage(int staffId,String maintenanceType) {
+
+        String sql1 = "SELECT COUNT(*) FROM maintenanceJobs WHERE assignedStaffId = ?";
+        String sql2 = "SELECT COUNT(*) FROM maintenanceJobs WHERE assignedStaffId = ? AND type = ?";
+
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement psTotal = con.prepareStatement(sql1);
+             PreparedStatement psType = con.prepareStatement(sql2)) {
+
+
+            psTotal.setInt(1, staffId);
+            ResultSet rsTotal = psTotal.executeQuery();
+            int totalJobs = 0;
+            if (rsTotal.next()) {
+                totalJobs = rsTotal.getInt(1);
+            }
+
+            if (totalJobs == 0) {
+                return 0;
+            }
+
+
+            psType.setInt(1, staffId);
+            psType.setString(2, maintenanceType);
+            ResultSet rsType = psType.executeQuery();
+
+            int typeJobs = 0;
+
+            if (rsType.next()) {
+
+                typeJobs = rsType.getInt(1);
+
+            }
+
+            // Calculate percentage as float
+            return (typeJobs * 100.0f) / totalJobs;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return 0;
+
+    }
+
+
 }

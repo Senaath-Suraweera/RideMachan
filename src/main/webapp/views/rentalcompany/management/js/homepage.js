@@ -84,7 +84,7 @@
 
       }
 
-      statsGrid.innerHTML += createStatsCard("fas fa-car", "blue", "Total Vehicles", stats.totalVehicles || 0);
+      statsGrid.innerHTML += createStatsCard("fas fa-car", "blue", "Total Vehicles", stats.totalVehicles || 2);
       statsGrid.innerHTML += createStatsCard("fas fa-users", "green", "Active Drivers", stats.activeDrivers || 0);
       statsGrid.innerHTML += createStatsCard("fas fa-calendar-check", "orange", "Active Bookings", stats.activeBookings || 0);
       statsGrid.innerHTML += createStatsCard("fas fa-rupee-sign", "purple", "Monthly Revenue", stats.monthlyRevenue || "Rs0");

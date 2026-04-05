@@ -1,144 +1,498 @@
-// Set today's date as default
-        document.getElementById('inspectionDate').valueAsDate = new Date();
+async function checkLogin() {
 
-        // Checklist functionality
-        function toggleCheck(item) {
-            const checkbox = item.querySelector('.checkbox');
-            const isChecked = checkbox.classList.contains('checked');
-            
-            if (isChecked) {
-                checkbox.classList.remove('checked');
-                item.classList.remove('checked');
-            } else {
-                checkbox.classList.add('checked');
-                item.classList.add('checked');
+    try {
+
+        const response = await fetch("/checklogin");
+        const data = await response.json();
+
+        if (!data.loggedIn) {
+
+            const modal = document.getElementById("loginModal");
+            modal.style.display = "flex";
+
+
+            document.getElementById("loginOkBtn").onclick = () => {
+
+                window.location.href = "/maintenancelogin";
+
+            };
+
+            return false;
+
+        }
+
+        console.log("User is logged in.");
+        return true;
+
+    } catch (err) {
+
+        console.error("Error checking login:", err);
+        return false;
+
+    }
+
+}
+
+
+let assignedVehicles;
+let selectedStatus = null;
+
+
+async function LoadAssignedVehicles() {
+
+    try {
+
+        let response = await fetch(`/assignedvehicles`);
+
+        if(!response.ok){
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        let data = await response.json();
+
+        console.log(data);
+
+
+        return data;
+
+    }catch (err) {
+
+        console.log(err);
+
+    }
+
+}
+
+
+
+async function updateVehicleStatus(vehicle,status) {
+
+
+    try {
+
+        if(!vehicle || !status){
+            return;
+        }
+
+        const response = await fetch('/vehicle/update', {
+
+            method: 'POST',
+
+            headers: { 'Content-Type': 'application/json' },
+
+            body: JSON.stringify({
+
+                numberplate: vehicle.numberplate,
+                status: status
+
+            })
+
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        const data = await response.json();
+
+
+    }catch (err) {
+
+        console.log(err);
+
+    }
+
+
+}
+
+
+
+function renderVehicleDropdown() {
+
+    const vehicleFilter = document.getElementById("vehicleFilter");
+    vehicleFilter.innerHTML = "";
+
+    assignedVehicles.forEach(vehicle => {
+
+        const option = document.createElement("option");
+        option.value = vehicle.numberplate;
+        option.textContent = `${vehicle.numberplate} - ${vehicle.brand} ${vehicle.model}`;
+
+        option.dataset.status = vehicle.status.toLowerCase();
+        vehicleFilter.appendChild(option);
+
+    });
+
+}
+
+
+
+function filterVehicleByNumberPlate(numberplate) {
+
+    const vehicleInformation = document.getElementsByClassName("vehicle-info")[0];
+    vehicleInformation.innerHTML = "";
+
+    let selectedVehicle = null;
+
+    for(let i=0; i<assignedVehicles.length; i++) {
+
+        //DEBUG 1
+        console.log("Vehicle:- ", assignedVehicles[i].numberplate);
+        console.log("selected assigned vehicle:- ", numberplate);
+
+        let VehicleNumberPlate =  assignedVehicles[i].numberplate || "";
+
+        //DEBUG 2
+        console.log("Comparing:- ", VehicleNumberPlate , "with ", numberplate)
+        console.log("Match?:- ", VehicleNumberPlate == numberplate)
+
+        if(VehicleNumberPlate == numberplate) {
+            selectedVehicle = assignedVehicles[i];
+        }
+
+    }
+
+    console.log("About to render...");
+    renderVehicle(selectedVehicle);
+    console.log("Render complete!");
+
+}
+
+function renderVehicle(vehicle) {
+
+    const vehicleInformation = document.getElementsByClassName("vehicle-info")[0];
+    vehicleInformation.innerHTML = "";
+
+
+    if (!vehicle) {
+        vehicleInformation.classList.remove("show");
+        return;
+    }
+
+    vehicleInformation.classList.add("show");
+
+    const vehicleCard = document.createElement("div");
+    vehicleCard.className = "vehicle-card";
+
+
+    vehicleCard.innerHTML = `
+
+                        <div class="vehicle-image">
+                            <i class="fas fa-car"></i>
+                        </div>
+                        <div class="vehicle-details">
+                            <h3>${vehicle.brand} ${vehicle.model} ${vehicle.year}</h3>
+                            <h5>${vehicle.numberplate}</h5>
+                            <div class="vehicle-status">
+                                <span class="status-label">Current Status:</span>
+                                <span class="status-badge ${vehicle.status.toLowerCase().replace(/\s+/g, '-')}">
+                                    ${vehicle.status}
+                                </span>
+                            </div>
+                        </div>
+                        
+                    `;
+
+
+    vehicleInformation.appendChild(vehicleCard);
+
+}
+
+
+function toggleCheck(item) {
+
+    const checkBox = item.querySelector(".checkbox");
+
+    if(checkBox.classList.contains('checked')){
+
+        checkBox.classList.remove('checked');
+        item.classList.remove('checked');
+
+    }else{
+
+        checkBox.classList.add('checked');
+        item.classList.add('checked');
+
+    }
+
+    updateProgress();
+
+}
+
+
+function updateProgress() {
+
+    const checkboxes = document.querySelectorAll('.checklist-item');
+    const checkedBoxes = document.querySelectorAll('.checklist-item.checked');
+
+    const progress = (checkedBoxes.length / checkboxes.length) * 100;
+
+    document.getElementById('progressFill').style.width = progress + '%';
+    document.getElementById('progressText').textContent = Math.round(progress) + '%';
+
+}
+
+function handleInspectionCheckList() {
+
+    document.querySelectorAll('.checklist-item').forEach(item => {
+
+        item.addEventListener('click', () => toggleCheck(item));
+
+    });
+
+}
+
+
+function handleFileInput() {
+
+    let fileInput = document.getElementById("fileInput");
+    let uploadArea = document.querySelector(".file-upload-area");
+    let chooseButton = document.querySelector(".choose-files-btn");
+
+
+    function selectFiles() {
+
+        const files = fileInput.files;
+        const selectedFilesContainer = document.getElementById("selectedFiles");
+
+        selectedFilesContainer.innerHTML = "";
+
+        if (files.length === 0) {
+            return;
+        }
+
+        for (let i = 0; i < files.length; i++) {
+
+            const file = files[i];
+
+            const fileDiv = document.createElement("div");
+            fileDiv.className = "selected-file";
+            fileDiv.textContent = file.name;
+
+            selectedFilesContainer.appendChild(fileDiv);
+
+        }
+
+        console.log("Selected files:", files);
+
+    }
+
+    fileInput.addEventListener("change", selectFiles);
+
+    uploadArea.addEventListener("click", () => {
+
+        //fileInput.value = "";
+        fileInput.click();
+
+    });
+
+    chooseButton.addEventListener("click", () => {
+
+        //fileInput.value = "";
+        fileInput.click();
+
+    });
+
+
+}
+
+
+
+function handleVehicleStatusUpdate() {
+
+    let buttons = document.querySelectorAll('.status-btn');
+
+    buttons.forEach(btn => {
+
+        btn.addEventListener('click',() => {
+
+            buttons.forEach(b => b.classList.remove('selected'));
+
+            btn.classList.add('selected');
+
+            selectedStatus = btn.innerText.trim();
+
+        });
+
+    });
+
+}
+
+
+
+function handleSubmitButton() {
+
+    let submitButton = document.getElementById('submitbutton');
+
+    if(!submitButton){
+        return;
+    }
+
+    submitButton.addEventListener('click', async () => {
+
+        let vehicleCard = document.querySelector('.vehicle-info .vehicle-card');
+
+        if (!vehicleCard) {
+
+            alert("Please select a vehicle first!");
+            return;
+
+        }
+
+
+        let vehicleRegInput = document.getElementById('vehiclenumber');
+        if (!vehicleRegInput || !vehicleRegInput.value.trim()) {
+
+            alert("Please enter Vehicle Registration number!");
+            return;
+
+        }
+
+
+        let inspectionType = document.getElementById('inspectiontype');
+        if (!inspectionType || !inspectionType.value) {
+
+            alert("Please select an Inspection Type!");
+            return;
+
+        }
+
+
+        let priorityLevel = document.getElementById('prioritylevel');
+        if (!priorityLevel || !priorityLevel.value) {
+
+            alert("Please select a Priority Level!");
+            return;
+
+        }
+
+
+        let checklistItems = document.querySelectorAll('.checklist-item');
+        let allChecked = Array.from(checklistItems).every(item => item.classList.contains('checked'));
+        if (!allChecked) {
+
+            alert("Please complete all checklist items!");
+            return;
+
+        }
+
+
+        let issuesFound = document.getElementById('issues');
+        if (!issuesFound || !issuesFound.value.trim()) {
+
+            alert("Please document any issues or repairs needed!");
+            return;
+
+        }
+
+
+        let inspectionDate = document.getElementById('inspectionDate');
+        if (!inspectionDate || !inspectionDate.value) {
+
+            alert("Please select an Inspection Date!");
+            return;
+
+        }
+
+
+        if (!selectedStatus) {
+
+            alert("Please select a vehicle status!");
+            return;
+
+        }
+
+
+
+
+        let numberplate = vehicleCard.querySelector('h5').textContent.trim();
+        let currentvehicle = null;
+
+        for(let i=0; i<assignedVehicles.length; i++){
+
+            if(assignedVehicles[i].numberplate == numberplate){
+                currentvehicle = assignedVehicles[i];
+                break;
             }
-            
-            updateProgress();
+
         }
 
-        function updateProgress() {
-            const checkboxes = document.querySelectorAll('.checkbox');
-            const checkedBoxes = document.querySelectorAll('.checkbox.checked');
-            const progress = (checkedBoxes.length / checkboxes.length) * 100;
-            
-            document.getElementById('progressFill').style.width = progress + '%';
-            document.getElementById('progressText').textContent = Math.round(progress) + '%';
+        if (!currentvehicle) {
+
+            alert("Vehicle not found!");
+            return;
+
         }
 
-        // Status selection
-        let selectedStatus = null;
 
-        function selectStatus(button, status) {
-            // Remove selected class from all status buttons
-            document.querySelectorAll('.status-btn').forEach(btn => {
-                btn.classList.remove('selected');
-            });
-            
-            // Add selected class to clicked button
-            button.classList.add('selected');
-            selectedStatus = status;
-        }
+        //await updateVehicleStatus(currentvehicle, selectedStatus);
 
-        // Form submission
-        function submitInspection() {
-            const registration = document.querySelector('input[placeholder="Enter registration number"]').value;
-            const inspectionType = document.querySelector('select').value;
-            const priorityLevel = document.querySelectorAll('select')[1].value;
-            const issues = document.querySelector('textarea').value;
-            const inspectionDate = document.getElementById('inspectionDate').value;
-            
-            if (!registration) {
-                alert('Please enter vehicle registration number');
-                return;
-            }
-            
-            if (!selectedStatus) {
-                alert('Please select vehicle status');
-                return;
-            }
-            
-            // Simulate form submission
-            alert(`Inspection submitted successfully!\n\nVehicle: ${registration}\nType: ${inspectionType}\nStatus: ${selectedStatus}\nDate: ${inspectionDate}`);
-        }
 
-        // Quick action functions
-        function notifyAdmin() {
-            alert('Admin notification sent successfully!');
-        }
+        currentvehicle.status = selectedStatus;
+        renderVehicle(currentvehicle);
 
-        function reportHazard() {
-            alert('Safety hazard report form opened');
-        }
+        alert("Inspection report submitted successfully!");
 
-        function emergencyWorkOrder() {
-            alert('Emergency work order created');
-        }
+    });
 
-        function contactSupervisor() {
-            alert('Supervisor contacted via internal messaging');
-        }
+}
 
-        function viewAllDocuments() {
-            alert('Opening compliance documents viewer');
-        }
+function submitInspectionForm() {
 
-        // File upload handling
-        document.getElementById('fileInput').addEventListener('change', function(e) {
-            const files = e.target.files;
-            if (files.length > 0) {
-                const uploadText = document.querySelector('.upload-text');
-                uploadText.textContent = `${files.length} file(s) selected`;
-            }
+    handleInspectionCheckList();
+
+    handleFileInput();
+
+    handleVehicleStatusUpdate();
+
+    handleSubmitButton();
+
+}
+
+
+document.addEventListener("DOMContentLoaded", async function() {
+
+    try {
+
+        /*const loggedIn = await checkLogin();
+
+        if (!loggedIn) {
+            return;
+        }*/
+
+        const dummyData = createDummyDataInput();
+
+        assignedVehicles = dummyData.assignedvehicles;
+
+        renderVehicleDropdown();
+
+
+        const vehicleFilter = document.getElementById("vehicleFilter");
+
+        vehicleFilter.addEventListener("change", function() {
+
+            filterVehicleByNumberPlate(this.value);
+
         });
 
 
+        if (assignedVehicles.length > 0) {
 
+            filterVehicleByNumberPlate(assignedVehicles[0].numberplate);
 
-
-
-
-
-
-
-
-        
-
-        function newInspection() {
-            document.querySelector('input[placeholder="Enter registration number"]').value = '';
-            document.querySelector('select').selectedIndex = 0;
-            document.querySelectorAll('select')[1].selectedIndex = 0;
-            document.querySelector('textarea').value = '';
-            document.querySelectorAll('.checkbox').forEach(box => box.classList.remove('checked'));
-            document.querySelectorAll('.checklist-item').forEach(item => item.classList.remove('checked'));
-            document.getElementById('progressFill').style.width = '0%';
-            document.getElementById('progressText').textContent = '0%';
-            document.querySelectorAll('.status-btn').forEach(btn => btn.classList.remove('selected'));
-            selectedStatus = null;
-            document.querySelector('.upload-text').textContent = 'Upload inspection photos';
-            document.getElementById('inspectionDate').valueAsDate = new Date();
-            
-            alert('New inspection form is ready!');
         }
 
 
+        submitInspectionForm();
 
 
+    } catch (err) {
 
-                // Get the search input from header
-        const searchInput = document.getElementById('searchInput');
+        console.error("Error during initialization:", err);
 
-        if (searchInput) {
-            searchInput.addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    const regNumber = searchInput.value.trim();
-                    if (regNumber) {
-                        // Redirect to vehiclerecords.html with query parameter
-                        window.location.href = `vehiclerecords.html?reg=${encodeURIComponent(regNumber)}`;
-                    }
-                }
-            });
-        }
+    }
+
+});
 
 
 
@@ -154,55 +508,92 @@
 
 
 
-                    // Select the user-profile div
-            const userProfile = document.querySelector('.user-profile');
 
-            // Create the dropdown menu dynamically
-            const dropdownMenu = document.createElement('div');
-            dropdownMenu.style.position = 'absolute';
-            dropdownMenu.style.top = '60px'; // adjust based on your header height
-            dropdownMenu.style.right = '0';
-            dropdownMenu.style.backgroundColor = '#fff';
-            dropdownMenu.style.border = '1px solid #ccc';
-            dropdownMenu.style.borderRadius = '5px';
-            dropdownMenu.style.width = '150px';
-            dropdownMenu.style.boxShadow = '0 2px 8px rgba(0,0,0,0.2)';
-            dropdownMenu.style.display = 'none';
-            dropdownMenu.style.zIndex = '1000';
-            dropdownMenu.style.fontFamily = 'sans-serif';
 
-            // Create "Profile" item
-            const profileItem = document.createElement('div');
-            profileItem.textContent = 'Profile';
-            profileItem.style.padding = '10px';
-            profileItem.style.cursor = 'pointer';
-            profileItem.addEventListener('click', () => {
-                window.location.href = 'staffprofile.html';
-            });
-            dropdownMenu.appendChild(profileItem);
 
-            // Create "Logout" item
-            const logoutItem = document.createElement('div');
-            logoutItem.textContent = 'Logout';
-            logoutItem.style.padding = '10px';
-            logoutItem.style.cursor = 'pointer';
-            logoutItem.addEventListener('click', () => {
-                alert('Logging out...');
-                window.location.href = 'login.html'; // replace with your logout page
-            });
-            dropdownMenu.appendChild(logoutItem);
 
-            // Append dropdown to userProfile and set relative position
-            userProfile.style.position = 'relative';
-            userProfile.appendChild(dropdownMenu);
 
-            // Toggle dropdown visibility when clicking the user profile
-            userProfile.addEventListener('click', (e) => {
-                e.stopPropagation(); // prevent closing immediately
-                dropdownMenu.style.display = dropdownMenu.style.display === 'block' ? 'none' : 'block';
-            });
 
-            // Close dropdown if clicking outside
-            document.addEventListener('click', () => {
-                dropdownMenu.style.display = 'none';
-            });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+function createDummyDataInput() {
+
+    return {
+        assignedvehicles: [
+            {
+                numberplate: "ABC-1234",
+                type: "Sedan",
+                brand: "Toyota",
+                model: "Prius",
+                year: 2020,
+                status: "Available",
+                lastServiceDate: "2024-04-12",
+                nextServiceDate: "2024-05-12"
+            },
+            {
+                numberplate: "XYZ-5678",
+                type: "Sedan",
+                brand: "Honda",
+                model: "Civic",
+                year: 2019,
+                status: "Under Maintenance",
+                lastServiceDate: "2024-07-12",
+                nextServiceDate: "2024-05-14"
+            },
+            {
+                numberplate: "DEF-9012",
+                type: "Sedan",
+                brand: "Nissan",
+                model: "Leaf",
+                year: 2021,
+                status: "Available",
+                lastServiceDate: "2024-04-02",
+                nextServiceDate: "2024-05-30"
+            },
+            {
+                numberplate: "GHI-3456",
+                type: "Hatchback",
+                brand: "Suzuki",
+                model: "Wagon R",
+                year: 2018,
+                status: "Under Maintenance",
+                lastServiceDate: "2024-04-18",
+                nextServiceDate: "2024-05-20"
+            },
+            {
+                numberplate: "JKL-7890",
+                type: "SUV",
+                brand: "BMW",
+                model: "X1",
+                year: 2022,
+                status: "Under Maintenance",
+                lastServiceDate: "2024-04-21",
+                nextServiceDate: "2024-05-23"
+            },
+            {
+                numberplate: "MNO-1234",
+                type: "Sedan",
+                brand: "Hyundai",
+                model: "Elantra",
+                year: 2020,
+                status: "Available",
+                lastServiceDate: "2024-04-15",
+                nextServiceDate: "2024-05-19"
+            }
+        ]
+    };
+
+}
