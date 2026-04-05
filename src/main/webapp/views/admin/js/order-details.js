@@ -1,280 +1,192 @@
-// Order Details JavaScript
-document.addEventListener("DOMContentLoaded", function () {
-  initializeOrderDetails();
-  loadOrderData();
-  initializeActions();
-  updateTimestamps();
+// order-details.js (API wired)
+// Uses: GET /api/admin/customer-bookings/{customerId}/{bookingId}
+
+document.addEventListener("DOMContentLoaded", async () => {
+  await loadOrderDetailsFromAPI();
+  wireBackButton();
 });
 
-// Initialize order details page
-function initializeOrderDetails() {
-  const urlParams = new URLSearchParams(window.location.search);
-  const orderId = urlParams.get("id") || "BK001";
-
-  loadOrderFromStorage(orderId);
-  startRealTimeUpdates();
+function getParam(name) {
+  return new URLSearchParams(window.location.search).get(name);
 }
 
-// Load order data
-function loadOrderData() {
-  console.log("Loading order data...");
+function apiBase() {
+  return "/api/admin/customer-bookings";
 }
 
-// Load order from storage or URL
-function loadOrderFromStorage(orderId) {
-  // Expanded order dataset
-  const orderData = {
-    BK001: {
-      id: "BK001",
-      customer: {
-        name: "John Smith",
-        email: "john.smith@email.com",
-        phone: "+94 77 123 4567",
-        license: "B1234567",
-        avatar: "JS",
-        rating: 4.8,
-        rides: 23,
-      },
-      vehicle: {
-        name: "Toyota Camry 2023",
-        plate: "CAB-1234",
-        type: "Sedan",
-        color: "Silver",
-        odometer: "45,230 km",
-      },
-      booking: {
-        duration: "3 Days",
-        pickupDateTime: "Dec 15, 2024 at 10:00 AM",
-        pickupLocation: "Bandaranaike International Airport",
-        returnDateTime: "Dec 18, 2024 at 6:00 PM",
-        returnLocation: "Bandaranaike International Airport",
-      },
-      driver: {
-        name: "Michael Johnson",
-        license: "D7890123",
-        phone: "+94 71 234 5678",
-        rating: 4.9,
-        trips: 156,
-      },
-      status: "pickup-ready",
-      payment: {
-        total: 23000,
-        earnings: 20240,
-        method: "Visa ending in 4567",
-        transactionId: "TXN-20241215-001",
-      },
-    },
-    BK002: {
-      id: "BK002",
-      customer: {
-        name: "Sarah Wilson",
-        email: "sarah.wilson@email.com",
-        phone: "+94 76 987 6543",
-        license: "B9876543",
-        avatar: "SW",
-        rating: 4.6,
-        rides: 15,
-      },
-      vehicle: {
-        name: "Honda Civic 2022",
-        plate: "XYZ-5678",
-        type: "Sedan",
-        color: "White",
-        odometer: "32,150 km",
-      },
-      booking: {
-        duration: "5 Days",
-        pickupDateTime: "Dec 16, 2024 at 2:00 PM",
-        pickupLocation: "Galle Face Hotel",
-        returnDateTime: "Dec 21, 2024 at 5:00 PM",
-        returnLocation: "Galle Face Hotel",
-      },
-      driver: null, // no driver assigned
-      status: "in-progress",
-      payment: {
-        total: 28000,
-        earnings: 23800,
-        method: "MasterCard ending in 1234",
-        transactionId: "TXN-20241216-002",
-      },
-    },
-    BK003: {
-      id: "BK003",
-      customer: {
-        name: "David Brown",
-        email: "david.brown@email.com",
-        phone: "+94 72 555 6789",
-        license: "B5556789",
-        avatar: "DB",
-        rating: 4.7,
-        rides: 19,
-      },
-      vehicle: {
-        name: "BMW X5 2023",
-        plate: "BXX-9090",
-        type: "SUV",
-        color: "Black",
-        odometer: "28,900 km",
-      },
-      booking: {
-        duration: "2 Days",
-        pickupDateTime: "Dec 17, 2024 at 9:00 AM",
-        pickupLocation: "Galle City Center",
-        returnDateTime: "Dec 19, 2024 at 6:00 PM",
-        returnLocation: "Galle City Center",
-      },
-      driver: {
-        name: "Alex Fernando",
-        license: "D3332211",
-        phone: "+94 70 987 6543",
-        rating: 4.5,
-        trips: 98,
-      },
-      status: "accepted",
-      payment: {
-        total: 18000,
-        earnings: 16200,
-        method: "Amex ending in 7890",
-        transactionId: "TXN-20241217-003",
-      },
-    },
-  };
+async function loadOrderDetailsFromAPI() {
+  const bookingId = getParam("id"); // BK001 or 12
+  const customerId = getParam("customerId");
 
-  const order = orderData[orderId];
-  if (order) {
-    populateOrderData(order);
-  } else {
-    console.error("No order data found for ID:", orderId);
+  if (!bookingId || !customerId) {
     document.getElementById("orderTitle").textContent = "Order Not Found";
+    document.getElementById("orderIdDisplay").textContent =
+      "Missing bookingId/customerId";
+    return;
+  }
+
+  try {
+    const url = `${apiBase()}/${encodeURIComponent(customerId)}/${encodeURIComponent(bookingId)}`;
+    const res = await fetch(url, { credentials: "include" });
+
+    const text = await res.text();
+    const data = text ? JSON.parse(text) : {};
+
+    if (!res.ok) {
+      document.getElementById("orderTitle").textContent = "Order Not Found";
+      document.getElementById("orderIdDisplay").textContent =
+        data.error || `HTTP ${res.status}`;
+      return;
+    }
+
+    populateOrderDataFromAPI(data);
+  } catch (e) {
+    console.error(e);
+    document.getElementById("orderTitle").textContent = "Order Not Found";
+    document.getElementById("orderIdDisplay").textContent =
+      "Failed to load order details.";
   }
 }
 
-// Populate order data in the UI
-function populateOrderData(order) {
-  document.getElementById(
-    "orderIdDisplay"
-  ).textContent = `Booking ID: ${order.id}`;
-  updateStatusBadge(order.status);
+function populateOrderDataFromAPI(order) {
+  // Header
+  document.getElementById("orderIdDisplay").textContent =
+    `Booking ID: ${order.bookingId || "—"}`;
 
-  document.getElementById("customerName").textContent = order.customer.name;
-  document.getElementById("customerEmail").textContent = order.customer.email;
-  document.getElementById("customerPhone").textContent = order.customer.phone;
+  // status badge
+  updateStatusBadge(order.status, order.paymentStatus);
+
+  // Customer
+  document.getElementById("customerName").textContent =
+    order.customer?.name || "—";
+  document.getElementById("customerEmail").textContent =
+    order.customer?.email || "—";
+  document.getElementById("customerPhone").textContent =
+    order.customer?.phone || "—";
   document.getElementById("customerLicense").textContent =
-    order.customer.license;
-  document.getElementById("customerAvatar").textContent = order.customer.avatar;
+    order.customer?.license || "—";
 
-  document.getElementById("vehicleName").textContent = order.vehicle.name;
-  document.getElementById("vehiclePlate").textContent = order.vehicle.plate;
-  document.getElementById("vehicleType").textContent = order.vehicle.type;
-  document.getElementById("vehicleColor").textContent = order.vehicle.color;
+  const initials = initialsFromName(order.customer?.name || "");
+  document.getElementById("customerAvatar").textContent = initials || "—";
+
+  // Vehicle
+  document.getElementById("vehicleName").textContent =
+    order.vehicle?.name || "—";
+  document.getElementById("vehiclePlate").textContent =
+    order.vehicle?.plate || "—";
+  document.getElementById("vehicleType").textContent =
+    order.vehicle?.type || "—";
+  document.getElementById("vehicleColor").textContent =
+    order.vehicle?.color || "—";
   document.getElementById("vehicleOdometer").textContent =
-    order.vehicle.odometer;
+    order.vehicle?.odometer || "—";
+
+  // Booking (dates/locations)
+  const pickupDT = formatDateTime(order.tripStartDate, order.startTime);
+  const returnDT = formatDateTime(order.tripEndDate, order.endTime);
 
   document.getElementById("bookingDuration").textContent =
-    order.booking.duration;
-  document.getElementById("pickupDateTime").textContent =
-    order.booking.pickupDateTime;
-  document.getElementById("pickupLocation").textContent =
-    order.booking.pickupLocation;
-  document.getElementById("returnDateTime").textContent =
-    order.booking.returnDateTime;
-  document.getElementById("returnLocation").textContent =
-    order.booking.returnLocation;
+    order.durationDays != null ? `${order.durationDays} Days` : "—";
 
+  document.getElementById("pickupDateTime").textContent = pickupDT;
+  document.getElementById("pickupLocation").textContent =
+    order.pickupLocation || "—";
+
+  document.getElementById("returnDateTime").textContent = returnDT;
+  document.getElementById("returnLocation").textContent =
+    order.dropLocation || "—";
+
+  // Driver (optional)
   if (order.driver) {
-    document.getElementById("driverName").textContent = order.driver.name;
-    document.querySelector(
-      ".driver-license"
-    ).textContent = `License: ${order.driver.license}`;
-    document.querySelector(
-      ".driver-rating"
-    ).textContent = `★ ${order.driver.rating} (${order.driver.trips} trips)`;
-    document.querySelector(
-      ".driver-contact span"
-    ).textContent = `📞 ${order.driver.phone}`;
+    document.getElementById("driverName").textContent =
+      order.driver.name || "—";
+    document.querySelector(".driver-license").textContent =
+      `License: ${order.driver.license || "—"}`;
+    document.querySelector(".driver-rating").textContent = `★ — (— trips)`; // DB doesn't provide rating/trips
+    document.querySelector(".driver-contact span").textContent =
+      `📞 ${order.driver.phone || "—"}`;
+    document.getElementById("driverSection").style.display = "";
   } else {
     document.getElementById("driverSection").style.display = "none";
   }
 
-  updateProgressTimeline(order.status);
+  // Payment / totals (if your HTML has these ids; if not, it safely does nothing)
+  const total =
+    order.totalAmount != null
+      ? `LKR ${Number(order.totalAmount).toLocaleString()}`
+      : "—";
+  const elTotal = document.getElementById("paymentTotal");
+  if (elTotal) elTotal.textContent = total;
+
+  // Company (if present on page)
+  const elCompany = document.getElementById("companyName");
+  if (elCompany) elCompany.textContent = order.company?.companyName || "—";
 }
 
-// Status badge logic
-function updateStatusBadge(status) {
+function updateStatusBadge(status, paymentStatus) {
   const badge = document.getElementById("orderStatusBadge");
+  if (!badge) return;
+
   badge.className = "order-status";
 
-  switch (status) {
-    case "pickup-ready":
-      badge.textContent = "Ready for Pickup";
-      badge.classList.add("status-ongoing");
-      break;
-    case "in-progress":
-      badge.textContent = "In Progress";
-      badge.classList.add("status-ongoing");
-      break;
-    case "completed":
-      badge.textContent = "Completed";
-      badge.classList.add("status-completed");
-      break;
-    case "cancelled":
-      badge.textContent = "Cancelled";
-      badge.classList.add("status-inactive");
-      break;
-    case "accepted":
-      badge.textContent = "Accepted";
-      badge.classList.add("status-pending");
-      break;
-    default:
-      badge.textContent = "Pending";
-      badge.classList.add("status-pending");
+  const s = String(status || "").toLowerCase();
+  const p = String(paymentStatus || "").toLowerCase();
+
+  if (s === "completed") {
+    badge.textContent = "Completed";
+    badge.classList.add("status-completed");
+    return;
   }
+  if (s === "cancelled") {
+    badge.textContent = "Cancelled";
+    badge.classList.add("status-cancelled");
+    return;
+  }
+  if (s === "in-progress" || s === "ongoing") {
+    badge.textContent = "In Progress";
+    badge.classList.add("status-ongoing");
+    return;
+  }
+  if (p === "paid") {
+    badge.textContent = "Paid";
+    badge.classList.add("status-ongoing");
+    return;
+  }
+  if (s === "accepted") {
+    badge.textContent = "Accepted";
+    badge.classList.add("status-ongoing");
+    return;
+  }
+
+  badge.textContent = status || "Ongoing";
+  badge.classList.add("status-ongoing");
 }
 
-// Progress timeline updater
-function updateProgressTimeline(status) {
-  const steps = document.querySelectorAll(".progress-step");
-  steps.forEach((step) => {
-    step.classList.remove("completed", "active", "pending");
-    step.classList.add("pending");
-  });
+function formatDateTime(dateStr, timeStr) {
+  if (!dateStr) return "—";
+  const d = new Date(dateStr);
+  const date = isNaN(d.getTime()) ? String(dateStr) : d.toDateString();
+  return timeStr ? `${date} at ${timeStr}` : date;
+}
 
-  const stepOrder = ["accepted", "paid", "pickup", "dropoff"];
-  let currentStepIndex = -1;
+function initialsFromName(name) {
+  const parts = String(name || "")
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean);
+  return (parts[0]?.[0] || "") + (parts[1]?.[0] || "");
+}
 
-  switch (status) {
-    case "accepted":
-      currentStepIndex = 0;
-      break;
-    case "pickup-ready":
-    case "in-progress":
-      currentStepIndex = 2;
-      break;
-    case "completed":
-      currentStepIndex = 3;
-      break;
-    default:
-      currentStepIndex = 1;
-  }
+function wireBackButton() {
+  const btn = document.getElementById("backBtn");
+  if (!btn) return;
 
-  stepOrder.forEach((stepName, index) => {
-    const stepElement = document.querySelector(`[data-step="${stepName}"]`);
-    if (stepElement) {
-      if (index < currentStepIndex) stepElement.classList.add("completed");
-      else if (index === currentStepIndex) stepElement.classList.add("active");
-    }
+  btn.addEventListener("click", () => {
+    // go back to iframe list (browser history works best)
+    window.history.back();
   });
 }
 
-// Dummy handlers
-function initializeActions() {
-  console.log("Action handlers initialized");
-}
-function updateTimestamps() {}
-function startRealTimeUpdates() {}
 function goBack() {
   window.history.back();
-}
-function printOrder() {
-  window.print();
 }

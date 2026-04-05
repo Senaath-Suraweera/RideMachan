@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -67,160 +67,37 @@
         </div>
 
         <!-- Companies List -->
-        <div class="companies-container">
-          <!-- Company Card 1 -->
-          <div class="company-card" data-rating="4" data-location="colombo">
-            <div class="company-header">
-              <div class="company-logo">
-                <div class="logo-placeholder">Logo</div>
-              </div>
-              <div class="company-main-info">
-                <h3 class="company-name">Premium Car Rentals</h3>
-                <div class="company-rating">
-                  <div class="stars">
-                    <span class="star filled">★</span>
-                    <span class="star filled">★</span>
-                    <span class="star filled">★</span>
-                    <span class="star filled">★</span>
-                    <span class="star empty">★</span>
-                  </div>
-                  <span class="rating-text">No of reviews: 156</span>
-                </div>
-                <div class="company-location">📍 Colombo</div>
-              </div>
-              <div class="company-actions">
-                <button
-                  class="btn btn-primary apply-btn"
-                  onclick="openApplicationModal('Premium Car Rentals')"
-                >
-                  Apply Now
-                </button>
-              </div>
-            </div>
-            <div class="company-description">
-              <p>
-                Leading car rental service with premium vehicles and excellent
-                customer support. We provide 24/7 service.
-              </p>
-            </div>
-            <div class="company-details">
-              <div class="detail-item">
-                <strong>Drivers:</strong>
-                <span class="driver-count">2</span>
-                <span class="driver-note"
-                  >(Applies/shows dropdown of all the available vehicles)</span
-                >
-              </div>
-              <div class="business-license">
-                <strong>Business License Number:</strong> BL-2024001234
-              </div>
-            </div>
-          </div>
-
-          <!-- Company Card 2 -->
-          <div class="company-card" data-rating="4" data-location="kandy">
-            <div class="company-header">
-              <div class="company-logo">
-                <div class="logo-placeholder">Logo</div>
-              </div>
-              <div class="company-main-info">
-                <h3 class="company-name">Elite Vehicle Solutions</h3>
-                <div class="company-rating">
-                  <div class="stars">
-                    <span class="star filled">★</span>
-                    <span class="star filled">★</span>
-                    <span class="star filled">★</span>
-                    <span class="star filled">★</span>
-                    <span class="star empty">★</span>
-                  </div>
-                  <span class="rating-text">No of reviews: 89</span>
-                </div>
-                <div class="company-location">📍 Kandy</div>
-              </div>
-              <div class="company-actions">
-                <button
-                  class="btn btn-primary apply-btn"
-                  onclick="openApplicationModal('Elite Vehicle Solutions')"
-                >
-                  Apply Now
-                </button>
-              </div>
-            </div>
-            <div class="company-description">
-              <p>
-                Specialized in luxury and sports cars. Professional service with
-                competitive rates and flexible terms.
-              </p>
-            </div>
-            <div class="company-details">
-              <div class="detail-item">
-                <strong>Drivers:</strong>
-                <span class="driver-count">1</span>
-                <span class="driver-note"
-                  >(Applies/shows dropdown of all the available vehicles)</span
-                >
-              </div>
-              <div class="business-license">
-                <strong>Business License Number:</strong> BL-2024005678
-              </div>
-            </div>
-          </div>
-
-          <!-- Company Card 3 -->
-          <div class="company-card" data-rating="4" data-location="galle">
-            <div class="company-header">
-              <div class="company-logo">
-                <div class="logo-placeholder">Logo</div>
-              </div>
-              <div class="company-main-info">
-                <h3 class="company-name">City Drive Rentals</h3>
-                <div class="company-rating">
-                  <div class="stars">
-                    <span class="star filled">★</span>
-                    <span class="star filled">★</span>
-                    <span class="star filled">★</span>
-                    <span class="star filled">★</span>
-                    <span class="star empty">★</span>
-                  </div>
-                  <span class="rating-text">No of reviews: 203</span>
-                </div>
-                <div class="company-location">📍 Galle</div>
-              </div>
-              <div class="company-actions">
-                <button
-                  class="btn btn-primary apply-btn"
-                  onclick="openApplicationModal('City Drive Rentals')"
-                >
-                  Apply Now
-                </button>
-              </div>
-            </div>
-            <div class="company-description">
-              <p>
-                Budget-friendly options with reliable vehicles. Perfect for city
-                tours and daily commuting needs.
-              </p>
-            </div>
-            <div class="company-details">
-              <div class="detail-item">
-                <strong>Drivers:</strong>
-                <span class="driver-count">3</span>
-                <span class="driver-note"
-                  >(Applies/shows dropdown of all the available vehicles)</span
-                >
-              </div>
-              <div class="business-license">
-                <strong>Business License Number:</strong> BL-2024009012
-              </div>
-            </div>
-          </div>
-        </div>
+        <div class="companies-container"></div>
 
         <!-- Load More Button -->
         <div class="load-more-section">
           <button class="btn btn-secondary" onclick="loadMoreCompanies()">
             Load More Companies
           </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Company Detail Modal -->
+    <div class="company-detail-overlay" id="companyDetailOverlay">
+      <div class="company-detail-card">
+        <div class="company-detail-header">
+          <h2>Company Details</h2>
+          <button
+            class="company-detail-close"
+            onclick="closeCompanyDetailModal()"
+          >
+            ×
+          </button>
+        </div>
+        <div class="company-detail-body">
+          <!-- Content loaded dynamically -->
+        </div>
+        <div class="company-detail-footer">
+          <button class="btn btn-secondary" onclick="closeCompanyDetailModal()">
+            Close
+          </button>
+          <button class="btn btn-primary">Apply Now</button>
         </div>
       </div>
     </div>
@@ -240,87 +117,47 @@
               <h3>Personal Information</h3>
               <div class="form-row">
                 <div class="form-group">
-                  <label class="form-label">Full Name</label>
+                  <label>Provider Name</label>
                   <input
+                    id="providerName"
+                    name="providerName"
                     type="text"
-                    class="form-control"
-                    placeholder="Enter your full name"
-                    required
+                    readonly
                   />
                 </div>
+
                 <div class="form-group">
-                  <label class="form-label">Email Address</label>
+                  <label>Provider Email</label>
                   <input
+                    id="providerEmail"
+                    name="providerEmail"
                     type="email"
-                    class="form-control"
-                    placeholder="Enter your email"
-                    required
+                    readonly
                   />
                 </div>
-              </div>
-              <div class="form-row">
+
                 <div class="form-group">
-                  <label class="form-label">Phone Number</label>
+                  <label>Provider Phone</label>
                   <input
-                    type="tel"
-                    class="form-control"
-                    placeholder="Enter your phone number"
-                    required
-                  />
-                </div>
-                <div class="form-group">
-                  <label class="form-label">License Number</label>
-                  <input
+                    id="providerPhone"
+                    name="providerPhone"
                     type="text"
-                    class="form-control"
-                    placeholder="Enter your license number"
-                    required
+                    readonly
                   />
                 </div>
+
+                <input id="providerIdDisplay" type="hidden" />
               </div>
             </div>
 
             <div class="form-section">
               <h3>Vehicle Information</h3>
               <div class="form-group">
-                <label class="form-label">Select Vehicles to Register</label>
-                <div class="vehicle-selection">
-                  <label class="vehicle-option">
-                    <input
-                      type="checkbox"
-                      name="vehicles"
-                      value="toyota-camry"
-                    />
-                    <div class="vehicle-info">
-                      <div class="vehicle-name">Toyota Camry 2023</div>
-                      <div class="vehicle-details">
-                        Rs 5,000/day • Automatic • AC
-                      </div>
-                    </div>
-                  </label>
-                  <label class="vehicle-option">
-                    <input
-                      type="checkbox"
-                      name="vehicles"
-                      value="honda-civic"
-                    />
-                    <div class="vehicle-info">
-                      <div class="vehicle-name">Honda Civic 2022</div>
-                      <div class="vehicle-details">
-                        Rs 4,500/day • Manual • AC
-                      </div>
-                    </div>
-                  </label>
-                  <label class="vehicle-option">
-                    <input type="checkbox" name="vehicles" value="bmw-x3" />
-                    <div class="vehicle-info">
-                      <div class="vehicle-name">BMW X3 2023</div>
-                      <div class="vehicle-details">
-                        Rs 8,500/day • Automatic • Luxury
-                      </div>
-                    </div>
-                  </label>
-                </div>
+                <label class="form-label"
+                  >Select Vehicle to Register (Choose One)
+                  <span style="color: red">*</span></label
+                >
+                <div class="vehicle-selection"></div>
               </div>
             </div>
 
@@ -328,7 +165,12 @@
               <h3>Additional Information</h3>
               <div class="form-group">
                 <label class="form-label">Years of Experience</label>
-                <select class="form-select" required>
+                <select
+                  class="form-select"
+                  name="experience"
+                  id="experience"
+                  required
+                >
                   <option value="">Select experience</option>
                   <option value="1-2">1-2 years</option>
                   <option value="3-5">3-5 years</option>
@@ -339,13 +181,15 @@
                 <label class="form-label">Message (Optional)</label>
                 <textarea
                   class="form-control"
+                  name="message"
+                  id="message"
                   rows="4"
                   placeholder="Tell us why you want to join this company..."
                 ></textarea>
               </div>
               <div class="form-group">
                 <label class="checkbox-label">
-                  <input type="checkbox" required />
+                  <input type="checkbox" name="terms" id="terms" required />
                   I agree to the terms and conditions
                 </label>
               </div>

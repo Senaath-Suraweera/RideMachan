@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -111,76 +111,87 @@
           <form id="registerDriverForm">
             <div class="form-row">
               <div class="form-group">
-                <label class="form-label">Full Name *</label>
+                <label class="form-label">Username *</label>
                 <input
                   type="text"
                   class="form-control"
-                  name="fullName"
+                  name="username"
                   required
                 />
               </div>
+
               <div class="form-group">
-                <label class="form-label">Age *</label>
+                <label class="form-label">Password *</label>
                 <input
-                  type="number"
+                  type="password"
                   class="form-control"
-                  name="age"
-                  min="18"
-                  max="80"
+                  name="password"
                   required
                 />
               </div>
             </div>
+
             <div class="form-row">
               <div class="form-group">
-                <label class="form-label">Phone Number *</label>
-                <input type="tel" class="form-control" name="phone" required />
-              </div>
-              <div class="form-group">
-                <label class="form-label">Email Address</label>
-                <input type="email" class="form-control" name="email" />
-              </div>
-            </div>
-            <div class="form-row">
-              <div class="form-group">
-                <label class="form-label">Location *</label>
+                <label class="form-label">Email *</label>
                 <input
-                  type="text"
+                  type="email"
                   class="form-control"
-                  name="location"
+                  name="email"
                   required
                 />
               </div>
+
               <div class="form-group">
-                <label class="form-label">Company</label>
-                <input
-                  type="text"
-                  class="form-control"
-                  name="company"
-                  placeholder="Independent if blank"
-                />
+                <label class="form-label">Phone Number</label>
+                <input type="tel" class="form-control" name="phonenumber" />
               </div>
             </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">First Name</label>
+                <input type="text" class="form-control" name="firstname" />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Last Name</label>
+                <input type="text" class="form-control" name="lastname" />
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">House No.</label>
+                <input type="text" class="form-control" name="housenumber" />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Street</label>
+                <input type="text" class="form-control" name="street" />
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">City</label>
+                <input type="text" class="form-control" name="city" />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Zip Code</label>
+                <input type="text" class="form-control" name="zipcode" />
+              </div>
+            </div>
+
             <div class="form-group">
-              <label class="form-label">Experience (Years)</label>
+              <label class="form-label">Company ID (optional)</label>
               <input
                 type="number"
                 class="form-control"
-                name="experience"
-                min="0"
-              />
-            </div>
-            <div class="form-group">
-              <label class="form-label">Business Registration No.</label>
-              <input type="text" class="form-control" name="licenseNumber" />
-            </div>
-            <div class="form-group">
-              <label class="form-label">NIC Number *</label>
-              <input
-                type="text"
-                class="form-control"
-                name="nicNumber"
-                required
+                name="company_id"
+                placeholder="Leave blank for Independent"
+                min="1"
               />
             </div>
           </form>

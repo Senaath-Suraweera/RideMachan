@@ -1,173 +1,32 @@
-// Customers Page JavaScript (theme-matched filters + cards render)
+// js/customers.js  (API-wired version)
 class CustomersManager {
   constructor() {
-    this.customers = [
-      {
-        id: 1,
-        name: "John Doe",
-        nic: "123456789V",
-        email: "john.doe@email.com",
-        phone: "+94 77 123 4567",
-        joinDate: "2023-01-15",
-        bookings: 25,
-        location: "Colombo",
-        rating: 4.8,
-        reviews: 18,
-        status: "active",
-        description: "Frequent customer with excellent payment history",
-      },
-      {
-        id: 2,
-        name: "Michael Chen",
-        nic: "987654321V",
-        email: "michael.chen@email.com",
-        phone: "+94 71 555 0123",
-        joinDate: "2023-11-10",
-        bookings: 8,
-        location: "Galle",
-        rating: 4.2,
-        reviews: 5,
-        status: "active",
-        description: "New customer showing promising booking patterns",
-      },
-      {
-        id: 3,
-        name: "Sarah Johnson",
-        nic: "456789123V",
-        email: "sarah.j@email.com",
-        phone: "+94 76 987 6543",
-        joinDate: "2023-09-22",
-        bookings: 12,
-        location: "Kandy",
-        rating: 4.6,
-        reviews: 8,
-        status: "active",
-        description: "Reliable customer, always on time for pickups",
-      },
-      {
-        id: 4,
-        name: "Ahmed Ali",
-        nic: "223344556V",
-        email: "ahmed.ali@email.com",
-        phone: "+94 72 345 6789",
-        joinDate: "2022-06-05",
-        bookings: 3,
-        location: "Negombo",
-        rating: 3.8,
-        reviews: 2,
-        status: "inactive",
-        description: "Low booking activity in recent months",
-      },
-      {
-        id: 5,
-        name: "Nimali Perera",
-        nic: "991234567V",
-        email: "nimali.p@email.com",
-        phone: "+94 77 888 1122",
-        joinDate: "2024-03-14",
-        bookings: 19,
-        location: "Matara",
-        rating: 4.9,
-        reviews: 21,
-        status: "active",
-        description: "Top customer with multiple repeat bookings",
-      },
-      {
-        id: 6,
-        name: "Ishara Fernando",
-        nic: "200045678V",
-        email: "ishara.f@email.com",
-        phone: "+94 70 112 3344",
-        joinDate: "2023-08-01",
-        bookings: 6,
-        location: "Jaffna",
-        rating: 3.5,
-        reviews: 4,
-        status: "active",
-        description: "Budget-conscious, books short trips",
-      },
-      {
-        id: 7,
-        name: "Carlos Gomez",
-        nic: "778899001V",
-        email: "carlos.g@email.com",
-        phone: "+94 74 667 8899",
-        joinDate: "2022-12-09",
-        bookings: 15,
-        location: "Colombo",
-        rating: 4.1,
-        reviews: 7,
-        status: "active",
-        description: "Responsive and punctual",
-      },
-      {
-        id: 8,
-        name: "Ayesha Rahman",
-        nic: "314159265V",
-        email: "ayesha.r@email.com",
-        phone: "+94 76 000 1234",
-        joinDate: "2024-05-20",
-        bookings: 10,
-        location: "Kandy",
-        rating: 4.4,
-        reviews: 6,
-        status: "active",
-        description: "Prefers weekend bookings",
-      },
-      {
-        id: 9,
-        name: "Tharindu Silva",
-        nic: "888777666V",
-        email: "tharindu@email.com",
-        phone: "+94 77 234 5678",
-        joinDate: "2022-02-11",
-        bookings: 2,
-        location: "Galle",
-        rating: 2.9,
-        reviews: 1,
-        status: "inactive",
-        description: "Dormant account",
-      },
-      {
-        id: 10,
-        name: "Emily Brown",
-        nic: "135792468V",
-        email: "emily.b@email.com",
-        phone: "+94 71 999 0000",
-        joinDate: "2024-01-05",
-        bookings: 30,
-        location: "Colombo",
-        rating: 5.0,
-        reviews: 40,
-        status: "active",
-        description: "VIP customer, highest loyalty score",
-      },
-    ];
-
-    this.filteredCustomers = [...this.customers];
+    this.customers = [];
+    this.filteredCustomers = [];
     this.minRating = 0;
+
+    // simple paging (optional; UI doesn't have pager, we keep it internal)
+    this.page = 1;
+    this.pageSize = 50;
+
+    this.API_BASE = "/api/admin/customers";
 
     this.init();
   }
 
   init() {
     this.cacheEls();
-    this.populateLocationFilter();
     this.initializeRatingFilter();
     this.setupEventListeners();
-    this.renderCustomers();
-    this.updateCustomerCount();
+    this.loadCustomers(); // <-- fetch from backend
   }
 
   cacheEls() {
-    // grid + counts
     this.grid = document.querySelector(".customers-grid");
-    // IMPORTANT: target the list title, not the filter title
     this.listTitle = document.querySelector(
-      ".customers-section .section-title"
-    ); // fixes wrong heading update
+      ".customers-section .section-title",
+    );
 
-    // filter inputs
     this.nameEl = document.getElementById("customerNameFilter");
     this.nicEl = document.getElementById("nicFilter");
     this.locEl = document.getElementById("locationFilter");
@@ -180,130 +39,259 @@ class CustomersManager {
   }
 
   setupEventListeners() {
-    // search/clear buttons (also present inline in HTML)
     document
       .querySelector(".search-actions .btn-primary")
-      ?.addEventListener("click", () => this.applyFilters());
+      ?.addEventListener("click", () => this.loadCustomers());
+
     document
       .querySelector(".search-actions .btn-secondary")
-      ?.addEventListener("click", () => this.clearFilters());
+      ?.addEventListener("click", () => this.clearFiltersAndReload());
 
-    // type-to-filter
+    // type-to-filter -> re-fetch
     [this.nameEl, this.nicEl, this.bookMinEl, this.bookMaxEl].forEach((el) =>
-      el?.addEventListener("input", () => this.applyFilters())
-    );
-    // change-to-filter
-    [this.locEl, this.statEl, this.sortEl, this.joinFrom, this.joinTo].forEach(
-      (el) => el?.addEventListener("change", () => this.applyFilters())
+      el?.addEventListener("input", () => this.debouncedReload()),
     );
 
-    // card click -> optional details
+    // change-to-filter -> re-fetch
+    [this.locEl, this.statEl, this.sortEl, this.joinFrom, this.joinTo].forEach(
+      (el) => el?.addEventListener("change", () => this.loadCustomers()),
+    );
+
+    // card click -> go to view page and store selected customer
     document.addEventListener("click", (e) => {
       const card = e.target.closest(".customer-card");
-      if (card) this.showCustomerDetails(Number(card.dataset.customerId));
+      if (!card) return;
+
+      const id = Number(card.dataset.customerId);
+      if (!Number.isFinite(id)) return;
+
+      const selected = this.customers.find((c) => Number(c.id) === id) || null;
+      if (selected) {
+        try {
+          sessionStorage.setItem("selectedCustomer", JSON.stringify(selected));
+        } catch (_) {}
+      }
+
+      window.location.href = `customer-view.html?id=${id}`;
     });
 
-    // register form submit
+    // register modal submit (if you use form submit)
     document.getElementById("registerForm")?.addEventListener("submit", (e) => {
       e.preventDefault();
       this.registerCustomer();
     });
   }
 
-  /* ---------- Helpers ---------- */
-  parseDate(s) {
-    return s ? new Date(s + "T00:00:00") : null;
-  }
-  toNum(v) {
-    const n = Number(v);
-    return Number.isFinite(n) ? n : NaN;
+  debouncedReload() {
+    clearTimeout(this._t);
+    this._t = setTimeout(() => this.loadCustomers(), 250);
   }
 
-  populateLocationFilter() {
-    if (!this.locEl) return;
-    const uniq = [...new Set(this.customers.map((c) => c.location))].sort();
-    uniq.forEach((loc) => {
-      const o = document.createElement("option");
-      o.value = loc;
-      o.textContent = loc;
-      this.locEl.appendChild(o);
-    });
-  }
-
+  /* ---------- Rating Filter ---------- */
   initializeRatingFilter() {
     const container = document.getElementById("ratingFilter");
     if (!container) return;
     const stars = Array.from(container.querySelectorAll(".star"));
     const paint = (value) =>
       stars.forEach((s) =>
-        s.classList.toggle("active", Number(s.dataset.value) <= value)
+        s.classList.toggle("active", Number(s.dataset.value) <= value),
       );
+
     stars.forEach((star) => {
       star.addEventListener("click", () => {
         this.minRating = Number(star.dataset.value || 0);
         paint(this.minRating);
-        this.applyFilters();
+        this.loadCustomers();
       });
       star.addEventListener("mouseenter", () =>
-        paint(Number(star.dataset.value || 0))
+        paint(Number(star.dataset.value || 0)),
       );
     });
+
     container.addEventListener("mouseleave", () => paint(this.minRating));
     paint(this.minRating);
   }
 
-  /* ---------- Filtering ---------- */
-  applyFilters() {
-    const nameFilter = (this.nameEl?.value || "").toLowerCase();
-    const nicFilter = (this.nicEl?.value || "").toLowerCase();
-    const sortOrder = this.sortEl?.value || "ascending";
+  /* ---------- API ---------- */
+  buildQueryFromUI() {
+    const qs = new URLSearchParams();
 
-    const loc = this.locEl?.value || "";
-    const status = this.statEl?.value || "";
-    const minRating = this.minRating || 0;
+    const name = (this.nameEl?.value || "").trim();
+    const nic = (this.nicEl?.value || "").trim();
+    const location = (this.locEl?.value || "").trim(); // exact match from dropdown
+    const status = (this.statEl?.value || "").trim();
+    const joinFrom = (this.joinFrom?.value || "").trim();
+    const joinTo = (this.joinTo?.value || "").trim();
+    const minBookings = (this.bookMinEl?.value || "").trim();
+    const maxBookings = (this.bookMaxEl?.value || "").trim();
 
-    const joinFrom = this.parseDate(this.joinFrom?.value);
-    const joinTo = this.parseDate(this.joinTo?.value);
-    const minBk = this.toNum(this.bookMinEl?.value);
-    const maxBk = this.toNum(this.bookMaxEl?.value);
+    if (name) qs.set("name", name);
+    if (nic) qs.set("nic", nic);
 
-    this.filteredCustomers = this.customers.filter((c) => {
-      const matchesName = c.name.toLowerCase().includes(nameFilter);
-      const matchesNIC = c.nic.toLowerCase().includes(nicFilter);
-      const matchesLoc = !loc || c.location === loc;
-      const matchesStat = !status || c.status === status;
-      const matchesRat = c.rating >= minRating;
+    // backend supports location as free text; dropdown gives exact city -> still fine
+    if (location) qs.set("location", location);
 
-      const jd = this.parseDate(c.joinDate);
-      const matchesJoin =
-        (!joinFrom || jd >= joinFrom) && (!joinTo || jd <= joinTo);
+    if (status) qs.set("status", status);
 
-      const matchesBookings =
-        (isNaN(minBk) || c.bookings >= minBk) &&
-        (isNaN(maxBk) || c.bookings <= maxBk);
+    if (joinFrom) qs.set("joinFrom", joinFrom);
+    if (joinTo) qs.set("joinTo", joinTo);
 
-      return (
-        matchesName &&
-        matchesNIC &&
-        matchesLoc &&
-        matchesStat &&
-        matchesRat &&
-        matchesJoin &&
-        matchesBookings
-      );
-    });
+    if (minBookings) qs.set("minBookings", minBookings);
+    if (maxBookings) qs.set("maxBookings", maxBookings);
 
-    // sort
-    this.filteredCustomers.sort(
-      (a, b) =>
-        (sortOrder === "ascending" ? 1 : -1) * a.name.localeCompare(b.name)
-    );
+    if (this.minRating > 0) qs.set("minRating", String(this.minRating));
 
-    this.renderCustomers();
-    this.updateCustomerCount();
+    qs.set("page", String(this.page));
+    qs.set("pageSize", String(this.pageSize));
+
+    return qs;
   }
 
-  clearFilters() {
+  async loadCustomers() {
+    const qs = this.buildQueryFromUI();
+    const url = `${this.API_BASE}?${qs.toString()}`;
+
+    try {
+      const res = await fetch(url, { credentials: "include" });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+      const data = await res.json();
+
+      // expects: { customers: [...], total, page, pageSize }
+      this.customers = Array.isArray(data.customers) ? data.customers : [];
+      this.filteredCustomers = [...this.customers];
+
+      // Populate location dropdown based on current dataset
+      this.populateLocationFilterFromData(this.customers);
+
+      // Sort locally (UI sortOrder is client-only)
+      this.applyLocalSort();
+
+      this.renderCustomers();
+      this.updateCustomerCount(this.filteredCustomers.length);
+    } catch (err) {
+      console.error("Failed to load customers:", err);
+      this.renderError(
+        "Failed to load customers. Check admin login/session and servlet mapping.",
+      );
+    }
+  }
+
+  populateLocationFilterFromData(customers) {
+    if (!this.locEl) return;
+
+    const current = this.locEl.value;
+    const uniq = [
+      ...new Set(customers.map((c) => c.location).filter(Boolean)),
+    ].sort((a, b) => String(a).localeCompare(String(b)));
+
+    // rebuild options but keep "All"
+    this.locEl.innerHTML = `<option value="">All</option>`;
+    uniq.forEach((loc) => {
+      const o = document.createElement("option");
+      o.value = loc;
+      o.textContent = loc;
+      this.locEl.appendChild(o);
+    });
+
+    // restore selection if still exists
+    if (current) this.locEl.value = current;
+  }
+
+  applyLocalSort() {
+    const sortOrder = this.sortEl?.value || "ascending";
+    this.filteredCustomers.sort(
+      (a, b) =>
+        (sortOrder === "ascending" ? 1 : -1) *
+        String(a.name || "").localeCompare(String(b.name || "")),
+    );
+  }
+
+  renderError(msg) {
+    if (!this.grid) return;
+    this.grid.innerHTML = `<div style="padding:16px;color:#b91c1c;">${msg}</div>`;
+  }
+
+  /* ---------- Rendering ---------- */
+  renderCustomers() {
+    if (!this.grid) return;
+
+    this.grid.innerHTML = "";
+    if (!this.filteredCustomers.length) {
+      this.grid.innerHTML = `<div style="padding:16px;color:#6b7280;">No customers match your filters.</div>`;
+      return;
+    }
+
+    this.filteredCustomers.forEach((c) =>
+      this.grid.appendChild(this.createCustomerCard(c)),
+    );
+  }
+
+  createCustomerCard(c) {
+    const card = document.createElement("div");
+    card.className = "customer-card";
+    card.dataset.customerId = c.id;
+
+    const initials = this.getInitials(c.name || "");
+    const stars = this.generateStarsHTML(Number(c.rating || 0));
+
+    // backend returns: name, nic, email, phone, joinDate, bookings, location, rating, reviews, status, description
+    card.innerHTML = `
+      <div class="customer-avatar"><span class="avatar-text">${initials}</span></div>
+      <div class="customer-info">
+        <h4 class="customer-name">${this.esc(c.name || "—")}</h4>
+        <div class="customer-details">
+          <div class="detail-item"><span class="detail-icon">NIC:</span><span class="detail-text">${this.esc(c.nic || "—")}</span></div>
+          <div class="detail-item"><span class="detail-icon">📧</span><span class="detail-text">${this.esc(c.email || "—")}</span></div>
+          <div class="detail-item"><span class="detail-icon">📞</span><span class="detail-text">${this.esc(c.phone || "—")}</span></div>
+          <div class="detail-item"><span class="detail-icon">📍</span><span class="detail-text">${this.esc(c.location || "—")}</span></div>
+        </div>
+        <div class="customer-description"><p>${this.esc(c.description || "")}</p></div>
+        <div class="customer-rating">
+          <div class="rating-stars">${stars}</div>
+          <span class="rating-value">${Number(c.rating || 0).toFixed(1)}</span>
+          <span class="review-count">${Number(c.reviews || 0)} reviews</span>
+          <div class="status-badge ${
+            String(c.status || "").toLowerCase() === "active"
+              ? "status-active"
+              : "status-inactive"
+          }">${this.esc(
+            String(c.status || "—").toLowerCase() === "active"
+              ? "Active"
+              : "Inactive",
+          )}</div>
+        </div>
+      </div>
+    `;
+    return card;
+  }
+
+  generateStarsHTML(rating) {
+    const filled = Math.round(rating);
+    return Array.from(
+      { length: 5 },
+      (_, i) => `<span class="star ${i < filled ? "active" : ""}">⭐</span>`,
+    ).join("");
+  }
+
+  updateCustomerCount(n) {
+    if (this.listTitle) this.listTitle.textContent = `Customer List (${n})`;
+  }
+
+  getInitials(name) {
+    const p = String(name).trim().split(/\s+/);
+    return ((p[0] || "")[0] || "") + ((p[1] || "")[0] || "");
+  }
+
+  esc(s) {
+    return String(s)
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;");
+  }
+
+  /* ---------- Clear Filters ---------- */
+  clearFiltersAndReload() {
     const ids = [
       "customerNameFilter",
       "nicFilter",
@@ -315,6 +303,7 @@ class CustomersManager {
       "bookingsMin",
       "bookingsMax",
     ];
+
     ids.forEach((id) => {
       const el = document.getElementById(id);
       if (!el) return;
@@ -322,92 +311,17 @@ class CustomersManager {
         el.value = id === "sortOrder" ? "ascending" : "";
       else el.value = "";
     });
+
     this.minRating = 0;
     document
       .querySelectorAll("#ratingFilter .star")
       .forEach((s) => s.classList.remove("active"));
 
-    this.filteredCustomers = [...this.customers];
-    this.renderCustomers();
-    this.updateCustomerCount();
+    this.page = 1;
+    this.loadCustomers();
   }
 
-  /* ---------- Rendering ---------- */
-  renderCustomers() {
-    if (!this.grid) return;
-    this.grid.innerHTML = "";
-    if (!this.filteredCustomers.length) {
-      this.grid.innerHTML = `<div style="padding:16px;color:#6b7280;">No customers match your filters.</div>`;
-      return;
-    }
-    this.filteredCustomers.forEach((c) =>
-      this.grid.appendChild(this.createCustomerCard(c))
-    );
-  }
-
-  createCustomerCard(c) {
-    const card = document.createElement("div");
-    card.className = "customer-card";
-    card.dataset.customerId = c.id;
-
-    const initials = this.getInitials(c.name);
-    const stars = this.generateStarsHTML(c.rating);
-
-    card.innerHTML = `
-      <div class="customer-avatar"><span class="avatar-text">${initials}</span></div>
-      <div class="customer-info">
-        <h4 class="customer-name">${c.name}</h4>
-        <div class="customer-details">
-          <div class="detail-item"><span class="detail-icon">NIC:</span><span class="detail-text">${
-            c.nic
-          }</span></div>
-          <div class="detail-item"><span class="detail-icon">📧</span><span class="detail-text">${
-            c.email
-          }</span></div>
-          <div class="detail-item"><span class="detail-icon">📞</span><span class="detail-text">${
-            c.phone
-          }</span></div>
-          <div class="detail-item"><span class="detail-icon">📍</span><span class="detail-text">${
-            c.location
-          }</span></div>
-        </div>
-        <div class="customer-description"><p>${c.description || ""}</p></div>
-        <div class="customer-rating">
-          <div class="rating-stars">${stars}</div>
-          <span class="rating-value">${c.rating.toFixed(1)}</span>
-          <span class="review-count">${c.reviews} reviews</span>
-          <div class="status-badge ${
-            c.status === "active" ? "status-active" : "status-inactive"
-          }">${c.status === "active" ? "Active" : "Inactive"}</div>
-        </div>
-      </div>
-    `;
-    return card;
-  }
-
-  generateStarsHTML(rating) {
-    const filled = Math.round(rating);
-    return Array.from(
-      { length: 5 },
-      (_, i) => `<span class="star ${i < filled ? "active" : ""}">⭐</span>`
-    ).join("");
-  }
-
-  updateCustomerCount() {
-    if (this.listTitle)
-      this.listTitle.textContent = `Customer List (${this.filteredCustomers.length})`;
-  }
-
-  /* ---------- Misc ---------- */
-  showCustomerDetails(id) {
-    /* hook up details modal here if needed */
-  }
-  getInitials(name) {
-    const p = name.trim().split(/\s+/);
-    return ((p[0] || "")[0] || "") + ((p[1] || "")[0] || "");
-  }
-
-  // Register modal
+  /* ---------- Modal helpers (keep your existing HTML onclicks) ---------- */
   openRegisterModal() {
     const modal = document.getElementById("registerModal");
     if (!modal) return;
@@ -415,84 +329,70 @@ class CustomersManager {
     modal.style.display = "block";
     document.body.style.overflow = "hidden";
   }
+
   closeRegisterModal() {
     const modal = document.getElementById("registerModal");
     if (!modal) return;
     modal.classList.remove("show");
     modal.style.display = "none";
     document.body.style.overflow = "";
-    this.resetForm();
-  }
-
-  resetForm() {
     document.getElementById("registerForm")?.reset();
-    document
-      .querySelectorAll(".form-group .error")
-      .forEach((el) => (el.textContent = ""));
   }
 
-  validateForm(data) {
-    let ok = true;
-    const setError = (name, msg) => {
-      const group = document
-        .querySelector(`[name="${name}"]`)
-        ?.closest(".form-group");
-      if (group) {
-        let err = group.querySelector(".error");
-        if (!err) {
-          err = document.createElement("div");
-          err.className = "error";
-          group.appendChild(err);
-        }
-        err.textContent = msg || "";
-      }
-    };
-    if (!data.fullName?.trim()) {
-      setError("fullName", "Full name is required");
-      ok = false;
-    } else setError("fullName", "");
-    if (!data.nicNumber?.trim()) {
-      setError("nicNumber", "NIC is required");
-      ok = false;
-    } else setError("nicNumber", "");
-    if (!data.email?.trim()) {
-      setError("email", "Email is required");
-      ok = false;
-    } else setError("email", "");
-    if (!data.phone?.trim()) {
-      setError("phone", "Phone is required");
-      ok = false;
-    } else setError("phone", "");
-    return ok;
+  splitName(full) {
+    const parts = String(full || "")
+      .trim()
+      .split(/\s+/)
+      .filter(Boolean);
+    if (parts.length === 0) return { firstName: "", lastName: "" };
+    if (parts.length === 1) return { firstName: parts[0], lastName: "" };
+    return { firstName: parts[0], lastName: parts.slice(1).join(" ") };
   }
 
-  registerCustomer() {
+  async registerCustomer() {
     const form = document.getElementById("registerForm");
     if (!form) return;
-    const data = Object.fromEntries(new FormData(form).entries());
-    if (!this.validateForm(data)) return;
 
-    const newCustomer = {
-      id: this.customers.length
-        ? Math.max(...this.customers.map((c) => c.id)) + 1
-        : 1,
-      name: data.fullName.trim(),
-      nic: data.nicNumber.trim(), // <-- fixed mapping
-      email: data.email.trim(),
-      phone: data.phone.trim(),
-      joinDate: new Date().toISOString().slice(0, 10),
-      bookings: Number(data.bookings || 0),
-      location: data.city || "Colombo",
-      rating: Number(data.rating || 4.0),
-      reviews: Number(data.reviews || 0),
-      status: "active",
-      description: data.address || "",
+    const data = Object.fromEntries(new FormData(form).entries());
+
+    const { firstName, lastName } = this.splitName(data.fullName);
+
+    const payload = {
+      firstName,
+      lastName,
+      nic: (data.nicNumber || "").trim(),
+      email: (data.email || "").trim(),
+      phone: (data.phone || "").trim(),
+      city: (data.city || "").trim(),
+      address: (data.address || "").trim(),
     };
 
-    this.customers.push(newCustomer);
-    this.applyFilters();
-    this.closeRegisterModal();
-    this.toast("Customer registered successfully");
+    if (!payload.firstName || !payload.nic || !payload.email) {
+      this.toast("Full name, NIC, Email are required");
+      return;
+    }
+
+    try {
+      const res = await fetch(this.API_BASE, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify(payload),
+      });
+
+      const out = await res.json().catch(() => ({}));
+
+      if (!res.ok || !out.success) {
+        throw new Error(out.error || `HTTP ${res.status}`);
+      }
+
+      this.closeRegisterModal();
+      this.toast("Customer registered successfully");
+      this.loadCustomers(); // refresh list from DB
+    } catch (err) {
+      console.error("Register failed:", err);
+      this.toast("Register failed. Check servlet and DB constraints.");
+    }
   }
 
   toast(message) {
@@ -509,12 +409,12 @@ window.addEventListener("DOMContentLoaded", () => {
   window.customersManager = new CustomersManager();
 });
 
-// Global helpers for inline onclicks
+// Keep your existing inline onclicks working
 function searchCustomers() {
-  window.customersManager?.applyFilters();
+  window.customersManager?.loadCustomers();
 }
 function clearFilters() {
-  window.customersManager?.clearFilters();
+  window.customersManager?.clearFiltersAndReload();
 }
 function openRegisterModal() {
   window.customersManager?.openRegisterModal();
@@ -522,27 +422,6 @@ function openRegisterModal() {
 function closeRegisterModal() {
   window.customersManager?.closeRegisterModal();
 }
-function exportCustomers() {
-  window.customersManager?.exportCustomers?.();
+function registerCustomer() {
+  window.customersManager?.registerCustomer();
 }
-
-// --- Open Customer View on card click ---
-document.addEventListener("click", (e) => {
-  const card = e.target.closest(".customer-card");
-  if (!card) return;
-
-  const id = Number(card.getAttribute("data-customer-id"));
-  if (!Number.isFinite(id)) return;
-
-  // Your seed data already exists here (CustomersManager.customers)
-  // Find the customer and stash it for the details page.
-  try {
-    const manager = window.__customersManager || null;
-    const data = manager?.customers || []; // if you expose it, else adapt
-    const selected = Array.isArray(data) ? data.find((c) => c.id === id) : null;
-    if (selected)
-      sessionStorage.setItem("selectedCustomer", JSON.stringify(selected));
-  } catch (_) {}
-
-  window.location.href = `customer-view.html?id=${id}`;
-});

@@ -1,41 +1,338 @@
-// Dashboard JavaScript
 document.addEventListener("DOMContentLoaded", function () {
-  initializeIncomeChart();
+  const providerId = sessionStorage.getItem("providerId"); // set this after login
+  const baseUrl = "http://localhost:8080/api/provider/dashboard";
+
+  loadSummary(baseUrl, providerId);
+  loadMonthlyIncome(baseUrl, providerId);
+  loadSessions(baseUrl, providerId);
+  loadMaintenance(baseUrl, providerId);
+  loadAvailable(baseUrl, providerId);
+
+  wireHeaderActions(providerId);
   updateLastModified();
-  initializeVehicleStatusUpdates();
 });
 
-// Initialize Income Chart
-function initializeIncomeChart() {
-  const canvas = document.getElementById("incomeChart");
-  if (!canvas) return;
-
-  const ctx = canvas.getContext("2d");
-
-  // Sample data for the chart
-  const months = [
-    "Jan",
-    "Feb",
-    "Mar",
-    "Apr",
-    "May",
-    "Jun",
-    "Jul",
-    "Aug",
-    "Sep",
-    "Oct",
-    "Nov",
-    "Dec",
-  ];
-  const incomeData = [
-    15000, 18000, 16000, 19000, 17000, 21000, 20000, 18000, 22000, 19000, 24000,
-    26000,
-  ];
-
-  // Simple chart implementation
-  drawIncomeChart(ctx, canvas, months, incomeData);
+async function apiGet(url) {
+  const res = await fetch(url);
+  if (!res.ok) {
+    const txt = await res.text();
+    throw new Error(txt || `HTTP ${res.status}`);
+  }
+  return res.json();
 }
 
+async function apiPut(url, body) {
+  const res = await fetch(url, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body ?? {}),
+  });
+  if (!res.ok) {
+    const txt = await res.text();
+    throw new Error(txt || `HTTP ${res.status}`);
+  }
+  return res.json().catch(() => ({}));
+}
+
+function formatLKR(amount) {
+  const n = Number(amount || 0);
+  return `Rs ${Math.round(n).toLocaleString()}`;
+}
+
+/* =========================
+   NEW: Header actions
+========================= */
+function wireHeaderActions(providerId) {
+  const profileBtn = document.getElementById("profileBtn");
+  const notifBtn = document.getElementById("notifBtn");
+  const notifPopover = document.getElementById("notifPopover");
+  const notifCloseBtn = document.getElementById("notifCloseBtn");
+  const notifBadge = document.getElementById("notifBadge");
+  const notifList = document.getElementById("notifList");
+  const markAllSeenBtn = document.getElementById("markAllSeenBtn");
+
+  if (profileBtn) {
+    profileBtn.addEventListener("click", () => {
+      // store providerId just in case
+      if (providerId) sessionStorage.setItem("providerId", providerId);
+      window.location.href = "./provider-profile.html";
+    });
+  }
+
+  // Notifications
+  let pollTimer = null;
+
+  async function refreshNotifications() {
+    if (!providerId) return;
+    const url = `http://localhost:8080/api/provider/notifications?providerId=${encodeURIComponent(
+      providerId,
+    )}&limit=10`;
+
+    try {
+      const data = await apiGet(url);
+      const items = data.items || [];
+
+      // "Seen" state stored locally (no DB changes)
+      const seenKey = `provider_${providerId}_notif_seen_max_bookingId`;
+      const seenMax = Number(localStorage.getItem(seenKey) || 0);
+
+      // Count unseen by bookingId
+      const unseen = items.filter((x) => Number(x.bookingId || 0) > seenMax);
+      if (notifBadge) {
+        if (unseen.length > 0) {
+          notifBadge.style.display = "inline-flex";
+          notifBadge.textContent = `${unseen.length}`;
+        } else {
+          notifBadge.style.display = "none";
+        }
+      }
+
+      if (notifList) {
+        notifList.innerHTML = "";
+        if (items.length === 0) {
+          notifList.innerHTML = `<div class="notif-item"><div class="notif-title">No notifications</div><div class="notif-msg">You're all caught up.</div></div>`;
+          return;
+        }
+
+        items.forEach((n) => {
+          const bookingId = Number(n.bookingId || 0);
+          const isUnseen = bookingId > seenMax;
+
+          const div = document.createElement("div");
+          div.className = `notif-item ${isUnseen ? "unseen" : ""}`;
+          div.innerHTML = `
+            <div class="notif-title">${escapeHtml(n.title || "Notification")}</div>
+            <div class="notif-msg">${escapeHtml(n.message || "")}</div>
+            <div class="notif-meta">
+              <span>${escapeHtml(n.date || "")}</span>
+              <span>#${escapeHtml(String(n.bookingId || ""))}</span>
+            </div>
+          `;
+          notifList.appendChild(div);
+        });
+      }
+    } catch (e) {
+      console.error("Notifications load failed:", e.message);
+    }
+  }
+
+  function openPopover() {
+    if (!notifPopover) return;
+    notifPopover.style.display = "block";
+    refreshNotifications();
+  }
+
+  function closePopover() {
+    if (!notifPopover) return;
+    notifPopover.style.display = "none";
+  }
+
+  if (notifBtn) {
+    notifBtn.addEventListener("click", (ev) => {
+      ev.stopPropagation();
+      const visible = notifPopover && notifPopover.style.display === "block";
+      if (visible) closePopover();
+      else openPopover();
+    });
+  }
+
+  if (notifCloseBtn) {
+    notifCloseBtn.addEventListener("click", closePopover);
+  }
+
+  // click outside closes
+  document.addEventListener("click", (ev) => {
+    if (!notifPopover) return;
+    if (notifPopover.style.display !== "block") return;
+    if (
+      notifPopover.contains(ev.target) ||
+      (notifBtn && notifBtn.contains(ev.target))
+    )
+      return;
+    closePopover();
+  });
+
+  if (markAllSeenBtn) {
+    markAllSeenBtn.addEventListener("click", async () => {
+      if (!providerId) return;
+      const url = `http://localhost:8080/api/provider/notifications?providerId=${encodeURIComponent(
+        providerId,
+      )}&limit=10`;
+      try {
+        const data = await apiGet(url);
+        const items = data.items || [];
+        const maxId = items.reduce(
+          (m, x) => Math.max(m, Number(x.bookingId || 0)),
+          0,
+        );
+
+        const seenKey = `provider_${providerId}_notif_seen_max_bookingId`;
+        localStorage.setItem(seenKey, String(maxId));
+
+        await refreshNotifications();
+      } catch (e) {
+        console.error("Mark seen failed:", e.message);
+      }
+    });
+  }
+
+  // initial load + polling
+  refreshNotifications();
+  pollTimer = setInterval(refreshNotifications, 30000);
+  window.addEventListener("beforeunload", () => {
+    if (pollTimer) clearInterval(pollTimer);
+  });
+}
+
+/* =========================
+   YOUR EXISTING DASHBOARD LOADERS
+========================= */
+
+async function loadSummary(baseUrl, providerId) {
+  const url = `${baseUrl}/summary${providerId ? `?providerId=${providerId}` : ""}`;
+
+  try {
+    const data = await apiGet(url);
+
+    const statValues = document.querySelectorAll(".stat-card .stat-value");
+    const statChanges = document.querySelectorAll(".stat-card .stat-change");
+
+    statValues[0].textContent = formatLKR(data.totalIncome);
+    statValues[1].textContent = `${Number(data.acceptanceRate || 0).toFixed(1)}%`;
+    statValues[2].textContent = `${data.totalBookings || 0}`;
+    statValues[3].textContent = formatLKR(data.pendingPayout);
+
+    if (statChanges[0]) {
+      const pct = Number(data.incomeChangePct || 0).toFixed(1);
+      statChanges[0].textContent = `${pct >= 0 ? "+" : ""} ${pct}%`;
+      statChanges[0].className = `stat-change ${pct >= 0 ? "positive" : "negative"}`;
+    }
+
+    if (statChanges[3]) {
+      statChanges[3].textContent = "Pending";
+      statChanges[3].className = "stat-change pending";
+    }
+  } catch (e) {
+    console.error("Summary load failed:", e.message);
+  }
+}
+
+async function loadMonthlyIncome(baseUrl, providerId) {
+  const url = `${baseUrl}/monthly-income?months=12${providerId ? `&providerId=${providerId}` : ""}`;
+
+  try {
+    const data = await apiGet(url);
+    const points = data.points || [];
+
+    const months = points.map((p) => p.label);
+    const income = points.map((p) => Number(p.income || 0));
+
+    const canvas = document.getElementById("incomeChart");
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+
+    drawIncomeChart(ctx, canvas, months, income);
+  } catch (e) {
+    console.error("Monthly income load failed:", e.message);
+  }
+}
+
+async function loadSessions(baseUrl, providerId) {
+  const url = `${baseUrl}/sessions?limit=8${providerId ? `&providerId=${providerId}` : ""}`;
+
+  try {
+    const data = await apiGet(url);
+
+    const list = document.querySelector(".sessions-list");
+    const total = document.querySelector(".total-sessions strong");
+
+    if (list) {
+      list.innerHTML = "";
+      (data.locations || []).forEach((row) => {
+        const item = document.createElement("div");
+        item.className = "session-item";
+        item.innerHTML = `
+          <span class="district-dot"></span>
+          <span class="district-name">${escapeHtml(row.location || "Unknown")}</span>
+          <span class="session-count">${row.sessions || 0} sessions</span>
+        `;
+        list.appendChild(item);
+      });
+    }
+
+    if (total) {
+      total.textContent = `Total Sessions: ${data.totalSessions || 0}`;
+    }
+  } catch (e) {
+    console.error("Sessions load failed:", e.message);
+  }
+}
+
+async function loadMaintenance(baseUrl, providerId) {
+  const url = `${baseUrl}/vehicles/maintenance?limit=6${providerId ? `&providerId=${providerId}` : ""}`;
+
+  try {
+    const data = await apiGet(url);
+    const maintenanceCard = document.querySelector(
+      ".maintenance-section .vehicle-list",
+    );
+    if (!maintenanceCard) return;
+
+    maintenanceCard.innerHTML = "";
+    (data.vehicles || []).forEach((v) => {
+      const div = document.createElement("div");
+      div.className = "vehicle-item";
+      div.innerHTML = `
+        <div class="vehicle-info">
+          <span class="vehicle-icon"></span>
+          <div>
+            <div class="vehicle-name">${escapeHtml(v.name || "")}</div>
+            <div class="vehicle-id">${escapeHtml(v.plate || "")}</div>
+          </div>
+        </div>
+        <span class="status-badge status-maintenance">${escapeHtml(v.serviceType || "Maintenance")}</span>
+        <span class="eta">ETA: ${Number(v.etaHours || 0)} hours</span>
+      `;
+      maintenanceCard.appendChild(div);
+    });
+  } catch (e) {
+    console.error("Maintenance load failed:", e.message);
+  }
+}
+
+async function loadAvailable(baseUrl, providerId) {
+  const url = `${baseUrl}/vehicles/available?limit=6${providerId ? `&providerId=${providerId}` : ""}`;
+
+  try {
+    const data = await apiGet(url);
+    const availableCard = document.querySelector(
+      ".available-section .vehicle-list",
+    );
+    if (!availableCard) return;
+
+    availableCard.innerHTML = "";
+    (data.vehicles || []).forEach((v) => {
+      const div = document.createElement("div");
+      div.className = "vehicle-item";
+      div.innerHTML = `
+        <div class="vehicle-info">
+          <span class="vehicle-icon"></span>
+          <div>
+            <div class="vehicle-name">${escapeHtml(v.name || "")}</div>
+            <div class="vehicle-id">${escapeHtml(v.plate || "")} • ${escapeHtml(v.location || "")}</div>
+          </div>
+        </div>
+        <span class="status-badge status-active">Available</span>
+        <span class="price">Rs ${Math.round(Number(v.pricePerDay || 0)).toLocaleString()}/day</span>
+      `;
+      availableCard.appendChild(div);
+    });
+  } catch (e) {
+    console.error("Available vehicles load failed:", e.message);
+  }
+}
+
+// --- chart ---
 function drawIncomeChart(ctx, canvas, months, data) {
   const width = (canvas.width = canvas.offsetWidth);
   const height = (canvas.height = canvas.offsetHeight);
@@ -44,71 +341,58 @@ function drawIncomeChart(ctx, canvas, months, data) {
   const chartWidth = width - 2 * padding;
   const chartHeight = height - 2 * padding;
 
-  // Clear canvas
   ctx.clearRect(0, 0, width, height);
 
-  // Set styles
-  ctx.strokeStyle = "#1abc9c";
-  ctx.lineWidth = 3;
-  ctx.fillStyle = "#1abc9c";
+  if (!data || data.length === 0) {
+    ctx.font = '14px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto';
+    ctx.fillText("No income data", padding, padding);
+    return;
+  }
 
-  // Find min and max values
   const maxValue = Math.max(...data);
   const minValue = Math.min(...data);
-  const valueRange = maxValue - minValue;
+  const valueRange = Math.max(1, maxValue - minValue);
 
-  // Draw grid lines and labels
   ctx.strokeStyle = "#e8eaed";
   ctx.lineWidth = 1;
   ctx.font = '12px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto';
   ctx.fillStyle = "#5f6368";
 
-  // Y-axis labels and grid
   for (let i = 0; i <= 5; i++) {
     const y = padding + (chartHeight / 5) * i;
     const value = maxValue - (valueRange / 5) * i;
-
     ctx.beginPath();
     ctx.moveTo(padding, y);
     ctx.lineTo(width - padding, y);
     ctx.stroke();
-
     ctx.fillText(`Rs ${(value / 1000).toFixed(0)}k`, 10, y + 4);
   }
 
-  // X-axis labels
   for (let i = 0; i < months.length; i++) {
-    const x = padding + (chartWidth / (months.length - 1)) * i;
+    const x = padding + (chartWidth / Math.max(1, months.length - 1)) * i;
     ctx.fillText(months[i], x - 15, height - 20);
   }
 
-  // Draw the line chart
   ctx.strokeStyle = "#1abc9c";
   ctx.lineWidth = 3;
   ctx.beginPath();
 
   for (let i = 0; i < data.length; i++) {
-    const x = padding + (chartWidth / (data.length - 1)) * i;
+    const x = padding + (chartWidth / Math.max(1, data.length - 1)) * i;
     const y =
       padding + chartHeight - ((data[i] - minValue) / valueRange) * chartHeight;
 
-    if (i === 0) {
-      ctx.moveTo(x, y);
-    } else {
-      ctx.lineTo(x, y);
-    }
+    if (i === 0) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
 
-    // Draw data points
     ctx.fillStyle = "#1abc9c";
     ctx.beginPath();
     ctx.arc(x, y, 4, 0, 2 * Math.PI);
     ctx.fill();
   }
-
   ctx.stroke();
 }
 
-// Update last modified timestamp
 function updateLastModified() {
   const timestamp = document.querySelector(".last-updated");
   if (timestamp) {
@@ -122,99 +406,11 @@ function updateLastModified() {
   }
 }
 
-// Initialize vehicle status updates
-function initializeVehicleStatusUpdates() {
-  // Simulate real-time updates for maintenance ETAs
-  setInterval(updateMaintenanceETAs, 60000); // Update every minute
+function escapeHtml(s) {
+  return String(s ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
 }
-
-function updateMaintenanceETAs() {
-  const etaElements = document.querySelectorAll(".eta");
-  etaElements.forEach((eta) => {
-    const currentText = eta.textContent;
-    const hours = parseInt(currentText.match(/\d+/));
-    if (hours > 0) {
-      // Randomly decrease time (simulate progress)
-      if (Math.random() > 0.7) {
-        const newHours = Math.max(0, hours - 1);
-        eta.textContent = `ETA: ${newHours} hour${newHours !== 1 ? "s" : ""}`;
-
-        // If completed, update status
-        if (newHours === 0) {
-          const statusBadge = eta.parentElement.querySelector(".status-badge");
-          statusBadge.textContent = "Completed";
-          statusBadge.className = "status-badge status-active";
-          eta.textContent = "Ready";
-        }
-      }
-    }
-  });
-}
-
-// Map view functionality
-document.addEventListener("click", function (e) {
-  if (e.target.textContent === "Load Map View") {
-    e.target.textContent = "Loading...";
-    e.target.disabled = true;
-
-    // Simulate loading
-    setTimeout(() => {
-      e.target.textContent = "Map Loaded";
-      e.target.style.backgroundColor = "#2e7d32";
-    }, 2000);
-  }
-});
-
-// Stats animation on page load
-function animateStats() {
-  const statValues = document.querySelectorAll(".stat-value");
-
-  statValues.forEach((stat, index) => {
-    const finalValue = stat.textContent;
-    stat.textContent = "0";
-
-    setTimeout(() => {
-      animateValue(
-        stat,
-        0,
-        parseFloat(finalValue.replace(/[^\d.]/g, "")),
-        1000,
-        finalValue
-      );
-    }, index * 200);
-  });
-}
-
-function animateValue(element, start, end, duration, finalText) {
-  const range = end - start;
-  const startTime = Date.now();
-
-  function updateValue() {
-    const elapsed = Date.now() - startTime;
-    const progress = Math.min(elapsed / duration, 1);
-    const current = start + range * easeOutCubic(progress);
-
-    if (finalText.includes("Rs")) {
-      element.textContent = `Rs ${Math.floor(current).toLocaleString()}`;
-    } else if (finalText.includes("%")) {
-      element.textContent = `${current.toFixed(1)}%`;
-    } else {
-      element.textContent = Math.floor(current).toString();
-    }
-
-    if (progress < 1) {
-      requestAnimationFrame(updateValue);
-    } else {
-      element.textContent = finalText;
-    }
-  }
-
-  updateValue();
-}
-
-function easeOutCubic(t) {
-  return 1 - Math.pow(1 - t, 3);
-}
-
-// Initialize animations when page loads
-setTimeout(animateStats, 500);

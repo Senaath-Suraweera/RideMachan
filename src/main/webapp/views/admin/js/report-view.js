@@ -1,320 +1,336 @@
-// Reports list with stats/filters/sorting + ROLE TOGGLE (All → Driver → Customer)
-(function () {
+// report-view.js (CONNECTED TO BACKEND) - matches report-view.html IDs
+(() => {
   const $ = (s, r = document) => r.querySelector(s);
-  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
 
-  // ----- Seed dataset (replace with API if available) -----
-  const BASE = [
-    {
-      id: "RPT-2024-001",
-      subject: "Vehicle breakdown during trip",
-      category: "Vehicle Issue",
-      status: "Pending",
-      dateCreated: "2024-01-15 10:30 AM",
-      reportedRole: "Driver",
-      priority: "High",
-    },
-    {
-      id: "RPT-2024-002",
-      subject: "Inappropriate behavior",
-      category: "User Behavior",
-      status: "Reviewed",
-      dateCreated: "2024-01-14 09:12 AM",
-      reportedRole: "Customer",
-      priority: "Medium",
-    },
-    {
-      id: "RPT-2024-003",
-      subject: "Payment not processed",
-      category: "Payment Issue",
-      status: "Resolved",
-      dateCreated: "2024-01-13 01:22 PM",
-      reportedRole: "Customer",
-      priority: "Low",
-    },
-    {
-      id: "RPT-2024-004",
-      subject: "Unsafe driving reported",
-      category: "Safety Concern",
-      status: "Pending",
-      dateCreated: "2024-01-12 05:40 PM",
-      reportedRole: "Driver",
-      priority: "High",
-    },
-    {
-      id: "RPT-2024-005",
-      subject: "App crashes on booking",
-      category: "App Bug",
-      status: "Reviewed",
-      dateCreated: "2024-01-11 08:00 AM",
-      reportedRole: "Customer",
-      priority: "Medium",
-    },
-    {
-      id: "RPT-2024-006",
-      subject: "Vehicle cleanliness complaint",
-      category: "Vehicle Issue",
-      status: "Resolved",
-      dateCreated: "2024-01-10 03:15 PM",
-      reportedRole: "Driver",
-      priority: "Low",
-    },
-    // If you added 007/008, include them here too:
-    {
-      id: "RPT-2024-007",
-      subject: "Brake light not working",
-      category: "Vehicle Issue",
-      status: "Pending",
-      dateCreated: "2024-01-09 02:45 PM",
-      reportedRole: "Driver",
-      priority: "Medium",
-    },
-    {
-      id: "RPT-2024-008",
-      subject: "Refund not reflected",
-      category: "Payment Issue",
-      status: "Reviewed",
-      dateCreated: "2024-01-08 11:10 AM",
-      reportedRole: "Customer",
-      priority: "High",
-    },
-  ];
+  let currentOpenReportId = null; // numeric report_id in DB
 
-  // Merge with any per-report edits saved by report.html (sessionStorage rm_report_<id>)
-  function mergedData() {
-    return BASE.map((b) => {
-      try {
-        const saved = JSON.parse(sessionStorage.getItem(`rm_report_${b.id}`));
-        return saved ? { ...b, ...saved } : b;
-      } catch {
-        return b;
-      }
-    });
-  }
-
-  // Nav helper (rows → detail)
-  window.viewReport = function (id) {
-    const fullId = /^\d+$/.test(String(id))
-      ? `RPT-2024-${String(id).padStart(3, "0")}`
-      : String(id);
-    location.href = `report.html?id=${encodeURIComponent(fullId)}`;
-  };
-
-  // ----- ROLE TOGGLE -----
-  let roleFilter = ""; // "" (All) | "Driver" | "Customer"
-  function updateRoleToggleButton() {
-    const btn = document.querySelector('[onclick="toggleFilter()"]');
-    if (!btn) return;
-    btn.textContent = roleFilter ? `Role: ${roleFilter}` : "Role: All";
-  }
-  window.toggleFilter = function () {
-    roleFilter =
-      roleFilter === "" ? "Driver" : roleFilter === "Driver" ? "Customer" : "";
-    updateRoleToggleButton();
-    render();
-  };
-
-  // ----- Rendering -----
-  let sortKey = "dateCreated";
-  let sortDir = "desc"; // 'asc' | 'desc'
-
-  document.addEventListener("DOMContentLoaded", () => {
-    bindFilters();
-    bindSorting();
-    updateRoleToggleButton();
-    render();
-  });
-
-  function render() {
-    const data = applyFilters(mergedData());
-    renderStats(data);
-    renderTable(data);
-    updateSortIndicators();
-  }
-
-  // Stats reflect the CURRENT filtered subset
-  function renderStats(rows) {
-    const total = rows.length;
-    const byStatus = countBy(rows, (r) => r.status);
-    const tot = $("#statTotal"),
-      pen = $("#statPending"),
-      rev = $("#statReviewed"),
-      res = $("#statResolved"),
-      clo = $("#statClosed");
-    if (tot) tot.textContent = total;
-    if (pen) pen.textContent = byStatus["Pending"] || 0;
-    if (rev) rev.textContent = byStatus["Reviewed"] || 0;
-    if (res) res.textContent = byStatus["Resolved"] || 0;
-    if (clo) clo.textContent = byStatus["Closed"] || 0;
-  }
-
-  function renderTable(rows) {
-    rows = sortRows(rows);
-    const tbody = $("#reportsTbody");
-    if (!tbody) return;
-    tbody.innerHTML = "";
-    for (const r of rows) {
-      const tr = document.createElement("tr");
-      tr.innerHTML = `
-        <td>${escape(r.id)}</td>
-        <td>${escape(r.subject)}</td>
-        <td>${badgeCategory(r.category)}</td>
-        <td>${escape(r.reportedRole)}</td>
-        <td>${escape(r.dateCreated)}</td>
-        <td>${badgeStatus(r.status)}</td>
-        <td>${badgePriority(r.priority)}</td>
-        <td class="open-cell" title="Open">›</td>
-      `;
-      tr.addEventListener("click", () => viewReport(r.id));
-      tbody.appendChild(tr);
-    }
-  }
-
-  // ----- Filters -----
-  function bindFilters() {
-    const search = $("#reportSearch");
-    const status = $("#statusFilter");
-    const cat = $("#categoryFilter");
-    const pri = $("#priorityFilter"); // may be absent
-    const apply = $("#applyFiltersBtn"); // ✅ new
-
-    if (search) search.addEventListener("input", render);
-    if (status) status.addEventListener("change", render);
-    if (cat) cat.addEventListener("change", render);
-    if (pri) pri.addEventListener("change", render);
-    if (apply) apply.addEventListener("click", render); // ✅ new
-  }
-
-  function applyFilters(rows) {
-    const search = $("#reportSearch");
-    const status = $("#statusFilter");
-    const cat = $("#categoryFilter");
-    const pri = $("#priorityFilter");
-
-    const q = (search?.value || "").toLowerCase().trim();
-    const st = status?.value || ""; // "pending" | "reviewed" | "resolved" | "" (all)
-    const catv = cat?.value || ""; // "vehicle" | "behavior" | "payment" | "app" | "safety" | ""
-    const prv = pri?.value || ""; // "Low"/"Medium"/"High"/"Urgent" if you add it
-
-    return rows.filter((r) => {
-      let ok = true;
-
-      // Search across common fields
-      if (q) {
-        ok = [
-          r.id,
-          r.subject,
-          r.category,
-          r.reportedRole,
-          r.dateCreated,
-          r.status,
-          r.priority,
-        ].some((v) => String(v).toLowerCase().includes(q));
-      }
-
-      // Status dropdown
-      if (ok && st) ok = String(r.status).toLowerCase() === st;
-
-      // Category dropdown (value is lowercase keyword)
-      if (ok && catv) ok = String(r.category).toLowerCase().includes(catv);
-
-      // Priority dropdown (if present)
-      if (ok && prv)
-        ok = String(r.priority).toLowerCase() === prv.toLowerCase();
-
-      // ROLE TOGGLE
-      if (ok && roleFilter) ok = r.reportedRole === roleFilter;
-
-      return ok;
-    });
-  }
-
-  // ----- Sorting -----
-  function bindSorting() {
-    $$(".reports-table thead th[data-sort]").forEach((th) => {
-      th.addEventListener("click", () => {
-        const key = th.getAttribute("data-sort");
-        if (sortKey === key) {
-          sortDir = sortDir === "asc" ? "desc" : "asc";
-        } else {
-          sortKey = key;
-          sortDir = key === "dateCreated" ? "desc" : "asc"; // sensible default
-        }
-        render();
-      });
-    });
-  }
-  function sortRows(rows) {
-    const dir = sortDir === "asc" ? 1 : -1;
-    const key = sortKey;
-    return [...rows].sort((a, b) => {
-      const va = normalize(a[key], key);
-      const vb = normalize(b[key], key);
-      if (va < vb) return -1 * dir;
-      if (va > vb) return 1 * dir;
-      return 0;
-    });
-  }
-  function updateSortIndicators() {
-    $$(".reports-table thead th").forEach((th) =>
-      th.classList.remove("sort-asc", "sort-desc")
-    );
-    const th = $(`.reports-table thead th[data-sort="${sortKey}"]`);
-    if (th) th.classList.add(sortDir === "asc" ? "sort-asc" : "sort-desc");
-  }
-
-  function normalize(v, key) {
-    if (key === "dateCreated") {
-      const d = Date.parse(v);
-      return isNaN(d) ? 0 : d;
-    }
-    return String(v).toLowerCase();
-  }
-
-  // ----- Badges -----
-  function badgePriority(p) {
-    const cls =
-      p === "Low"
-        ? "pri-low"
-        : p === "Medium"
-        ? "pri-medium"
-        : p === "High"
-        ? "pri-high"
-        : p === "Urgent"
-        ? "pri-urgent"
-        : "";
-    return `<span class="badge ${cls}">${escape(p)}</span>`;
-  }
-  function badgeStatus(s) {
-    const cls =
-      s === "Pending"
-        ? "st-pending"
-        : s === "Reviewed"
-        ? "st-reviewed"
-        : s === "Resolved"
-        ? "st-resolved"
-        : s === "Closed"
-        ? "st-closed"
-        : "";
-    return `<span class="badge ${cls}">${escape(s)}</span>`;
-  }
-  function badgeCategory(c) {
-    return `<span class="badge">${escape(c)}</span>`;
-  }
-
-  // ----- Utils -----
-  function countBy(arr, keyFn) {
-    const out = Object.create(null);
-    for (const x of arr) {
-      const k = keyFn(x);
-      out[k] = (out[k] || 0) + 1;
-    }
-    return out;
-  }
-  function escape(s) {
-    return String(s)
+  // ---------- Helpers ----------
+  function escapeHTML(str) {
+    return String(str ?? "")
       .replaceAll("&", "&amp;")
       .replaceAll("<", "&lt;")
-      .replaceAll(">", "&gt;");
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
   }
+
+  function toDisplayId(reportId) {
+    // Display like #1 (your table sample uses #1)
+    return `#${reportId}`;
+  }
+
+  function formatDate(ts) {
+    // Backend may return "2026-01-04 12:34:56" or ISO-like; keep simple
+    if (!ts) return "—";
+    return String(ts).replace("T", " ").replace(".000Z", "");
+  }
+
+  function categoryBadge(cat) {
+    const c = (cat || "").toLowerCase();
+    const label =
+      c === "vehicle"
+        ? "Vehicle Issue"
+        : c === "behavior"
+        ? "Behavior"
+        : c === "payment"
+        ? "Payment"
+        : c === "app"
+        ? "App Issue"
+        : c === "safety"
+        ? "Safety"
+        : "Other";
+
+    // your CSS uses: <span class="category-badge vehicle">Vehicle Issue</span>
+    return `<span class="category-badge ${escapeHTML(c)}">${escapeHTML(
+      label
+    )}</span>`;
+  }
+
+  function statusBadge(status) {
+    const s = (status || "Pending").toLowerCase(); // pending/reviewed/resolved/closed
+    return `<span class="status-badge status-${escapeHTML(s)}">${escapeHTML(
+      s
+    )}</span>`;
+  }
+
+  function priorityBadge(priority) {
+    const p = (priority || "Low").toLowerCase(); // low/medium/high/urgent
+    return `<span class="priority-badge priority-${escapeHTML(p)}">${escapeHTML(
+      p
+    )}</span>`;
+  }
+
+  function normalizeRole(roleDb) {
+    // DB stores DRIVER/CUSTOMER/COMPANY -> UI expects "Driver" etc.
+    const r = String(roleDb || "").toUpperCase();
+    return r === "DRIVER"
+      ? "Driver"
+      : r === "CUSTOMER"
+      ? "Customer"
+      : r === "COMPANY"
+      ? "Company"
+      : r;
+  }
+
+  // ---------- API ----------
+  async function apiListReports({
+    status = "",
+    category = "",
+    search = "",
+  } = {}) {
+    const qs = new URLSearchParams();
+    if (status) qs.set("status", status); // pending/reviewed/resolved/closed
+    if (category) qs.set("category", category); // vehicle/behavior/payment/app/safety
+    if (search) qs.set("search", search);
+
+    const res = await fetch(`/reports/list?${qs.toString()}`, {
+      method: "GET",
+      headers: { Accept: "application/json" },
+    });
+
+    const data = await res.json();
+    if (!res.ok || data.status !== "success") {
+      throw new Error(data.message || "Failed to load reports");
+    }
+    return data.reports || [];
+  }
+
+  async function apiGetReport(idOrCode) {
+    const res = await fetch(`/report/get?id=${encodeURIComponent(idOrCode)}`, {
+      method: "GET",
+      headers: { Accept: "application/json" },
+    });
+
+    const data = await res.json();
+    if (!res.ok || data.status !== "success") {
+      throw new Error(data.message || "Report not found");
+    }
+    return data; // {status, report, imageIds}
+  }
+
+  async function apiUpdateReport(reportId, status, priority) {
+    const res = await fetch(`/report/update`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      body: JSON.stringify({ reportId, status, priority }),
+    });
+
+    const data = await res.json();
+    if (!res.ok || data.status !== "success") {
+      throw new Error(data.message || "Update failed");
+    }
+    return data;
+  }
+
+  // ---------- Render Table ----------
+  function getFilters() {
+    return {
+      search: ($("#reportSearch")?.value || "").trim(),
+      status: $("#statusFilter")?.value || "",
+      category: $("#categoryFilter")?.value || "",
+    };
+  }
+
+  function getTbody() {
+    // Your HTML: <table class="table reports-table"> ... <tbody> ...
+    return document.querySelector(".reports-table tbody");
+  }
+
+  function renderRows(rows) {
+    const tbody = getTbody();
+    if (!tbody) return;
+
+    tbody.innerHTML = "";
+
+    rows.forEach((r) => {
+      const reportId = r.reportId ?? r.report_id;
+      const subject = r.subject || "";
+      const cat = r.category || "";
+      const role = normalizeRole(r.reportedRole || r.reported_role);
+      const created = formatDate(r.createdAt || r.created_at);
+      const status = r.status || "Pending";
+      const priority = r.priority || "Low";
+
+      const tr = document.createElement("tr");
+      tr.addEventListener("click", () => viewReport(reportId));
+
+      tr.innerHTML = `
+        <td>${escapeHTML(toDisplayId(reportId))}</td>
+        <td>${escapeHTML(subject)}</td>
+        <td>${categoryBadge(cat)}</td>
+        <td>${escapeHTML(role)}</td>
+        <td>${escapeHTML(created)}</td>
+        <td>${statusBadge(status)}</td>
+        <td>${priorityBadge(priority)}</td>
+        <td>
+          <button class="btn-icon" onclick="viewReport(${reportId}); event.stopPropagation();" title="View">👁️</button>
+        </td>
+      `;
+
+      tbody.appendChild(tr);
+    });
+  }
+
+  // ---------- Modal ----------
+  function openModal() {
+    const modal = $("#reportModal");
+    if (modal) modal.classList.add("show");
+  }
+
+  function closeModal() {
+    const modal = $("#reportModal");
+    if (modal) modal.classList.remove("show");
+    currentOpenReportId = null;
+  }
+
+  function modalContentHTML(report, imageIds) {
+    const rid = report.reportId;
+    const images = (imageIds || []).map((imgId) => {
+      const url = `/report/image/get?imageId=${imgId}`;
+      return `
+        <a class="evidence-item" href="${url}" target="_blank" rel="noopener">
+          Evidence #${imgId}
+        </a>`;
+    });
+
+    // status/priority selects for update
+    const statusOptions = ["Pending", "Reviewed", "Resolved", "Closed"]
+      .map(
+        (s) =>
+          `<option value="${s}" ${
+            report.status === s ? "selected" : ""
+          }>${s}</option>`
+      )
+      .join("");
+
+    const priorityOptions = ["Low", "Medium", "High", "Urgent"]
+      .map(
+        (p) =>
+          `<option value="${p}" ${
+            report.priority === p ? "selected" : ""
+          }>${p}</option>`
+      )
+      .join("");
+
+    return `
+      <div class="report-detail-grid">
+        <div><strong>ID:</strong> ${escapeHTML(toDisplayId(rid))}</div>
+        <div><strong>Category:</strong> ${escapeHTML(report.category)}</div>
+        <div><strong>Status:</strong>
+          <select id="modalStatusSelect" class="form-select">${statusOptions}</select>
+        </div>
+        <div><strong>Priority:</strong>
+          <select id="modalPrioritySelect" class="form-select">${priorityOptions}</select>
+        </div>
+
+        <div style="grid-column:1/-1"><strong>Subject:</strong><br>${escapeHTML(
+          report.subject
+        )}</div>
+        <div style="grid-column:1/-1"><strong>Description:</strong><br>${escapeHTML(
+          report.description || "—"
+        )}</div>
+
+        <div style="grid-column:1/-1">
+          <strong>Reporter:</strong><br>
+          ${escapeHTML(report.reporterName || "—")} (${escapeHTML(
+      report.reporterRole || "—"
+    )})<br>
+          ${escapeHTML(report.reporterEmail || "—")}<br>
+          ${escapeHTML(report.reporterPhone || "—")}
+        </div>
+
+        <div style="grid-column:1/-1">
+          <strong>Reported Party:</strong><br>
+          ${escapeHTML(report.reportedRole)} (ID: ${escapeHTML(
+      report.reportedId
+    )})
+        </div>
+
+        <div style="grid-column:1/-1">
+          <strong>Evidence:</strong><br>
+          ${images.length ? images.join("") : "No evidence uploaded."}
+        </div>
+      </div>
+    `;
+  }
+
+  // global (called by HTML inline onclick)
+  // Redirect to report.html instead of opening a modal
+  window.viewReport = function (idOrNumber) {
+    const idParam = String(idOrNumber);
+    window.location.href = `report.html?id=${encodeURIComponent(idParam)}`;
+  };
+
+  window.closeReportModal = function () {
+    closeModal();
+  };
+
+  window.updateReportStatus = async function () {
+    if (!currentOpenReportId) {
+      alert("No report selected");
+      return;
+    }
+
+    const status = $("#modalStatusSelect")?.value;
+    const priority = $("#modalPrioritySelect")?.value;
+
+    try {
+      await apiUpdateReport(currentOpenReportId, status, priority);
+      alert("Report updated");
+
+      // refresh table using current filters
+      await loadReports();
+      closeModal();
+    } catch (e) {
+      console.error(e);
+      alert(e.message || "Update failed");
+    }
+  };
+
+  // ---------- Load ----------
+  async function loadReports() {
+    const { status, category, search } = getFilters();
+    const rows = await apiListReports({ status, category, search });
+    renderRows(rows);
+  }
+
+  function bindUI() {
+    $("#applyFiltersBtn")?.addEventListener("click", () => {
+      loadReports().catch((e) => alert(e.message || "Failed to load reports"));
+    });
+
+    // optional: live filter without pressing apply
+    $("#statusFilter")?.addEventListener("change", () =>
+      loadReports().catch(() => {})
+    );
+    $("#categoryFilter")?.addEventListener("change", () =>
+      loadReports().catch(() => {})
+    );
+
+    // Search live typing
+    $("#reportSearch")?.addEventListener("input", () => {
+      // light debounce
+      clearTimeout(window.__rptSearchTimer);
+      window.__rptSearchTimer = setTimeout(
+        () => loadReports().catch(() => {}),
+        250
+      );
+    });
+
+    // close modal by clicking backdrop
+    $("#reportModal")?.addEventListener("click", (e) => {
+      if (e.target?.id === "reportModal") closeModal();
+    });
+  }
+
+  window.addEventListener("DOMContentLoaded", () => {
+    bindUI();
+    loadReports().catch((e) => {
+      console.error(e);
+      alert(e.message || "Failed to load reports");
+    });
+  });
 })();

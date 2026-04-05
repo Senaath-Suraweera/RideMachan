@@ -13,6 +13,9 @@ public class RentalCompany {
     private String taxDocumentPath;
     private String hashedPassword;
     private String salt;
+    private String description;
+    private String terms;
+
 
     public RentalCompany() {}
 
@@ -69,4 +72,11 @@ public class RentalCompany {
 
     public String getSalt() { return salt; }
     public void setSalt(String salt) { this.salt = salt; }
+
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
+
+    public String getTerms() { return terms; }
+    public void setTerms(String terms) { this.terms = terms; }
+
 }

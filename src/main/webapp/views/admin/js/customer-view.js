@@ -1,66 +1,6 @@
-// customer-view.js
+// js/customer-view.js  (API-wired version)
 (function () {
-  // ---- Local canonical dataset (fallback if sessionStorage doesn't have it) ----
-  const DATA = [
-    {
-      id: 1,
-      name: "John Doe",
-      nic: "123456789V",
-      email: "john.doe@email.com",
-      phone: "+94 77 123 4567",
-      joinDate: "2023-01-15",
-      bookings: 25,
-      location: "Colombo",
-      rating: 4.8,
-      reviews: 18,
-      status: "active",
-      description: "Frequent customer with excellent payment history",
-    },
-    {
-      id: 2,
-      name: "Michael Chen",
-      nic: "987654321V",
-      email: "michael.chen@email.com",
-      phone: "+94 71 555 0123",
-      joinDate: "2023-11-10",
-      bookings: 8,
-      location: "Galle",
-      rating: 4.2,
-      reviews: 5,
-      status: "active",
-      description: "New customer showing promising booking patterns",
-    },
-    {
-      id: 3,
-      name: "Sarah Johnson",
-      nic: "456789123V",
-      email: "sarah.j@email.com",
-      phone: "+94 76 987 6543",
-      joinDate: "2023-09-22",
-      bookings: 12,
-      location: "Kandy",
-      rating: 4.6,
-      reviews: 8,
-      status: "active",
-      description: "Reliable customer, always on time for pickups",
-    },
-    // ... (same shape as your customers seed)
-  ];
-
-  const DEFAULTS = {
-    id: 0,
-    name: "—",
-    nic: "—",
-    email: "—",
-    phone: "—",
-    joinDate: "—",
-    bookings: 0,
-    location: "—",
-    rating: 0,
-    reviews: 0,
-    status: "—",
-    description: "—",
-  };
+  const API_BASE = "/api/admin/customers";
 
   const $ = (s) => document.querySelector(s);
   const esc = (s) =>
@@ -68,27 +8,12 @@
       .replaceAll("&", "&amp;")
       .replaceAll("<", "&lt;")
       .replaceAll(">", "&gt;");
+
   const q = new URLSearchParams(location.search);
   const id = Number(q.get("id"));
 
-  function getNormalizedCustomer(id) {
-    const base = DATA.find((c) => c.id === id) || null;
-
-    let saved = null;
-    try {
-      const raw = sessionStorage.getItem("selectedCustomer");
-      if (raw) {
-        const parsed = JSON.parse(raw);
-        if (parsed && Number(parsed.id) === id) saved = parsed;
-      }
-    } catch (_) {}
-
-    if (!base && !saved) return null;
-    return { ...DEFAULTS, ...(base || {}), ...(saved || {}) };
-  }
-
   function initials(n) {
-    return String(n)
+    return String(n || "—")
       .trim()
       .split(/\s+/)
       .map((p) => p[0] || "")
@@ -100,40 +25,55 @@
   function render(c) {
     const mount = $("#customerView");
     if (!mount) return;
+
+    const status = String(c.status || "—").toLowerCase();
+    const joined = c.joinDate || "—";
+
     mount.innerHTML = `
       <div class="profile-header">
         <div class="profile-avatar"><span>${esc(initials(c.name))}</span></div>
         <div class="profile-basic">
-          <h2>${esc(c.name)}</h2>
+          <h2>${esc(c.name || "—")}</h2>
           <div class="profile-meta">
-            <span>📍 ${esc(c.location)}</span>
-            <span>📅 Joined ${esc(c.joinDate)}</span>
+            <span>📍 ${esc(c.location || "—")}</span>
+            <span>📅 Joined ${esc(joined)}</span>
             <span>🚗 ${Number(c.bookings) || 0} bookings</span>
-            <span>⭐ ${(Number(c.rating) || 0).toFixed(1)} (${
-      Number(c.reviews) || 0
-    } reviews)</span>
+            <span>⭐ ${(Number(c.rating) || 0).toFixed(1)} (${Number(c.reviews) || 0} reviews)</span>
           </div>
-          <div class="profile-desc">${esc(c.description)}</div>
+          <div class="profile-desc">${esc(c.description || "—")}</div>
         </div>
         <div class="profile-contact">
-          <div>📞 ${esc(c.phone)}</div>
-          <div>📧 ${esc(c.email)}</div>
+          <div>📞 ${esc(c.phone || "—")}</div>
+          <div>📧 ${esc(c.email || "—")}</div>
           <div class="status-badge ${
-            c.status === "inactive" ? "status-inactive" : ""
+            status === "inactive" ? "status-inactive" : ""
           }">
-            ${esc(String(c.status).toUpperCase())}
+            ${esc(status.toUpperCase())}
           </div>
         </div>
       </div>
     `;
 
-    // Load the two booking pages with context
+    // Load iframe pages with the customerId (your existing flow)
+    // NOTE: Your booking iframe pages must call admin bookings endpoints in their JS.
     const qs = new URLSearchParams({
       customerId: String(c.id),
-      customerName: c.name,
+      customerName: c.name || "",
     });
-    $("#ongoingFrame").src = `ongoing-bookings.html?${qs}`;
-    $("#pastFrame").src = `past-bookings.html?${qs}`;
+
+    $("#ongoingFrame").src = `ongoing-bookings.html?${qs.toString()}`;
+    $("#pastFrame").src = `past-bookings.html?${qs.toString()}`;
+
+    // Ban button wiring
+    wireBanButton(c);
+  }
+
+  async function fetchCustomer(customerId) {
+    const res = await fetch(`${API_BASE}/${customerId}`, {
+      credentials: "include",
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return res.json();
   }
 
   function wireTabs() {
@@ -142,6 +82,7 @@
       ongoing: document.getElementById("panel-ongoing"),
       past: document.getElementById("panel-past"),
     };
+
     tabs.forEach((btn) => {
       btn.addEventListener("click", () => {
         tabs.forEach((b) => b.classList.remove("active"));
@@ -153,30 +94,73 @@
     });
   }
 
-  document.addEventListener("DOMContentLoaded", () => {
-    if (!Number.isFinite(id)) {
-      $(
-        "#customerView"
-      ).innerHTML = `<p style="margin:0;color:#374151;">Missing customer id.</p>`;
-      return;
-    }
-    const customer = getNormalizedCustomer(id);
-    if (!customer) {
-      $(
-        "#customerView"
-      ).innerHTML = `<p style="margin:0;color:#374151;">Customer not found for id ${esc(
-        id
-      )}.</p>`;
-      return;
-    }
-    render(customer);
-    wireTabs();
+  function toast(message) {
+    const el = document.createElement("div");
+    el.textContent = message;
+    el.style.cssText = `position:fixed;right:16px;bottom:16px;background:#2c3e50;color:#fff;padding:10px 14px;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,.2);z-index:1001;`;
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 2200);
+  }
 
-    // --- Back Button ---
+  function wireBanButton(customer) {
+    const btn = document.getElementById("banCustomerBtn");
+    if (!btn) return;
+
+    const isBanned = String(customer.status || "").toLowerCase() === "banned";
+    btn.textContent = isBanned ? "Unban Customer" : "Ban Customer";
+
+    btn.onclick = async () => {
+      try {
+        const next = isBanned ? "active" : "banned";
+
+        const res = await fetch(`${API_BASE}/${customer.id}/status`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({ status: next }),
+        });
+
+        const out = await res.json().catch(() => ({}));
+        if (!res.ok || !out.success) {
+          throw new Error(out.error || `HTTP ${res.status}`);
+        }
+
+        toast(next === "banned" ? "Customer banned" : "Customer unbanned");
+        // refresh view
+        const fresh = await fetchCustomer(customer.id);
+        render(fresh);
+      } catch (e) {
+        console.error(e);
+        toast("Failed to update status");
+      }
+    };
+  }
+
+  document.addEventListener("DOMContentLoaded", async () => {
+    // back button
     document
       .getElementById("backToCustomersBtn")
       ?.addEventListener("click", () => {
         window.location.href = "customers.html";
       });
+
+    if (!Number.isFinite(id)) {
+      $("#customerView").innerHTML =
+        `<p style="margin:0;color:#374151;">Missing customer id.</p>`;
+      return;
+    }
+
+    try {
+      // Prefer server truth
+      const customer = await fetchCustomer(id);
+      render(customer);
+      wireTabs();
+    } catch (e) {
+      console.error(e);
+      $("#customerView").innerHTML =
+        `<p style="margin:0;color:#b91c1c;">Failed to load customer ${esc(
+          id,
+        )}. Check session/login and API.</p>`;
+    }
   });
 })();

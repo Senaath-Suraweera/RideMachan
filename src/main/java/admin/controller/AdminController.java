@@ -165,6 +165,21 @@ public class AdminController {
         }
     }
 
+    public static boolean emailExists(String email) {
+        String sql = "SELECT COUNT(*) FROM Admin WHERE email = ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, email);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1) > 0;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
     public static boolean setVerified(String email)
     {
         try (Connection conn = DBConnection.getConnection()) {

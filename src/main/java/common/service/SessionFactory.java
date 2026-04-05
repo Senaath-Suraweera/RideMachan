@@ -31,5 +31,23 @@ public class SessionFactory {
             RequestDispatcher rd = req.getRequestDispatcher("/admin/save");
             rd.forward(req, resp);
         }
+        else if (role.equalsIgnoreCase("company")) {
+            // Remove context path from RequestDispatcher
+            RequestDispatcher rd = req.getRequestDispatcher("/admin/save");
+            rd.forward(req, resp);
+        }
+        else if (role.equalsIgnoreCase("driver")) {
+            // Remove context path from RequestDispatcher
+            RequestDispatcher rd = req.getRequestDispatcher("/admin/save");
+            rd.forward(req, resp);
+        }else if (role.equalsIgnoreCase("maintenance")) {
+            // Remove context path from RequestDispatcher
+            RequestDispatcher rd = req.getRequestDispatcher("/admin/save");
+            rd.forward(req, resp);
+        }else if (role.equalsIgnoreCase("provider")) {
+            // Remove context path from RequestDispatcher
+            RequestDispatcher rd = req.getRequestDispatcher("/admin/save");
+            rd.forward(req, resp);
+        }
     }
 }

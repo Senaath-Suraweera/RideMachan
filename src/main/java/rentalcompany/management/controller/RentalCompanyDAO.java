@@ -9,7 +9,7 @@ public class RentalCompanyDAO {
 
     public boolean addCompany(RentalCompany company) {
         String sql = "INSERT INTO rentalcompany (companyname, companyemail, phone, registrationnumber, taxid, " +
-                "street, city, certificatepath, taxdocumentpath, hashedpassword, salt) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                "street, city, certificatepath, taxdocumentpath, description, terms , hashedpassword, salt) VALUES (?,?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (Connection con = DBConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
 
@@ -22,8 +22,10 @@ public class RentalCompanyDAO {
             ps.setString(7, company.getCity());
             ps.setString(8, company.getCertificatePath());
             ps.setString(9, company.getTaxDocumentPath());
-            ps.setString(10, company.getHashedPassword());
-            ps.setString(11, company.getSalt());
+            ps.setString(10, company.getDescription());
+            ps.setString(11, company.getTerms());
+            ps.setString(12, company.getHashedPassword());
+            ps.setString(13, company.getSalt());
 
             ps.executeUpdate();
             return true;
@@ -52,6 +54,8 @@ public class RentalCompanyDAO {
                 company.setCity(rs.getString("city"));
                 company.setCertificatePath(rs.getString("certificatepath"));
                 company.setTaxDocumentPath(rs.getString("taxdocumentpath"));
+                company.setDescription(rs.getString("description"));
+                company.setTerms(rs.getString("terms"));
                 company.setHashedPassword(rs.getString("hashedpassword"));
                 company.setSalt(rs.getString("salt"));
                 return company;
