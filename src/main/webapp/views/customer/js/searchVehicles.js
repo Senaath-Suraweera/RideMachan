@@ -489,12 +489,7 @@ function viewVehicle(vehicleId) {
 // View Company Profile
 // ========================================
 function viewCompany(companyId) {
-    try {
-        sessionStorage.setItem('selectedCompanyId', companyId.toString());
-    } catch(e) {
-        console.log('SessionStorage not available:', e);
-    }
-    window.location.href = 'company-profile.html';
+    window.location.href = 'company-profile.html?companyId=' + companyId;
 }
 
 // ========================================

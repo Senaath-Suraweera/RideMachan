@@ -183,22 +183,22 @@
         }
     }
 
-    /* ---------- Dashboard Dummy Data ---------- */
-    function loadDashboardData() {
-        const data = {
-            active: 1,
-            upcoming: 2,
-            completed: 12,
-            monthlySpending: 45750
-        };
+    /* ---------- Dashboard Data from Backend ---------- */
+    async function loadDashboardData() {
+        try {
+            const response = await fetch('/RideMachan/customer/dashboard-stats');
+            if (!response.ok) throw new Error('Failed');
+            const data = await response.json();
 
-        document.getElementById("activeCount").textContent = data.active;
-        document.getElementById("upcomingCount").textContent = data.upcoming;
-        document.getElementById("completedCount").textContent = data.completed;
-        document.getElementById("monthlySpend").textContent =
-            `LKR ${data.monthlySpending.toLocaleString()}`;
+            document.getElementById("activeCount").textContent = data.active;
+            document.getElementById("upcomingCount").textContent = data.upcoming;
+            document.getElementById("completedCount").textContent = data.completed;
+            document.getElementById("monthlySpend").textContent =
+                "LKR " + data.monthlySpending.toLocaleString();
+        } catch (error) {
+            console.error("Dashboard error:", error);
+        }
     }
-
     /* ---------- Actions ---------- */
     function navigateToBookings(filter) {
         window.location.href = `../pages/bookings.html?filter=${filter}`;

@@ -308,6 +308,22 @@
                 }
             }, 100);
         });
+
+        // View company profile
+        function viewCompanyProfile(cardElement) {
+            // Extract company ID from the card's data attribute
+            const companyId = cardElement.getAttribute('data-company-id');
+
+            if (!companyId) {
+                console.error('❌ No company ID found on card');
+                return;
+            }
+
+            console.log('🔗 Navigating to company profile:', companyId);
+
+            // Use URL parameter instead of sessionStorage
+            window.location.href = `company-profile.html?companyId=${encodeURIComponent(companyId)}`;
+        }
     </script>
 </body>
 </html>
