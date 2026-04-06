@@ -171,4 +171,38 @@ public class RentalCompanyBookingsDAO {
         return activeDriverCount;
 
     }
+
+
+    public static boolean assignDriverToBooking(int companyId, int driverId, int bookingId) {
+
+        boolean success = false;
+
+        try {
+
+            Connection con = DBConnection.getConnection();
+
+            String sql = "UPDATE companybookings SET driverid=? " +
+                    "WHERE booking_id=? AND companyid=?";
+
+            PreparedStatement ps = con.prepareStatement(sql);
+            ps.setInt(1, driverId);
+            ps.setInt(2, bookingId);
+            ps.setInt(3, companyId);
+
+            int rows = ps.executeUpdate();
+
+            if (rows > 0) {
+                success = true;
+            }
+
+        } catch (Exception e) {
+
+            e.printStackTrace();
+
+        }
+
+        return success;
+
+    }
+
 }

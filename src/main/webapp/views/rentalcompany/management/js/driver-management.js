@@ -67,29 +67,25 @@ async function AssignBooking(driverId) {
     try {
 
         const bookingId = document.getElementById("bookingIdInput").value.trim();
-        const pickupLocation = document.getElementById("pickupLocationInput").value.trim();
-        const dropoffLocation = document.getElementById("dropoffLocationInput").value.trim();
 
-        if (!bookingId || !pickupLocation || !dropoffLocation) {
+
+        if (!bookingId) {
             alert("Please fill all fields!");
             return;
         }
 
 
-        const payload = {
-            driverId,
-            bookingId,
-            pickupLocation,
-            dropoffLocation
-        };
+
 
 
         let response = await fetch("/assignbookingdriver", {
+
             method: "POST",
             headers: {
-                "Content-Type": "application/json"
+                "Content-Type": "application/x-www-form-urlencoded"
             },
-            body: JSON.stringify(payload)
+            body: `driverId=${driverId}&bookingId=${bookingId}`
+
         });
 
         if (!response.ok) {
@@ -129,6 +125,29 @@ function renderdrivers(drivers) {
 
         const rating = driver.rating || 0;
         const trips = driver.trips || 0;
+
+
+
+        let bookingsHtml = "";
+        if (driver.bookings && driver.bookings.length > 0) {
+            for (let i = 0; i < driver.bookings.length; i++) {
+                const booking = driver.bookings[i];
+                bookingsHtml += `
+                    <div class="booking-card">
+                        <div class="booking-header">
+                            <span class="booking-id">Booking: ${booking.bookingId}</span>
+                        </div>
+                        <div class="booking-body">
+                            <p><i class="fas fa-car"></i> Ride: ${booking.rideId}</p>
+                            <p><i class="fas fa-money-bill"></i> Amount: Rs${booking.totalAmount} </p>
+                            ${booking.customerName ? `<p><i class="fas fa-user"></i> Customer: ${booking.customerName}</p>` : ""}
+                            <p>Trip Start Date: ${booking.tripStartDate}</p>
+                            <p>Trip End Date: ${booking.tripEndDate}</p>
+                        </div>
+                    </div>
+                `;
+            }
+        }
 
         const driverCard = document.createElement("div");
         driverCard.className = "driver-card";
@@ -171,25 +190,8 @@ function renderdrivers(drivers) {
                                         </div>
                                     </div>
     
-                                    ${driver.currentBooking    ?
-
-                                                            `
-                                                               <div class="current-booking">
-                                                                   <div class="booking-header">
-                                                                       <span class="booking-title">Current Booking</span>
-                                                                       <span class="booking-id">${driver.currentBooking.id}</span>
-                                                                   </div>
-                                                                   <div class="booking-details">
-                                                                       <span><i class="fas fa-clock"></i> ${driver.currentBooking.time}</span>
-                                                                       <span><i class="fas fa-car"></i> ${driver.currentBooking.vehicle}</span>
-                                                                   </div>
-                                                                   <div class="booking-details">
-                                                                       <span><i class="fas fa-user"></i> Customer: ${driver.currentBooking.customer}</span>
-                                                                   </div>
-                                                               </div>
-                                                            `
-                                                              : ""
-        }
+                                    ${bookingsHtml}
+        
     
                                    <div class="driver-actions">
                                        <button class="action-btn" onclick="window.driverManager.messageDriver('${driver.driverId}')">
@@ -245,7 +247,7 @@ function openAssignBookingModel(driverId) {
             <div class="form-row" style="width:100%; display:flex; flex-direction:column; gap:15px;">                                   
                 <div class="form-group" style="display:flex; flex-direction:column; width:100%;">
                     <label>Booking Id</label>
-                    <input type="number" name="bookingid" required style="padding:8px; border-radius:5px; border:1px solid #ccc;"/>
+                    <input id="bookingIdInput" type="number" name="bookingid" required style="padding:8px; border-radius:5px; border:1px solid #ccc;"/>
                 </div>
                 <div class="form-group" style="display:flex; flex-direction:column; width:100%;">
                     <label>Pickup Location</label>
@@ -253,7 +255,7 @@ function openAssignBookingModel(driverId) {
                 </div>
                 <div class="form-group" style="display:flex; flex-direction:column; width:100%;">
                     <label>Drop Off Location</label>
-                    <input type="text" name="dropofflocation" required style="padding:8px; border-radius:5px; border:1px solid #ccc;"/>
+                    <input id="dropoffLocationInput" type="text" name="dropofflocation" required style="padding:8px; border-radius:5px; border:1px solid #ccc;"/>
                 </div>
             </div>
 

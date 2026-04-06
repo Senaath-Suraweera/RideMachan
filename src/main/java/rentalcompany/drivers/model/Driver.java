@@ -1,6 +1,9 @@
 package rentalcompany.drivers.model;
 
+import rentalcompany.management.model.RentalCompanyBookings;
+
 import java.util.Date;
+import java.util.List;
 
 public class Driver {
     private int driverId;
@@ -28,6 +31,7 @@ public class Driver {
     private String shiftTime;
     private String reportingManager;
     private String profilePicture;
+    private List<RentalCompanyBookings> bookings;
 
 
     // Default constructor
@@ -163,5 +167,9 @@ public class Driver {
             return username;
         }
     }
+
+
+    public List<RentalCompanyBookings> getBookings() { return bookings; }
+    public void setBookings(List<RentalCompanyBookings> bookings) { this.bookings = bookings; }
 
 }

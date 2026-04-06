@@ -108,6 +108,8 @@ public class DriverDAO {
 
                 );
 
+                List<RentalCompanyBookings> activeBookings = getActiveBookingsByDriverId(driver.getDriverId());
+                driver.setBookings(activeBookings);
 
                 drivers.add(driver);
 
@@ -185,6 +187,51 @@ public class DriverDAO {
 
         return count;
     }
+
+    public static List<RentalCompanyBookings> getActiveBookingsByDriverId(int driverId) {
+
+        List<RentalCompanyBookings> bookings = new ArrayList<>();
+        String sql = "SELECT * FROM companybookings WHERE driverid=? AND status='active'";
+
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setInt(1, driverId);
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                RentalCompanyBookings booking = new RentalCompanyBookings();
+                booking.setBookingId(rs.getInt("booking_id"));
+                booking.setRideId(rs.getString("ride_id"));
+                booking.setCustomerName(rs.getString("customer_name"));
+                booking.setVehicleModel(rs.getString("vehicle_model"));
+                booking.setTripStartDate(rs.getDate("trip_start_date"));
+                booking.setTripEndDate(rs.getDate("trip_end_date"));
+
+                // Correct column names
+                booking.setStartTimeStr(rs.getString("start_time"));
+                booking.setEndTimeStr(rs.getString("end_time"));
+
+                booking.setPickupLocation(rs.getString("pickup_location"));
+                booking.setDropLocation(rs.getString("drop_location"));
+                booking.setStatus(rs.getString("status"));
+
+                bookings.add(booking);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return bookings;
+    }
+
+
+
+
+
+
+
 
 
 
