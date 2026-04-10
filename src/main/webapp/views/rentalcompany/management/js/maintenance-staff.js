@@ -120,10 +120,14 @@ function renderMaintenanceStaff(maintenanceStaffs) {
     const staffGrid = document.getElementsByClassName("staff-grid")[0];
     staffGrid.innerHTML = "";
 
+    let status;
+
     maintenanceStaffs.forEach(maintenanceStaff => {
 
         maintenanceStaff.initials = maintenanceStaff.initials || maintenanceStaff.firstname?.[0] || "";
-        maintenanceStaff.status = maintenanceStaff.status || "Unknown";
+
+        status = maintenanceStaff.status ? maintenanceStaff.status.charAt(0).toUpperCase() + maintenanceStaff.status.slice(1).toLowerCase(): "";
+
         maintenanceStaff.specialization = maintenanceStaff.specialization || "";
         maintenanceStaff.completedJobs = maintenanceStaff.completedJobs || 0;
         maintenanceStaff.assignedVehicles = maintenanceStaff.assignedVehicles || [];
@@ -141,41 +145,31 @@ function renderMaintenanceStaff(maintenanceStaffs) {
                               <div class="staff-info">
                                   <h3 class="staff-name">${maintenanceStaff.firstname + " " + maintenanceStaff.lastname}</h3>
                                   <p class="staff-id">Staff ID: ${maintenanceStaff.staffId}</p>
-                                  <p class="staff-specialization">${maintenanceStaff.specialization}</p>
                                   <div class="staff-jobs">
+                                      <i class="fas fa-star rating-star"></i>  
                                       <span class="job-count">(${maintenanceStaff.completedJobs} jobs)</span>
                                   </div>
                               </div>
-                              <div class="status-badge ${maintenanceStaff.status}">${maintenanceStaff.status}</div>
-                          </div>
-                          <div class="vehicle-assignments">
-                              <h4>Vehicle Assignments</h4>
-                              <div class="assignment-badge">${maintenanceStaff.assignedVehicles.length}</div>
-                              <div class="vehicle-list">
-                                  ${maintenanceStaff.assignedVehicles.map(v => `<div class="vehicle-item">${v}</div>`).join('')}
-                                  ${maintenanceStaff.moreVehiclesCount ? `<div class="vehicle-more">+${maintenanceStaff.moreVehiclesCount} more vehicles</div>` : ''}
-                              </div>
+                              <div class="staff-status status-badge ${maintenanceStaff.status}">${status}</div>
                           </div>
                           <div class="staff-details">
-                              <div class="detail-item"><i class="fas fa-phone"></i><span>${maintenanceStaff.contactNumber}</span></div>
-                              <div class="detail-item"><i class="fas fa-calendar"></i><span>${maintenanceStaff.yearsOfExperience} years exp.</span></div>
-                              <div class="detail-item"><i class="fas fa-car"></i><span>${maintenanceStaff.assignedVehicles.length} vehicles</span></div>
+                              <div class="detail-item"><i class="fas fa-phone detail-icon"></i><span>+ ${maintenanceStaff.contactNumber}</span></div>
+                              <div class="detail-item"><i class="fas fa-calendar detail-icon"></i><span>Years of Experience: ${maintenanceStaff.yearsOfExperience}</span></div>
+                              <div class="detail-item"><i class="fas fa-car detail-icon"></i><span>Assigned Vehicles: ${maintenanceStaff.assignedVehicles.length}</span></div>
+                              <div class="detail-item"><i class="fas fa-wrench detail-icon"></i><span>${maintenanceStaff.specialization}</span></div>  
                           </div>
                           <div class="staff-badges">
                               ${maintenanceStaff.certifications.map(cert => `<span class="badge">${cert}</span>`).join('')}
                           </div>
                           <div class="staff-actions">
-                              <a href="maintenance-staffprofile1.html">
-                                  <button class="btn-secondary" onclick="viewStaffDetails('${maintenanceStaff.staffId}')">
-                                      <i class="fas fa-eye"></i>
-                                      View Details
-                                  </button>
-                              </a>
-                              <button class="btn-secondary" onclick="messageStaff('${maintenanceStaff.staffId}')">
-                                  <i class="fas fa-comment"></i>
-                                  Message
+                              <button class="action-btn" onclick="messageStaff('${maintenanceStaff.staffId}')">
+                                      <i class="fas fa-comment"></i>
+                                      Message
                               </button>
-                          </div>
+                              <button class="action-btn primary" data-staff-id="${maintenanceStaff.staffId}" onclick="viewStaffDetails('${maintenanceStaff.staffId}')">
+                                      View Details
+                              </button>                                                           
+                          </div>                         
                        `;
 
         staffGrid.appendChild(staffCard);

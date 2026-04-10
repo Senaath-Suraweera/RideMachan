@@ -150,17 +150,17 @@
 
 .staff-card {
   background: white;
-  border-radius: 16px;
-  padding: 24px;
-  box-shadow: 0 4px 20px rgba(58, 12, 163, 0.08);
-  border: 1px solid rgba(58, 12, 163, 0.1);
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  border: 1px solid #e1e5e9;
   transition: all 0.3s ease;
-  max-width: 400px;
+  position: relative;
 }
 
 .staff-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 8px 30px rgba(58, 12, 163, 0.15);
+  box-shadow: 0 12px 30px rgba(67, 97, 238, 0.15);
 }
 
 .staff-header {
@@ -227,19 +227,34 @@
 /* ===========================
    BADGES & DETAILS
    =========================== */
+
+
+.staff-status {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: 38px;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
 .status-badge.available {
+  border-radius: 8px;
   background: rgba(34, 197, 94, 0.1);
   color: #22c55e;
 }
 
-.status-badge.on-job {
-  background: rgba(59, 130, 246, 0.1);
-  color: #3b82f6;
+.status-badge.on job {
+  border-radius: 8px;
+  background: #cce7ff;
+  color: #0066cc;
 }
 
 .status-badge.offline {
-  background: rgba(107, 114, 128, 0.1);
-  color: #6b7280;
+  border-radius: 8px;
+  background: #f8d7da;
+  color: #721c24;
 }
 
 /* ===========================
@@ -364,4 +379,66 @@
     transform: translateY(0);
     opacity: 1;
   }
+}
+
+.detail-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.detail-icon {
+  color: #4361ee;
+  width: 16px;
+}
+
+.staff-details{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.rating-star {
+  color: #ffc107;
+}
+
+
+.staff-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.action-btn {
+  flex: 1;
+  padding: 0.5rem;
+  border: 1px solid #e1e5e9;
+  background: white;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+}
+
+.action-btn:hover {
+  background: #f8f9fa;
+  border-color: #4361ee;
+  color: #4361ee;
+}
+
+.action-btn.primary {
+  background: linear-gradient(135deg, #3a0ca3 0%, #4361ee 100%);
+  color: white;
+  border-color: transparent;
+}
+
+.action-btn.primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(67, 97, 238, 0.3);
 }

@@ -120,13 +120,14 @@ function renderdrivers(drivers) {
     let driversGrid = document.getElementById("driversGrid");
     driversGrid.innerHTML = "";
 
+    let status;
 
     drivers.forEach(driver => {
 
         const rating = driver.rating || 0;
         const trips = driver.trips || 0;
 
-
+        status = (driver.status || "").toLowerCase();
 
         let bookingsHtml = "";
         if (driver.bookings && driver.bookings.length > 0) {
@@ -152,8 +153,10 @@ function renderdrivers(drivers) {
         const driverCard = document.createElement("div");
         driverCard.className = "driver-card";
 
+
+
         driverCard.innerHTML = `                                    
-                                    <div class="driver-status status-${driver.status}">
+                                    <div class="driver-status status-${status}">
                                         ${driver.status}
                                     </div>
     
