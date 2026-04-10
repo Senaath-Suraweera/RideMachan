@@ -64,24 +64,29 @@ async function UpdateProfile() {
 
     try {
 
-        const updatedData = {
+        let fullAddress = document.getElementById("businessAddress").value;
+        let street = fullAddress;
+        let city = "";
 
+        const parts = fullAddress.split(",");
+
+        if (parts.length >= 2) {
+            street = parts[0].trim();
+            city = parts.slice(1).join(",").trim();
+        }
+
+        const params = new URLSearchParams({
             companyName: document.getElementById("companyName").value,
             phone: document.getElementById("phoneNumber").value,
             email: document.getElementById("emailAddress").value,
-            address: document.getElementById("businessAddress").value
-
-        };
-
-        let response = await fetch(`/updatecompanyprofile`, {
-
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify(updatedData)
-
+            street: street,
+            city: city
         });
+
+        let response = await fetch(`/updatecompanyprofile?${params.toString()}`, {
+            method: "POST"
+        });
+
 
         if(!response.ok){
             throw new Error(`HTTP error! Status: ${response.status}`);
