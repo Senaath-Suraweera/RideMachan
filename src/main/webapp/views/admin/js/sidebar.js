@@ -28,7 +28,6 @@ class SidebarManager {
             <ul class="nav-menu">
               <li class="nav-item"><a href="dashboard.html" class="nav-link" data-page="dashboard"><span class="nav-icon dashboard"></span>Dashboard</a></li>
               <li class="nav-item"><a href="earnings.html" class="nav-link" data-page="earnings"><span class="nav-icon earnings"></span>Earnings</a></li>
-              <li class="nav-item"><a href="promotions.html" class="nav-link" data-page="promotions"><span class="nav-icon promotions"></span>Promotions</a></li>
             </ul>
           </div>
           <div class="nav-section">
