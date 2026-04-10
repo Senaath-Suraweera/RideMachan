@@ -1,5 +1,23 @@
 /* Customers Page Styles - Aligned with Customer Home Theme */
 
+/* === CSS Variables (fallbacks if not set globally) === */
+:root {
+  --primary: #3a0ca3;
+  --primary-light: #4361ee;
+  --secondary: #7209b7;
+  --dark: #1a1a2e;
+  --text: #2d3748;
+  --text-light: #6c757d;
+  --border: #e9ecef;
+  --radius: 10px;
+  --radius-sm: 6px;
+  --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  --shadow-lg:
+    0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  --transition: all 0.3s ease;
+  --danger: #f72585;
+}
+
 /* === Page Header === */
 .page-header {
   margin-bottom: 30px;
@@ -15,7 +33,7 @@
 .page-title {
   font-size: 28px;
   font-weight: 700;
-  color: var(--dark, #1a1a2e);
+  color: var(--dark);
   margin: 0;
   position: relative;
   padding-bottom: 10px;
@@ -28,11 +46,7 @@
   left: 0;
   width: 40px;
   height: 3px;
-  background: linear-gradient(
-    90deg,
-    var(--primary, #3a0ca3),
-    var(--primary-light, #4361ee)
-  );
+  background: linear-gradient(90deg, var(--primary), var(--primary-light));
   border-radius: 10px;
 }
 
@@ -42,7 +56,7 @@
 }
 
 .page-subtitle {
-  color: var(--text-light, #6c757d);
+  color: var(--text-light);
   font-size: 15px;
   margin: 8px 0 0 0;
   font-weight: 500;
@@ -55,7 +69,7 @@
   justify-content: center;
   gap: 8px;
   padding: 10px 20px;
-  border-radius: var(--radius, 10px);
+  border-radius: var(--radius);
   font-weight: 500;
   cursor: pointer;
   border: none;
@@ -85,46 +99,55 @@
   left: 100%;
 }
 
+.btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
 .btn-primary {
-  background: linear-gradient(
-    135deg,
-    var(--primary, #3a0ca3),
-    var(--primary-light, #4361ee)
-  );
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
   color: #fff;
 }
 
-.btn-primary:hover {
-  background: linear-gradient(
-    135deg,
-    var(--secondary, #7209b7),
-    var(--primary, #3a0ca3)
-  );
+.btn-primary:hover:not(:disabled) {
+  background: linear-gradient(135deg, var(--secondary), var(--primary));
   transform: translateY(-2px);
   box-shadow: 0 6px 15px rgba(58, 12, 163, 0.2);
 }
 
 .btn-secondary {
   background: transparent;
-  border: 2px solid var(--primary-light, #4361ee);
-  color: var(--primary, #3a0ca3);
+  border: 2px solid var(--primary-light);
+  color: var(--primary);
 }
 
-.btn-secondary:hover {
-  background: var(--primary, #3a0ca3);
+.btn-secondary:hover:not(:disabled) {
+  background: var(--primary);
   color: #fff;
-  border-color: var(--primary, #3a0ca3);
+  border-color: var(--primary);
   transform: translateY(-2px);
   box-shadow: 0 6px 15px rgba(58, 12, 163, 0.2);
+}
+
+.btn-spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
 }
 
 /* === Search and Filter Section === */
 .search-filter-section {
   background-color: white;
-  border-radius: var(--radius, 10px);
+  border-radius: var(--radius);
   padding: 25px;
   margin-bottom: 25px;
-  box-shadow: var(--shadow-sm, 0 4px 6px -1px rgba(0, 0, 0, 0.1));
+  box-shadow: var(--shadow-sm);
   border: 1px solid rgba(0, 0, 0, 0.03);
   animation: fadeInUp 0.6s ease;
 }
@@ -132,7 +155,7 @@
 .section-title {
   font-size: 18px;
   font-weight: 600;
-  color: var(--dark, #1a1a2e);
+  color: var(--dark);
   margin: 0 0 20px 0;
   display: flex;
   align-items: center;
@@ -154,7 +177,7 @@
 
 .form-label {
   font-size: 12px;
-  color: var(--text-light, #6c757d);
+  color: var(--text-light);
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -164,17 +187,19 @@
 .form-select {
   width: 100%;
   padding: 12px 14px;
-  border: 1px solid var(--border, #e9ecef);
-  border-radius: var(--radius, 10px);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
   background: #fff;
-  color: var(--text, #2d3748);
+  color: var(--text);
   font-size: 14px;
   outline: none;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
 }
 
 .form-control::placeholder {
-  color: var(--text-light, #6c757d);
+  color: var(--text-light);
 }
 
 .form-control:hover,
@@ -184,7 +209,7 @@
 
 .form-control:focus,
 .form-select:focus {
-  border-color: var(--primary-light, #4361ee);
+  border-color: var(--primary-light);
   box-shadow: 0 0 0 4px rgba(67, 97, 238, 0.12);
 }
 
@@ -198,7 +223,7 @@ textarea.form-control {
   gap: 12px;
   justify-content: flex-end;
   padding-top: 16px;
-  border-top: 1px solid var(--border, #e9ecef);
+  border-top: 1px solid var(--border);
 }
 
 /* === Rating Section === */
@@ -224,16 +249,16 @@ textarea.form-control {
 
 .rating-text {
   font-size: 12px;
-  color: var(--text-light, #6c757d);
+  color: var(--text-light);
   margin-top: 4px;
 }
 
 /* === Customers Section === */
 .customers-section {
   background-color: white;
-  border-radius: var(--radius, 10px);
+  border-radius: var(--radius);
   padding: 25px;
-  box-shadow: var(--shadow-sm, 0 4px 6px -1px rgba(0, 0, 0, 0.1));
+  box-shadow: var(--shadow-sm);
   border: 1px solid rgba(0, 0, 0, 0.03);
   animation: fadeInUp 0.7s ease;
 }
@@ -241,7 +266,7 @@ textarea.form-control {
 .section-header {
   margin-bottom: 20px;
   padding-bottom: 16px;
-  border-bottom: 1px solid var(--border, #e9ecef);
+  border-bottom: 1px solid var(--border);
 }
 
 .customers-grid {
@@ -253,7 +278,7 @@ textarea.form-control {
 .customer-card {
   background: rgba(67, 97, 238, 0.02);
   border: 1px solid rgba(0, 0, 0, 0.03);
-  border-radius: var(--radius, 10px);
+  border-radius: var(--radius);
   padding: 24px;
   transition: all 0.4s ease;
   cursor: pointer;
@@ -272,21 +297,13 @@ textarea.form-control {
   left: 0;
   width: 4px;
   height: 100%;
-  background: linear-gradient(
-    to bottom,
-    var(--primary, #3a0ca3),
-    var(--primary-light, #4361ee)
-  );
+  background: linear-gradient(to bottom, var(--primary), var(--primary-light));
   opacity: 0;
-  transition: var(--transition, all 0.3s ease);
+  transition: var(--transition);
 }
 
 .customer-card:hover {
-  box-shadow: var(
-    --shadow-lg,
-    0 20px 25px -5px rgba(0, 0, 0, 0.1),
-    0 10px 10px -5px rgba(0, 0, 0, 0.04)
-  );
+  box-shadow: var(--shadow-lg);
   transform: translateY(-7px);
 }
 
@@ -294,22 +311,17 @@ textarea.form-control {
   opacity: 0.8;
 }
 
-/* Customer Avatar */
 .customer-avatar {
   width: 64px;
   height: 64px;
   border-radius: 50%;
-  background: linear-gradient(
-    135deg,
-    var(--primary, #3a0ca3),
-    var(--primary-light, #4361ee)
-  );
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
   box-shadow: 0 6px 15px rgba(67, 97, 238, 0.3);
-  transition: var(--transition, all 0.3s ease);
+  transition: var(--transition);
 }
 
 .customer-card:hover .customer-avatar {
@@ -322,7 +334,6 @@ textarea.form-control {
   font-weight: 700;
 }
 
-/* Customer Info */
 .customer-info {
   min-width: 0;
 }
@@ -330,7 +341,7 @@ textarea.form-control {
 .customer-name {
   font-size: 18px;
   font-weight: 600;
-  color: var(--dark, #1a1a2e);
+  color: var(--dark);
   margin: 0 0 12px 0;
 }
 
@@ -346,7 +357,7 @@ textarea.form-control {
   align-items: center;
   gap: 6px;
   font-size: 13px;
-  color: var(--text-light, #6c757d);
+  color: var(--text-light);
 }
 
 .detail-icon {
@@ -360,12 +371,11 @@ textarea.form-control {
 .customer-description p {
   margin: 0;
   font-size: 14px;
-  color: var(--text, #2d3748);
+  color: var(--text);
   font-style: italic;
   line-height: 1.4;
 }
 
-/* Customer Rating */
 .customer-rating {
   display: flex;
   align-items: center;
@@ -389,15 +399,14 @@ textarea.form-control {
 
 .rating-value {
   font-weight: 600;
-  color: var(--dark, #1a1a2e);
+  color: var(--dark);
 }
 
 .review-count {
   font-size: 12px;
-  color: var(--text-light, #6c757d);
+  color: var(--text-light);
 }
 
-/* Customer Actions */
 .customer-actions {
   display: flex;
   flex-direction: column;
@@ -417,7 +426,7 @@ textarea.form-control {
   align-items: center;
   gap: 6px;
   font-size: 13px;
-  color: var(--text, #2d3748);
+  color: var(--text);
 }
 
 .contact-icon {
@@ -455,85 +464,108 @@ textarea.form-control {
   border: 1px solid rgba(248, 150, 30, 0.3);
 }
 
-/* === Modals === */
+/* ================================================================
+   MODAL SYSTEM — Shared
+   ================================================================ */
 .modal {
   display: none;
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(10, 10, 30, 0.55);
   z-index: 1000;
-  backdrop-filter: blur(4px);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  /* CENTERING */
+  justify-content: center;
+  align-items: center;
 }
 
 .modal.show {
   display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
 .modal-content {
-  background: white;
-  border-radius: var(--radius, 10px);
+  background: #fff;
+  border-radius: 16px;
   width: 90%;
   max-width: 600px;
   max-height: 90vh;
   overflow-y: auto;
-  box-shadow: var(
-    --shadow-lg,
-    0 20px 25px -5px rgba(0, 0, 0, 0.1),
-    0 10px 10px -5px rgba(0, 0, 0, 0.04)
-  );
-  animation: fadeInUp 0.3s ease;
+  box-shadow:
+    0 24px 64px rgba(0, 0, 0, 0.18),
+    0 0 0 1px rgba(67, 97, 238, 0.06);
+  animation: modalSlideIn 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+}
+
+.modal-content.modal-lg {
+  max-width: 720px;
+}
+
+.modal-content.modal-sm {
+  max-width: 440px;
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(24px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 .modal-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px 24px;
-  background: #f8f9fa;
-  border-bottom: 1px solid var(--border, #e9ecef);
+  padding: 20px 28px;
+  background: linear-gradient(135deg, #081553 0%, #0b1aa1 100%);
+  color: #fff;
+  border-radius: 16px 16px 0 0;
 }
 
 .modal-header h3 {
   margin: 0;
   font-size: 18px;
-  font-weight: 600;
-  color: var(--dark, #1a1a2e);
+  font-weight: 700;
+  letter-spacing: 0.3px;
 }
 
 .modal-close {
-  background: transparent;
+  background: rgba(255, 255, 255, 0.15);
   border: none;
-  font-size: 24px;
+  font-size: 20px;
   cursor: pointer;
-  color: var(--text-light, #6c757d);
-  padding: 4px;
+  color: #fff;
   width: 32px;
   height: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: var(--radius-sm, 6px);
-  transition: var(--transition, all 0.3s ease);
+  border-radius: 8px;
+  transition: var(--transition);
+  line-height: 1;
 }
 
 .modal-close:hover {
-  background: rgba(0, 0, 0, 0.05);
-  color: var(--dark, #1a1a2e);
+  background: rgba(255, 255, 255, 0.25);
 }
 
 .modal-body {
-  padding: 24px;
+  padding: 28px;
 }
 
 .modal-footer {
   display: flex;
-  justify-content: flex-end;
+  align-items: center;
   gap: 12px;
-  padding: 16px 24px;
-  background: #f8f9fa;
-  border-top: 1px solid var(--border, #e9ecef);
+  padding: 16px 28px;
+  background: #f8f9fc;
+  border-top: 1px solid var(--border);
+  border-radius: 0 0 16px 16px;
 }
 
 .form-row {
@@ -543,7 +575,487 @@ textarea.form-control {
   margin-bottom: 16px;
 }
 
-/* === Loading States === */
+/* ================================================================
+   STEP INDICATOR
+   ================================================================ */
+.step-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  padding: 24px 28px 8px;
+  background: #f8f9fc;
+}
+
+.step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  position: relative;
+}
+
+.step-number {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 700;
+  background: var(--border);
+  color: var(--text-light);
+  transition: all 0.35s ease;
+  border: 2px solid transparent;
+}
+
+.step.active .step-number {
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  color: #fff;
+  box-shadow: 0 4px 14px rgba(67, 97, 238, 0.35);
+}
+
+.step.completed .step-number {
+  background: #10b981;
+  color: #fff;
+  border-color: #10b981;
+}
+
+.step-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-light);
+  transition: color 0.3s;
+}
+
+.step.active .step-label,
+.step.completed .step-label {
+  color: var(--dark);
+}
+
+.step-line {
+  flex: 1;
+  height: 2px;
+  background: var(--border);
+  margin: 0 12px;
+  margin-bottom: 22px;
+  min-width: 40px;
+  transition: background 0.4s;
+}
+
+.step-line.done {
+  background: linear-gradient(90deg, #10b981, var(--primary-light));
+}
+
+/* ================================================================
+   FORM STEPS
+   ================================================================ */
+.form-step {
+  display: none;
+  animation: fadeInUp 0.3s ease;
+}
+
+.form-step.active {
+  display: block;
+}
+
+.step-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--dark);
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid var(--border);
+  position: relative;
+}
+
+.step-title::after {
+  content: "";
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 50px;
+  height: 2px;
+  background: linear-gradient(90deg, var(--primary), var(--primary-light));
+}
+
+/* ================================================================
+   PASSWORD TOGGLE
+   ================================================================ */
+.password-wrapper {
+  position: relative;
+}
+
+.password-wrapper .form-control {
+  padding-right: 44px;
+}
+
+.toggle-pw {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  opacity: 0.5;
+  transition: opacity 0.2s;
+  padding: 4px;
+}
+
+.toggle-pw:hover {
+  opacity: 1;
+}
+
+/* ================================================================
+   FILE UPLOAD AREAS
+   ================================================================ */
+.file-upload-area {
+  position: relative;
+  border: 2px dashed var(--border);
+  border-radius: var(--radius);
+  padding: 20px 16px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s;
+  background: #fafbfe;
+}
+
+.file-upload-area:hover,
+.file-upload-area.dragover {
+  border-color: var(--primary-light);
+  background: rgba(67, 97, 238, 0.04);
+}
+
+.file-upload-area.has-file {
+  border-color: #10b981;
+  background: rgba(16, 185, 129, 0.04);
+}
+
+.file-input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+  z-index: 2;
+}
+
+.file-upload-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  pointer-events: none;
+}
+
+.file-icon {
+  font-size: 28px;
+  margin-bottom: 4px;
+}
+
+.file-text {
+  font-size: 13px;
+  color: var(--text);
+  font-weight: 500;
+}
+
+.file-hint {
+  font-size: 11px;
+  color: var(--text-light);
+}
+
+.no-type-msg {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 20px;
+  background: #f0f4ff;
+  border-radius: var(--radius);
+  color: var(--primary);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.no-type-icon {
+  font-size: 20px;
+}
+
+/* ================================================================
+   OTP VERIFICATION MODAL
+   ================================================================ */
+.otp-header {
+  text-align: center;
+  justify-content: center;
+  position: relative;
+}
+
+.otp-header .modal-close {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.otp-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 32px 28px 28px;
+}
+
+.otp-icon-wrapper {
+  margin-bottom: 16px;
+}
+
+.otp-icon {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: linear-gradient(
+    135deg,
+    rgba(67, 97, 238, 0.1),
+    rgba(114, 9, 183, 0.1)
+  );
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.06);
+  }
+}
+
+.otp-desc {
+  font-size: 14px;
+  color: var(--text-light);
+  margin: 0 0 4px;
+}
+
+.otp-email {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0 0 28px;
+  word-break: break-all;
+}
+
+/* OTP Input Boxes */
+.otp-inputs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.otp-box {
+  width: 48px;
+  height: 56px;
+  text-align: center;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--dark);
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  outline: none;
+  transition: all 0.2s;
+  background: #fafbfe;
+  caret-color: var(--primary);
+}
+
+.otp-box:focus {
+  border-color: var(--primary-light);
+  box-shadow: 0 0 0 4px rgba(67, 97, 238, 0.15);
+  background: #fff;
+}
+
+.otp-box.filled {
+  border-color: var(--primary);
+  background: #fff;
+}
+
+.otp-box.error {
+  border-color: var(--danger);
+  animation: shake 0.4s ease;
+}
+
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  20%,
+  60% {
+    transform: translateX(-6px);
+  }
+  40%,
+  80% {
+    transform: translateX(6px);
+  }
+}
+
+.otp-error {
+  font-size: 13px;
+  color: var(--danger);
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.otp-timer {
+  font-size: 13px;
+  color: var(--text-light);
+  margin-bottom: 24px;
+}
+
+.otp-timer span {
+  font-weight: 700;
+  color: var(--primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.otp-submit-btn {
+  width: 100%;
+  padding: 14px;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.otp-resend {
+  margin-top: 16px;
+  background: none;
+  border: none;
+  color: var(--primary);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: underline;
+  transition: opacity 0.2s;
+}
+
+.otp-resend:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  text-decoration: none;
+}
+
+/* ================================================================
+   SUCCESS MODAL
+   ================================================================ */
+.success-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 48px 32px 36px;
+}
+
+.success-checkmark {
+  margin-bottom: 20px;
+}
+
+.check-circle {
+  width: 72px;
+  height: 72px;
+  color: #10b981;
+  animation: successPop 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.check-circle svg {
+  width: 100%;
+  height: 100%;
+}
+
+.check-circle circle {
+  stroke-dasharray: 157;
+  stroke-dashoffset: 157;
+  animation: drawCircle 0.6s 0.1s forwards;
+}
+
+.check-circle path {
+  stroke-dasharray: 50;
+  stroke-dashoffset: 50;
+  animation: drawCheck 0.4s 0.5s forwards;
+}
+
+@keyframes successPop {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(1.15);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes drawCircle {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes drawCheck {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.success-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--dark);
+  margin: 0 0 8px;
+}
+
+.success-desc {
+  font-size: 14px;
+  color: var(--text-light);
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* ================================================================
+   FORM VALIDATION STATES
+   ================================================================ */
+.form-control.success {
+  border-color: #10b981;
+}
+
+.form-control.error {
+  border-color: var(--danger);
+}
+
+.form-feedback {
+  font-size: 12px;
+  margin-top: 4px;
+  font-weight: 500;
+}
+
+.form-feedback.success {
+  color: #10b981;
+}
+
+.form-feedback.error {
+  color: var(--danger);
+}
+
+/* ================================================================
+   LOADING STATES
+   ================================================================ */
 .customer-card.loading {
   opacity: 0.6;
   pointer-events: none;
@@ -558,35 +1070,34 @@ textarea.form-control {
   height: 20px;
   margin: -10px 0 0 -10px;
   border: 2px solid #f3f3f3;
-  border-top: 2px solid var(--primary-light, #4361ee);
+  border-top: 2px solid var(--primary-light);
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
 
-/* === Form Validation States === */
-.form-control.success {
-  border-color: #10b981;
+/* ================================================================
+   SCROLLBAR STYLING (for modal body)
+   ================================================================ */
+.modal-content::-webkit-scrollbar {
+  width: 6px;
 }
 
-.form-control.error {
-  border-color: var(--danger, #f72585);
+.modal-content::-webkit-scrollbar-track {
+  background: transparent;
 }
 
-.form-feedback {
-  font-size: 12px;
-  margin-top: 4px;
-  font-weight: 500;
+.modal-content::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.12);
+  border-radius: 3px;
 }
 
-.form-feedback.success {
-  color: #10b981;
+.modal-content::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.2);
 }
 
-.form-feedback.error {
-  color: var(--danger, #f72585);
-}
-
-/* === Animations === */
+/* ================================================================
+   ANIMATIONS
+   ================================================================ */
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -616,13 +1127,14 @@ textarea.form-control {
   }
 }
 
-/* === Responsive Design === */
+/* ================================================================
+   RESPONSIVE
+   ================================================================ */
 @media (max-width: 1200px) {
   .customer-card {
     grid-template-columns: auto 1fr;
     grid-template-rows: auto auto;
   }
-
   .customer-actions {
     grid-column: 1 / -1;
     flex-direction: row;
@@ -631,7 +1143,6 @@ textarea.form-control {
     padding-top: 16px;
     border-top: 1px solid rgba(0, 0, 0, 0.05);
   }
-
   .contact-info {
     text-align: left;
   }
@@ -643,56 +1154,61 @@ textarea.form-control {
     gap: 16px;
     align-items: flex-start;
   }
-
   .filter-row {
     grid-template-columns: 1fr;
   }
-
   .search-actions {
     justify-content: stretch;
   }
-
   .search-actions .btn {
     flex: 1;
   }
-
   .customer-card {
     grid-template-columns: 1fr;
     text-align: center;
   }
-
   .customer-avatar {
     margin: 0 auto;
   }
-
   .customer-details {
     justify-content: center;
   }
-
   .customer-rating {
     justify-content: center;
   }
-
   .customer-actions {
     flex-direction: column;
     align-items: center;
   }
-
   .contact-info {
     text-align: center;
   }
-
   .form-row {
     grid-template-columns: 1fr;
   }
-
   .modal-content {
     width: 95%;
-    margin: 20px;
   }
-
+  .modal-content.modal-lg {
+    max-width: 95%;
+  }
   .page-title {
     font-size: 24px;
+  }
+  .step-indicator {
+    gap: 0;
+    padding: 20px 16px 8px;
+  }
+  .step-label {
+    font-size: 10px;
+  }
+  .otp-box {
+    width: 42px;
+    height: 50px;
+    font-size: 20px;
+  }
+  .otp-inputs {
+    gap: 8px;
   }
 }
 
@@ -700,28 +1216,31 @@ textarea.form-control {
   .customer-card {
     padding: 16px;
   }
-
   .customer-avatar {
     width: 48px;
     height: 48px;
   }
-
   .avatar-text {
     font-size: 16px;
   }
-
   .customer-name {
     font-size: 16px;
   }
-
   .search-filter-section,
   .customers-section {
     padding: 16px;
   }
-
   .modal-header,
   .modal-body,
   .modal-footer {
     padding: 16px;
+  }
+  .otp-box {
+    width: 38px;
+    height: 46px;
+    font-size: 18px;
+  }
+  .otp-inputs {
+    gap: 6px;
   }
 }
