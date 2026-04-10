@@ -1,4 +1,4 @@
-package admin.service;
+package customer.service;
 
 import admin.controller.AdminController;
 import com.google.gson.JsonObject;
