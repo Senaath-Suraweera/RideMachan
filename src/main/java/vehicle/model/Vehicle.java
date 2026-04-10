@@ -19,6 +19,10 @@ public class Vehicle {
     private String milage;
     private Integer companyId;
     private Integer providerId;
+    private double pricePerDay;
+    private String location;
+    private String features;
+
 
     // Constructors
     public Vehicle() {}
@@ -92,4 +96,13 @@ public class Vehicle {
 
     public Integer getProviderId() { return providerId; }
     public void setProviderId(Integer providerId) { this.providerId = providerId; }
+
+    public double getPricePerDay() { return pricePerDay; }
+    public void setPricePerDay(double pricePerDay) { this.pricePerDay = pricePerDay; }
+
+    public String getLocation() { return location; }
+    public void setLocation(String location) { this.location = location; }
+
+    public String getFeatures() { return features; }
+    public void setFeatures(String features) { this.features = features; }
 }
