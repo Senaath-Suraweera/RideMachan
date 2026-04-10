@@ -1,47 +1,93 @@
-/* Earnings Specific Styles */
+/* =========================================================
+   Earnings — Theme-aligned (matches main.css + home.css reference)
+   ========================================================= */
+
 .page-header h1 {
-  font-size: 32px;
-  font-weight: 600;
-  color: #202124;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--dark, #1a1a2e);
   margin: 0 0 12px 0;
+  position: relative;
+  padding-bottom: 10px;
+}
+
+.page-header h1::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 40px;
+  height: 3px;
+  background: linear-gradient(
+    90deg,
+    var(--primary, #3a0ca3),
+    var(--primary-light, #4361ee)
+  );
+  border-radius: 10px;
 }
 
 .page-subtitle {
-  font-size: 16px;
-  color: #5f6368;
+  font-size: 14px;
+  color: var(--text-light, #718096);
   margin-bottom: 30px;
+  font-weight: 500;
 }
 
 /* Stats Grid */
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 24px;
-  margin-bottom: 32px;
+  gap: 25px;
+  margin-bottom: 30px;
+  animation: fadeInUp 0.6s ease;
 }
 
 .stat-card {
   background: white;
-  border-radius: 12px;
+  border-radius: var(--radius, 10px);
   padding: 24px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-sm, 0 4px 6px -1px rgba(0, 0, 0, 0.1));
   display: flex;
   align-items: center;
   gap: 20px;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: all 0.4s ease;
+  border: 1px solid rgba(0, 0, 0, 0.03);
+  position: relative;
+  overflow: hidden;
+}
+
+.stat-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
 }
 
 .stat-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  transform: translateY(-5px);
+  box-shadow: var(
+    --shadow-lg,
+    0 20px 25px -5px rgba(0, 0, 0, 0.1),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04)
+  );
 }
 
-.stat-card.income {
-  border-left: 4px solid #1abc9c;
+.stat-card.income::before {
+  background: linear-gradient(
+    to bottom,
+    var(--primary, #3a0ca3),
+    var(--primary-light, #4361ee)
+  );
 }
 
-.stat-card.bookings {
-  border-left: 4px solid #3498db;
+.stat-card.bookings::before {
+  background: linear-gradient(
+    to bottom,
+    var(--info, #4895ef),
+    var(--success, #4cc9f0)
+  );
 }
 
 .stat-icon {
@@ -51,8 +97,15 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #f8f9fa;
-  border-radius: 12px;
+  background: rgba(67, 97, 238, 0.08);
+  border-radius: 50%;
+  color: var(--primary, #3a0ca3);
+  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.06);
+  transition: var(--transition, all 0.3s ease);
+}
+
+.stat-card:hover .stat-icon {
+  transform: scale(1.1);
 }
 
 .stat-content {
@@ -62,13 +115,18 @@
 .stat-value {
   font-size: 32px;
   font-weight: 700;
-  color: #202124;
-  margin-bottom: 8px;
+  color: var(--dark, #1a1a2e);
+  margin-bottom: 6px;
+  transition: var(--transition, all 0.3s ease);
+}
+
+.stat-card:hover .stat-value {
+  color: var(--primary, #3a0ca3);
 }
 
 .stat-label {
-  font-size: 16px;
-  color: #5f6368;
+  font-size: 15px;
+  color: var(--text-light, #718096);
   margin-bottom: 8px;
   font-weight: 500;
 }
@@ -80,23 +138,24 @@
 }
 
 .stat-change.positive {
-  color: #2e7d32;
+  color: #059669;
 }
 
 .stat-change.negative {
-  color: #c62828;
+  color: #db2777;
 }
 
 /* Chart Section */
 .chart-section {
-  margin-bottom: 32px;
+  margin-bottom: 30px;
 }
 
 .chart-card {
   background: white;
-  border-radius: 12px;
-  padding: 24px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-radius: var(--radius, 10px);
+  padding: 25px;
+  box-shadow: var(--shadow-sm, 0 4px 6px -1px rgba(0, 0, 0, 0.1));
+  border: 1px solid rgba(0, 0, 0, 0.03);
 }
 
 .chart-header {
@@ -109,15 +168,15 @@
 }
 
 .chart-header h2 {
-  font-size: 24px;
+  font-size: 20px;
   font-weight: 600;
-  color: #202124;
+  color: var(--dark, #1a1a2e);
   margin-bottom: 8px;
 }
 
 .chart-header p {
   font-size: 14px;
-  color: #5f6368;
+  color: var(--text-light, #718096);
   margin: 0;
 }
 
@@ -136,7 +195,7 @@
 .earnings-grid {
   display: grid;
   grid-template-columns: 400px 1fr;
-  gap: 24px;
+  gap: 25px;
 }
 
 /* Vehicle Earnings Section */
@@ -158,18 +217,20 @@
   align-items: center;
   padding: 16px;
   background: #f8f9fa;
-  border-radius: 8px;
-  transition: background-color 0.2s ease;
+  border-radius: var(--radius-sm, 6px);
+  transition: all 0.2s ease;
 }
 
 .vehicle-earning-item:hover {
-  background: #e8eaed;
+  background: rgba(67, 97, 238, 0.05);
+  transform: translateY(-2px);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.04);
 }
 
 .ranking {
   font-size: 18px;
   font-weight: 700;
-  color: #1abc9c;
+  color: var(--primary, #3a0ca3);
   width: 40px;
   text-align: center;
 }
@@ -182,13 +243,13 @@
 .vehicle-name {
   font-size: 16px;
   font-weight: 600;
-  color: #202124;
+  color: var(--dark, #1a1a2e);
 }
 
 .earnings-amount {
   font-size: 16px;
   font-weight: 700;
-  color: #202124;
+  color: var(--dark, #1a1a2e);
   display: flex;
   align-items: center;
   gap: 8px;
@@ -199,11 +260,11 @@
 }
 
 .trend.up {
-  color: #2e7d32;
+  color: #059669;
 }
 
 .trend.down {
-  color: #c62828;
+  color: #db2777;
 }
 
 /* Recent Bookings Section */
@@ -215,17 +276,23 @@
 
 .booking-item {
   background: #f8f9fa;
-  border-radius: 12px;
+  border-radius: var(--radius, 10px);
   padding: 20px;
-  border-left: 4px solid #e8eaed;
+  border-left: 4px solid var(--border, #e9ecef);
+  transition: all 0.2s ease;
+}
+
+.booking-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
 }
 
 .booking-item.completed {
-  border-left-color: #2e7d32;
+  border-left-color: #059669;
 }
 
 .booking-item.ongoing {
-  border-left-color: #1976d2;
+  border-left-color: var(--primary-light, #4361ee);
 }
 
 .booking-header {
@@ -238,25 +305,28 @@
 .vehicle-id {
   font-size: 16px;
   font-weight: 600;
-  color: #202124;
+  color: var(--dark, #1a1a2e);
 }
 
 .booking-status {
   padding: 4px 12px;
-  border-radius: 16px;
+  border-radius: 999px;
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 700;
   text-transform: uppercase;
+  border: 1px solid rgba(0, 0, 0, 0.04);
 }
 
 .booking-status.completed {
-  background: #e8f5e8;
-  color: #2e7d32;
+  background: rgba(16, 185, 129, 0.15);
+  color: #059669;
+  border-color: rgba(16, 185, 129, 0.22);
 }
 
 .booking-status.ongoing {
-  background: #e3f2fd;
-  color: #1976d2;
+  background: rgba(72, 149, 239, 0.15);
+  color: #2563eb;
+  border-color: rgba(72, 149, 239, 0.22);
 }
 
 .booking-details {
@@ -265,7 +335,7 @@
   gap: 8px;
   margin-bottom: 16px;
   font-size: 14px;
-  color: #5f6368;
+  color: var(--text-light, #718096);
 }
 
 .booking-details > div {
@@ -282,29 +352,32 @@
 
 .progress-step {
   font-size: 12px;
-  font-weight: 500;
+  font-weight: 600;
   padding: 4px 8px;
-  border-radius: 12px;
+  border-radius: 999px;
   display: flex;
   align-items: center;
   gap: 4px;
+  border: 1px solid rgba(0, 0, 0, 0.04);
 }
 
 .progress-step.completed {
-  background: #e8f5e8;
-  color: #2e7d32;
+  background: rgba(16, 185, 129, 0.15);
+  color: #059669;
+  border-color: rgba(16, 185, 129, 0.22);
 }
 
 .progress-step.pending {
-  background: #fff3e0;
-  color: #f57c00;
+  background: rgba(248, 150, 30, 0.15);
+  color: #d97706;
+  border-color: rgba(248, 150, 30, 0.22);
 }
 
 .fare-breakdown {
   background: white;
-  border-radius: 8px;
+  border-radius: var(--radius-sm, 6px);
   padding: 16px;
-  border: 1px solid #e8eaed;
+  border: 1px solid var(--border, #e9ecef);
 }
 
 .fare-item {
@@ -316,39 +389,33 @@
 }
 
 .fare-item:not(:last-child) {
-  border-bottom: 1px solid #f1f3f4;
+  border-bottom: 1px solid var(--border, #e9ecef);
 }
 
 .fare-item.platform-fee span:last-child,
 .fare-item.company-fee span:last-child {
-  color: #c62828;
+  color: #db2777;
 }
 
 .fare-item.net-earnings {
   font-weight: 600;
   font-size: 16px;
-  background: #e8f5e8;
+  background: rgba(16, 185, 129, 0.12);
   margin: 8px -16px -16px -16px;
   padding: 12px 16px;
-  border-radius: 0 0 8px 8px;
+  border-radius: 0 0 var(--radius-sm, 6px) var(--radius-sm, 6px);
 }
 
 .fare-item.net-earnings span:last-child {
-  color: #2e7d32;
+  color: #059669;
   font-weight: 700;
 }
-
-
-.chart-container {
-  height: 400px;
-  position: relative;
-} 
 
 #earningsChart {
   width: 100%;
   height: 100%;
   display: block;
-} 
+}
 
 /* Responsive Design */
 @media (max-width: 1024px) {
@@ -432,5 +499,17 @@
 
   .progress-step {
     justify-content: flex-start;
+  }
+}
+
+/* Animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }

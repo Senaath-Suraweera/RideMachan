@@ -1,4 +1,43 @@
-/* Theme-bridged shared styles — align with home.css manager theme */
+/* =========================================================
+   Shared Styles — Theme-aligned with customer main.css
+   ========================================================= */
+
+/* =========================
+   CSS Variables (mirrored from main.css)
+   ========================= */
+:root {
+  /* Color Palette */
+  --primary: #3a0ca3;
+  --primary-light: #4361ee;
+  --secondary: #7209b7;
+  --success: #4cc9f0;
+  --danger: #f72585;
+  --warning: #f8961e;
+  --info: #4895ef;
+  --dark: #1a1a2e;
+  --light: #f8f9fa;
+  --border: #e9ecef;
+  --text: #2d3748;
+  --text-light: #718096;
+
+  /* Shadows */
+  --shadow:
+    0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  --shadow-lg:
+    0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+
+  /* Border Radius */
+  --radius: 10px;
+  --radius-sm: 6px;
+
+  /* Layout */
+  --sidebar-width: 260px;
+  --header-height: 70px;
+
+  /* Transition */
+  --transition: all 0.3s ease;
+}
 
 /* Base reset */
 * {
@@ -10,9 +49,31 @@
 html,
 body {
   height: 100%;
-  background-color: #f5f7fb; /* same bg as home */
-  color: var(--text, #2d3748);
+  background-color: #f5f7fb;
+  color: var(--text);
   font-family: "Poppins", sans-serif;
+  overflow-x: hidden;
+}
+
+/* =========================
+   Custom Scrollbar
+   ========================= */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--primary-light);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--primary);
 }
 
 /* Layout: keep space for the fixed sidebar */
@@ -209,14 +270,6 @@ body {
   margin-bottom: 20px;
 }
 
-/* Responsive */
-@media (max-width: 992px) {
-  .main-content {
-    margin-left: 0;
-    padding: 20px;
-  }
-}
-
 .search-filter-section .filter-row {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -309,16 +362,51 @@ body {
 /* Secondary button (used by filter toggle / load more, etc.) */
 .btn.btn-secondary {
   background: #f1f3f4;
-  color: #5f6368;
-  border: 1px solid #dadce0;
+  color: var(--text-light);
+  border: 1px solid var(--border);
 }
 .btn.btn-secondary:hover {
-  background: #eaecef;
+  background: rgba(67, 97, 238, 0.06);
+  color: var(--primary);
+  border-color: var(--primary-light);
 }
 
 /* Search box takes remaining width on My Vehicles */
 .search-filter-section .search-box .form-control {
   width: 100%;
+}
+
+/* =========================
+   Animations
+   ========================= */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* =========================
+   Responsive Media Queries
+   ========================= */
+@media (max-width: 992px) {
+  .main-content {
+    margin-left: 0;
+    padding: 20px;
+  }
 }
 
 /* Compact helper for small screens */
@@ -334,4 +422,11 @@ body {
   .search-filter-section .btn {
     width: 100%;
   }
+}
+
+/* =========================
+   Font Awesome Icon Size
+   ========================= */
+.fas {
+  font-size: 18px;
 }

@@ -1,8 +1,36 @@
+/* =========================================================
+   Provider Profile — Theme-aligned (matches main.css + home.css reference)
+   ========================================================= */
+
 .page-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 24px;
+}
+
+.page-header h1 {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--dark, #1a1a2e);
+  margin: 0;
+  position: relative;
+  padding-bottom: 10px;
+}
+
+.page-header h1::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 40px;
+  height: 3px;
+  background: linear-gradient(
+    90deg,
+    var(--primary, #3a0ca3),
+    var(--primary-light, #4361ee)
+  );
+  border-radius: 10px;
 }
 
 .header-actions {
@@ -12,23 +40,24 @@
 
 .card {
   background: #fff;
-  border-radius: 12px;
+  border-radius: var(--radius, 10px);
   padding: 24px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-sm, 0 4px 6px -1px rgba(0, 0, 0, 0.1));
+  border: 1px solid rgba(0, 0, 0, 0.03);
 }
 
 .card-header h2 {
   margin: 0 0 6px 0;
-  font-size: 22px;
-  font-weight: 800;
-  color: #202124;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--dark, #1a1a2e);
 }
 
 .card-header p {
   margin: 0 0 18px 0;
-  color: #5f6368;
+  color: var(--text-light, #718096);
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 500;
 }
 
 .form-grid {
@@ -40,8 +69,8 @@
 .form-group label {
   display: block;
   font-size: 12px;
-  color: #5f6368;
-  font-weight: 800;
+  color: var(--text-light, #718096);
+  font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.4px;
   margin-bottom: 6px;
@@ -50,24 +79,25 @@
 .input {
   width: 100%;
   padding: 12px 14px;
-  border: 1px solid #e8eaed;
-  border-radius: 12px;
+  border: 1px solid var(--border, #e9ecef);
+  border-radius: var(--radius-sm, 6px);
   outline: none;
   font-size: 14px;
-  font-weight: 650;
-  color: #202124;
+  font-weight: 600;
+  color: var(--dark, #1a1a2e);
   background: #f8fafc;
+  transition: all 0.2s ease;
 }
 
 .input:focus {
   background: #fff;
-  border-color: rgba(67, 97, 238, 0.45);
-  box-shadow: 0 0 0 4px rgba(67, 97, 238, 0.12);
+  border-color: var(--primary-light, #4361ee);
+  box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.15);
 }
 
 .divider {
   height: 1px;
-  background: #eef0f2;
+  background: var(--border, #e9ecef);
   margin: 18px 0;
 }
 
@@ -81,22 +111,22 @@
 .muted {
   font-size: 12px;
   color: #6b7280;
-  font-weight: 800;
+  font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.4px;
 }
 
 .strong {
   font-size: 14px;
-  font-weight: 850;
-  color: #202124;
+  font-weight: 700;
+  color: var(--dark, #1a1a2e);
 }
 
 .toast {
   margin-top: 16px;
   padding: 12px 14px;
-  border-radius: 12px;
-  font-weight: 800;
+  border-radius: var(--radius-sm, 6px);
+  font-weight: 700;
   font-size: 13px;
 }
 
