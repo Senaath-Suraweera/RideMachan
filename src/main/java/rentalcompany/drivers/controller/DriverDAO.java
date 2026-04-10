@@ -246,6 +246,11 @@ public class DriverDAO {
 
 
 
+
+    //pevindi's part
+
+
+
     // Get complete driver profile with company details
     public static Driver getDriverProfile(int driverId) {
 

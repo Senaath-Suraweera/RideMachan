@@ -2,6 +2,7 @@ package vehicle.dao;
 
 import common.util.DBConnection;
 import vehicle.model.Vehicle;
+import vehicle.model.MaintenanceRecord;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -259,4 +260,46 @@ public class VehicleDAO {
 
         return vehicleId;
     }
+
+    public static List<MaintenanceRecord> getMaintenanceRecordsByVehicleId(int vehicleId) {
+
+        List<MaintenanceRecord> records = new ArrayList<>();
+
+        String sql1 = "SELECT jobId, vehicleId, assignedStaffId, companyId, status, scheduledDate, completedDate, type, description, mileage " +
+                      "FROM maintenancejobs WHERE vehicleId = ? ORDER BY scheduledDate DESC";
+
+        //String sql2 = "";
+
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql1)) {
+
+            ps.setInt(1, vehicleId);
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+
+                MaintenanceRecord record = new MaintenanceRecord();
+
+                record.setRecordId(rs.getInt("jobId"));
+                record.setVehicleId(rs.getInt("vehicleId"));
+                record.setCompanyId(rs.getInt("companyId"));
+                record.setStatus(rs.getString("status"));
+                record.setScheduledDate(rs.getString("scheduledDate"));
+                record.setCompletedDate(rs.getString("completedDate"));
+                record.setServiceType(rs.getString("type"));
+                record.setDescription(rs.getString("description"));
+                record.setMileage(rs.getInt("mileage"));
+
+                records.add(record);
+
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return records;
+
+    }
+
 }
