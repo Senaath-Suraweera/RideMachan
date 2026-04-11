@@ -13,7 +13,7 @@ import vehicle.dao.VehicleDAO;
 
 import java.io.IOException;
 
-@WebServlet("/displaymaintenancestatistics")
+@WebServlet("/display/maintenancestatistics")
 public class DisplayMaintenanceStaffStatistics extends HttpServlet {
 
     @Override
@@ -23,11 +23,11 @@ public class DisplayMaintenanceStaffStatistics extends HttpServlet {
 
             HttpSession session = req.getSession(false);
 
-            /*if(session == null || session.getAttribute("staff_id") == null) {
+            if(session == null || session.getAttribute("staff_id") == null) {
                 String requestedPage = req.getRequestURI();
-                //resp.sendRedirect(req.getContextPath() + "companylogin.html?redirect=" + requestedPage);
+                resp.sendRedirect(req.getContextPath() + "/maintenance.html?redirect=" + requestedPage);
                 return;
-            }*/
+            }
 
             int staffId = (int) session.getAttribute("staff_id");
 

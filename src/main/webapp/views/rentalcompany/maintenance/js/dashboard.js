@@ -2,7 +2,7 @@ async function checkLogin() {
 
     try {
 
-        const response = await fetch("/checklogin");
+        const response = await fetch("/check/login/maintenance");
         const data = await response.json();
 
         if (!data.loggedIn) {
@@ -13,7 +13,7 @@ async function checkLogin() {
 
             document.getElementById("loginOkBtn").onclick = () => {
 
-                window.location.href = "/login";
+                window.location.href = "/views/landing/maintenancelogin.html";
 
             };
 
@@ -37,7 +37,7 @@ async function loadStatistics() {
 
     try {
 
-        const response = await fetch("/displaymaintenancestatistics", {method: "POST"});
+        const response = await fetch("/display/maintenancestatistics", {method: "POST"});
         console.log(response);
 
         if (!response.ok) {
@@ -64,7 +64,7 @@ async function loadMaintenanceDistribution() {
 
     try {
 
-        const response = await fetch("/displaymaintenancedistribution", {method: "POST"});
+        const response = await fetch("/display/maintenance/distribution", {method: "POST"});
         console.log(response);
 
         if (!response.ok) {
@@ -381,7 +381,7 @@ document.addEventListener("DOMContentLoaded", async function() {
 
     try {
 
-        /*
+
 
           const loggedIn = await checkLogin();
 
@@ -389,7 +389,7 @@ document.addEventListener("DOMContentLoaded", async function() {
               return;    // stop here if not logged in
           }
 
-        */
+
 
         const dummyData = createDummyDataInput();
 

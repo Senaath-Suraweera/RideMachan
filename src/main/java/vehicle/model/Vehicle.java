@@ -11,6 +11,7 @@ public class Vehicle {
     private int tareWeight;
     private String color;
     private int numberOfPassengers;
+    private int associateMaintenanceStaffId;
     private int engineCapacity;
     private String engineNumber;
     private String chasisNumber;
@@ -73,6 +74,9 @@ public class Vehicle {
 
     public int getNumberOfPassengers() { return numberOfPassengers; }
     public void setNumberOfPassengers(int numberOfPassengers) { this.numberOfPassengers = numberOfPassengers; }
+
+    public int getAssociateMaintenanceStaffId() { return associateMaintenanceStaffId; }
+    public void setAssociateMaintenanceStaffId(int associateMaintenanceStaffId) { this.associateMaintenanceStaffId = associateMaintenanceStaffId;}
 
     public int getEngineCapacity() { return engineCapacity; }
     public void setEngineCapacity(int engineCapacity) { this.engineCapacity = engineCapacity; }

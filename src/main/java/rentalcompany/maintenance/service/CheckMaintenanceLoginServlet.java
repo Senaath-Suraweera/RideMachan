@@ -8,8 +8,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 
 
-@WebServlet("/checkloginmaintenance")
-public class CheckLoginServlet extends HttpServlet{
+@WebServlet("/check/login/maintenance")
+public class CheckMaintenanceLoginServlet extends HttpServlet{
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)

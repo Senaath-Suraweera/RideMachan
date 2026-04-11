@@ -10,7 +10,7 @@ import jakarta.servlet.http.*;
 import rentalcompany.maintenance.controller.MaintenanceStaffDAO;
 
 
-@WebServlet("/displaymaintenancedistribution")
+@WebServlet("/display/maintenance/distribution")
 public class MaintenanceTypeDistributionServlet extends HttpServlet{
 
     @Override
@@ -20,11 +20,11 @@ public class MaintenanceTypeDistributionServlet extends HttpServlet{
 
             HttpSession session = req.getSession(false);
 
-            /*if(session == null || session.getAttribute("staff_id") == null) {
+            if(session == null || session.getAttribute("staff_id") == null) {
                 String requestedPage = req.getRequestURI();
-                resp.sendRedirect(req.getContextPath() + "maintenance.html?redirect=" + requestedPage);
+                resp.sendRedirect(req.getContextPath() + "/maintenance.html?redirect=" + requestedPage);
                 return;
-            }*/
+            }
 
             int staffId = (int) session.getAttribute("staff_id");
 
@@ -35,14 +35,12 @@ public class MaintenanceTypeDistributionServlet extends HttpServlet{
             float otherServicesPercentage = MaintenanceStaffDAO.calculateMaintenanceStaffPercentage(staffId,"Other Services");
 
 
-            String json = "{"
-                    + "\"maintenanceDistribution\": {"
+            String json = "["
                     + "{\"type\":\"Oil Changes\",\"percentage\":" + oilChangesPercentage + "},"
                     + "{\"type\":\"Brake Services\",\"percentage\":" + brakeServicesPercentage + "},"
                     + "{\"type\":\"Tire Services\",\"percentage\":" + tireServicesPercentage + "},"
                     + "{\"type\":\"Other Services\",\"percentage\":" + otherServicesPercentage + "}"
-                    + "}"
-                    + "}";
+                    + "]";
 
             resp.getWriter().write(json);
 
