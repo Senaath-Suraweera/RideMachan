@@ -410,9 +410,9 @@ class Dashboard {
   handleStatCardClick(index) {
     const pages = [
       "earnings.html",
-      "ongoing-orders.html",
-      "support-tickets.html",
-      "reports.html",
+      "rental-company-requests.html",
+      "support-ticket-view.html",
+      "report-view.html",
     ];
     if (pages[index]) window.location.href = pages[index];
   }

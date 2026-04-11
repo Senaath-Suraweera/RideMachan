@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", function () {
-  const providerId = sessionStorage.getItem("providerId"); // set this after login
+  const providerId = sessionStorage.getItem("providerId"); // used for dashboard/profile endpoints
   const baseUrl = "http://localhost:8080/api/provider/dashboard";
 
   loadSummary(baseUrl, providerId);
@@ -13,11 +13,15 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 async function apiGet(url) {
-  const res = await fetch(url);
+  const res = await fetch(url, {
+    credentials: "include",
+  });
+
   if (!res.ok) {
     const txt = await res.text();
     throw new Error(txt || `HTTP ${res.status}`);
   }
+
   return res.json();
 }
 
@@ -25,12 +29,36 @@ async function apiPut(url, body) {
   const res = await fetch(url, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
+    credentials: "include",
     body: JSON.stringify(body ?? {}),
   });
+
   if (!res.ok) {
     const txt = await res.text();
     throw new Error(txt || `HTTP ${res.status}`);
   }
+
+  return res.json().catch(() => ({}));
+}
+
+async function apiPost(url, body = null) {
+  const options = {
+    method: "POST",
+    credentials: "include",
+  };
+
+  if (body !== null) {
+    options.headers = { "Content-Type": "application/json" };
+    options.body = JSON.stringify(body);
+  }
+
+  const res = await fetch(url, options);
+
+  if (!res.ok) {
+    const txt = await res.text();
+    throw new Error(txt || `HTTP ${res.status}`);
+  }
+
   return res.json().catch(() => ({}));
 }
 
@@ -40,10 +68,9 @@ function formatLKR(amount) {
 }
 
 /* =========================
-   NEW: Header actions
+   Header actions — profile & notifications
 ========================= */
 function wireHeaderActions(providerId) {
-  const profileBtn = document.getElementById("profileBtn");
   const notifBtn = document.getElementById("notifBtn");
   const notifPopover = document.getElementById("notifPopover");
   const notifCloseBtn = document.getElementById("notifCloseBtn");
@@ -51,63 +78,168 @@ function wireHeaderActions(providerId) {
   const notifList = document.getElementById("notifList");
   const markAllSeenBtn = document.getElementById("markAllSeenBtn");
 
-  if (profileBtn) {
-    profileBtn.addEventListener("click", () => {
-      // store providerId just in case
-      if (providerId) sessionStorage.setItem("providerId", providerId);
-      window.location.href = "./provider-profile.html";
+  const profileToggle = document.getElementById("profileToggle");
+  const profileDropdown = document.getElementById("profileDropdown");
+
+  if (profileToggle && profileDropdown) {
+    profileToggle.addEventListener("click", function (event) {
+      event.stopPropagation();
+      profileDropdown.classList.toggle("show");
+    });
+
+    document.addEventListener("click", function (event) {
+      if (
+        profileToggle &&
+        !profileToggle.contains(event.target) &&
+        profileDropdown &&
+        !profileDropdown.contains(event.target)
+      ) {
+        profileDropdown.classList.remove("show");
+      }
     });
   }
 
-  // Notifications
+  const logoutLink = document.getElementById("logoutLink");
+  if (logoutLink) {
+    logoutLink.addEventListener("click", function (event) {
+      event.preventDefault();
+      handleLogout();
+    });
+  }
+
+  loadProviderInfo(providerId);
+
   let pollTimer = null;
 
-  async function refreshNotifications() {
-    if (!providerId) return;
-    const url = `http://localhost:8080/api/provider/notifications?providerId=${encodeURIComponent(
-      providerId,
-    )}&limit=10`;
-
+  async function refreshNotificationCount() {
     try {
-      const data = await apiGet(url);
-      const items = data.items || [];
+      const data = await apiGet(
+        "http://localhost:8080/api/notifications/count",
+      );
+      const count = Number(data.count || 0);
 
-      // "Seen" state stored locally (no DB changes)
-      const seenKey = `provider_${providerId}_notif_seen_max_bookingId`;
-      const seenMax = Number(localStorage.getItem(seenKey) || 0);
-
-      // Count unseen by bookingId
-      const unseen = items.filter((x) => Number(x.bookingId || 0) > seenMax);
       if (notifBadge) {
-        if (unseen.length > 0) {
-          notifBadge.style.display = "inline-flex";
-          notifBadge.textContent = `${unseen.length}`;
+        if (count > 0) {
+          notifBadge.style.display = "flex";
+          notifBadge.textContent = String(count);
         } else {
           notifBadge.style.display = "none";
+          notifBadge.textContent = "0";
         }
       }
+    } catch (e) {
+      console.error("Notification count load failed:", e.message);
+    }
+  }
+
+  function formatNotificationMeta(n) {
+    const createdAt = n.createdAt ? new Date(n.createdAt) : null;
+
+    let dateText = "";
+    if (createdAt && !Number.isNaN(createdAt.getTime())) {
+      dateText = createdAt.toLocaleString();
+    } else {
+      dateText = n.createdAt || "";
+    }
+
+    const refType = n.referenceType || "";
+    const refId =
+      n.referenceId !== null && n.referenceId !== undefined
+        ? String(n.referenceId)
+        : "";
+
+    if (refType && refId) {
+      return { left: dateText, right: `${refType} #${refId}` };
+    }
+
+    if (refType) {
+      return { left: dateText, right: refType };
+    }
+
+    return { left: dateText, right: n.type || "" };
+  }
+
+  function redirectFromNotification(n) {
+    const refType = (n.referenceType || "").toUpperCase();
+    const refId = n.referenceId;
+
+    if (!refType || refId === null || refId === undefined) return;
+
+    switch (refType) {
+      case "PROVIDER_REQUEST":
+        window.location.href = `./provider-requests.html?requestId=${encodeURIComponent(refId)}`;
+        break;
+      case "BOOKING":
+        window.location.href = `./bookings.html?bookingId=${encodeURIComponent(refId)}`;
+        break;
+      case "TICKET":
+        window.location.href = `./support.html?ticketId=${encodeURIComponent(refId)}`;
+        break;
+      case "REPORT":
+        window.location.href = `./reports.html?reportId=${encodeURIComponent(refId)}`;
+        break;
+      default:
+        // stay on page if no target screen exists yet
+        break;
+    }
+  }
+
+  async function markNotificationRead(notificationId) {
+    await apiPost(
+      `http://localhost:8080/api/notifications/read?id=${encodeURIComponent(notificationId)}`,
+    );
+  }
+
+  async function refreshNotifications() {
+    try {
+      const data = await apiGet(
+        "http://localhost:8080/api/notifications?limit=10&offset=0",
+      );
+
+      const items = data.notifications || [];
 
       if (notifList) {
         notifList.innerHTML = "";
+
         if (items.length === 0) {
-          notifList.innerHTML = `<div class="notif-item"><div class="notif-title">No notifications</div><div class="notif-msg">You're all caught up.</div></div>`;
+          notifList.innerHTML = `
+            <div class="notif-item">
+              <div class="notif-title">No notifications</div>
+              <div class="notif-msg">You're all caught up.</div>
+            </div>
+          `;
           return;
         }
 
         items.forEach((n) => {
-          const bookingId = Number(n.bookingId || 0);
-          const isUnseen = bookingId > seenMax;
+          const meta = formatNotificationMeta(n);
 
           const div = document.createElement("div");
-          div.className = `notif-item ${isUnseen ? "unseen" : ""}`;
+          div.className = `notif-item ${!n.isRead ? "unseen" : ""}`;
           div.innerHTML = `
             <div class="notif-title">${escapeHtml(n.title || "Notification")}</div>
-            <div class="notif-msg">${escapeHtml(n.message || "")}</div>
+            <div class="notif-msg">${escapeHtml(n.body || "")}</div>
             <div class="notif-meta">
-              <span>${escapeHtml(n.date || "")}</span>
-              <span>#${escapeHtml(String(n.bookingId || ""))}</span>
+              <span>${escapeHtml(meta.left || "")}</span>
+              <span>${escapeHtml(meta.right || "")}</span>
             </div>
           `;
+
+          div.addEventListener("click", async () => {
+            try {
+              if (!n.isRead) {
+                await markNotificationRead(n.notificationId);
+              }
+
+              await refreshNotificationCount();
+              await refreshNotifications();
+
+              redirectFromNotification(n);
+            } catch (e) {
+              console.error("Notification click failed:", e.message);
+            }
+          });
+
           notifList.appendChild(div);
         });
       }
@@ -120,6 +252,7 @@ function wireHeaderActions(providerId) {
     if (!notifPopover) return;
     notifPopover.style.display = "block";
     refreshNotifications();
+    refreshNotificationCount();
   }
 
   function closePopover() {
@@ -130,6 +263,9 @@ function wireHeaderActions(providerId) {
   if (notifBtn) {
     notifBtn.addEventListener("click", (ev) => {
       ev.stopPropagation();
+
+      if (profileDropdown) profileDropdown.classList.remove("show");
+
       const visible = notifPopover && notifPopover.style.display === "block";
       if (visible) closePopover();
       else openPopover();
@@ -140,52 +276,89 @@ function wireHeaderActions(providerId) {
     notifCloseBtn.addEventListener("click", closePopover);
   }
 
-  // click outside closes
   document.addEventListener("click", (ev) => {
     if (!notifPopover) return;
     if (notifPopover.style.display !== "block") return;
     if (
       notifPopover.contains(ev.target) ||
       (notifBtn && notifBtn.contains(ev.target))
-    )
+    ) {
       return;
+    }
     closePopover();
   });
 
   if (markAllSeenBtn) {
     markAllSeenBtn.addEventListener("click", async () => {
-      if (!providerId) return;
-      const url = `http://localhost:8080/api/provider/notifications?providerId=${encodeURIComponent(
-        providerId,
-      )}&limit=10`;
       try {
-        const data = await apiGet(url);
-        const items = data.items || [];
-        const maxId = items.reduce(
-          (m, x) => Math.max(m, Number(x.bookingId || 0)),
-          0,
-        );
-
-        const seenKey = `provider_${providerId}_notif_seen_max_bookingId`;
-        localStorage.setItem(seenKey, String(maxId));
-
+        await apiPost("http://localhost:8080/api/notifications/readAll");
+        await refreshNotificationCount();
         await refreshNotifications();
       } catch (e) {
-        console.error("Mark seen failed:", e.message);
+        console.error("Mark all as read failed:", e.message);
       }
     });
   }
 
-  // initial load + polling
+  refreshNotificationCount();
   refreshNotifications();
-  pollTimer = setInterval(refreshNotifications, 30000);
+
+  pollTimer = setInterval(() => {
+    refreshNotificationCount();
+    refreshNotifications();
+  }, 30000);
+
   window.addEventListener("beforeunload", () => {
     if (pollTimer) clearInterval(pollTimer);
   });
 }
 
+/* Load provider name/initial into the header */
+function loadProviderInfo(providerId) {
+  const userNameEl = document.getElementById("userName");
+  const profileInitialEl = document.getElementById("profileInitial");
+
+  if (providerId) {
+    const url = `http://localhost:8080/api/provider/profile?providerId=${encodeURIComponent(providerId)}`;
+    fetch(url, { credentials: "include" })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (data && data.firstName) {
+          const firstName = data.firstName;
+          if (userNameEl) userNameEl.textContent = firstName;
+          if (profileInitialEl) {
+            profileInitialEl.textContent = firstName.charAt(0).toUpperCase();
+          }
+        }
+      })
+      .catch(() => {
+        // keep defaults
+      });
+  }
+}
+
+function handleLogout() {
+  if (confirm("Are you sure you want to logout?")) {
+    fetch("/provider/logout", {
+      method: "GET",
+      credentials: "include",
+    })
+      .then((response) => {
+        if (response.redirected) {
+          window.location.href = response.url;
+        } else {
+          window.location.href = "/views/landing/index.html";
+        }
+      })
+      .catch((error) => {
+        console.error("Logout failed:", error);
+        window.location.href = "/views/landing/index.html";
+      });
+  }
+}
+
 /* =========================
-   YOUR EXISTING DASHBOARD LOADERS
+   Dashboard data loaders
 ========================= */
 
 async function loadSummary(baseUrl, providerId) {
@@ -344,7 +517,8 @@ function drawIncomeChart(ctx, canvas, months, data) {
   ctx.clearRect(0, 0, width, height);
 
   if (!data || data.length === 0) {
-    ctx.font = '14px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto';
+    ctx.font = '14px "Poppins", sans-serif';
+    ctx.fillStyle = "#718096";
     ctx.fillText("No income data", padding, padding);
     return;
   }
@@ -353,10 +527,10 @@ function drawIncomeChart(ctx, canvas, months, data) {
   const minValue = Math.min(...data);
   const valueRange = Math.max(1, maxValue - minValue);
 
-  ctx.strokeStyle = "#e8eaed";
+  ctx.strokeStyle = "#e9ecef";
   ctx.lineWidth = 1;
-  ctx.font = '12px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto';
-  ctx.fillStyle = "#5f6368";
+  ctx.font = '12px "Poppins", sans-serif';
+  ctx.fillStyle = "#718096";
 
   for (let i = 0; i <= 5; i++) {
     const y = padding + (chartHeight / 5) * i;
@@ -373,7 +547,7 @@ function drawIncomeChart(ctx, canvas, months, data) {
     ctx.fillText(months[i], x - 15, height - 20);
   }
 
-  ctx.strokeStyle = "#1abc9c";
+  ctx.strokeStyle = "#4361ee";
   ctx.lineWidth = 3;
   ctx.beginPath();
 
@@ -385,11 +559,13 @@ function drawIncomeChart(ctx, canvas, months, data) {
     if (i === 0) ctx.moveTo(x, y);
     else ctx.lineTo(x, y);
 
-    ctx.fillStyle = "#1abc9c";
+    ctx.fillStyle = "#3a0ca3";
     ctx.beginPath();
     ctx.arc(x, y, 4, 0, 2 * Math.PI);
     ctx.fill();
   }
+
+  ctx.strokeStyle = "#4361ee";
   ctx.stroke();
 }
 

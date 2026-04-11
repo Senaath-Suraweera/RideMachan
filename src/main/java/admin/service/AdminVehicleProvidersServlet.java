@@ -67,20 +67,45 @@ public class AdminVehicleProvidersServlet extends HttpServlet {
         catch (Exception e) { return null; }
     }
 
-    // ============================= GET =============================
-    // GET  /api/admin/vehicle-providers
-    // GET  /api/admin/vehicle-providers/{id}
-    // GET  /api/admin/vehicle-providers/{id}/vehicles
+    private String trimToNull(String s) {
+        if (s == null) return null;
+        s = s.trim();
+        return s.isEmpty() ? null : s;
+    }
+
+    private Integer getIntOrNull(JsonObject body, String key) {
+        try {
+            return body.has(key) && !body.get(key).isJsonNull() ? body.get(key).getAsInt() : null;
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    private Double getDoubleOrNull(JsonObject body, String key) {
+        try {
+            return body.has(key) && !body.get(key).isJsonNull() ? body.get(key).getAsDouble() : null;
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    private String getStringOrNull(JsonObject body, String key) {
+        try {
+            return body.has(key) && !body.get(key).isJsonNull() ? trimToNull(body.get(key).getAsString()) : null;
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         addCors(resp);
 
-        String path = req.getPathInfo(); // null, "/", "/{id}", "/{id}/vehicles"
+        String path = req.getPathInfo();
         String[] parts = (path == null ? "" : path).split("/");
 
         try (Connection con = DBConnection.getConnection()) {
 
-            // LIST providers
             if (path == null || "/".equals(path) || parts.length <= 1 || parts[1].isEmpty()) {
                 String q = req.getParameter("q");
                 String status = req.getParameter("status");
@@ -91,80 +116,88 @@ public class AdminVehicleProvidersServlet extends HttpServlet {
                                 "COALESCE(status,'pending') AS status, created_at " +
                                 "FROM VehicleProvider WHERE 1=1 "
                 );
+
                 List<Object> params = new ArrayList<>();
 
                 if (q != null && !q.trim().isEmpty()) {
-                    sql.append(" AND (LOWER(firstname) LIKE ? OR LOWER(lastname) LIKE ? OR LOWER(email) LIKE ? OR LOWER(username) LIKE ? OR phonenumber LIKE ?) ");
+                    sql.append("AND (LOWER(firstname) LIKE ? OR LOWER(lastname) LIKE ? OR LOWER(email) LIKE ? OR LOWER(username) LIKE ? OR phonenumber LIKE ?) ");
                     String like = "%" + q.trim().toLowerCase() + "%";
-                    params.add(like); params.add(like); params.add(like); params.add(like);
+                    params.add(like);
+                    params.add(like);
+                    params.add(like);
+                    params.add(like);
                     params.add("%" + q.trim() + "%");
                 }
+
                 if (status != null && !status.trim().isEmpty()) {
-                    sql.append(" AND COALESCE(status,'pending') = ? ");
+                    sql.append("AND COALESCE(status,'pending') = ? ");
                     params.add(status.trim());
                 }
+
                 if (city != null && !city.trim().isEmpty()) {
-                    sql.append(" AND city = ? ");
+                    sql.append("AND city = ? ");
                     params.add(city.trim());
                 }
 
-                sql.append(" ORDER BY providerid DESC");
+                sql.append("ORDER BY providerid DESC");
 
                 try (PreparedStatement ps = con.prepareStatement(sql.toString())) {
-                    for (int i = 0; i < params.size(); i++) ps.setObject(i + 1, params.get(i));
+                    for (int i = 0; i < params.size(); i++) {
+                        ps.setObject(i + 1, params.get(i));
+                    }
+
                     try (ResultSet rs = ps.executeQuery()) {
                         List<Map<String, Object>> out = new ArrayList<>();
+
                         while (rs.next()) {
                             Map<String, Object> p = new LinkedHashMap<>();
-                            int id = rs.getInt("providerid");
                             String fn = rs.getString("firstname");
                             String ln = rs.getString("lastname");
 
-                            p.put("id", id);
+                            p.put("id", rs.getInt("providerid"));
                             p.put("name", ((fn == null ? "" : fn) + " " + (ln == null ? "" : ln)).trim());
                             p.put("email", rs.getString("email"));
                             p.put("phone", rs.getString("phonenumber"));
                             p.put("location", rs.getString("city"));
                             p.put("status", rs.getString("status"));
 
-                            Timestamp created = null;
-                            try { created = rs.getTimestamp("created_at"); } catch (SQLException ignore) {}
+                            Timestamp created = rs.getTimestamp("created_at");
                             p.put("joinDate", created == null ? null : created.toLocalDateTime().toLocalDate().toString());
 
-                            // NO ratings/reviews
                             out.add(p);
                         }
-                        Map<String, Object> res = new LinkedHashMap<>();
-                        res.put("ok", true);
-                        res.put("data", out);
-                        sendJson(resp, 200, res);
+
+                        sendJson(resp, 200, Map.of("ok", true, "data", out));
                         return;
                     }
                 }
             }
 
-            // /{id}/vehicles
             if (parts.length >= 3 && !parts[1].isEmpty() && "vehicles".equals(parts[2])) {
                 Integer providerId = tryParseInt(parts[1]);
-                if (providerId == null) { sendJson(resp, 400, error("Invalid provider id")); return; }
+                if (providerId == null) {
+                    sendJson(resp, 400, error("Invalid provider id"));
+                    return;
+                }
+
                 sendJson(resp, 200, vehiclesByProvider(con, providerId));
                 return;
             }
 
-            // /{id}
             if (parts.length >= 2 && !parts[1].isEmpty()) {
                 Integer providerId = tryParseInt(parts[1]);
-                if (providerId == null) { sendJson(resp, 400, error("Invalid provider id")); return; }
+                if (providerId == null) {
+                    sendJson(resp, 400, error("Invalid provider id"));
+                    return;
+                }
 
                 Map<String, Object> provider = getProvider(con, providerId);
-                if (provider == null) { sendJson(resp, 404, error("Provider not found")); return; }
+                if (provider == null) {
+                    sendJson(resp, 404, error("Provider not found"));
+                    return;
+                }
 
-                provider.put("vehicles", vehiclesByProvider(con, providerId).get("data"));
-
-                Map<String, Object> res = new LinkedHashMap<>();
-                res.put("ok", true);
-                res.put("data", provider);
-                sendJson(resp, 200, res);
+                sendJson(resp, 200, Map.of("ok", true, "data", provider));
                 return;
             }
 
@@ -174,9 +207,6 @@ public class AdminVehicleProvidersServlet extends HttpServlet {
         }
     }
 
-    // ============================= POST =============================
-    // POST /api/admin/vehicle-providers/{id}/vehicles
-    // Uses price_per_day (required) and inserts required NOT NULL columns too.
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         addCors(resp);
@@ -186,87 +216,91 @@ public class AdminVehicleProvidersServlet extends HttpServlet {
 
         try (Connection con = DBConnection.getConnection()) {
 
-            // POST /{id}/vehicles
             if (parts.length >= 3 && !parts[1].isEmpty() && "vehicles".equals(parts[2])) {
                 Integer providerId = tryParseInt(parts[1]);
-                if (providerId == null) { sendJson(resp, 400, error("Invalid provider id")); return; }
+                if (providerId == null) {
+                    sendJson(resp, 400, error("Invalid provider id"));
+                    return;
+                }
 
                 if (isProviderSuspended(con, providerId)) {
                     sendJson(resp, 403, error("Provider is suspended. Cannot add vehicles."));
                     return;
                 }
 
-
                 JsonObject body = readJson(req);
 
-                String make = body.has("make") ? body.get("make").getAsString() : null;
-                String model = body.has("model") ? body.get("model").getAsString() : null;
-                String regNo = body.has("regNo") ? body.get("regNo").getAsString() : null;
+                String make = getStringOrNull(body, "make");
+                String model = getStringOrNull(body, "model");
+                String regNo = getStringOrNull(body, "regNo");
+                Integer manufactureYear = getIntOrNull(body, "manufactureYear");
+                String color = getStringOrNull(body, "color");
+                Integer seats = getIntOrNull(body, "seats");
+                Integer engineCapacity = getIntOrNull(body, "engineCapacity");
+                String engineNumber = getStringOrNull(body, "engineNumber");
+                String chasisNumber = getStringOrNull(body, "chasisNumber");
+                String milage = getStringOrNull(body, "milage");
+                Double pricePerDay = getDoubleOrNull(body, "pricePerDay");
+                String location = getStringOrNull(body, "location");
+                String fuelType = getStringOrNull(body, "fuelType");
+                String transmission = getStringOrNull(body, "transmission");
+                String availabilityStatus = getStringOrNull(body, "availabilityStatus");
+                Integer companyId = getIntOrNull(body, "companyId");
+                String description = getStringOrNull(body, "description");
 
-                Integer seats = body.has("seats") && !body.get("seats").isJsonNull() ? body.get("seats").getAsInt() : null;
-
-                Double pricePerDay = body.has("pricePerDay") && !body.get("pricePerDay").isJsonNull()
-                        ? body.get("pricePerDay").getAsDouble()
-                        : null;
-
-                Integer companyId = body.has("companyId") && !body.get("companyId").isJsonNull()
-                        ? body.get("companyId").getAsInt()
-                        : null; // NULL = not assigned
-
-                // You MUST provide required fields
                 if (make == null || model == null || regNo == null || seats == null || pricePerDay == null) {
                     sendJson(resp, 400, error("Required: make, model, regNo, seats, pricePerDay"));
                     return;
                 }
 
-                // Vehicle table has MANY NOT NULL columns. Provide safe defaults.
                 String sql =
                         "INSERT INTO Vehicle (" +
                                 "vehiclebrand, vehiclemodel, numberplatenumber, tareweight, color, numberofpassengers, " +
-                                "enginecapacity, enginenumber, chasisnumber, registrationdocumentation, vehicleimages, " +
-                                "description, milage, company_id, provider_id, price_per_day" +
-                                ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                                "enginecapacity, enginenumber, chasisnumber, registrationdocumentation, vehicleimages, description, milage, " +
+                                "company_id, provider_id, price_per_day, location, features, manufacture_year, transmission, fuel_type, availability_status" +
+                                ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
                 try (PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
                     ps.setString(1, make);
                     ps.setString(2, model);
                     ps.setString(3, regNo);
-
-                    // required NOT NULL columns
-                    ps.setInt(4, 0);              // tareweight
-                    ps.setString(5, "N/A");        // color
-                    ps.setInt(6, seats);           // numberofpassengers
-                    ps.setInt(7, 0);               // enginecapacity
-                    ps.setString(8, "N/A");        // enginenumber
-                    ps.setString(9, "N/A");        // chasisnumber
-
-                    // required LONGBLOB NOT NULL
-                    ps.setBytes(10, new byte[0]);  // registrationdocumentation
-                    ps.setBytes(11, new byte[0]);  // vehicleimages
-
-                    // optional
-                    ps.setNull(12, Types.VARCHAR); // description
-                    ps.setNull(13, Types.VARCHAR); // milage
+                    ps.setInt(4, 0);
+                    ps.setString(5, color != null ? color : "N/A");
+                    ps.setInt(6, seats);
+                    ps.setInt(7, engineCapacity != null ? engineCapacity : 0);
+                    ps.setString(8, engineNumber != null ? engineNumber : "N/A");
+                    ps.setString(9, chasisNumber != null ? chasisNumber : "N/A");
+                    ps.setBytes(10, new byte[0]);
+                    ps.setBytes(11, new byte[0]);
+                    ps.setString(12, description);
+                    ps.setString(13, milage);
 
                     if (companyId == null) ps.setNull(14, Types.INTEGER); else ps.setInt(14, companyId);
                     ps.setInt(15, providerId);
-
-                    // THE MAIN POINT: use price_per_day
                     ps.setDouble(16, pricePerDay);
+                    ps.setString(17, location);
+                    ps.setNull(18, Types.VARCHAR);
+                    if (manufactureYear == null) ps.setNull(19, Types.INTEGER); else ps.setInt(19, manufactureYear);
+                    ps.setString(20, transmission);
+                    ps.setString(21, fuelType);
+                    ps.setString(22, availabilityStatus != null ? availabilityStatus : "available");
 
                     int n = ps.executeUpdate();
-                    if (n == 0) { sendJson(resp, 500, error("Insert failed")); return; }
+                    if (n == 0) {
+                        sendJson(resp, 500, error("Insert failed"));
+                        return;
+                    }
 
                     int newId;
                     try (ResultSet keys = ps.getGeneratedKeys()) {
-                        if (!keys.next()) { sendJson(resp, 500, error("No generated id")); return; }
+                        if (!keys.next()) {
+                            sendJson(resp, 500, error("No generated id"));
+                            return;
+                        }
                         newId = keys.getInt(1);
                     }
 
-                    Map<String, Object> res = new LinkedHashMap<>();
-                    res.put("ok", true);
-                    res.put("vehicleId", newId);
-                    sendJson(resp, 201, res);
+                    sendJson(resp, 201, Map.of("ok", true, "vehicleId", newId));
                     return;
                 }
             }
@@ -277,11 +311,6 @@ public class AdminVehicleProvidersServlet extends HttpServlet {
         }
     }
 
-    // ============================= PUT =============================
-    // PUT /api/admin/vehicle-providers/{id} (update provider)
-    // PUT /api/admin/vehicle-providers/{id}/vehicles/{vehicleId} (update vehicle fields + pricePerDay)
-    // PUT /api/admin/vehicle-providers/{id}/vehicles/{vehicleId}/assign {companyId}
-    // PUT /api/admin/vehicle-providers/{id}/vehicles/{vehicleId}/unassign
     @Override
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         addCors(resp);
@@ -291,150 +320,173 @@ public class AdminVehicleProvidersServlet extends HttpServlet {
 
         try (Connection con = DBConnection.getConnection()) {
 
-            // ✅ PUT /{id}/ban  and  PUT /{id}/unban
-            if (parts.length >= 3 && !parts[1].isEmpty() && !parts[2].isEmpty()
-                    && ("ban".equals(parts[2]) || "unban".equals(parts[2]))) {
+            if (parts.length >= 3 && !parts[1].isEmpty() &&
+                    ("ban".equals(parts[2]) || "unban".equals(parts[2]))) {
 
                 Integer providerId = tryParseInt(parts[1]);
-                if (providerId == null) { sendJson(resp, 400, error("Invalid provider id")); return; }
-
-
+                if (providerId == null) {
+                    sendJson(resp, 400, error("Invalid provider id"));
+                    return;
+                }
 
                 String newStatus = "ban".equals(parts[2]) ? "suspended" : "active";
 
-                String sql = "UPDATE VehicleProvider SET status = ? WHERE providerid = ?";
-                try (PreparedStatement ps = con.prepareStatement(sql)) {
+                try (PreparedStatement ps =
+                             con.prepareStatement("UPDATE VehicleProvider SET status = ? WHERE providerid = ?")) {
                     ps.setString(1, newStatus);
                     ps.setInt(2, providerId);
 
                     int updated = ps.executeUpdate();
-                    if (updated == 0) { sendJson(resp, 404, error("Provider not found")); return; }
+                    if (updated == 0) {
+                        sendJson(resp, 404, error("Provider not found"));
+                        return;
+                    }
 
-                    Map<String, Object> res = new LinkedHashMap<>();
-                    res.put("ok", true);
-                    res.put("providerId", providerId);
-                    res.put("status", newStatus);
-                    sendJson(resp, 200, res);
+                    sendJson(resp, 200, Map.of("ok", true, "providerId", providerId, "status", newStatus));
                     return;
                 }
             }
 
-
-            // PUT /{id}
             if (parts.length >= 2 && !parts[1].isEmpty() && (parts.length == 2 || parts[2].isEmpty())) {
                 Integer providerId = tryParseInt(parts[1]);
-
-
-                if (providerId == null) { sendJson(resp, 400, error("Invalid provider id")); return; }
-
-                if (isProviderSuspended(con, providerId)) {
-                    sendJson(resp, 403, error("Provider is suspended. Vehicle changes are not allowed."));
+                if (providerId == null) {
+                    sendJson(resp, 400, error("Invalid provider id"));
                     return;
                 }
 
                 JsonObject body = readJson(req);
-                String status = body.has("status") ? body.get("status").getAsString() : null;
-                String phone = body.has("phone") ? body.get("phone").getAsString() : null;
-                String city = body.has("location") ? body.get("location").getAsString() : null;
+
+                String firstname = getStringOrNull(body, "firstname");
+                String lastname = getStringOrNull(body, "lastname");
+                String email = getStringOrNull(body, "email");
+                String phone = getStringOrNull(body, "phone");
+                String housenumber = getStringOrNull(body, "housenumber");
+                String street = getStringOrNull(body, "street");
+                String city = getStringOrNull(body, "city");
+                String zipcode = getStringOrNull(body, "zipcode");
+                Integer companyId = getIntOrNull(body, "companyId");
+                String status = getStringOrNull(body, "status");
 
                 String sql =
                         "UPDATE VehicleProvider SET " +
-                                "status = COALESCE(?, status), " +
+                                "firstname = COALESCE(?, firstname), " +
+                                "lastname = COALESCE(?, lastname), " +
+                                "email = COALESCE(?, email), " +
                                 "phonenumber = COALESCE(?, phonenumber), " +
-                                "city = COALESCE(?, city) " +
+                                "housenumber = COALESCE(?, housenumber), " +
+                                "street = COALESCE(?, street), " +
+                                "city = COALESCE(?, city), " +
+                                "zipcode = COALESCE(?, zipcode), " +
+                                "company_id = ?, " +
+                                "status = COALESCE(?, status) " +
                                 "WHERE providerid = ?";
 
                 try (PreparedStatement ps = con.prepareStatement(sql)) {
-                    if (status == null || status.trim().isEmpty()) ps.setNull(1, Types.VARCHAR); else ps.setString(1, status);
-                    if (phone == null || phone.trim().isEmpty()) ps.setNull(2, Types.VARCHAR); else ps.setString(2, phone);
-                    if (city == null || city.trim().isEmpty()) ps.setNull(3, Types.VARCHAR); else ps.setString(3, city);
-                    ps.setInt(4, providerId);
+                    if (firstname == null) ps.setNull(1, Types.VARCHAR); else ps.setString(1, firstname);
+                    if (lastname == null) ps.setNull(2, Types.VARCHAR); else ps.setString(2, lastname);
+                    if (email == null) ps.setNull(3, Types.VARCHAR); else ps.setString(3, email);
+                    if (phone == null) ps.setNull(4, Types.VARCHAR); else ps.setString(4, phone);
+                    if (housenumber == null) ps.setNull(5, Types.VARCHAR); else ps.setString(5, housenumber);
+                    if (street == null) ps.setNull(6, Types.VARCHAR); else ps.setString(6, street);
+                    if (city == null) ps.setNull(7, Types.VARCHAR); else ps.setString(7, city);
+                    if (zipcode == null) ps.setNull(8, Types.VARCHAR); else ps.setString(8, zipcode);
+                    if (companyId == null) ps.setNull(9, Types.INTEGER); else ps.setInt(9, companyId);
+                    if (status == null) ps.setNull(10, Types.VARCHAR); else ps.setString(10, status);
+                    ps.setInt(11, providerId);
 
                     int updated = ps.executeUpdate();
-                    if (updated == 0) { sendJson(resp, 404, error("Provider not found")); return; }
+                    if (updated == 0) {
+                        sendJson(resp, 404, error("Provider not found"));
+                        return;
+                    }
 
                     sendJson(resp, 200, Map.of("ok", true));
                     return;
                 }
             }
 
-            // vehicle routes: /{id}/vehicles/{vehicleId}...
             if (parts.length >= 4 && !parts[1].isEmpty() && "vehicles".equals(parts[2]) && !parts[3].isEmpty()) {
                 Integer providerId = tryParseInt(parts[1]);
                 Integer vehicleId = tryParseInt(parts[3]);
-                if (providerId == null || vehicleId == null) { sendJson(resp, 400, error("Invalid ids")); return; }
+
+                if (providerId == null || vehicleId == null) {
+                    sendJson(resp, 400, error("Invalid ids"));
+                    return;
+                }
 
                 if (isProviderSuspended(con, providerId)) {
                     sendJson(resp, 403, error("Provider is suspended. Vehicle changes are not allowed."));
                     return;
                 }
 
-                // /assign
-                if (parts.length >= 5 && "assign".equals(parts[4])) {
-                    JsonObject body = readJson(req);
-                    Integer companyId = body.has("companyId") && !body.get("companyId").isJsonNull()
-                            ? body.get("companyId").getAsInt()
-                            : null;
-                    if (companyId == null) { sendJson(resp, 400, error("companyId is required")); return; }
-
-                    String sql = "UPDATE Vehicle SET company_id = ? WHERE vehicleid = ? AND provider_id = ?";
-                    try (PreparedStatement ps = con.prepareStatement(sql)) {
-                        ps.setInt(1, companyId);
-                        ps.setInt(2, vehicleId);
-                        ps.setInt(3, providerId);
-                        int updated = ps.executeUpdate();
-                        if (updated == 0) { sendJson(resp, 404, error("Vehicle not found for provider")); return; }
-                        sendJson(resp, 200, Map.of("ok", true));
-                        return;
-                    }
-                }
-
-                // /unassign
-                if (parts.length >= 5 && "unassign".equals(parts[4])) {
-                    String sql = "UPDATE Vehicle SET company_id = NULL WHERE vehicleid = ? AND provider_id = ?";
-                    try (PreparedStatement ps = con.prepareStatement(sql)) {
-                        ps.setInt(1, vehicleId);
-                        ps.setInt(2, providerId);
-                        int updated = ps.executeUpdate();
-                        if (updated == 0) { sendJson(resp, 404, error("Vehicle not found for provider")); return; }
-                        sendJson(resp, 200, Map.of("ok", true));
-                        return;
-                    }
-                }
-
-                // PUT /{id}/vehicles/{vehicleId} update basic fields + price_per_day
                 JsonObject body = readJson(req);
 
-                String make = body.has("make") ? body.get("make").getAsString() : null;
-                String model = body.has("model") ? body.get("model").getAsString() : null;
-                String regNo = body.has("regNo") ? body.get("regNo").getAsString() : null;
-                Integer seats = body.has("seats") && !body.get("seats").isJsonNull() ? body.get("seats").getAsInt() : null;
-
-                Double pricePerDay = body.has("pricePerDay") && !body.get("pricePerDay").isJsonNull()
-                        ? body.get("pricePerDay").getAsDouble()
-                        : null;
+                String make = getStringOrNull(body, "make");
+                String model = getStringOrNull(body, "model");
+                String regNo = getStringOrNull(body, "regNo");
+                Integer manufactureYear = getIntOrNull(body, "manufactureYear");
+                String color = getStringOrNull(body, "color");
+                Integer seats = getIntOrNull(body, "seats");
+                Integer engineCapacity = getIntOrNull(body, "engineCapacity");
+                String engineNumber = getStringOrNull(body, "engineNumber");
+                String chasisNumber = getStringOrNull(body, "chasisNumber");
+                String milage = getStringOrNull(body, "milage");
+                Double pricePerDay = getDoubleOrNull(body, "pricePerDay");
+                String location = getStringOrNull(body, "location");
+                String fuelType = getStringOrNull(body, "fuelType");
+                String transmission = getStringOrNull(body, "transmission");
+                String availabilityStatus = getStringOrNull(body, "availabilityStatus");
+                Integer companyId = getIntOrNull(body, "companyId");
+                String description = getStringOrNull(body, "description");
 
                 String sql =
                         "UPDATE Vehicle SET " +
                                 "vehiclebrand = COALESCE(?, vehiclebrand), " +
                                 "vehiclemodel = COALESCE(?, vehiclemodel), " +
                                 "numberplatenumber = COALESCE(?, numberplatenumber), " +
+                                "manufacture_year = COALESCE(?, manufacture_year), " +
+                                "color = COALESCE(?, color), " +
                                 "numberofpassengers = COALESCE(?, numberofpassengers), " +
-                                "price_per_day = COALESCE(?, price_per_day) " +
+                                "enginecapacity = COALESCE(?, enginecapacity), " +
+                                "enginenumber = COALESCE(?, enginenumber), " +
+                                "chasisnumber = COALESCE(?, chasisnumber), " +
+                                "milage = COALESCE(?, milage), " +
+                                "price_per_day = COALESCE(?, price_per_day), " +
+                                "location = COALESCE(?, location), " +
+                                "fuel_type = COALESCE(?, fuel_type), " +
+                                "transmission = COALESCE(?, transmission), " +
+                                "availability_status = COALESCE(?, availability_status), " +
+                                "company_id = ?, " +
+                                "description = COALESCE(?, description) " +
                                 "WHERE vehicleid = ? AND provider_id = ?";
 
                 try (PreparedStatement ps = con.prepareStatement(sql)) {
-                    if (make == null || make.trim().isEmpty()) ps.setNull(1, Types.VARCHAR); else ps.setString(1, make);
-                    if (model == null || model.trim().isEmpty()) ps.setNull(2, Types.VARCHAR); else ps.setString(2, model);
-                    if (regNo == null || regNo.trim().isEmpty()) ps.setNull(3, Types.VARCHAR); else ps.setString(3, regNo);
-                    if (seats == null) ps.setNull(4, Types.INTEGER); else ps.setInt(4, seats);
-                    if (pricePerDay == null) ps.setNull(5, Types.DECIMAL); else ps.setDouble(5, pricePerDay);
-
-                    ps.setInt(6, vehicleId);
-                    ps.setInt(7, providerId);
+                    if (make == null) ps.setNull(1, Types.VARCHAR); else ps.setString(1, make);
+                    if (model == null) ps.setNull(2, Types.VARCHAR); else ps.setString(2, model);
+                    if (regNo == null) ps.setNull(3, Types.VARCHAR); else ps.setString(3, regNo);
+                    if (manufactureYear == null) ps.setNull(4, Types.INTEGER); else ps.setInt(4, manufactureYear);
+                    if (color == null) ps.setNull(5, Types.VARCHAR); else ps.setString(5, color);
+                    if (seats == null) ps.setNull(6, Types.INTEGER); else ps.setInt(6, seats);
+                    if (engineCapacity == null) ps.setNull(7, Types.INTEGER); else ps.setInt(7, engineCapacity);
+                    if (engineNumber == null) ps.setNull(8, Types.VARCHAR); else ps.setString(8, engineNumber);
+                    if (chasisNumber == null) ps.setNull(9, Types.VARCHAR); else ps.setString(9, chasisNumber);
+                    if (milage == null) ps.setNull(10, Types.VARCHAR); else ps.setString(10, milage);
+                    if (pricePerDay == null) ps.setNull(11, Types.DECIMAL); else ps.setDouble(11, pricePerDay);
+                    if (location == null) ps.setNull(12, Types.VARCHAR); else ps.setString(12, location);
+                    if (fuelType == null) ps.setNull(13, Types.VARCHAR); else ps.setString(13, fuelType);
+                    if (transmission == null) ps.setNull(14, Types.VARCHAR); else ps.setString(14, transmission);
+                    if (availabilityStatus == null) ps.setNull(15, Types.VARCHAR); else ps.setString(15, availabilityStatus);
+                    if (companyId == null) ps.setNull(16, Types.INTEGER); else ps.setInt(16, companyId);
+                    if (description == null) ps.setNull(17, Types.VARCHAR); else ps.setString(17, description);
+                    ps.setInt(18, vehicleId);
+                    ps.setInt(19, providerId);
 
                     int updated = ps.executeUpdate();
-                    if (updated == 0) { sendJson(resp, 404, error("Vehicle not found for provider")); return; }
+                    if (updated == 0) {
+                        sendJson(resp, 404, error("Vehicle not found for provider"));
+                        return;
+                    }
+
                     sendJson(resp, 200, Map.of("ok", true));
                     return;
                 }
@@ -446,8 +498,6 @@ public class AdminVehicleProvidersServlet extends HttpServlet {
         }
     }
 
-    // ============================= DELETE =============================
-    // DELETE /api/admin/vehicle-providers/{id}/vehicles/{vehicleId}
     @Override
     protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         addCors(resp);
@@ -456,23 +506,31 @@ public class AdminVehicleProvidersServlet extends HttpServlet {
         String[] parts = (path == null ? "" : path).split("/");
 
         try (Connection con = DBConnection.getConnection()) {
-
             if (parts.length >= 4 && !parts[1].isEmpty() && "vehicles".equals(parts[2]) && !parts[3].isEmpty()) {
                 Integer providerId = tryParseInt(parts[1]);
                 Integer vehicleId = tryParseInt(parts[3]);
-                if (providerId == null || vehicleId == null) { sendJson(resp, 400, error("Invalid ids")); return; }
+
+                if (providerId == null || vehicleId == null) {
+                    sendJson(resp, 400, error("Invalid ids"));
+                    return;
+                }
 
                 if (isProviderSuspended(con, providerId)) {
                     sendJson(resp, 403, error("Provider is suspended. Cannot delete vehicles."));
                     return;
                 }
 
-                String sql = "DELETE FROM Vehicle WHERE vehicleid = ? AND provider_id = ?";
-                try (PreparedStatement ps = con.prepareStatement(sql)) {
+                try (PreparedStatement ps = con.prepareStatement(
+                        "DELETE FROM Vehicle WHERE vehicleid = ? AND provider_id = ?")) {
                     ps.setInt(1, vehicleId);
                     ps.setInt(2, providerId);
+
                     int deleted = ps.executeUpdate();
-                    if (deleted == 0) { sendJson(resp, 404, error("Vehicle not found for provider")); return; }
+                    if (deleted == 0) {
+                        sendJson(resp, 404, error("Vehicle not found for provider"));
+                        return;
+                    }
+
                     sendJson(resp, 200, Map.of("ok", true));
                     return;
                 }
@@ -484,30 +542,33 @@ public class AdminVehicleProvidersServlet extends HttpServlet {
         }
     }
 
-    // ============================= helpers =============================
     private Map<String, Object> getProvider(Connection con, int providerId) throws SQLException {
         String sql =
-                "SELECT providerid, username, email, firstname, lastname, phonenumber, city, " +
+                "SELECT providerid, username, email, firstname, lastname, phonenumber, housenumber, street, city, zipcode, company_id, " +
                         "COALESCE(status,'pending') AS status, created_at " +
                         "FROM VehicleProvider WHERE providerid = ?";
+
         try (PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setInt(1, providerId);
+
             try (ResultSet rs = ps.executeQuery()) {
                 if (!rs.next()) return null;
 
                 Map<String, Object> p = new LinkedHashMap<>();
-                String fn = rs.getString("firstname");
-                String ln = rs.getString("lastname");
-
                 p.put("id", rs.getInt("providerid"));
-                p.put("name", ((fn == null ? "" : fn) + " " + (ln == null ? "" : ln)).trim());
+                p.put("username", rs.getString("username"));
+                p.put("firstname", rs.getString("firstname"));
+                p.put("lastname", rs.getString("lastname"));
                 p.put("email", rs.getString("email"));
                 p.put("phone", rs.getString("phonenumber"));
-                p.put("location", rs.getString("city"));
+                p.put("housenumber", rs.getString("housenumber"));
+                p.put("street", rs.getString("street"));
+                p.put("city", rs.getString("city"));
+                p.put("zipcode", rs.getString("zipcode"));
+                p.put("companyId", rs.getObject("company_id"));
                 p.put("status", rs.getString("status"));
 
-                Timestamp created = null;
-                try { created = rs.getTimestamp("created_at"); } catch (SQLException ignore) {}
+                Timestamp created = rs.getTimestamp("created_at");
                 p.put("joinDate", created == null ? null : created.toLocalDateTime().toLocalDate().toString());
 
                 return p;
@@ -516,29 +577,33 @@ public class AdminVehicleProvidersServlet extends HttpServlet {
     }
 
     private boolean isProviderSuspended(Connection con, int providerId) throws SQLException {
-        String sql = "SELECT COALESCE(status,'pending') AS status FROM VehicleProvider WHERE providerid = ?";
-        try (PreparedStatement ps = con.prepareStatement(sql)) {
+        try (PreparedStatement ps = con.prepareStatement(
+                "SELECT COALESCE(status,'pending') AS status FROM VehicleProvider WHERE providerid = ?")) {
             ps.setInt(1, providerId);
+
             try (ResultSet rs = ps.executeQuery()) {
-                if (!rs.next()) return false; // or treat missing as not suspended
+                if (!rs.next()) return false;
                 return "suspended".equalsIgnoreCase(rs.getString("status"));
             }
         }
     }
 
-
     private Map<String, Object> vehiclesByProvider(Connection con, int providerId) throws SQLException {
         String sql =
-                "SELECT v.vehicleid, v.vehiclebrand, v.vehiclemodel, v.numberplatenumber, v.numberofpassengers, " +
-                        "v.price_per_day, rc.companyname AS rental_company_name " +
+                "SELECT v.vehicleid, v.vehiclebrand, v.vehiclemodel, v.numberplatenumber, v.manufacture_year, v.color, " +
+                        "v.numberofpassengers, v.enginecapacity, v.enginenumber, v.chasisnumber, v.milage, v.price_per_day, " +
+                        "v.location, v.fuel_type, v.transmission, v.availability_status, v.company_id, v.description, " +
+                        "rc.companyname AS rental_company_name " +
                         "FROM Vehicle v " +
                         "LEFT JOIN RentalCompany rc ON rc.companyid = v.company_id " +
                         "WHERE v.provider_id = ? " +
                         "ORDER BY v.vehicleid DESC";
 
         List<Map<String, Object>> list = new ArrayList<>();
+
         try (PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setInt(1, providerId);
+
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     Map<String, Object> v = new LinkedHashMap<>();
@@ -546,21 +611,26 @@ public class AdminVehicleProvidersServlet extends HttpServlet {
                     v.put("make", rs.getString("vehiclebrand"));
                     v.put("model", rs.getString("vehiclemodel"));
                     v.put("regNo", rs.getString("numberplatenumber"));
-                    v.put("seats", rs.getInt("numberofpassengers"));
-
-                    // MAIN POINT: price_per_day -> pricePerDay (JSON)
-                    v.put("pricePerDay", rs.getObject("price_per_day") == null ? null : rs.getDouble("price_per_day"));
-
-                    String companyName = rs.getString("rental_company_name");
-                    v.put("rentalCompany", companyName == null ? "Not assigned" : companyName);
+                    v.put("manufactureYear", rs.getObject("manufacture_year"));
+                    v.put("color", rs.getString("color"));
+                    v.put("seats", rs.getObject("numberofpassengers"));
+                    v.put("engineCapacity", rs.getObject("enginecapacity"));
+                    v.put("engineNumber", rs.getString("enginenumber"));
+                    v.put("chasisNumber", rs.getString("chasisnumber"));
+                    v.put("milage", rs.getString("milage"));
+                    v.put("pricePerDay", rs.getObject("price_per_day"));
+                    v.put("location", rs.getString("location"));
+                    v.put("fuelType", rs.getString("fuel_type"));
+                    v.put("transmission", rs.getString("transmission"));
+                    v.put("availabilityStatus", rs.getString("availability_status"));
+                    v.put("companyId", rs.getObject("company_id"));
+                    v.put("description", rs.getString("description"));
+                    v.put("rentalCompany", rs.getString("rental_company_name") == null ? "Not assigned" : rs.getString("rental_company_name"));
                     list.add(v);
                 }
             }
         }
 
-        Map<String, Object> res = new LinkedHashMap<>();
-        res.put("ok", true);
-        res.put("data", list);
-        return res;
+        return Map.of("ok", true, "data", list);
     }
 }

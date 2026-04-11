@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -6,6 +6,18 @@
     <title>Reports - Ride Machan</title>
     <link rel="stylesheet" href="css/styles.css" />
     <link rel="stylesheet" href="css/sidebar.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
     <link rel="stylesheet" href="css/report-view.css" />
   </head>
   <body>
@@ -14,51 +26,53 @@
         <header class="page-header">
           <div class="header-content">
             <h1 class="page-title">Specific Reports</h1>
-            <div class="header-actions">
-              <button class="btn btn-secondary" onclick="toggleFilter()">
-                Filter by role toggle
-              </button>
-            </div>
           </div>
-          <p class="page-subtitle">Monitor and manage all platform reports</p>
         </header>
 
         <!-- Reports Overview -->
         <div class="reports-overview">
           <div class="stats-grid">
             <div class="stat-card">
-              <div class="stat-icon"></div>
+              <div class="stat-icon">
+                <i class="fas fa-flag"></i>
+              </div>
               <div class="stat-content">
-                <div class="stat-value">156</div>
+                <div class="stat-value" id="totalReports">0</div>
                 <div class="stat-label">Total Reports</div>
-                <div class="stat-change positive">+12% from last month</div>
+                <div class="stat-change positive">All submitted reports</div>
               </div>
             </div>
 
             <div class="stat-card">
-              <div class="stat-icon"></div>
+              <div class="stat-icon">
+                <i class="fas fa-clock"></i>
+              </div>
               <div class="stat-content">
-                <div class="stat-value">23</div>
+                <div class="stat-value" id="pendingReports">0</div>
                 <div class="stat-label">Pending Review</div>
-                <div class="stat-change negative">-5% from last month</div>
+                <div class="stat-change negative">Awaiting action</div>
               </div>
             </div>
 
             <div class="stat-card">
-              <div class="stat-icon"></div>
+              <div class="stat-icon">
+                <i class="fas fa-check-circle"></i>
+              </div>
               <div class="stat-content">
-                <div class="stat-value">133</div>
+                <div class="stat-value" id="resolvedReports">0</div>
                 <div class="stat-label">Resolved</div>
-                <div class="stat-change positive">+18% from last month</div>
+                <div class="stat-change positive">Successfully handled</div>
               </div>
             </div>
 
             <div class="stat-card">
-              <div class="stat-icon"></div>
+              <div class="stat-icon">
+                <i class="fas fa-triangle-exclamation"></i>
+              </div>
               <div class="stat-content">
-                <div class="stat-value">8</div>
+                <div class="stat-value" id="highPriorityReports">0</div>
                 <div class="stat-label">High Priority</div>
-                <div class="stat-change positive">+2 from last month</div>
+                <div class="stat-change positive">Needs quick attention</div>
               </div>
             </div>
           </div>
@@ -67,21 +81,33 @@
         <!-- Reports Section -->
         <div class="reports-section">
           <div class="section-header">
-            <h3 class="section-title">All Reports</h3>
+            <div>
+              <h3 class="section-title">All Reports</h3>
+              <p class="section-subtitle">
+                Review, search, and filter submitted reports
+              </p>
+            </div>
+
             <div class="filter-controls">
-              <input
-                type="text"
-                class="form-control search-input"
-                placeholder="Search reports..."
-                id="reportSearch"
-              />
-              <select class="form-select" id="statusFilter">
+              <div class="filter-field search-field">
+                <i class="fas fa-search"></i>
+                <input
+                  type="text"
+                  class="form-control search-input"
+                  placeholder="Search reports..."
+                  id="reportSearch"
+                />
+              </div>
+
+              <select class="form-select compact-select" id="statusFilter">
                 <option value="">All Status</option>
                 <option value="pending">Pending</option>
                 <option value="reviewed">Reviewed</option>
                 <option value="resolved">Resolved</option>
+                <option value="closed">Closed</option>
               </select>
-              <select class="form-select" id="categoryFilter">
+
+              <select class="form-select compact-select" id="categoryFilter">
                 <option value="">All Categories</option>
                 <option value="vehicle">Vehicle Issue</option>
                 <option value="behavior">User Behavior</option>
@@ -89,13 +115,6 @@
                 <option value="app">App Bug</option>
                 <option value="safety">Safety Concern</option>
               </select>
-              <button
-                class="btn btn-primary"
-                id="applyFiltersBtn"
-                title="Apply current filters"
-              >
-                Apply Filters
-              </button>
             </div>
           </div>
 
@@ -114,174 +133,12 @@
                 </tr>
               </thead>
               <tbody>
-                <tr onclick="viewReport(1)">
-                  <td>#1</td>
-                  <td>Vehicle breakdown during trip</td>
-                  <td>
-                    <span class="category-badge vehicle">Vehicle Issue</span>
-                  </td>
-                  <td>Driver</td>
-                  <td>2024-01-15</td>
-                  <td>
-                    <span class="status-badge status-pending">pending</span>
-                  </td>
-                  <td>
-                    <span class="priority-badge priority-high">high</span>
-                  </td>
-                  <td>
-                    <button
-                      class="btn-icon"
-                      onclick="viewReport(1); event.stopPropagation();"
-                      title="View"
-                    >
-                      👁️
-                    </button>
-                  </td>
-                </tr>
-                <tr onclick="viewReport(2)">
-                  <td>#2</td>
-                  <td>Inappropriate behavior</td>
-                  <td>
-                    <span class="category-badge behavior">User Behavior</span>
-                  </td>
-                  <td>Customer</td>
-                  <td>2024-01-14</td>
-                  <td>
-                    <span class="status-badge status-reviewed">reviewed</span>
-                  </td>
-                  <td>
-                    <span class="priority-badge priority-medium">medium</span>
-                  </td>
-                  <td>
-                    <button
-                      class="btn-icon"
-                      onclick="viewReport(2); event.stopPropagation();"
-                      title="View"
-                    >
-                      👁️
-                    </button>
-                  </td>
-                </tr>
-                <tr onclick="viewReport(3)">
-                  <td>#3</td>
-                  <td>Payment not processed</td>
-                  <td>
-                    <span class="category-badge payment">Payment Issue</span>
-                  </td>
-                  <td>Customer</td>
-                  <td>2024-01-13</td>
-                  <td>
-                    <span class="status-badge status-resolved">resolved</span>
-                  </td>
-                  <td><span class="priority-badge priority-low">low</span></td>
-                  <td>
-                    <button
-                      class="btn-icon"
-                      onclick="viewReport(3); event.stopPropagation();"
-                      title="View"
-                    >
-                      👁️
-                    </button>
-                  </td>
-                </tr>
-                <tr onclick="viewReport(4)">
-                  <td>#4</td>
-                  <td>Unsafe driving reported</td>
-                  <td>
-                    <span class="category-badge safety">Safety Concern</span>
-                  </td>
-                  <td>Driver</td>
-                  <td>2024-01-12</td>
-                  <td>
-                    <span class="status-badge status-pending">pending</span>
-                  </td>
-                  <td>
-                    <span class="priority-badge priority-high">high</span>
-                  </td>
-                  <td>
-                    <button
-                      class="btn-icon"
-                      onclick="viewReport(4); event.stopPropagation();"
-                      title="View"
-                    >
-                      👁️
-                    </button>
-                  </td>
-                </tr>
-                <tr onclick="viewReport(5)">
-                  <td>#5</td>
-                  <td>App crashes on booking</td>
-                  <td><span class="category-badge app">App Bug</span></td>
-                  <td>Customer</td>
-                  <td>2024-01-11</td>
-                  <td>
-                    <span class="status-badge status-reviewed">reviewed</span>
-                  </td>
-                  <td>
-                    <span class="priority-badge priority-medium">medium</span>
-                  </td>
-                  <td>
-                    <button
-                      class="btn-icon"
-                      onclick="viewReport(5); event.stopPropagation();"
-                      title="View"
-                    >
-                      👁️
-                    </button>
-                  </td>
-                </tr>
-                <tr onclick="viewReport(6)">
-                  <td>#6</td>
-                  <td>Vehicle cleanliness complaint</td>
-                  <td>
-                    <span class="category-badge vehicle">Vehicle Issue</span>
-                  </td>
-                  <td>Driver</td>
-                  <td>2024-01-10</td>
-                  <td>
-                    <span class="status-badge status-resolved">resolved</span>
-                  </td>
-                  <td><span class="priority-badge priority-low">low</span></td>
-                  <td>
-                    <button
-                      class="btn-icon"
-                      onclick="viewReport(6); event.stopPropagation();"
-                      title="View"
-                    >
-                      👁️
-                    </button>
-                  </td>
-                </tr>
+                <!-- Loaded dynamically from /reports/list -->
               </tbody>
             </table>
           </div>
         </div>
       </main>
-    </div>
-
-    <!-- Report Details Modal -->
-    <div class="modal" id="reportModal">
-      <div class="modal-content report-modal">
-        <div class="modal-header">
-          <h3 id="reportModalTitle">Report Details</h3>
-          <button class="modal-close" onclick="closeReportModal()">
-            &times;
-          </button>
-        </div>
-        <div class="modal-body">
-          <div id="reportContent">
-            <!-- Report content will be loaded here -->
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button class="btn btn-secondary" onclick="closeReportModal()">
-            Close
-          </button>
-          <button class="btn btn-primary" onclick="updateReportStatus()">
-            Update Status
-          </button>
-        </div>
-      </div>
     </div>
 
     <script src="js/sidebar.js"></script>

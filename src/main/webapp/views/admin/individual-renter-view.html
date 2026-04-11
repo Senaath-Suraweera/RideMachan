@@ -7,9 +7,12 @@
     <link rel="stylesheet" href="css/styles.css" />
     <link rel="stylesheet" href="css/sidebar.css" />
     <link rel="stylesheet" href="css/individual-renter-view.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
   </head>
   <body>
-    <!-- Sidebar -->
     <script src="js/sidebar.js"></script>
 
     <main class="main-content">
@@ -21,6 +24,9 @@
           <h1 class="page-title" style="flex: 1">Individual Renter</h1>
           <button id="backToRentersBtn" class="btn btn-secondary">
             ← Back to Individual Renters
+          </button>
+          <button id="editProfileBtn" class="btn btn-primary">
+            Edit Profile
           </button>
           <button id="banUserBtn" class="btn btn-danger">Ban User</button>
         </div>
@@ -47,6 +53,93 @@
       </section>
     </main>
 
+    <!-- Provider Profile Edit Modal -->
+    <div class="modal" id="profileFormModal" aria-hidden="true">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>Edit Provider Profile</h3>
+          <button class="modal-close" onclick="closeProfileForm()">×</button>
+        </div>
+        <div class="modal-body">
+          <form id="profileForm">
+            <div class="form-grid">
+              <div class="form-group">
+                <label class="form-label" for="pf_firstname">First Name</label>
+                <input class="form-control" id="pf_firstname" />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="pf_lastname">Last Name</label>
+                <input class="form-control" id="pf_lastname" />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="pf_email">Email</label>
+                <input
+                  class="form-control"
+                  id="pf_email"
+                  type="email"
+                  readonly
+                />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="pf_phone">Phone</label>
+                <input class="form-control" id="pf_phone" />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="pf_house">House Number</label>
+                <input class="form-control" id="pf_house" />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="pf_street">Street</label>
+                <input class="form-control" id="pf_street" />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="pf_city">City</label>
+                <input class="form-control" id="pf_city" />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="pf_zipcode">Zip Code</label>
+                <input class="form-control" id="pf_zipcode" />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="pf_companyId">Company ID</label>
+                <input
+                  class="form-control"
+                  id="pf_companyId"
+                  min="1"
+                  readonly
+                />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="pf_status">Status</label>
+                <select class="form-select" id="pf_status" disabled>
+                  <option value="active">Active</option>
+                  <option value="pending">Pending</option>
+                  <option value="suspended">Suspended</option>
+                </select>
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" onclick="closeProfileForm()">
+            Cancel
+          </button>
+          <button class="btn btn-primary" id="profileFormSubmitBtn">
+            Save Profile
+          </button>
+        </div>
+      </div>
+    </div>
+
     <!-- Vehicle Details Modal -->
     <div class="modal" id="vehicleModal" aria-hidden="true">
       <div class="modal-content">
@@ -72,105 +165,152 @@
         </div>
         <div class="modal-body">
           <form id="vehicleForm">
-            <input type="hidden" name="id" id="vf_id" />
             <div class="form-grid">
               <div class="form-group">
                 <label class="form-label" for="vf_make">Make *</label>
-                <input class="form-control" id="vf_make" name="make" required />
+                <input class="form-control" id="vf_make" readonly />
               </div>
+
               <div class="form-group">
                 <label class="form-label" for="vf_model">Model *</label>
-                <input
-                  class="form-control"
-                  id="vf_model"
-                  name="model"
-                  required
-                />
+                <input class="form-control" id="vf_model" readonly />
               </div>
-              <div class="form-group">
-                <label class="form-label" for="vf_year">Year *</label>
-                <input
-                  class="form-control"
-                  id="vf_year"
-                  name="year"
-                  type="number"
-                  min="1990"
-                  max="2099"
-                  required
-                />
-              </div>
+
               <div class="form-group">
                 <label class="form-label" for="vf_reg"
                   >Registration No. *</label
                 >
-                <input class="form-control" id="vf_reg" name="regNo" required />
+                <input class="form-control" id="vf_reg" readonly />
               </div>
+
               <div class="form-group">
-                <label class="form-label" for="vf_rate"
-                  >Price Per Day (Rs.) *</label
-                >
+                <label class="form-label" for="vf_year">Manufacture Year</label>
                 <input
                   class="form-control"
-                  id="vf_rate"
-                  name="pricePerDay"
+                  id="vf_year"
                   type="number"
-                  min="0"
-                  step="1"
-                  required
+                  min="1900"
+                  max="2099"
+                  readonly
                 />
               </div>
+
               <div class="form-group">
-                <label class="form-label" for="vf_fuel">Fuel Type *</label>
-                <select
-                  class="form-select"
-                  id="vf_fuel"
-                  name="fuelType"
-                  required
-                >
-                  <option value="">Choose…</option>
-                  <option>Petrol</option>
-                  <option>Diesel</option>
-                  <option>Hybrid</option>
-                  <option>Electric</option>
-                </select>
+                <label class="form-label" for="vf_color">Color</label>
+                <input class="form-control" id="vf_color" readonly />
               </div>
-              <div class="form-group">
-                <label class="form-label" for="vf_trans">Transmission *</label>
-                <select
-                  class="form-select"
-                  id="vf_trans"
-                  name="transmission"
-                  required
-                >
-                  <option value="">Choose…</option>
-                  <option>Auto</option>
-                  <option>Manual</option>
-                </select>
-              </div>
+
               <div class="form-group">
                 <label class="form-label" for="vf_seats">Seats *</label>
                 <input
                   class="form-control"
                   id="vf_seats"
-                  name="seats"
                   type="number"
-                  min="2"
-                  max="12"
+                  min="1"
                   required
                 />
               </div>
+
               <div class="form-group">
-                <label class="form-label" for="vf_companyId"
-                  >Company ID (optional)</label
+                <label class="form-label" for="vf_enginecapacity"
+                  >Engine Capacity</label
                 >
                 <input
                   class="form-control"
+                  id="vf_enginecapacity"
+                  type="number"
+                  min="0"
+                  readonly
+                />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="vf_engineno"
+                  >Engine Number</label
+                >
+                <input class="form-control" id="vf_engineno" readonly />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="vf_chasisno"
+                  >Chassis Number</label
+                >
+                <input class="form-control" id="vf_chasisno" readonly />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="vf_milage">Mileage</label>
+                <input class="form-control" id="vf_milage" />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="vf_rate">Price Per Day *</label>
+                <input
+                  class="form-control"
+                  id="vf_rate"
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  required
+                />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="vf_location">Location</label>
+                <input class="form-control" id="vf_location" />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="vf_fuel">Fuel Type</label>
+                <select class="form-select" id="vf_fuel" disabled>
+                  <option value="">Choose…</option>
+                  <option value="Petrol">Petrol</option>
+                  <option value="Diesel">Diesel</option>
+                  <option value="Hybrid">Hybrid</option>
+                  <option value="Electric">Electric</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="vf_trans">Transmission</label>
+                <select class="form-select" id="vf_trans" disabled>
+                  <option value="">Choose…</option>
+                  <option value="Auto">Auto</option>
+                  <option value="Manual">Manual</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="vf_availability"
+                  >Availability</label
+                >
+                <select class="form-select" id="vf_availability">
+                  <option value="available">available</option>
+                  <option value="unavailable">unavailable</option>
+                  <option value="maintenance">maintenance</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="vf_companyId">Company ID</label>
+                <input
+                  class="form-control"
                   id="vf_companyId"
-                  name="companyId"
                   type="number"
                   min="1"
-                  placeholder="Leave empty for not assigned"
+                  readonly
                 />
+              </div>
+
+              <div class="form-group" style="grid-column: 1 / -1">
+                <label class="form-label" for="vf_description"
+                  >Description</label
+                >
+                <textarea
+                  class="form-control"
+                  id="vf_description"
+                  rows="4"
+                ></textarea>
               </div>
             </div>
           </form>
@@ -180,7 +320,7 @@
             Cancel
           </button>
           <button class="btn btn-primary" id="vehicleFormSubmitBtn">
-            Save
+            Save Vehicle
           </button>
         </div>
       </div>

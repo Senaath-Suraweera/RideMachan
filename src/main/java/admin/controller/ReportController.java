@@ -243,4 +243,41 @@ public class ReportController {
         }
     }
 
+    public static java.util.Map<String, Integer> getReportStats() {
+        java.util.Map<String, Integer> stats = new java.util.HashMap<>();
+
+        stats.put("total", 0);
+        stats.put("pending", 0);
+        stats.put("resolved", 0);
+        stats.put("highPriority", 0);
+
+        try {
+            con = DBConnection.getConnection();
+
+            String sql = """
+            SELECT
+                COUNT(*) AS total,
+                SUM(CASE WHEN status = 'Pending' THEN 1 ELSE 0 END) AS pending,
+                SUM(CASE WHEN status = 'Resolved' THEN 1 ELSE 0 END) AS resolved,
+                SUM(CASE WHEN priority = 'High' OR priority = 'Urgent' THEN 1 ELSE 0 END) AS highPriority
+            FROM Report
+        """;
+
+            PreparedStatement ps = con.prepareStatement(sql);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                stats.put("total", rs.getInt("total"));
+                stats.put("pending", rs.getInt("pending"));
+                stats.put("resolved", rs.getInt("resolved"));
+                stats.put("highPriority", rs.getInt("highPriority"));
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return stats;
+    }
+
 }
