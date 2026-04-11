@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Company Endpoint</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        .test-section {
+            border: 1px solid #ccc;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        button {
+            padding: 10px 20px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        pre {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+        .success { color: green; }
+        .error { color: red; }
+        select {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 Company Endpoint Test</h1>
+
+    <div class="test-section">
+        <h2>1. Test Backend Endpoint</h2>
+        <button onclick="testEndpoint()">Fetch Companies</button>
+        <div id="endpointResult"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>2. Test Dropdown Population</h2>
+        <button onclick="populateDropdown()">Load Companies to Dropdown</button>
+        <select id="companyDropdown">
+            <option value="">All Companies</option>
+        </select>
+        <div id="dropdownResult"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>3. Test Selected Value</h2>
+        <button onclick="testSelection()">Get Selected Company</button>
+        <div id="selectionResult"></div>
+    </div>
+
+    <script>
+        let companies = [];
+
+        // Test 1: Fetch from backend
+        async function testEndpoint() {
+            const result = document.getElementById('endpointResult');
+            result.innerHTML = '<p>⏳ Fetching companies...</p>';
+
+            const endpoints = [
+                '/customer/getCompanies',
+                '/RideMachan-1.0-SNAPSHOT/customer/getCompanies',
+                window.location.origin + '/customer/getCompanies'
+            ];
+
+            for (const endpoint of endpoints) {
+                try {
+                    console.log('Trying:', endpoint);
+                    const response = await fetch(endpoint);
+
+                    if (response.ok) {
+                        companies = await response.json();
+                        result.innerHTML = `
+                            <p class="success">✅ SUCCESS! Endpoint: ${endpoint}</p>
+                            <p>Status: ${response.status}</p>
+                            <p>Companies found: ${companies.length}</p>
+                            <pre>${JSON.stringify(companies, null, 2)}</pre>
+                        `;
+                        return;
+                    }
+                } catch (error) {
+                    console.error('Error with', endpoint, error);
+                }
+            }
+
+            result.innerHTML = '<p class="error">❌ All endpoints failed. Check console.</p>';
+        }
+
+        // Test 2: Populate dropdown
+        async function populateDropdown() {
+            const result = document.getElementById('dropdownResult');
+            const dropdown = document.getElementById('companyDropdown');
+
+            if (companies.length === 0) {
+                result.innerHTML = '<p class="error">⚠️ No companies loaded. Run Test 1 first.</p>';
+                return;
+            }
+
+            dropdown.innerHTML = '<option value="">All Companies</option>';
+
+            companies.forEach(company => {
+                const option = document.createElement('option');
+                option.value = company.id;
+                option.textContent = company.name;
+                dropdown.appendChild(option);
+            });
+
+            result.innerHTML = `<p class="success">✅ Dropdown populated with ${companies.length} companies!</p>`;
+        }
+
+        // Test 3: Test selection
+        function testSelection() {
+            const result = document.getElementById('selectionResult');
+            const dropdown = document.getElementById('companyDropdown');
+            const selectedId = dropdown.value;
+            const selectedText = dropdown.options[dropdown.selectedIndex].text;
+
+            if (!selectedId) {
+                result.innerHTML = '<p>ℹ️ "All Companies" selected (no filter)</p>';
+                return;
+            }
+
+            const company = companies.find(c => c.id == selectedId);
+
+            result.innerHTML = `
+                <p class="success">✅ Selected Company:</p>
+                <p>ID: ${selectedId}</p>
+                <p>Name: ${selectedText}</p>
+                <p>Matched from backend: ${company ? 'Yes ✓' : 'No ✗'}</p>
+            `;
+        }
+
+        // Auto-run first test on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            console.log('Test page loaded. Click buttons to test company fetching.');
+        });
+    </script>
+</body>
+</html>

@@ -37,24 +37,32 @@ public class CustomerVehicleDAO {
 
         Vehicle v = new Vehicle();
 
-        v.setVehicleId(rs.getInt("vehicle_id"));
-        v.setVehicleBrand(rs.getString("vehicle_brand"));
-        v.setVehicleModel(rs.getString("vehicle_model"));
-        v.setNumberPlateNumber(rs.getString("number_plate_number"));
-        v.setTareWeight(rs.getInt("tare_weight"));
+        v.setVehicleId(rs.getInt("vehicleid"));
+        v.setVehicleBrand(rs.getString("vehiclebrand"));
+        v.setVehicleModel(rs.getString("vehiclemodel"));
+        v.setNumberPlateNumber(rs.getString("numberplatenumber"));
+        v.setTareWeight(rs.getInt("tareweight"));
         v.setColor(rs.getString("color"));
-        v.setNumberOfPassengers(rs.getInt("number_of_passengers"));
-        v.setEngineCapacity(rs.getInt("engine_capacity"));
-        v.setEngineNumber(rs.getString("engine_number"));
-        v.setChasisNumber(rs.getString("chasis_number"));
+        v.setNumberOfPassengers(rs.getInt("numberofpassengers"));
+        v.setEngineCapacity(rs.getInt("enginecapacity"));
+        v.setEngineNumber(rs.getString("enginenumber"));
+        v.setChasisNumber(rs.getString("chasisnumber"));
         v.setDescription(rs.getString("description"));
         v.setMilage(rs.getString("milage"));
         v.setCompanyId(rs.getObject("company_id", Integer.class));
         v.setProviderId(rs.getObject("provider_id", Integer.class));
 
+        // New fields for search functionality
+        v.setPricePerDay(rs.getDouble("price_per_day"));
+        v.setLocation(rs.getString("location"));
+        v.setFeatures(rs.getString("features"));
+        v.setVehicleType(rs.getString("vehicle_type"));
+        v.setFuelType(rs.getString("fuel_type"));
+        v.setAvailabilityStatus(rs.getString("availability_status"));
+
         // BLOB / IMAGE fields (optional for search page)
-        //v.setRegistrationDocumentation(rs.getBinaryStream("registration_documentation"));
-        v.setVehicleImages(rs.getBinaryStream("vehicle_images"));
+        // v.setRegistrationDocumentation(rs.getBinaryStream("registrationdocumentation"));
+        // v.setVehicleImages(rs.getBinaryStream("vehicleimages"));
 
         return v;
 

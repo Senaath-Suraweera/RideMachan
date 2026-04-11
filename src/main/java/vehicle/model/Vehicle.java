@@ -23,6 +23,14 @@ public class Vehicle {
     private String location;
     private String features;
 
+    // Fields used by search/filter UI
+    private String vehicleType;
+    private String fuelType;
+    private String availabilityStatus;
+
+    // Company name for display purposes
+    private String companyName;
+
 
     // Constructors
     public Vehicle() {}
@@ -105,4 +113,17 @@ public class Vehicle {
 
     public String getFeatures() { return features; }
     public void setFeatures(String features) { this.features = features; }
+
+    public String getVehicleType() { return vehicleType; }
+    public void setVehicleType(String vehicleType) { this.vehicleType = vehicleType; }
+
+    public String getFuelType() { return fuelType; }
+    public void setFuelType(String fuelType) { this.fuelType = fuelType; }
+
+    public String getAvailabilityStatus() { return availabilityStatus; }
+    public void setAvailabilityStatus(String availabilityStatus) { this.availabilityStatus = availabilityStatus; }
+
+    public String getCompanyName() { return companyName; }
+    public void setCompanyName(String companyName) { this.companyName = companyName; }
 }
+

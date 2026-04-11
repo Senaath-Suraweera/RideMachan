@@ -12,7 +12,8 @@ public class VehicleDAO {
     public static boolean addVehicle(Vehicle v) {
         String sql = "INSERT INTO Vehicle (vehiclebrand, vehiclemodel, numberplatenumber, tareweight, color, " +
                 "numberofpassengers, enginecapacity, enginenumber, chasisnumber, registrationdocumentation, " +
-                "vehicleimages, description, milage, price_per_day, location , features ,company_id, provider_id) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+                "vehicleimages, description, milage, price_per_day, location, features, vehicle_type, fuel_type, " +
+                "availability_status, company_id, provider_id) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
         try (Connection con = DBConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
 
@@ -32,14 +33,17 @@ public class VehicleDAO {
             ps.setDouble(14, v.getPricePerDay());
             ps.setString(15, v.getLocation());
             ps.setString(16, v.getFeatures());
+            ps.setString(17, v.getVehicleType());
+            ps.setString(18, v.getFuelType());
+            ps.setString(19, v.getAvailabilityStatus() != null ? v.getAvailabilityStatus() : "available");
             if (v.getCompanyId() != null)
-                ps.setInt(17, v.getCompanyId());
+                ps.setInt(20, v.getCompanyId());
             else
-                ps.setNull(17, Types.INTEGER);
+                ps.setNull(20, Types.INTEGER);
             if (v.getProviderId() != null)
-                ps.setInt(18, v.getProviderId());
+                ps.setInt(21, v.getProviderId());
             else
-                ps.setNull(18, Types.INTEGER);
+                ps.setNull(21, Types.INTEGER);
 
             return ps.executeUpdate() > 0;
         } catch (Exception e) {
@@ -80,6 +84,9 @@ public class VehicleDAO {
                 v.setPricePerDay(rs.getDouble("price_per_day"));
                 v.setLocation(rs.getString("location"));
                 v.setFeatures(rs.getString("features"));
+                v.setVehicleType(rs.getString("vehicle_type"));
+                v.setFuelType(rs.getString("fuel_type"));
+                v.setAvailabilityStatus(rs.getString("availability_status"));
                 v.setMilage(rs.getString("milage"));
                 int companyId = rs.getInt("company_id");
                 if (rs.wasNull()) {
@@ -105,8 +112,8 @@ public class VehicleDAO {
 
     public static boolean updateVehicle(Vehicle v) {
         String sql = "UPDATE Vehicle SET vehiclebrand=?, vehiclemodel=?, numberplatenumber=?, tareweight=?, color=?, " +
-                "numberofpassengers=?, enginecapacity=?, enginenumber=?, chasisnumber=?, description=?, milage=? , price_per_day=?,"+
-                "location=?,features=? WHERE vehicleid=?";
+                "numberofpassengers=?, enginecapacity=?, enginenumber=?, chasisnumber=?, description=?, milage=?, price_per_day=?, " +
+                "location=?, features=?, vehicle_type=?, fuel_type=?, availability_status=? WHERE vehicleid=?";
         try (Connection con = DBConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
 
@@ -121,10 +128,13 @@ public class VehicleDAO {
             ps.setString(9, v.getChasisNumber());
             ps.setString(10, v.getDescription());
             ps.setString(11, v.getMilage());
-            ps.setDouble(12,v.getPricePerDay());
-            ps.setString(13,v.getLocation());
-            ps.setString(14,v.getFeatures());
-            ps.setInt(15, v.getVehicleId());
+            ps.setDouble(12, v.getPricePerDay());
+            ps.setString(13, v.getLocation());
+            ps.setString(14, v.getFeatures());
+            ps.setString(15, v.getVehicleType());
+            ps.setString(16, v.getFuelType());
+            ps.setString(17, v.getAvailabilityStatus());
+            ps.setInt(18, v.getVehicleId());
 
 
             return ps.executeUpdate() > 0;
@@ -171,6 +181,9 @@ public class VehicleDAO {
                 v.setPricePerDay(rs.getDouble("price_per_day"));
                 v.setLocation(rs.getString("location"));
                 v.setFeatures(rs.getString("features"));
+                v.setVehicleType(rs.getString("vehicle_type"));
+                v.setFuelType(rs.getString("fuel_type"));
+                v.setAvailabilityStatus(rs.getString("availability_status"));
                 int companyId = rs.getInt("company_id");
                 if (rs.wasNull()) {
                     v.setCompanyId(null);
@@ -192,4 +205,55 @@ public class VehicleDAO {
         }
         return list;
     }
+
+    public static Vehicle getOneVehicleById(int vehicleId) {
+
+        Vehicle v = null;
+        String sql = "SELECT v.*, rc.companyname " +
+                     "FROM Vehicle v " +
+                     "LEFT JOIN RentalCompany rc ON v.company_id = rc.companyid " +
+                     "WHERE v.vehicleid = ?";
+
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setInt(1, vehicleId);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {   // only ONE row expected
+                v = new Vehicle();
+                v.setVehicleId(rs.getInt("vehicleid"));
+                v.setVehicleBrand(rs.getString("vehiclebrand"));
+                v.setVehicleModel(rs.getString("vehiclemodel"));
+                v.setNumberPlateNumber(rs.getString("numberplatenumber"));
+                v.setTareWeight(rs.getInt("tareweight"));
+                v.setColor(rs.getString("color"));
+                v.setNumberOfPassengers(rs.getInt("numberofpassengers"));
+                v.setEngineCapacity(rs.getInt("enginecapacity"));
+                v.setEngineNumber(rs.getString("enginenumber"));
+                v.setChasisNumber(rs.getString("chasisnumber"));
+                v.setDescription(rs.getString("description"));
+                v.setMilage(rs.getString("milage"));
+                v.setPricePerDay(rs.getDouble("price_per_day"));
+                v.setLocation(rs.getString("location"));
+                v.setFeatures(rs.getString("features"));
+                v.setVehicleType(rs.getString("vehicle_type"));
+                v.setFuelType(rs.getString("fuel_type"));
+                v.setAvailabilityStatus(rs.getString("availability_status"));
+
+                int companyId = rs.getInt("company_id");
+                v.setCompanyId(rs.wasNull() ? null : companyId);
+
+                int providerId = rs.getInt("provider_id");
+                v.setProviderId(rs.wasNull() ? null : providerId);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return v;
+    }
+
 }
+
+
