@@ -91,7 +91,7 @@ async function loadRecentMaintenance() {
 
     try {
 
-        const response = await fetch("/displayrecentmaintenance", {method: "POST"});
+        const response = await fetch("/display/recent/maintenance", {method: "POST"});
         console.log(response);
 
         if (!response.ok) {
