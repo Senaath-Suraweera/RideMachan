@@ -788,3 +788,5 @@ ALTER TABLE maintenanceJobs
 
 ALTER TABLE maintenanceJobs
     ADD COLUMN type ENUM('Oil Change', 'Brake Services', 'Tire Services',  'Other Services') NOT NULL DEFAULT 'Other Services';
+
+
