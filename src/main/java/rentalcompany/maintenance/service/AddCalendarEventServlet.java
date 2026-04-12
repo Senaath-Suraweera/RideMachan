@@ -4,7 +4,7 @@ import jakarta.servlet.*;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 import rentalcompany.maintenance.controller.CalendarEventDAO;
-import vehicle.dao.VehicleDAO;
+import rentalcompany.companyvehicle.dao.VehicleDAO;
 import rentalcompany.maintenance.model.CalendarEvent;
 import common.util.DBConnection;
 import com.google.gson.Gson;

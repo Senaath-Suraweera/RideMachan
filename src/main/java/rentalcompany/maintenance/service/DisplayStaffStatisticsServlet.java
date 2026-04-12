@@ -9,7 +9,7 @@ import jakarta.servlet.http.HttpSession;
 import rentalcompany.maintenance.controller.MaintenanceStaffDAO;
 import rentalcompany.maintenance.model.MaintenanceStaff;
 
-import vehicle.dao.VehicleDAO;
+import rentalcompany.companyvehicle.dao.VehicleDAO;
 
 import java.io.IOException;
 
