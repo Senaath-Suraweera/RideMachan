@@ -29,6 +29,7 @@ public class DeleteCalendarEventServlet extends HttpServlet {
         resp.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
         try (Connection con = DBConnection.getConnection()) {
+
             CalendarEventDAO dao = new CalendarEventDAO(con);
             int eventId;
 

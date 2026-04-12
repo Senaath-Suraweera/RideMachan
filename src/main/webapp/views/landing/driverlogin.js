@@ -20,7 +20,7 @@ loginForm.addEventListener("submit", async (e) => {
 
     if (result.status === "success") {
       alert("✅ Login successful!");
-      window.location.href = "/views/rentalcompany/driver/dashboard.html";
+      window.location.href = "/views/rentalcompany/driver/pages/dashboard.html";
     } else {
       errorMsg.style.display = "block";
       errorMsg.textContent = result.message || "Invalid email or password";

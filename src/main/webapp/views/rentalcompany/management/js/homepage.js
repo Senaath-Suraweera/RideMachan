@@ -1,155 +1,190 @@
-document.addEventListener("DOMContentLoaded", () => {
-  // Navigation active state management
-  const navLinks = document.querySelectorAll(".nav-link")
+  async function checkLogin() {
 
-  navLinks.forEach((link) => {
-    link.addEventListener("click", function (e) {
-      
+      try {
 
-      // Remove active class from all nav items
-      document.querySelectorAll(".nav-item").forEach((item) => {
-        item.classList.remove("active")
-      })
+          const response = await fetch("/checklogin");
+          const data = await response.json();
 
-      // Add active class to clicked item
-      this.parentElement.classList.add("active")
-    })
-  })
- 
-  // Stats cards animation on scroll
-  const observerOptions = {
-    threshold: 0.1,
-    rootMargin: "0px 0px -50px 0px",
+          if (!data.loggedIn) {
+
+              const modal = document.getElementById("loginModal");
+              modal.style.display = "flex";
+
+
+              document.getElementById("loginOkBtn").onclick = () => {
+
+                  window.location.href = "/companylogin";
+
+              };
+
+              return false;
+
+          }
+
+          console.log("User is logged in.");
+          return true;
+
+      } catch (err) {
+
+          console.error("Error checking login:", err);
+          return false;
+
+      }
+
   }
 
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach((entry) => {
-      if (entry.isIntersecting) {
-        entry.target.style.opacity = "1"
-        entry.target.style.transform = "translateY(0)"
+  async function loadStatistics() {
+
+      try {
+
+          const response = await fetch("/displaystatistics", {method: "POST"});
+          console.log(response);
+
+          if (!response.ok) {
+              throw new Error(`HTTP error! Status: ${response.status}`);
+          }
+
+
+          const data = await response.json();
+
+          console.log(data);
+
+
+          return data;
+
+      }catch (err) {
+
+          console.log(err);
+
       }
-    })
-  }, observerOptions)
 
-  // Observe stat cards
-  document.querySelectorAll(".stat-card").forEach((card) => {
-    card.style.opacity = "0"
-    card.style.transform = "translateY(20px)"
-    card.style.transition = "all 0.6s ease"
-    observer.observe(card)
-  })
-
-  // Action items click handlers
-  document.querySelectorAll(".action-item").forEach((item) => {
-    item.addEventListener("click", function () {
-      const title = this.querySelector(".action-title").textContent
-      console.log(`[v0] Action clicked: ${title}`)
-
-      // Add click animation
-      this.style.transform = "translateX(5px) scale(0.98)"
-      setTimeout(() => {
-        this.style.transform = "translateX(5px)"
-      }, 150)
-    })
-  })
-
-  // Notification bell animation
-  const notificationIcon = document.querySelector(".notification-icon")
-  if (notificationIcon) {
-    notificationIcon.addEventListener("click", function () {
-      this.style.animation = "shake 0.5s ease-in-out"
-      setTimeout(() => {
-        this.style.animation = ""
-      }, 500)
-    })
   }
 
-  // Button hover effects
-  document.querySelectorAll(".btn-primary, .btn-secondary").forEach((btn) => {
-    btn.addEventListener("mouseenter", function () {
-      this.style.transform = "translateY(-2px)"
-    })
 
-    btn.addEventListener("mouseleave", function () {
-      this.style.transform = "translateY(0)"
-    })
-  })
+  function renderStatistics(stats) {
 
-  // Booking items hover effect
-  document.querySelectorAll(".booking-item").forEach((item) => {
-    item.addEventListener("mouseenter", function () {
-      this.style.backgroundColor = "rgba(58, 12, 163, 0.02)"
-      this.style.borderRadius = "8px"
-      this.style.margin = "0 -8px"
-      this.style.padding = "16px 8px"
-    })
+      const statsGrid = document.getElementById("stats-grid");
+      statsGrid.innerHTML = "";
 
-    item.addEventListener("mouseleave", function () {
-      this.style.backgroundColor = ""
-      this.style.borderRadius = ""
-      this.style.margin = ""
-      this.style.padding = "16px 0"
-    })
-  })
-})
+      function createStatsCard(iconClass, colorClass, label, value) {
 
-// Add shake animation for notification
-const style = document.createElement("style")
-style.textContent = `
-    @keyframes shake {
-        0%, 100% { transform: translateX(0); }
-        25% { transform: translateX(-5px); }
-        75% { transform: translateX(5px); }
-    }
-`
-document.head.appendChild(style)
+            return `
+            
+                <div class="stat-card">
+                    <div class="stat-icon ${colorClass}">
+                        <i class="${iconClass}"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-label">${label}</div>
+                        <div class="stat-value">${value}</div>
+                    </div>
+                </div>            
+            
+            `;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-document.addEventListener("DOMContentLoaded", () => {
-  document.querySelectorAll(".action-item").forEach((item) => {
-    item.addEventListener("click", function () {
-      const title = this.querySelector(".action-title").textContent
-      console.log(`[v0] Action clicked: ${title}`)
-
-      // Add click animation
-      this.style.transform = "translateX(5px) scale(0.98)"
-      setTimeout(() => {
-        this.style.transform = "translateX(5px)"
-      }, 150)
-
-      // Redirect Add Driver
-      if (title.trim() === "Add Driver") {
-        window.location.href = "driver-management.html?openAddDriver=true";
       }
-    })
-  })
-});
 
+      statsGrid.innerHTML += createStatsCard("fas fa-car", "blue", "Total Vehicles", stats.totalVehicles || 2);
+      statsGrid.innerHTML += createStatsCard("fas fa-users", "green", "Active Drivers", stats.activeDrivers || 0);
+      statsGrid.innerHTML += createStatsCard("fas fa-calendar-check", "orange", "Active Bookings", stats.activeBookings || 0);
+      statsGrid.innerHTML += createStatsCard("fas fa-rupee-sign", "purple", "Monthly Revenue", stats.monthlyRevenue || "Rs0");
+
+  }
+
+  let recentBookings;
+
+  async function loadRecentBookings() {
+
+      try {
+
+          let response = await fetch(`/displayrecentbookings`, {
+              method: "POST",
+              headers: {
+                  "Content-Type": "application/json"
+              }
+          });
+
+          if(!response.ok){
+              throw new Error(`HTTP error! Status: ${response.status}`);
+          }
+
+          let data = await response.json();
+
+          console.log(data);
+
+
+          return data;
+
+      }catch (err) {
+
+          console.log(err);
+
+      }
+
+  }
+
+  function renderRecentBookings(bookings) {
+
+      const bookingList = document.getElementsByClassName("bookings-list")[0];
+
+      bookingList.innerHTML = "";
+
+      if(bookings && bookings.length > 0) {
+
+          bookings.forEach(b => {
+              bookingList.innerHTML += `
+                <div class="booking-item">
+                    <div class="booking-info">
+                        <div class="vehicle-name">${b.vehicleBrand || "Unknown Brand"} ${b.vehicleModel || ""}</div>
+                        <div class="customer-name">${b.customerName || "Unknown Customer"}</div>
+                        <div class="booking-date">${b.tripStartDate} - ${b.tripEndDate}</div>
+                    </div>
+                    <div class="booking-status">
+                        <span class="status-badge ${b.status.toLowerCase()}">${b.status}</span>
+                        <div class="booking-price">Rs ${b.totalAmount}</div>
+                    </div>
+                </div>
+            `;
+          });
+
+      }
+
+  }
+
+  function formatDate(dateStr) {
+
+
+  }
+
+
+
+  document.addEventListener("DOMContentLoaded", async function() {
+
+      try {
+
+          const loggedIn = await checkLogin();
+
+          if (!loggedIn) {
+              return;    // stop here if not logged in
+          }
+
+          const stats = await loadStatistics();
+
+          if(stats) {
+              renderStatistics(stats)
+          }
+
+          recentBookings = await loadRecentBookings();
+
+          console.log("Recent Bookings:", recentBookings);
+
+          renderRecentBookings(recentBookings);
+
+
+      } catch (err) {
+
+          console.error("Error during initialization:", err);
+
+      }
+
+  });

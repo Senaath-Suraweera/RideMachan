@@ -1,254 +1,499 @@
-// Fleet Calendar JavaScript
-const currentDate = new Date()
-let currentVehicle = "WP CAB 2156"
-let currentView = "daily"
+async function checkLogin() {
 
-// Initialize calendar
-document.addEventListener("DOMContentLoaded", () => {
-  updateDateDisplay()
-  loadVehicleSchedule()
-})
+    try {
 
-// Date navigation functions
-function previousMonth() {
-  currentDate.setMonth(currentDate.getMonth() - 1)
-  updateDateDisplay()
-  loadVehicleSchedule()
-}
+        const response = await fetch("/checklogin");
+        const data = await response.json();
 
-function nextMonth() {
-  currentDate.setMonth(currentDate.getMonth() + 1)
-  updateDateDisplay()
-  loadVehicleSchedule()
-}
+        if (!data.loggedIn) {
 
-function updateDateDisplay() {
-  const monthNames = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
-  ]
+            const modal = document.getElementById("loginModal");
+            modal.style.display = "flex";
 
-  const currentDateElement = document.querySelector(".current-date")
-  if (currentDateElement) {
-    currentDateElement.textContent = `${monthNames[currentDate.getMonth()]} ${currentDate.getFullYear()}`
-  }
-}
 
-// Vehicle selection
-function changeVehicle() {
-  const vehicleSelect = document.getElementById("vehicleSelect")
-  currentVehicle = vehicleSelect.value
-  loadVehicleSchedule()
-  updateVehicleInfo()
-}
+            document.getElementById("loginOkBtn").onclick = () => {
 
-function updateVehicleInfo() {
-  // Update vehicle information based on selected vehicle
-  const vehicleDetails = {
-    "WP CAB 2156": {
-      name: "Toyota Prius 2020",
-      status: "Available",
-    },
-    "ABC 123": {
-      name: "Honda Civic 2021",
-      status: "On Trip",
-    },
-    "XYZ 789": {
-      name: "Ford Explorer 2022",
-      status: "Maintenance",
-    },
-  }
+                window.location.href = "/companylogin";
 
-  const vehicle = vehicleDetails[currentVehicle]
-  if (vehicle) {
-    document.querySelector(".vehicle-details h3").textContent = vehicle.name
-    const statusBadge = document.querySelector(".status-badge")
-    statusBadge.textContent = vehicle.status
-    statusBadge.className = `status-badge ${vehicle.status.toLowerCase().replace(" ", "-")}`
-  }
-}
+            };
 
-// View selection
-function changeView() {
-  const viewSelect = document.getElementById("viewType")
-  currentView = viewSelect.value
-  loadVehicleSchedule()
-}
+            return false;
 
-// Load vehicle schedule
-function loadVehicleSchedule() {
-  // Simulate loading schedule data
-  console.log(`Loading schedule for ${currentVehicle} in ${currentView} view for ${currentDate.toDateString()}`)
-
-  // Update daily stats
-  updateDailyStats()
-}
-
-function updateDailyStats() {
-  // Simulate updating daily statistics
-  const stats = {
-    trips: Math.floor(Math.random() * 5) + 1,
-    maintenance: Math.floor(Math.random() * 3),
-    drivers: Math.floor(Math.random() * 3) + 1,
-  }
-
-  const statCards = document.querySelectorAll(".stat-number")
-  if (statCards.length >= 3) {
-    statCards[0].textContent = stats.trips
-    statCards[1].textContent = stats.maintenance
-    statCards[2].textContent = stats.drivers
-  }
-}  
-
-// Action functions
-function addToMaintenance() {
-  alert(`Adding ${currentVehicle} to maintenance schedule...`)
-  // Implement maintenance scheduling logic
-}
-
-function refreshCalendar() {
-  loadVehicleSchedule()
-  showNotification("Calendar refreshed successfully!")
-}
-
-function contactAdmin() {
-  alert("Contacting admin...")
-  // Implement admin contact functionality
-}
-
-// Utility functions
-function showNotification(message) {
-  // Create and show notification
-  const notification = document.createElement("div")
-  notification.className = "notification"
-  notification.textContent = message
-  notification.style.cssText = `
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        background: #4caf50;
-        color: white;
-        padding: 12px 24px;
-        border-radius: 8px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-        z-index: 1000;
-        animation: slideIn 0.3s ease;
-    `
-
-  document.body.appendChild(notification)
-
-  setTimeout(() => {
-    notification.remove()
-  }, 3000)
-}
-
-// Add CSS animation for notifications
-const style = document.createElement("style")
-style.textContent = `
-    @keyframes slideIn {
-        from {
-            transform: translateX(100%);
-            opacity: 0;
         }
-        to {
-            transform: translateX(0);
-            opacity: 1;
+
+        console.log("User is logged in.");
+        return true;
+
+    } catch (err) {
+
+        console.error("Error checking login:", err);
+        return false;
+
+    }
+
+}
+
+
+let vehicle;
+
+async function LoadVehicleDetails(numberplate,date) {
+
+    try {
+
+        const response = await fetch("/getvehicledetails", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ numberplate, date })
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        console.log("Vehicle's details:", data);
+
+        return data;
+
+    } catch (err) {
+
+        console.log(err);
+
+    }
+
+}
+
+
+async function LoadAllSchedule(date) {
+
+    try {
+
+        const response = await fetch("/getallschedule", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ date })
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        console.log("All schedule data:", data);
+
+        return data;
+
+    } catch (err) {
+
+        console.log(err);
+
+    }
+
+}
+
+async function LoadStatistics(date) {
+
+    try {
+
+        const response = await fetch("/displaydaystatistics", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ date })
+        });
+
+
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+
+        const data = await response.json();
+
+        console.log("Statistics for", date, ":", data);
+
+
+        return data;
+
+    }catch (err) {
+
+        console.log(err);
+
+    }
+
+}
+
+
+function findTodayDate() {
+
+    const today = new Date();
+    const options = { month: "long", day: "numeric", year: "numeric" };
+    return today.toLocaleDateString(undefined, options);
+
+}
+
+function getTodayForInput() {
+
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, "0");
+    const dd = String(today.getDate()).padStart(2, "0");
+    return `${yyyy}-${mm}-${dd}`;
+
+}
+
+function handleDateSection() {
+
+    const calenderControls = document.getElementsByClassName("calendar-controls")[0];
+
+    calenderControls.innerHTML = `
+        <div class="date-selection">
+            <label for="calendarDate">Select Date:</label>
+            <input type="date" id="calendarDate" value="${getTodayForInput()}">
+        </div>
+
+        <div class="date-info">
+            <span id="todayInfo">Today: ${findTodayDate()}</span>
+        </div>
+    `;
+
+}
+
+
+function renderVehicleCard(vehicle) {
+
+    let vehicleInformation = document.getElementsByClassName("vehicle-info")[0];
+    vehicleInformation.innerHTML = "";
+
+
+    if (!vehicle) {
+        return;
+    }
+
+
+    const vehicleCard = document.createElement("div");
+    vehicleCard.className = "vehicle-card";
+
+
+    vehicleCard.innerHTML = `
+
+                         <div class="vehicle-image">
+                            <i class="fas fa-car"></i>
+                         </div>
+                        
+                         <div class="vehicle-details">
+                            <h3>${vehicle.brand} ${vehicle.model} ${vehicle.year}</h3>
+                            <div class="vehicle-status">
+                                <span class="status-label">Current Status:</span>
+                                <span class="status-badge ${vehicle.status.toLowerCase()}">
+                                    ${vehicle.status}
+                                </span>
+                            </div>
+                        </div>      
+                                                      
+                    `;
+
+
+    vehicleInformation.appendChild(vehicleCard);
+
+}
+
+function splitOnlyHourPartStartTime(time) {
+
+    let hours = "";
+    let minutes = "";
+    let foundColon = false;
+
+    for (let i = 0; i < time.length; i++) {
+        let char = time[i];
+
+        if (char === ":") {
+            foundColon = true;
+            continue;
+        }
+
+        if (!foundColon) {
+            hours += char;
+        } else {
+            minutes += char;
         }
     }
-`
-document.head.appendChild(style)
 
-// Handle booking interactions
-document.addEventListener("click", (e) => {
-  if (e.target.closest(".booking")) {
-    const booking = e.target.closest(".booking")
-    const bookingId = booking.querySelector(".booking-id").textContent
-    console.log(`Clicked on booking: ${bookingId}`)
-    // Implement booking details modal or navigation
-  }
+    return hours;
+}
 
-  if (e.target.closest(".maintenance")) {
-    const maintenance = e.target.closest(".maintenance")
-    const maintenanceType = maintenance.querySelector(".maintenance-type").textContent
-    console.log(`Clicked on maintenance: ${maintenanceType}`)
-    // Implement maintenance details modal or navigation
-  }
-})
+function splitOnlyHourPartEndTime(time) {
 
-// Auto-refresh every 5 minutes
-setInterval(() => {
-  loadVehicleSchedule()
-}, 300000)
- 
+    let hours = "";
+    let minutes = "";
+    let foundColon = false;
 
+    for (let i = 0; i < time.length; i++) {
+        let char = time[i];
 
+        if (char === ":") {
+            foundColon = true;
+            continue;
+        }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// Initialize date picker with current date
-document.addEventListener("DOMContentLoaded", () => {
-    const dateInput = document.getElementById("calendarDate");
-    if (dateInput) {
-        const todayStr = currentDate.toISOString().split("T")[0]; // yyyy-mm-dd
-        dateInput.value = todayStr;
+        if (!foundColon) {
+            hours += char;
+        } else {
+            minutes += char;
+        }
     }
-    updateDateDisplay()
-    loadVehicleSchedule()
+
+    let h = parseInt(hours, 10);
+    let m = parseInt(minutes, 10);
+
+
+    if (m > 0) {
+        return h;
+    } else {
+        return h - 1;
+    }
+
+}
+
+function findSlotWork(schedule, hour) {
+
+    let result = "Available";
+
+    schedule.bookings.forEach(booking => {
+
+        let startHour = splitOnlyHourPartStartTime(booking.startTime);
+        let endHour = splitOnlyHourPartEndTime(booking.endTime);
+
+        if (hour >= startHour && hour <= endHour) {
+            result = { ...booking, type: "booking" };
+
+        }
+
+    });
+
+    schedule.maintenance.forEach(task => {
+
+        let startHour = splitOnlyHourPartStartTime(task.startTime);
+        let endHour = splitOnlyHourPartEndTime(task.endTime);
+
+
+        if (hour >= startHour && hour <= endHour) {
+            result = { ...task, type: "maintenance", maintenanceType: task.type }; // include startHour, endHour
+        }
+
+    });
+
+    return result;
+}
+
+
+function renderScheduleSection(schedule) {
+
+    let scheduleSection = document.getElementsByClassName("schedule-section")[0];
+
+    scheduleSection.innerHTML = `
+                        <h3><i class="fas fa-calendar-alt"></i> Schedule</h3>
+                        <div class="schedule-timeline"></div>
+                    `;
+
+    let timeline = scheduleSection.querySelector(".schedule-timeline");
+
+    let startHour = 8;
+    let endHour = 18;
+
+
+
+    for(let hour=startHour; hour <= endHour; hour++) {
+
+        let time = (hour < 10 ? "0" + hour : hour) + ":00";
+
+        let slot = document.createElement("div");
+        slot.className = "time-slot";
+
+        let slotStatus = findSlotWork(schedule, hour);
+
+        let innerHTML = `<div class="time-label">${time}</div>`;
+
+        if (slotStatus !== "Available") {
+            if (slotStatus.type === "booking") {
+                innerHTML += `
+                    <div class="schedule-item booking ${slotStatus.status.toLowerCase()}">
+                        <div class="booking-header">
+                            <span class="booking-id">${slotStatus.id}</span>
+                            <span class="booking-status">${slotStatus.status}</span>
+                        </div>
+                        <div class="booking-details">
+                            <div class="booking-info">
+                                <i class="fas fa-user"></i>
+                                <span>Customer: ${slotStatus.customer}</span>
+                            </div>
+                            <div class="booking-info">
+                                <i class="fas fa-id-card"></i>
+                                <span>Driver: ${slotStatus.driver}</span>
+                            </div>
+                        </div>
+                        <div class="booking-time">
+                            <i class="fas fa-clock"></i>
+                            <span>Time: ${slotStatus.startTime < 10 ? "0" + slotStatus.startTime : slotStatus.startTime}-${slotStatus.endTime < 10 ? "0" + slotStatus.endTime : slotStatus.endTime}</span>
+                        </div>
+                    </div>
+                `;
+            } else if (slotStatus.type === "maintenance") {
+                innerHTML += `
+                        <div class="schedule-item maintenance ${slotStatus.status.toLowerCase()}">
+                            <div class="maintenance-header">
+                                <span class="maintenance-type">${slotStatus.maintenanceType}</span>
+                                <span class="maintenance-status">${slotStatus.status}</span>
+                            </div>
+                            <div class="maintenance-time">
+                                <i class="fas fa-clock"></i>
+                                <span>${slotStatus.startTime < 10 ? "0" + slotStatus.startTime : slotStatus.startTime}-${slotStatus.endTime < 10 ? "0" + slotStatus.endTime : slotStatus.endTime}</span>
+                            </div>
+                        </div>
+                    `;
+            }
+        } else {
+            innerHTML += `<div class="schedule-item available">Available</div>`;
+        }
+
+        slot.innerHTML = innerHTML;
+        timeline.appendChild(slot);
+    }
+
+}
+
+function renderStatistics(stats) {
+
+    let dailyStatsContainer = document.getElementsByClassName("daily-stats")[0];
+    dailyStatsContainer.innerHTML = "";
+
+
+    function createStatsCard(label, value) {
+            return `
+                <div class="stat-card">
+                <div class="stat-number">${value}</div>
+                <div class="stat-label">${label}</div>
+                </div>
+            `;
+    }
+
+    dailyStatsContainer.innerHTML += createStatsCard("Total Trips Today", stats.totalTripsToday);
+    dailyStatsContainer.innerHTML += createStatsCard("Maintenance Tasks Today", stats.maintenanceTasksToday);
+    dailyStatsContainer.innerHTML += createStatsCard("Assigned Drivers Today", stats.assignedDriversToday);
+
+}
+
+
+document.addEventListener("DOMContentLoaded", async function () {
+
+    try {
+
+        const loggedIn = await checkLogin();
+
+        if (!loggedIn) {
+            return;    // stop here if not logged in
+        }
+
+        handleDateSection();
+
+        const selectedDate = document.getElementById("calendarDate").value;
+
+        const dummyData = createDummyDataInput();
+
+
+        vehicle = dummyData.vehicle;
+        //vehicle = LoadVehicleDetails("ABC-1234", selectedDate);
+
+
+        renderVehicleCard(vehicle);
+
+        let schedule = createDummyDataInput().schedule;
+        //let schedule = LoadAllSchedule(selectedDate);
+        renderScheduleSection(schedule);
+
+        let stats = dummyData.stats;
+        //let stats = LoadStatistics(selectedDate);
+
+        if (stats) {
+            renderStatistics(stats)
+        }
+
+
+    } catch (err) {
+
+        console.error("Error during initialization:", err);
+
+    }
+
 });
 
-// Go to selected date
-function goToSelectedDate() {
-    const dateInput = document.getElementById("calendarDate");
-    if (dateInput && dateInput.value) {
-        currentDate.setTime(new Date(dateInput.value).getTime());
-        updateDateDisplay();
-        loadVehicleSchedule();
-    }
-}
 
-// Update date display for "current-date" and "Today"
-function updateDateDisplay() {
-    const monthNames = [
-        "January","February","March","April","May","June",
-        "July","August","September","October","November","December"
-    ];
 
-    const currentDateElement = document.querySelector(".current-date");
-    const todayInfo = document.getElementById("todayInfo");
-    const dateStr = `${monthNames[currentDate.getMonth()]} ${currentDate.getDate()}, ${currentDate.getFullYear()}`;
 
-    if (currentDateElement) currentDateElement.textContent = dateStr;
-    if (todayInfo) todayInfo.textContent = `Today: ${dateStr}`;
 
-    // Update the date picker input value to match
-    const dateInput = document.getElementById("calendarDate");
-    if (dateInput) dateInput.value = currentDate.toISOString().split("T")[0];
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+function createDummyDataInput() {
+    return {
+        vehicle: {
+            numberplate: "ABC-1234",
+            brand: "Toyota",
+            model: "Prius",
+            year: 2020,
+            status: "Available"
+        },
+        schedule: {
+            bookings: [
+                {
+                    id: "BK001",
+                    customer: "John Smith",
+                    driver: "Mike Johnson",
+                    startTime: "8:55",
+                    endTime: "11:48",
+                    status: "Ongoing"
+                },
+                {
+                    id: "BK002",
+                    customer: "Sarah Wilson",
+                    driver: "Mike Johnson",
+                    startTime: "16:00",
+                    endTime: "18:00",
+                    status: "Ongoing"
+                }
+            ],
+            maintenance: [
+                {
+                    type: "Oil Change",
+                    startTime: "13:15",
+                    endTime: "15:34",
+                    status: "Scheduled"
+                }
+            ]
+        },
+        stats: {
+            totalTripsToday: 2,
+            maintenanceTasksToday: 1,
+            assignedDriversToday: 1
+        }
+    };
 }

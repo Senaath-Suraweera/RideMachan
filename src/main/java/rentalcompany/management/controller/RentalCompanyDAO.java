@@ -65,4 +65,68 @@ public class RentalCompanyDAO {
         }
         return null;
     }
+
+    public static RentalCompany getCompanyById(int companyId) {
+
+        String sql = "SELECT * FROM rentalcompany WHERE companyid = ?";
+
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setInt(1, companyId);
+
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+
+                RentalCompany company = new RentalCompany();
+
+                company.setCompanyId(rs.getInt("companyid"));
+                company.setCompanyName(rs.getString("companyname"));
+                company.setEmail(rs.getString("companyemail"));
+                company.setPhone(rs.getString("phone"));
+                company.setRegistrationNumber(rs.getString("registrationnumber"));
+                company.setTaxId(rs.getString("taxid"));
+                company.setStreet(rs.getString("street"));
+                company.setCity(rs.getString("city"));
+                company.setCertificatePath(rs.getString("certificatepath"));
+                company.setTaxDocumentPath(rs.getString("taxdocumentpath"));
+                company.setDescription(rs.getString("description"));
+                company.setTerms(rs.getString("terms"));
+
+                return company;
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    public static boolean updateCompanyProfile(int companyId,String companyName,String phone,String email,String street, String city) {
+
+        boolean status = false;
+
+        String sql = "UPDATE rentalcompany SET companyname=?, phone=?, companyemail=?, street=?, city=? WHERE companyid=?";
+
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+
+            ps.setString(1, companyName);
+            ps.setString(2, phone);
+            ps.setString(3, email);
+            ps.setString(4, street);
+            ps.setString(5, city);
+            ps.setInt(6, companyId);
+
+            status = ps.executeUpdate() > 0;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return status;
+    }
 }

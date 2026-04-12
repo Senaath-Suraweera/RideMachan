@@ -1,223 +1,266 @@
-document.addEventListener("DOMContentLoaded", () => {
-  // Profile form handling
-  const profileForm = document.getElementById("profileForm")
-  const saveBtn = document.querySelector(".save-changes-btn")
+async function checkLogin() {
 
-  // Handle form submission
-  profileForm.addEventListener("submit", (e) => {
-    e.preventDefault()
+    try {
 
-    // Add loading state
-    profileForm.classList.add("form-saving")
-    saveBtn.disabled = true
+        const response = await fetch("/checklogin");
+        const data = await response.json();
 
-    // Simulate API call
-    setTimeout(() => {
-      // Remove loading state
-      profileForm.classList.remove("form-saving")
-      saveBtn.disabled = false
+        if (!data.loggedIn) {
 
-      // Show success message
-      showNotification("Profile updated successfully!", "success")
-    }, 2000)
-  }) 
+            const modal = document.getElementById("loginModal");
+            modal.style.display = "flex";
 
-  // Handle profile picture update
-  const updatePictureBtn = document.querySelector(".update-picture-btn")
-  updatePictureBtn.addEventListener("click", () => {
-    // Create file input
-    const fileInput = document.createElement("input")
-    fileInput.type = "file"
-    fileInput.accept = "image/*"
 
-    fileInput.addEventListener("change", (e) => {
-      const file = e.target.files[0]
-      if (file) {
-        // Simulate file upload
-        showNotification("Profile picture updated successfully!", "success")
-      }
-    })
+            document.getElementById("loginOkBtn").onclick = () => {
 
-    fileInput.click()
-  })
+                window.location.href = "/companylogin";
 
-  // Handle notification toggles
-  const toggles = document.querySelectorAll('.toggle-switch input[type="checkbox"]')
-  toggles.forEach((toggle) => {
-    toggle.addEventListener("change", function () {
-      const notificationName = this.id.replace(/([A-Z])/g, " $1").toLowerCase()
-      const status = this.checked ? "enabled" : "disabled"
-      showNotification(`${notificationName} notifications ${status}`, "info")
-    })
-  })
+            };
 
-  // Notification system
-  function showNotification(message, type = "info") {
-    // Remove existing notifications
-    const existingNotification = document.querySelector(".notification-toast")
-    if (existingNotification) {
-      existingNotification.remove()
-    }
+            return false;
 
-    // Create notification element
-    const notification = document.createElement("div")
-    notification.className = `notification-toast notification-${type}`
-    notification.innerHTML = `
-            <div class="notification-content">
-                <i class="fas fa-${type === "success" ? "check-circle" : type === "error" ? "exclamation-circle" : "info-circle"}"></i>
-                <span>${message}</span>
-            </div>
-            <button class="notification-close">
-                <i class="fas fa-times"></i>
-            </button>
-        `
-
-    // Add styles
-    notification.style.cssText = `
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: ${type === "success" ? "#10b981" : type === "error" ? "#ef4444" : "#3b82f6"};
-            color: white;
-            padding: 1rem 1.5rem;
-            border-radius: 8px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-            z-index: 1000;
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            min-width: 300px;
-            animation: slideIn 0.3s ease;
-        `
-
-    // Add animation keyframes
-    if (!document.querySelector("#notification-styles")) {
-      const style = document.createElement("style")
-      style.id = "notification-styles"
-      style.textContent = `
-                @keyframes slideIn {
-                    from {
-                        transform: translateX(100%);
-                        opacity: 0;
-                    }
-                    to {
-                        transform: translateX(0);
-                        opacity: 1;
-                    }
-                }
-                
-                .notification-content {
-                    display: flex;
-                    align-items: center;
-                    gap: 0.5rem;
-                    flex: 1;
-                }
-                
-                .notification-close {
-                    background: none;
-                    border: none;
-                    color: white;
-                    cursor: pointer;
-                    padding: 0.25rem;
-                    border-radius: 4px;
-                    opacity: 0.8;
-                    transition: opacity 0.2s ease;
-                }
-                
-                .notification-close:hover {
-                    opacity: 1;
-                }
-            `
-      document.head.appendChild(style)
-    }
-
-    // Add to page
-    document.body.appendChild(notification)
-
-    // Handle close button
-    const closeBtn = notification.querySelector(".notification-close")
-    closeBtn.addEventListener("click", () => {
-      notification.remove()
-    })
-
-    // Auto remove after 5 seconds
-    setTimeout(() => {
-      if (notification.parentNode) {
-        notification.remove()
-      }
-    }, 5000)
-  }
-
-  // Form validation
-  const inputs = document.querySelectorAll(".profile-form input")
-  inputs.forEach((input) => {
-    input.addEventListener("blur", function () {
-      validateField(this)
-    })
-
-    input.addEventListener("input", function () {
-      // Remove error state on input
-      this.classList.remove("error")
-      const errorMsg = this.parentNode.querySelector(".error-message")
-      if (errorMsg) {
-        errorMsg.remove()
-      }
-    })
-  })
-
-  function validateField(field) {
-    const value = field.value.trim()
-    let isValid = true
-    let errorMessage = ""
-
-    // Remove existing error
-    field.classList.remove("error")
-    const existingError = field.parentNode.querySelector(".error-message")
-    if (existingError) {
-      existingError.remove()
-    }
-
-    // Validation rules
-    switch (field.type) {
-      case "email":
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-        if (value && !emailRegex.test(value)) {
-          isValid = false
-          errorMessage = "Please enter a valid email address"
         }
-        break
-      case "tel":
-        const phoneRegex = /^[+]?[1-9][\d]{0,15}$/
-        if (value && !phoneRegex.test(value.replace(/[-\s]/g, ""))) {
-          isValid = false
-          errorMessage = "Please enter a valid phone number"
-        }
-        break
-      default:
-        if (field.hasAttribute("required") && !value) {
-          isValid = false
-          errorMessage = "This field is required"
-        }
+
+        console.log("User is logged in.");
+        return true;
+
+    } catch (err) {
+
+        console.error("Error checking login:", err);
+        return false;
+
     }
 
-    if (!isValid) {
-      field.classList.add("error")
-      const errorDiv = document.createElement("div")
-      errorDiv.className = "error-message"
-      errorDiv.textContent = errorMessage
-      errorDiv.style.cssText = `
-                color: #ef4444;
-                font-size: 0.75rem;
-                margin-top: 0.25rem;
-            `
-      field.parentNode.appendChild(errorDiv)
+}
 
-      // Add error styles to input
-      field.style.borderColor = "#ef4444"
+let profileData;
+
+async function LoadProfile() {
+
+    try {
+
+        let response = await fetch(`/loadcompanyprofile`);
+
+        if(!response.ok){
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        let data = await response.json();
+
+        console.log(data);
+
+
+        return data;
+
+    }catch (err) {
+
+        console.log(err);
+
+    }
+
+}
+
+async function UpdateProfile() {
+
+    try {
+
+        let fullAddress = document.getElementById("businessAddress").value;
+        let street = fullAddress;
+        let city = "";
+
+        const parts = fullAddress.split(",");
+
+        if (parts.length >= 2) {
+            street = parts[0].trim();
+            city = parts.slice(1).join(",").trim();
+        }
+
+        const params = new URLSearchParams({
+            companyName: document.getElementById("companyName").value,
+            phone: document.getElementById("phoneNumber").value,
+            email: document.getElementById("emailAddress").value,
+            street: street,
+            city: city
+        });
+
+        let response = await fetch(`/updatecompanyprofile?${params.toString()}`, {
+            method: "POST"
+        });
+
+
+        if(!response.ok){
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        const result = await response.json();
+
+        console.log(result);
+
+        if (result.success) {
+
+            showNotification("Profile updated successfully!", "success");
+
+        } else {
+
+            showNotification("Update failed!", "error");
+
+        }
+
+
+    }catch(err) {
+
+        console.log(err);
+
+    }
+
+}
+
+function showNotification(message, type = "info") {
+
+    const notification = document.createElement("div");
+
+    notification.textContent = message;
+
+    // basic styling
+    notification.style.position = "fixed";
+    notification.style.top = "20px";
+    notification.style.right = "20px";
+    notification.style.padding = "12px 18px";
+    notification.style.borderRadius = "8px";
+    notification.style.color = "#fff";
+    notification.style.fontSize = "14px";
+    notification.style.zIndex = "9999";
+    notification.style.boxShadow = "0 4px 12px rgba(0,0,0,0.2)";
+    notification.style.transition = "0.3s ease";
+
+    // color based on type
+    if (type === "success") {
+        notification.style.background = "#28a745";
+    } else if (type === "error") {
+        notification.style.background = "#dc3545";
+    } else if (type === "info") {
+        notification.style.background = "#17a2b8";
     } else {
-      field.style.borderColor = "#d1d5db"
+        notification.style.background = "#333";
     }
 
-    return isValid
-  }
-})
+    document.body.appendChild(notification);
+
+    // auto remove after 3 seconds
+    setTimeout(() => {
+
+        notification.style.opacity = "0";
+        setTimeout(() => notification.remove(), 300);
+
+    }, 3000);
+
+}
+
+function populateProfile(data) {
+
+    if (!data) {
+        return;
+    }
+
+    document.getElementById("companyName").value = data.companyName || "";
+    document.getElementById("phoneNumber").value = "+ " + (data.phone || "");
+    document.getElementById("emailAddress").value = data.email || "";
+    document.getElementById("businessAddress").value = (data.street || "") + ", " + (data.city || "");
+
+    const companyname = document.getElementById("company");
+
+    if (companyname) {
+
+        companyname.textContent = data.companyName || "";
+
+    }
+
+}
+
+function handleProfilePictureUpload() {
+
+    const uploadBtn = document.querySelector(".update-picture-btn");
+    const avatar = document.querySelector(".profile-avatar");
+
+    if (!uploadBtn || !avatar) {
+
+        console.warn("Profile picture elements not found");
+        return;
+
+    }
+
+
+    const fileInput = document.createElement("input");
+    fileInput.type = "file";
+    fileInput.accept = "image/*";
+    fileInput.style.display = "none";
+
+    document.body.appendChild(fileInput);
+
+
+    uploadBtn.addEventListener("click", () => {
+
+        fileInput.click();
+
+    });
+
+
+    fileInput.addEventListener("change", () => {
+
+        const file = fileInput.files[0];
+        if (!file) return;
+
+
+        const reader = new FileReader();
+
+        reader.onload = function (e) {
+
+            avatar.innerHTML = `
+                <img src="${e.target.result}" 
+                     style="width:100%; height:100%; object-fit:cover; border-radius:50%;" />
+            `;
+        };
+
+        reader.readAsDataURL(file);
+
+        console.log("Selected profile picture:", file);
+
+    });
+
+}
+
+
+
+document.addEventListener("DOMContentLoaded", async function() {
+
+    try {
+
+        const loggedIn = await checkLogin();
+
+        if (!loggedIn) {
+            return;    // stop here if not logged in
+        }
+
+        profileData = await LoadProfile();
+
+        populateProfile(profileData);
+
+        handleProfilePictureUpload();
+
+
+    } catch (err) {
+
+        console.error("Error during initialization:", err);
+
+    }
+
+});
+
+
+document.getElementById("profileForm").addEventListener("submit", async(e) => {
+
+    e.preventDefault();
+
+    await UpdateProfile();
+
+});
