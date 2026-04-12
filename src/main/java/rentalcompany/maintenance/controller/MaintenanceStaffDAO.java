@@ -325,7 +325,8 @@ public class MaintenanceStaffDAO {
         List<Vehicle> vehicles = new ArrayList<>();
 
         String sql = "SELECT vehicle.vehicleid, vehicle.vehiclebrand, vehicle.vehiclemodel, " +
-                     "vehicle.numberplatenumber, vehicle.manufacture_year, vehicle.availability_status " +
+                     "vehicle.numberplatenumber, vehicle.manufacture_year, vehicle.availability_status, " +
+                     "vehicle.vehicle_type, vehicle.milage " +
                      "FROM vehicle " +
                      "INNER JOIN maintenance_vehicle_assignment " +
                      "ON vehicle.vehicleid = maintenance_vehicle_assignment.vehicleid " +
@@ -356,10 +357,10 @@ public class MaintenanceStaffDAO {
                 v.setYear(year);
 
                 v.setStatus(rs.getString("availability_status"));
-                v.setType("");
-                v.setMilage("");
-                v.setLastServiceDate("");
-                v.setNextServiceDate("");
+                v.setType(rs.getString("vehicle_type"));
+                v.setMilage(rs.getString("milage"));
+                v.setLastServiceDate(getLastServiceDateVehicle(v.getVehicleId()));
+                v.setNextServiceDate(getNextServiceDateVehicle(v.getVehicleId()));
 
                 vehicles.add(v);
             }
@@ -369,6 +370,73 @@ public class MaintenanceStaffDAO {
         }
 
         return vehicles;
+    }
+
+
+    public static String getLastServiceDateVehicle(int vehicleId) {
+
+        String sql = "SELECT MAX(completedDate) AS lastDate " +
+                     "FROM maintenancejobs " +
+                     "WHERE vehicleId = ? AND status = 'completed'";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, vehicleId);
+
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+
+                String date = rs.getString("lastDate");
+
+                if (date == null) {
+                    return "";
+                }
+
+                return date;
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return "";
+
+    }
+
+    public static String getNextServiceDateVehicle(int vehicleId) {
+
+        String sql = "SELECT scheduled_date " +
+                     "FROM calendarevents " +
+                     "WHERE vehicle_id = ? " +
+                     "AND status = 'scheduled' " +
+                     "AND scheduled_date >= CURDATE() " +
+                     "ORDER BY scheduled_date ASC LIMIT 1";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, vehicleId);
+
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+
+                String date = rs.getString("scheduled_date");
+
+                if (date == null) {
+                    return "";
+                }
+
+                return date;
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return "";
     }
 
     public static boolean updateVehicleStatus(String numberplate, String status) {

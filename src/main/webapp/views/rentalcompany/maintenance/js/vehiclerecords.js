@@ -2,7 +2,7 @@ async function checkLogin() {
 
     try {
 
-        const response = await fetch("/checkloginmaintenance");
+        const response = await fetch("/check/login/maintenance");
         const data = await response.json();
 
         if (!data.loggedIn) {
@@ -13,7 +13,7 @@ async function checkLogin() {
 
             document.getElementById("loginOkBtn").onclick = () => {
 
-                window.location.href = "/maintenancelogin";
+                window.location.href = "/views/landing/maintenancelogin.html";
 
             };
 
@@ -361,9 +361,9 @@ document.addEventListener("DOMContentLoaded", async function () {
             return;
         }*/
 
-        const dummyData = createDummyDataInput();
+        //const dummyData = createDummyDataInput();
 
-        assignedVehicles = dummyData.assignedvehicles;
+        assignedVehicles = await LoadAssignedVehicles();
 
 
         renderVehicleTypesDropdown();
