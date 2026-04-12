@@ -51,12 +51,30 @@ public class DriverOngoingServlet extends HttpServlet {
 
                 json.append("{")
                         .append("\"rideId\":\"").append(escape(b.getRideId())).append("\",")
+
                         .append("\"customerName\":\"").append(escape(b.getCustomerName())).append("\",")
+                        .append("\"customerPhone\":\"").append(escape(b.getCustomerPhoneNumber())).append("\",")
+                        .append("\"customerEmail\":\"").append(escape(b.getCustomerEmail())).append("\",")
+
+                        // FRONTEND EXPECTED NAMES
                         .append("\"pickup\":\"").append(escape(b.getPickupLocation())).append("\",")
                         .append("\"dropOff\":\"").append(escape(b.getDropLocation())).append("\",")
-                        .append("\"date\":\"").append(b.getBookedDate()).append("\",")
-                        .append("\"time\":\"").append(b.getBookingTime()).append("\",")
+
+                        .append("\"startdate\":\"").append(b.getTripStartDate().toString()).append("\",")
+                        .append("\"time\":\"").append(b.getStartTimeStr()).append("\",")
+
+                        // VEHICLE INFO
+                        .append("\"vehicleModel\":\"").append(escape(b.getVehicleModel())).append("\",")
+                        .append("\"vehiclePlate\":\"").append(escape(b.getNumberPlate())).append("\",")
+
+                        // TRIP INFO
+                        .append("\"estimatedDuration\":").append(b.getEstimatedDuration()).append(",")
+                        .append("\"distance\":").append(b.getDistance()).append(",")
+                        .append("\"totalAmount\":").append(b.getTotalAmount()).append(",")
+
+                        // STATUS
                         .append("\"status\":\"").append(escape(b.getStatus())).append("\"")
+
                         .append("}");
 
                 if (i < bookings.size() - 1) {

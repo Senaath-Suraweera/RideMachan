@@ -799,40 +799,71 @@ public class DriverDAO {
 
     public static List<RentalCompanyBookings> getOngoingBookings(int driverId) {
 
-        String sql = "SELECT * FROM companybookings WHERE driverid = ? " +
-                "AND status IN ('upcoming', 'in-progress') " +
-                "ORDER BY booked_Date ASC, start_time ASC";
-
         List<RentalCompanyBookings> bookings = new ArrayList<>();
 
-        try (Connection con = DBConnection.getConnection();
-             PreparedStatement ps = con.prepareStatement(sql)) {
+        try (Connection con = DBConnection.getConnection()) {
 
-            ps.setInt(1, driverId);
-            ResultSet rs = ps.executeQuery();
+            // =========================
+            // STEP 1: FETCH ACTIVE BOOKINGS
+            // =========================
+            String sql1 =
+                    "SELECT * FROM companybookings " +
+                            "WHERE driverid = ? AND status = 'active'";
+
+            PreparedStatement ps1 = con.prepareStatement(sql1);
+            ps1.setInt(1, driverId);
+
+            ResultSet rs = ps1.executeQuery();
 
             while (rs.next()) {
+
                 RentalCompanyBookings booking = new RentalCompanyBookings();
-                booking.setBookingId(rs.getInt("booking_id"));
+
+                int bookingId = rs.getInt("booking_id");
+
+                booking.setBookingId(bookingId);
                 booking.setRideId(rs.getString("ride_id"));
                 booking.setDriverId(rs.getInt("driverid"));
+
                 booking.setCustomerName(rs.getString("customer_name"));
                 booking.setCustomerPhoneNumber(rs.getString("customer_phone"));
                 booking.setCustomerEmail(rs.getString("customer_email"));
+
                 booking.setPickupLocation(rs.getString("pickup_location"));
                 booking.setDropLocation(rs.getString("drop_location"));
-                booking.setBookedDate(rs.getDate("booked_Date"));
-                booking.setBookingTime(rs.getTime("start_time"));
+
+                booking.setTripStartDate(rs.getDate("trip_start_date"));
+                booking.setStartTimeStr(rs.getTime("start_time").toString());
+
                 booking.setEstimatedDuration(rs.getInt("estimated_duration"));
                 booking.setDistance(rs.getDouble("distance"));
                 booking.setTotalAmount(rs.getDouble("total_amount"));
-                booking.setStatus(rs.getString("status"));
+
+                // IMPORTANT: always send frontend status as upcoming
+                booking.setStatus("upcoming");
+
                 booking.setVehicleModel(rs.getString("vehicle_model"));
                 booking.setNumberPlate(rs.getString("vehicle_plate"));
+
                 booking.setSpecialInstructions(rs.getString("special_instructions"));
                 booking.setCreatedAt(rs.getTimestamp("created_at"));
 
                 bookings.add(booking);
+
+                // =========================
+                // STEP 2: INSERT INTO STATUS TABLE
+                // =========================
+                String sql2 =
+                        "INSERT INTO driver_booking_status (booking_id, driverid, status) " +
+                                "VALUES (?, ?, 'upcoming')";
+
+                PreparedStatement ps2 = con.prepareStatement(sql2);
+                ps2.setInt(1, bookingId);
+                ps2.setInt(2, driverId);
+
+                int rows = ps2.executeUpdate();
+
+                System.out.println("Inserted rows: " + rows + " for bookingId: " + bookingId);
             }
 
         } catch (Exception e) {
@@ -841,7 +872,6 @@ public class DriverDAO {
 
         return bookings;
     }
-
 
     public static RentalCompanyBookings getBookingByRideId(String rideId) {
 

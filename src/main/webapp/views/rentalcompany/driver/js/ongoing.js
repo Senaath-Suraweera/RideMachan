@@ -87,10 +87,19 @@ async function loadBookings() {
         });
 
         if (response.status === 401) {
-            // Not authenticated, redirect to login
-            alert('Please login first');
-            window.location.href = '/views/landing/driverlogin.html';
+
+            const modal = document.getElementById("loginModal");
+            modal.style.display = "flex";
+
+
+            document.getElementById("loginOkBtn").onclick = () => {
+
+                window.location.href = "/views/landing/driverlogin.html";
+
+            };
+
             return;
+
         }
 
         if (!response.ok) {
@@ -159,15 +168,15 @@ function createBookingCard(booking) {
     const card = document.createElement('div');
     card.className = `booking-card ${booking.status}`;
     card.dataset.status = booking.status;
-    card.dataset.time = booking.bookingTime;
-    card.dataset.fare = booking.totalAmount;
+    card.dataset.time = booking.bookingTime || '';
+    card.dataset.fare = booking.totalAmount || 0;
 
-    // Format date
-    const bookingDate = new Date(booking.bookingDate);
+    // Format date safely
+    const bookingDate = booking.startdate ? new Date(booking.startdate) : new Date();
     const formattedDate = formatDate(bookingDate);
 
-    // Format time
-    const formattedTime = formatTime(booking.bookingTime);
+    // Format time safely
+    const formattedTime = formatTime(booking.time);
 
     // Status badge
     const statusBadge = getStatusBadge(booking.status);
@@ -177,41 +186,48 @@ function createBookingCard(booking) {
             <div class="booking-id">#${booking.rideId}</div>
             ${statusBadge}
         </div>
+
         <div class="booking-time">
             <div class="date">${formattedDate}</div>
             <div class="time">${formattedTime}</div>
         </div>
+
         <div class="booking-route">
             <div class="route-item pickup">
                 <i class="fas fa-map-marker-alt"></i>
-                <span>${booking.pickupLocation}</span>
+                <span>${booking.pickup || 'N/A'}</span>
             </div>
             <div class="route-divider">
                 <i class="fas fa-arrow-down"></i>
             </div>
             <div class="route-item dropoff">
                 <i class="fas fa-map-marker-alt"></i>
-                <span>${booking.dropoffLocation}</span>
+                <span>${booking.dropOff || 'N/A'}</span>
             </div>
         </div>
+
         <div class="booking-info">
             <div class="info-item">
                 <i class="fas fa-user"></i>
-                <span>${booking.customerName}</span>
+                <span>${booking.customerName || 'N/A'}</span>
             </div>
+
             <div class="info-item">
                 <i class="fas fa-car"></i>
-                <span>${booking.vehicleModel} - ${booking.vehiclePlate}</span>
+                <span>${booking.vehicleModel || 'N/A'} - ${booking.vehiclePlate || 'N/A'}</span>
             </div>
+
             <div class="info-item">
                 <i class="fas fa-clock"></i>
-                <span>${booking.estimatedDuration} mins</span>
+                <span>${booking.estimatedDuration || 0} mins</span>
             </div>
+
             <div class="info-item">
                 <i class="fas fa-dollar-sign"></i>
-                <span>LKR ${booking.totalAmount.toFixed(2)}</span>
+                <span>LKR ${(Number(booking.totalAmount || 0)).toFixed(2)}</span>
             </div>
         </div>
+
         <div class="booking-actions">
             <button class="btn btn-outline" onclick="showBookingDetails('${booking.rideId}')">
                 <i class="fas fa-info-circle"></i>
@@ -224,6 +240,100 @@ function createBookingCard(booking) {
     return card;
 }
 
+
+
+
+function getActionButton(booking) {
+
+    const canStart = canStartRide(booking.startdate, booking.time);
+
+    // upcoming but NOT yet allowed → NO BUTTON
+    if (booking.status === 'upcoming') {
+
+        if (!canStart) {
+            return ''; // ✅ nothing shown
+        }
+
+        return `
+            <button class="btn btn-primary" onclick="startRide('${booking.rideId}')">
+                <i class="fas fa-play"></i> Start Ride
+            </button>
+        `;
+    }
+
+    // in progress → always show complete button
+    if (booking.status === 'in-progress') {
+        return `
+            <button class="btn btn-primary" onclick="completeRide('${booking.rideId}')">
+                <i class="fas fa-check"></i> Complete Ride
+            </button>
+        `;
+    }
+
+    return '';
+}
+
+// Start ride
+async function startRide(rideId) {
+    const booking = allBookings.find(b => b.rideId === rideId);
+    if (!booking) return;
+
+    const canStart = canStartRide(booking.startdate, booking.time);
+
+    if (!canStart) {
+        showNotification("You cannot start this ride yet!", "error");
+        return; // ❌ STOP HERE
+    }
+
+    if (!confirm('Are you sure you want to start this ride?')) return;
+
+    const btn = event.target;
+    const originalContent = btn.innerHTML;
+
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Starting...';
+    btn.disabled = true;
+
+    try {
+        const response = await fetch('/driver/ongoing', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            credentials: 'include',
+            body: `action=updateStatus&rideId=${rideId}&status=in-progress`
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            btn.innerHTML = '<i class="fas fa-check"></i> Started';
+            btn.className = 'btn btn-primary';
+
+            setTimeout(() => {
+                loadBookings(); // Reload bookings
+            }, 1500);
+        } else {
+            throw new Error(data.error || 'Failed to start ride');
+        }
+
+    } catch (error) {
+        console.error('Error starting ride:', error);
+        alert('Failed to start ride: ' + error.message);
+        btn.innerHTML = originalContent;
+        btn.disabled = false;
+    }
+}
+
+
+function canStartRide(bookingDate, bookingTime) {
+    if (!bookingDate || !bookingTime) return false;
+
+    const bookingDateTime = new Date(`${bookingDate}T${bookingTime}`);
+    return Date.now() >= bookingDateTime.getTime();
+}
+
+
+
 // Get status badge HTML
 function getStatusBadge(status) {
     const badges = {
@@ -234,18 +344,46 @@ function getStatusBadge(status) {
     return badges[status] || badges['upcoming'];
 }
 
-// Get action button based on status
-function getActionButton(booking) {
-    if (booking.status === 'upcoming') {
-        return `<button class="btn btn-primary" onclick="startRide('${booking.rideId}')">
-                    <i class="fas fa-play"></i> Start Ride
-                </button>`;
-    } else if (booking.status === 'in-progress') {
-        return `<button class="btn btn-primary" onclick="completeRide('${booking.rideId}')">
-                    <i class="fas fa-check"></i> Complete Ride
-                </button>`;
+
+function showNotification(message, type = "info") {
+
+    const notification = document.createElement("div");
+
+    notification.textContent = message;
+
+    // basic styling
+    notification.style.position = "fixed";
+    notification.style.top = "20px";
+    notification.style.right = "20px";
+    notification.style.padding = "12px 18px";
+    notification.style.borderRadius = "8px";
+    notification.style.color = "#fff";
+    notification.style.fontSize = "14px";
+    notification.style.zIndex = "9999";
+    notification.style.boxShadow = "0 4px 12px rgba(0,0,0,0.2)";
+    notification.style.transition = "0.3s ease";
+
+    // color based on type
+    if (type === "success") {
+        notification.style.background = "#28a745";
+    } else if (type === "error") {
+        notification.style.background = "#dc3545";
+    } else if (type === "info") {
+        notification.style.background = "#17a2b8";
+    } else {
+        notification.style.background = "#333";
     }
-    return '';
+
+    document.body.appendChild(notification);
+
+    // auto remove after 3 seconds
+    setTimeout(() => {
+
+        notification.style.opacity = "0";
+        setTimeout(() => notification.remove(), 300);
+
+    }, 3000);
+
 }
 
 // Format date
@@ -386,45 +524,7 @@ function closeModal() {
     currentBookingDetails = null;
 }
 
-// Start ride
-async function startRide(rideId) {
-    if (!confirm('Are you sure you want to start this ride?')) return;
 
-    const btn = event.target;
-    const originalContent = btn.innerHTML;
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Starting...';
-    btn.disabled = true;
-
-    try {
-        const response = await fetch('/driver/ongoing', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            credentials: 'include',
-            body: `action=updateStatus&rideId=${rideId}&status=in-progress`
-        });
-
-        const data = await response.json();
-
-        if (data.success) {
-            btn.innerHTML = '<i class="fas fa-check"></i> Started';
-            btn.className = 'btn btn-primary';
-
-            setTimeout(() => {
-                loadBookings(); // Reload bookings
-            }, 1500);
-        } else {
-            throw new Error(data.error || 'Failed to start ride');
-        }
-
-    } catch (error) {
-        console.error('Error starting ride:', error);
-        alert('Failed to start ride: ' + error.message);
-        btn.innerHTML = originalContent;
-        btn.disabled = false;
-    }
-}
 
 // Start ride from modal
 async function startRideFromModal(rideId) {
