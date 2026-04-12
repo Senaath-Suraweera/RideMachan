@@ -170,7 +170,7 @@ async function removeVehicle(vehicleId) {
 
     if (!vehicleId || vehicleId === undefined || vehicleId === "undefined") {
 
-        alert("Invalid vehicle ID");
+        showNotification("Invalid vehicle ID", "error");
         return;
 
     }
@@ -211,14 +211,14 @@ async function removeVehicle(vehicleId) {
 
         }
 
-        alert("Vehicle deleted successfully!");
-        loadVehicles();
+        showNotification("Vehicle deleted successfully!", "success");
+        await loadVehicles();
         loadVehicleStatistics().then(stats => { if(stats) renderVehicleStatistics(stats); });
 
     } catch (err) {
 
         console.error("Error deleting vehicle:", err);
-        alert("Failed to delete vehicle: " + err.message);
+        showNotification("Failed to delete vehicle!", "error");
 
     }
 
@@ -245,7 +245,7 @@ async function openEditModal(vehicleId) {
 
     if (!vehicleId || vehicleId === undefined || vehicleId === "undefined") {
 
-        alert("Invalid vehicle ID");
+        showNotification("Invalid vehicle ID!", "error");
         return;
 
     }
@@ -297,7 +297,7 @@ async function openEditModal(vehicleId) {
     } catch (err) {
 
         console.error("Error fetching vehicle data:", err);
-        alert("Failed to load vehicle details for update. Error: " + err.message);
+        showNotification("Failed to load vehicle details for update!", "error");
         closeEditModal();
 
     }
@@ -314,7 +314,7 @@ function closeEditModal() {
 function redirectCalenderView(vehicleId) {
 
     if (!vehicleId) {
-        alert("Invalid vehicle ID");
+        showNotification("Invalid vehicle ID!", "error");
         return;
     }
 
@@ -325,7 +325,7 @@ function redirectCalenderView(vehicleId) {
 function redirectMaintenanceView(vehicleId) {
 
     if (!vehicleId) {
-        alert("Invalid vehicle ID");
+        showNotification("Invalid vehicle ID!", "error");
         return;
     }
 
@@ -387,10 +387,10 @@ document.getElementById("addVehicleForm").addEventListener("submit", async funct
 
             if (data.status === "success") {
 
-                alert("Vehicle registered successfully!");
+                showNotification("Vehicle registered successfully!", "success");
                 closeAddModal();
                 this.reset(); // Reset the form after success
-                loadVehicles();
+                await loadVehicles();
                 loadVehicleStatistics().then(stats => { if(stats) renderVehicleStatistics(stats); });
 
             } else {
@@ -402,7 +402,7 @@ document.getElementById("addVehicleForm").addEventListener("submit", async funct
         } catch (err) {
 
             console.error("Error adding vehicle:", err);
-            alert("Failed to register vehicle: " + err.message);
+            showNotification("Failed to register vehicle!", "error");
 
         }
 
@@ -432,9 +432,9 @@ document.getElementById("editVehicleForm").addEventListener("submit", async func
 
         if (data.status === "success") {
 
-            alert("Vehicle updated successfully!");
+            showNotification("Vehicle updated successfully!", "success");
             closeEditModal();
-            loadVehicles();
+            await loadVehicles();
             loadVehicleStatistics().then(stats => { if(stats) renderVehicleStatistics(stats); });
 
         } else {
@@ -446,7 +446,7 @@ document.getElementById("editVehicleForm").addEventListener("submit", async func
     } catch (err) {
 
         console.error("Error updating vehicle:", err);
-        alert("Failed to update vehicle: " + err.message);
+        showNotification("Failed to update vehicle!", "error");
 
     }
 
@@ -566,6 +566,46 @@ function filterBookingsByTripStatus(status) {
 
 
 
+function showNotification(message, type = "info") {
+
+    const notification = document.createElement("div");
+
+    notification.textContent = message;
+
+    // basic styling
+    notification.style.position = "fixed";
+    notification.style.top = "20px";
+    notification.style.right = "20px";
+    notification.style.padding = "12px 18px";
+    notification.style.borderRadius = "8px";
+    notification.style.color = "#fff";
+    notification.style.fontSize = "14px";
+    notification.style.zIndex = "9999";
+    notification.style.boxShadow = "0 4px 12px rgba(0,0,0,0.2)";
+    notification.style.transition = "0.3s ease";
+
+    // color based on type
+    if (type === "success") {
+        notification.style.background = "#28a745";
+    } else if (type === "error") {
+        notification.style.background = "#dc3545";
+    } else if (type === "info") {
+        notification.style.background = "#17a2b8";
+    } else {
+        notification.style.background = "#333";
+    }
+
+    document.body.appendChild(notification);
+
+    // auto remove after 3 seconds
+    setTimeout(() => {
+
+        notification.style.opacity = "0";
+        setTimeout(() => notification.remove(), 300);
+
+    }, 3000);
+
+}
 
 
 
