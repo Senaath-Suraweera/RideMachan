@@ -25,10 +25,6 @@ public class AddVehicleServlet extends HttpServlet {
             String model = request.getParameter("vehiclemodel");
             String numberPlate = request.getParameter("numberplatenumber");
             int tareWeight = Integer.parseInt(request.getParameter("tareweight"));
-
-            int pricePerDay = Integer.parseInt(request.getParameter("price_per_day"));
-            String location = request.getParameter("location");
-
             String color = request.getParameter("color");
             int passengers = Integer.parseInt(request.getParameter("numberofpassengers"));
             int engineCapacity = Integer.parseInt(request.getParameter("enginecapacity"));
@@ -55,7 +51,7 @@ public class AddVehicleServlet extends HttpServlet {
                     : null;
 
             Vehicle v = new Vehicle(brand, model, numberPlate, tareWeight, color, passengers, engineCapacity,
-                    engineNumber, chasisNumber, docStream, imgStream, description, milage, companyId, providerId,pricePerDay, location);
+                    engineNumber, chasisNumber, docStream, imgStream, description, milage, companyId, providerId);
 
             boolean success = VehicleDAO.addVehicle(v);
 

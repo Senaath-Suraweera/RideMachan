@@ -2,7 +2,6 @@ package vehicle.dao;
 
 import common.util.DBConnection;
 import vehicle.model.Vehicle;
-import vehicle.model.MaintenanceRecord;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -13,7 +12,8 @@ public class VehicleDAO {
     public static boolean addVehicle(Vehicle v) {
         String sql = "INSERT INTO Vehicle (vehiclebrand, vehiclemodel, numberplatenumber, tareweight, color, " +
                 "numberofpassengers, enginecapacity, enginenumber, chasisnumber, registrationdocumentation, " +
-                "vehicleimages, description, milage, company_id, provider_id,price_per_day,location) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+                "vehicleimages, description, milage, price_per_day, location, features, vehicle_type, fuel_type, " +
+                "availability_status, company_id, provider_id) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
         try (Connection con = DBConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
 
@@ -30,18 +30,20 @@ public class VehicleDAO {
             ps.setBlob(11, v.getVehicleImages());
             ps.setString(12, v.getDescription());
             ps.setString(13, v.getMilage());
+            ps.setDouble(14, v.getPricePerDay());
+            ps.setString(15, v.getLocation());
+            ps.setString(16, v.getFeatures());
+            ps.setString(17, v.getVehicleType());
+            ps.setString(18, v.getFuelType());
+            ps.setString(19, v.getAvailabilityStatus() != null ? v.getAvailabilityStatus() : "available");
             if (v.getCompanyId() != null)
-                ps.setInt(14, v.getCompanyId());
+                ps.setInt(20, v.getCompanyId());
             else
-                ps.setNull(14, Types.INTEGER);
+                ps.setNull(20, Types.INTEGER);
             if (v.getProviderId() != null)
-                ps.setInt(15, v.getProviderId());
+                ps.setInt(21, v.getProviderId());
             else
-                ps.setNull(15, Types.INTEGER);
-
-
-            ps.setInt(16, v.getPricePerDay());
-            ps.setString(17, v.getLocation());
+                ps.setNull(21, Types.INTEGER);
 
             return ps.executeUpdate() > 0;
         } catch (Exception e) {
@@ -69,7 +71,6 @@ public class VehicleDAO {
             while (rs.next()) {
                 Vehicle v = new Vehicle();
                 v.setVehicleId(rs.getInt("vehicleid"));
-                v.setStatus(rs.getString("availability_status"));
                 v.setVehicleBrand(rs.getString("vehiclebrand"));
                 v.setVehicleModel(rs.getString("vehiclemodel"));
                 v.setNumberPlateNumber(rs.getString("numberplatenumber"));
@@ -80,9 +81,27 @@ public class VehicleDAO {
                 v.setEngineNumber(rs.getString("enginenumber"));
                 v.setChasisNumber(rs.getString("chasisnumber"));
                 v.setDescription(rs.getString("description"));
+                v.setPricePerDay(rs.getDouble("price_per_day"));
+                v.setLocation(rs.getString("location"));
+                v.setFeatures(rs.getString("features"));
+                v.setVehicleType(rs.getString("vehicle_type"));
+                v.setFuelType(rs.getString("fuel_type"));
+                v.setAvailabilityStatus(rs.getString("availability_status"));
                 v.setMilage(rs.getString("milage"));
-                v.setCompanyId(rs.getInt("company_id"));
-                v.setProviderId(rs.getInt("provider_id"));
+                int companyId = rs.getInt("company_id");
+                if (rs.wasNull()) {
+                    v.setCompanyId(null);
+                } else {
+                    v.setCompanyId(companyId);
+                }
+
+                int providerId = rs.getInt("provider_id");
+                if (rs.wasNull()) {
+                    v.setProviderId(null);
+                } else {
+                    v.setProviderId(providerId);
+                }
+
                 list.add(v);
             }
         } catch (Exception e) {
@@ -93,7 +112,8 @@ public class VehicleDAO {
 
     public static boolean updateVehicle(Vehicle v) {
         String sql = "UPDATE Vehicle SET vehiclebrand=?, vehiclemodel=?, numberplatenumber=?, tareweight=?, color=?, " +
-                "numberofpassengers=?, enginecapacity=?, enginenumber=?, chasisnumber=?, description=?, milage=? WHERE vehicleid=?";
+                "numberofpassengers=?, enginecapacity=?, enginenumber=?, chasisnumber=?, description=?, milage=?, price_per_day=?, " +
+                "location=?, features=?, vehicle_type=?, fuel_type=?, availability_status=? WHERE vehicleid=?";
         try (Connection con = DBConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
 
@@ -108,7 +128,14 @@ public class VehicleDAO {
             ps.setString(9, v.getChasisNumber());
             ps.setString(10, v.getDescription());
             ps.setString(11, v.getMilage());
-            ps.setInt(12, v.getVehicleId());
+            ps.setDouble(12, v.getPricePerDay());
+            ps.setString(13, v.getLocation());
+            ps.setString(14, v.getFeatures());
+            ps.setString(15, v.getVehicleType());
+            ps.setString(16, v.getFuelType());
+            ps.setString(17, v.getAvailabilityStatus());
+            ps.setInt(18, v.getVehicleId());
+
 
             return ps.executeUpdate() > 0;
         } catch (Exception e) {
@@ -151,8 +178,26 @@ public class VehicleDAO {
                 v.setChasisNumber(rs.getString("chasisnumber"));
                 v.setDescription(rs.getString("description"));
                 v.setMilage(rs.getString("milage"));
-                v.setCompanyId(rs.getInt("company_id"));
-                v.setProviderId(rs.getInt("provider_id"));
+                v.setPricePerDay(rs.getDouble("price_per_day"));
+                v.setLocation(rs.getString("location"));
+                v.setFeatures(rs.getString("features"));
+                v.setVehicleType(rs.getString("vehicle_type"));
+                v.setFuelType(rs.getString("fuel_type"));
+                v.setAvailabilityStatus(rs.getString("availability_status"));
+                int companyId = rs.getInt("company_id");
+                if (rs.wasNull()) {
+                    v.setCompanyId(null);
+                } else {
+                    v.setCompanyId(companyId);
+                }
+
+                int providerId = rs.getInt("provider_id");
+                if (rs.wasNull()) {
+                    v.setProviderId(null);
+                } else {
+                    v.setProviderId(providerId);
+                }
+
                 list.add(v);
             }
         } catch (Exception e) {
@@ -161,145 +206,54 @@ public class VehicleDAO {
         return list;
     }
 
-    public static int getTotalVehiclesCount(int companyId) {
+    public static Vehicle getOneVehicleById(int vehicleId) {
 
-        int totalVehiclesCount = 0;
-
-        String sql = "SELECT COUNT(*) FROM vehicle WHERE company_id = ?";
-
-        try(Connection con = DBConnection.getConnection();
-            PreparedStatement ps = con.prepareStatement(sql)) {
-
-            ps.setInt(1, companyId);
-
-            ResultSet rs = ps.executeQuery();
-
-            if(rs.next()) {
-                totalVehiclesCount = rs.getInt(1);
-            }
-
-        }catch(Exception e) {
-            e.printStackTrace();
-        }
-
-
-        return totalVehiclesCount;
-
-    }
-
-    public static int getAvailableVehiclesCount(int companyId) {
-
-        int availableVehiclesCount = 0;
-
-        String sql = "SELECT COUNT(*) FROM vehicle WHERE company_id = ? AND availability_status = 'available'";
-
-        try(Connection con = DBConnection.getConnection();
-            PreparedStatement ps = con.prepareStatement(sql)) {
-
-            ps.setInt(1, companyId);
-
-            ResultSet rs = ps.executeQuery();
-
-            if(rs.next()) {
-                availableVehiclesCount = rs.getInt(1);
-            }
-
-        }catch(Exception e) {
-            e.printStackTrace();
-        }
-
-
-        return availableVehiclesCount;
-
-    }
-
-    public static int getOnTripVehiclesCount(int companyId) {
-
-        int onTripVehiclesCount = 0;
-
-        String sql = "SELECT COUNT(*) FROM vehicle WHERE company_id = ? AND availability_status = 'ontrip'";
-
-        try(Connection con = DBConnection.getConnection();
-            PreparedStatement ps = con.prepareStatement(sql)) {
-
-            ps.setInt(1, companyId);
-
-            ResultSet rs = ps.executeQuery();
-
-            if(rs.next()) {
-                onTripVehiclesCount = rs.getInt(1);
-            }
-
-        }catch(Exception e) {
-            e.printStackTrace();
-        }
-
-
-        return onTripVehiclesCount;
-
-    }
-
-    public static int getIdOfVehicle(String numberplatenumber) {
-
-        int vehicleId = -1; // default if not found
-        String sql = "SELECT vehicleid FROM vehicle WHERE numberplatenumber = ?";
+        Vehicle v = null;
+        String sql = "SELECT v.*, rc.companyname " +
+                     "FROM Vehicle v " +
+                     "LEFT JOIN RentalCompany rc ON v.company_id = rc.companyid " +
+                     "WHERE v.vehicleid = ?";
 
         try (Connection con = DBConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
 
-            ps.setString(1, numberplatenumber);
-            ResultSet rs = ps.executeQuery();
-
-            if (rs.next()) {
-                vehicleId = rs.getInt("vehicleid");
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return vehicleId;
-    }
-
-    public static List<MaintenanceRecord> getMaintenanceRecordsByVehicleId(int vehicleId) {
-
-        List<MaintenanceRecord> records = new ArrayList<>();
-
-        String sql1 = "SELECT jobId, vehicleId, assignedStaffId, companyId, status, scheduledDate, completedDate, type, description, mileage " +
-                      "FROM maintenancejobs WHERE vehicleId = ? ORDER BY scheduledDate DESC";
-
-        //String sql2 = "";
-
-        try (Connection con = DBConnection.getConnection();
-             PreparedStatement ps = con.prepareStatement(sql1)) {
-
             ps.setInt(1, vehicleId);
             ResultSet rs = ps.executeQuery();
 
-            while (rs.next()) {
+            if (rs.next()) {   // only ONE row expected
+                v = new Vehicle();
+                v.setVehicleId(rs.getInt("vehicleid"));
+                v.setVehicleBrand(rs.getString("vehiclebrand"));
+                v.setVehicleModel(rs.getString("vehiclemodel"));
+                v.setNumberPlateNumber(rs.getString("numberplatenumber"));
+                v.setTareWeight(rs.getInt("tareweight"));
+                v.setColor(rs.getString("color"));
+                v.setNumberOfPassengers(rs.getInt("numberofpassengers"));
+                v.setEngineCapacity(rs.getInt("enginecapacity"));
+                v.setEngineNumber(rs.getString("enginenumber"));
+                v.setChasisNumber(rs.getString("chasisnumber"));
+                v.setDescription(rs.getString("description"));
+                v.setMilage(rs.getString("milage"));
+                v.setPricePerDay(rs.getDouble("price_per_day"));
+                v.setLocation(rs.getString("location"));
+                v.setFeatures(rs.getString("features"));
+                v.setVehicleType(rs.getString("vehicle_type"));
+                v.setFuelType(rs.getString("fuel_type"));
+                v.setAvailabilityStatus(rs.getString("availability_status"));
 
-                MaintenanceRecord record = new MaintenanceRecord();
+                int companyId = rs.getInt("company_id");
+                v.setCompanyId(rs.wasNull() ? null : companyId);
 
-                record.setRecordId(rs.getInt("jobId"));
-                record.setVehicleId(rs.getInt("vehicleId"));
-                record.setCompanyId(rs.getInt("companyId"));
-                record.setStatus(rs.getString("status"));
-                record.setScheduledDate(rs.getString("scheduledDate"));
-                record.setCompletedDate(rs.getString("completedDate"));
-                record.setServiceType(rs.getString("type"));
-                record.setDescription(rs.getString("description"));
-                record.setMileage(rs.getInt("mileage"));
-
-                records.add(record);
-
+                int providerId = rs.getInt("provider_id");
+                v.setProviderId(rs.wasNull() ? null : providerId);
             }
 
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-        return records;
-
+        return v;
     }
 
 }
+
+

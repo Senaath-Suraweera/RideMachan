@@ -1,43 +1,5 @@
-// Vehicle data with hourly rates
-const vehicleDetails = {
-    1: {
-        id: 1,
-        name: "Honda Vezel",
-        company: "Premium Rentals Colombo",
-        companyId: 1,
-        location: "Colombo 03, Sri Lanka",
-        hourlyRate: 2700,
-        hourlyRateWithDriver: 3500,
-        rating: 4.7,
-        reviews: 47,
-        year: 2022,
-        mileage: "16 km/L",
-        engine: "1.5L Hybrid",
-        color: "Pearl White",
-        transmission: "CVT Automatic",
-        fuel: "Hybrid Petrol",
-        seats: 5,
-        ac: "Dual Zone AC",
-        luggage: "3-4 Large Bags",
-        bookedDates: [
-            '2025-10-20',
-            '2025-10-21',
-            '2025-10-22',
-            '2025-10-25',
-            '2025-10-26',
-            '2025-11-01',
-            '2025-11-02',
-            '2025-11-03'
-        ],
-        pickupLocations: [
-            'Colombo 01', 'Colombo 02', 'Colombo 03', 'Colombo 04',
-            'Colombo 05', 'Colombo 06', 'Colombo 07', 'Colombo 08',
-            'Colombo 09', 'Colombo 10', 'Colombo 11', 'Colombo 12',
-            'Colombo 13', 'Colombo 14', 'Colombo 15', 'Colombo Suburbs'
-        ]
-    }
-};
-
+// Global vehicle data
+let vehicleData = null;
 let isWishlisted = false;
 let selectedMode = 'self-drive';
 let bookingData = {
@@ -57,21 +19,208 @@ document.addEventListener('DOMContentLoaded', function() {
     loadVehicleDetails();
 });
 
-function loadVehicleDetails() {
-    const vehicleId = 1;
-    const vehicle = vehicleDetails[vehicleId];
+async function loadVehicleDetails() {
+    // Get vehicle ID from URL parameter
+    const urlParams = new URLSearchParams(window.location.search);
+    const vehicleId = urlParams.get('id');
 
-    if (!vehicle) return;
+    if (!vehicleId) {
+        showNotification('No vehicle ID provided', 'error');
+        setTimeout(() => {
+            window.location.href = 'search.html';
+        }, 2000);
+        return;
+    }
 
-    document.getElementById('vehicleName').textContent = vehicle.name;
-    document.getElementById('vehicleCompany').textContent = vehicle.company;
-    document.getElementById('vehicleLocation').textContent = vehicle.location;
-    document.getElementById('vehiclePrice').innerHTML = `LKR ${vehicle.hourlyRate.toLocaleString()}<span class="price-period">/hour</span>`;
-    document.getElementById('overallRating').textContent = vehicle.rating;
-    document.getElementById('ratingText').textContent = `${vehicle.reviews} reviews`;
-    document.getElementById('ratingSummary').textContent = `Based on ${vehicle.reviews} customer reviews`;
+    try {
+        // Fetch vehicle details from servlet
+        const response = await fetch(`/customer/vehicle-details?vehicleId=${vehicleId}`);
 
-    updateStars('vehicleStars', vehicle.rating);
+        if (!response.ok) {
+            throw new Error('Failed to fetch vehicle details');
+        }
+
+        vehicleData = await response.json();
+
+        if (!vehicleData) {
+            throw new Error('Vehicle not found');
+        }
+
+        // Fetch company name using FK (company_id)
+        if (vehicleData.companyId) {
+            const companyResponse = await fetch(`/customer/company-name?companyId=${vehicleData.companyId}`);
+            if (companyResponse.ok) {
+                const companyData = await companyResponse.json();
+                vehicleData.companyName = companyData.companyName || 'N/A';
+            } else {
+                vehicleData.companyName = 'N/A';
+            }
+        } else {
+            vehicleData.companyName = 'N/A';
+        }
+
+        // Populate the page with vehicle data
+        populateVehicleDetails(vehicleData);
+
+    } catch (error) {
+        console.error('Error loading vehicle details:', error);
+        showNotification('Failed to load vehicle details', 'error');
+        setTimeout(() => {
+            window.location.href = 'search.html';
+        }, 2000);
+    }
+}
+
+function populateVehicleDetails(vehicle) {
+    // Basic info
+    const vehicleName = `${vehicle.vehicleBrand} ${vehicle.vehicleModel}`;
+    document.getElementById('vehicleName').textContent = vehicleName;
+    document.getElementById('vehicleCompany').textContent = vehicle.companyName || 'N/A';
+    document.getElementById('vehicleLocation').textContent = vehicle.location || 'N/A';
+
+    // Price - convert daily rate to hourly (assuming 24 hours)
+    const hourlyRate = Math.round(vehicle.pricePerDay / 24);
+    const hourlyRateWithDriver = Math.round(hourlyRate * 1.3); // 30% more for with driver
+    document.getElementById('vehiclePrice').innerHTML = `LKR ${hourlyRate.toLocaleString()}<span class="price-period">/hour</span>`;
+
+    // Store rates for booking
+    vehicleData.hourlyRate = hourlyRate;
+    vehicleData.hourlyRateWithDriver = hourlyRateWithDriver;
+    vehicleData.name = vehicleName;
+    vehicleData.company = vehicle.companyName || 'N/A';
+    vehicleData.companyId = vehicle.companyId;
+
+    // Rating (hardcoded for now - can be fetched from a ratings table later)
+    const rating = 4.7;
+    const reviews = 47;
+    document.getElementById('overallRating').textContent = rating.toFixed(1);
+    document.getElementById('ratingText').textContent = `${reviews} reviews`;
+    document.getElementById('ratingSummary').textContent = `Based on ${reviews} customer reviews`;
+    updateStars('vehicleStars', rating);
+
+    // Vehicle Meta Information
+    const metaContainer = document.getElementById('vehicleMeta');
+    const features = parseFeatures(vehicle.features);
+
+    metaContainer.innerHTML = `
+        <div class="meta-item">
+            <span class="meta-label">Type:</span>
+            <span class="meta-value">${vehicle.vehicleType || 'N/A'}</span>
+        </div>
+        <div class="meta-item">
+            <span class="meta-label">Mileage:</span>
+            <span class="meta-value">${vehicle.milage || 'N/A'}</span>
+        </div>
+        <div class="meta-item">
+            <span class="meta-label">Engine:</span>
+            <span class="meta-value">${(vehicle.engineCapacity / 1000).toFixed(1)}L ${vehicle.fuelType || ''}</span>
+        </div>
+        <div class="meta-item">
+            <span class="meta-label">Color:</span>
+            <span class="meta-value">${vehicle.color || 'N/A'}</span>
+        </div>
+    `;
+
+    // Key Features
+    const featuresContainer = document.querySelector('.features-list');
+    featuresContainer.innerHTML = `
+        <div class="feature-item">
+            <div class="feature-icon transmission">
+                <i class="fas fa-cogs"></i>
+            </div>
+            <div class="feature-content">
+                <div class="feature-title">Transmission</div>
+                <div class="feature-subtitle">${features.transmission || 'Automatic'}</div>
+            </div>
+        </div>
+        <div class="feature-item">
+            <div class="feature-icon fuel">
+                <i class="fas fa-gas-pump"></i>
+            </div>
+            <div class="feature-content">
+                <div class="feature-title">Fuel Type</div>
+                <div class="feature-subtitle">${vehicle.fuelType || 'N/A'}</div>
+            </div>
+        </div>
+        <div class="feature-item">
+            <div class="feature-icon seating">
+                <i class="fas fa-users"></i>
+            </div>
+            <div class="feature-content">
+                <div class="feature-title">Seating Capacity</div>
+                <div class="feature-subtitle">${vehicle.numberOfPassengers} Passengers</div>
+            </div>
+        </div>
+        <div class="feature-item">
+            <div class="feature-icon ac">
+                <i class="fas fa-snowflake"></i>
+            </div>
+            <div class="feature-content">
+                <div class="feature-title">Air Conditioning</div>
+                <div class="feature-subtitle">${features.ac ? 'Yes' : 'Standard AC'}</div>
+            </div>
+        </div>
+        <div class="feature-item">
+            <div class="feature-icon luggage">
+                <i class="fas fa-suitcase"></i>
+            </div>
+            <div class="feature-content">
+                <div class="feature-title">Description</div>
+                <div class="feature-subtitle">${vehicle.description || 'Comfortable ride'}</div>
+            </div>
+        </div>
+    `;
+
+    // Availability status
+    const availabilityDiv = document.querySelector('.availability-status');
+    if (vehicle.availabilityStatus === 'available') {
+        availabilityDiv.className = 'availability-status available';
+        availabilityDiv.innerHTML = '<i class="fas fa-check-circle"></i><span>Available Now</span>';
+        document.querySelector('.availability-text').textContent = 'Next available: Immediately';
+    } else {
+        availabilityDiv.className = 'availability-status unavailable';
+        availabilityDiv.innerHTML = '<i class="fas fa-times-circle"></i><span>Currently Unavailable</span>';
+        document.querySelector('.availability-text').textContent = 'Check back later for availability';
+    }
+
+    // Set pickup locations (use vehicle location as default)
+    const locationParts = vehicle.location ? vehicle.location.split(',') : ['Colombo'];
+    vehicleData.pickupLocations = [vehicle.location, ...generateNearbyLocations(locationParts[0])];
+}
+
+function parseFeatures(featuresString) {
+    // Parse comma-separated features string
+    if (!featuresString) return {};
+
+    const features = {};
+    const parts = featuresString.split(',');
+
+    parts.forEach(feature => {
+        const lower = feature.trim().toLowerCase();
+        if (lower.includes('a/c') || lower.includes('ac')) {
+            features.ac = true;
+        }
+        if (lower.includes('gps')) {
+            features.gps = true;
+        }
+        if (lower.includes('leather')) {
+            features.leather = true;
+        }
+        if (lower.includes('automatic') || lower.includes('cvt')) {
+            features.transmission = feature.trim();
+        }
+    });
+
+    return features;
+}
+
+function generateNearbyLocations(city) {
+    // Generate nearby locations based on city
+    const baseCity = city.trim();
+    return [
+        `${baseCity} 01`, `${baseCity} 02`, `${baseCity} 03`, `${baseCity} 04`,
+        `${baseCity} 05`, `${baseCity} 06`, `${baseCity} 07`, `${baseCity} Suburbs`
+    ];
 }
 
 function updateStars(containerId, rating) {
@@ -86,12 +235,15 @@ function updateStars(containerId, rating) {
 }
 
 function bookVehicle() {
-    const vehicle = vehicleDetails[1];
-    showBookingPopup(vehicle);
+    if (!vehicleData) {
+        showNotification('Vehicle data not loaded', 'error');
+        return;
+    }
+    showBookingPopup(vehicleData);
 }
 
 function showBookingPopup(vehicle) {
-    const locationOptions = vehicle.pickupLocations.map(loc => 
+    const locationOptions = (vehicle.pickupLocations || [vehicle.location]).map(loc =>
         `<option value="${loc}"${loc === vehicle.location ? ' selected' : ''}>${loc}</option>`
     ).join('');
     
@@ -283,7 +435,10 @@ function showBookingPopup(vehicle) {
 }
 
 function renderCalendar() {
-    const vehicle = vehicleDetails[1];
+    if (!vehicleData) return;
+
+    const vehicle = vehicleData;
+    const bookedDates = vehicle.bookedDates || []; // Empty for now, can be fetched from bookings table later
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     
@@ -323,7 +478,7 @@ function renderCalendar() {
         const dateStr = date.toISOString().split('T')[0];
         
         const isToday = dateStr === today.toISOString().split('T')[0];
-        const isBooked = vehicle.bookedDates.includes(dateStr);
+        const isBooked = bookedDates.includes(dateStr);
         const isPastDate = date < today;
         const isPickupSelected = dateStr === selectedPickupDate;
         const isReturnSelected = dateStr === selectedReturnDate;
@@ -480,9 +635,11 @@ function generateTimeOptions() {
 }
 
 function selectMode(mode) {
+    if (!vehicleData) return;
+
     selectedMode = mode;
-    const vehicle = vehicleDetails[1];
-    
+    const vehicle = vehicleData;
+
     document.querySelectorAll('.mode-option').forEach(opt => {
         opt.classList.remove('active');
     });
@@ -522,7 +679,8 @@ function calculateDuration() {
     const diffMs = returnDT - pickup;
     const hours = Math.ceil(diffMs / (1000 * 60 * 60));
     
-    const vehicle = vehicleDetails[1];
+    if (!vehicleData) return;
+    const vehicle = vehicleData;
     const rate = selectedMode === 'self-drive' ? vehicle.hourlyRate : vehicle.hourlyRateWithDriver;
     const serviceFee = 500;
     const subtotal = hours * rate;
@@ -580,7 +738,12 @@ function validateBookingForm() {
 }
 
 function confirmBooking() {
-    const vehicle = vehicleDetails[1];
+    if (!vehicleData) {
+        showNotification('Vehicle data not loaded', 'error');
+        return;
+    }
+
+    const vehicle = vehicleData;
     const pickupLocation = document.getElementById('pickupLocation').value.trim();
     
     if (!pickupLocation || !bookingData.pickupDate || !bookingData.pickupTime || 
@@ -593,7 +756,7 @@ function confirmBooking() {
     const returnDateTime = new Date(`${bookingData.returnDate}T${bookingData.returnTime}`);
     
     const finalBookingData = {
-        vehicleId: 1,
+        vehicleId: vehicle.vehicleId,
         vehicleName: vehicle.name,
         company: vehicle.company,
         mode: selectedMode,
