@@ -74,26 +74,24 @@ async function updateVehicleStatus(vehicle,status) {
             return;
         }
 
-        const response = await fetch('/vehicle/update', {
-
+        const response = await fetch('/vehicle/update/status', {
             method: 'POST',
-
-            headers: { 'Content-Type': 'application/json' },
-
-            body: JSON.stringify({
-
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: new URLSearchParams({
                 numberplate: vehicle.numberplate,
                 status: status
-
             })
-
         });
 
         if (!response.ok) {
             throw new Error(`HTTP error! Status: ${response.status}`);
         }
 
-        const data = await response.json();
+        let result = await response.json();
+
+        console.log(result);
 
 
     }catch (err) {
@@ -105,6 +103,84 @@ async function updateVehicleStatus(vehicle,status) {
 
 }
 
+async function submitInspection(data) {
+
+    try {
+
+        const response = await fetch('/inspection/submit', {
+
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+
+            body: new URLSearchParams({
+                numberplate: data.numberplate,
+                status: data.status,
+                inspectionType: data.inspectionType,
+                priorityLevel: data.priorityLevel,
+                issues: data.issues,
+                inspectionDate: data.inspectionDate,
+                checklist: JSON.stringify(data.checklist)
+            })
+
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        const result = await response.json();
+        console.log(result);
+
+    } catch (err) {
+
+        console.log(err);
+
+    }
+
+}
+
+function showNotification(message, type = "info") {
+
+    const notification = document.createElement("div");
+
+    notification.textContent = message;
+
+    // basic styling
+    notification.style.position = "fixed";
+    notification.style.top = "20px";
+    notification.style.right = "20px";
+    notification.style.padding = "12px 18px";
+    notification.style.borderRadius = "8px";
+    notification.style.color = "#fff";
+    notification.style.fontSize = "14px";
+    notification.style.zIndex = "9999";
+    notification.style.boxShadow = "0 4px 12px rgba(0,0,0,0.2)";
+    notification.style.transition = "0.3s ease";
+
+    // color based on type
+    if (type === "success") {
+        notification.style.background = "#28a745";
+    } else if (type === "error") {
+        notification.style.background = "#dc3545";
+    } else if (type === "info") {
+        notification.style.background = "#17a2b8";
+    } else {
+        notification.style.background = "#333";
+    }
+
+    document.body.appendChild(notification);
+
+    // auto remove after 3 seconds
+    setTimeout(() => {
+
+        notification.style.opacity = "0";
+        setTimeout(() => notification.remove(), 300);
+
+    }, 3000);
+
+}
 
 
 function renderVehicleDropdown() {
@@ -310,7 +386,7 @@ function handleVehicleStatusUpdate() {
 
             btn.classList.add('selected');
 
-            selectedStatus = btn.innerText.trim();
+            selectedStatus = btn.dataset.status;
 
         });
 
@@ -334,7 +410,7 @@ function handleSubmitButton() {
 
         if (!vehicleCard) {
 
-            alert("Please select a vehicle first!");
+            showNotification("Please select a vehicle first!!", "error");
             return;
 
         }
@@ -343,7 +419,7 @@ function handleSubmitButton() {
         let vehicleRegInput = document.getElementById('vehiclenumber');
         if (!vehicleRegInput || !vehicleRegInput.value.trim()) {
 
-            alert("Please enter Vehicle Registration number!");
+            showNotification("Please enter Vehicle Registration number!", "error");
             return;
 
         }
@@ -352,7 +428,7 @@ function handleSubmitButton() {
         let inspectionType = document.getElementById('inspectiontype');
         if (!inspectionType || !inspectionType.value) {
 
-            alert("Please select an Inspection Type!");
+            showNotification("Please select an Inspection Type!", "error");
             return;
 
         }
@@ -361,7 +437,7 @@ function handleSubmitButton() {
         let priorityLevel = document.getElementById('prioritylevel');
         if (!priorityLevel || !priorityLevel.value) {
 
-            alert("Please select a Priority Level!");
+            showNotification("Please select a Priority Level!", "error");
             return;
 
         }
@@ -371,7 +447,7 @@ function handleSubmitButton() {
         let allChecked = Array.from(checklistItems).every(item => item.classList.contains('checked'));
         if (!allChecked) {
 
-            alert("Please complete all checklist items!");
+            showNotification("Please complete all checklist items!", "error");
             return;
 
         }
@@ -380,7 +456,7 @@ function handleSubmitButton() {
         let issuesFound = document.getElementById('issues');
         if (!issuesFound || !issuesFound.value.trim()) {
 
-            alert("Please document any issues or repairs needed!");
+            showNotification("Please document any issues or repairs needed!", "error");
             return;
 
         }
@@ -389,7 +465,7 @@ function handleSubmitButton() {
         let inspectionDate = document.getElementById('inspectionDate');
         if (!inspectionDate || !inspectionDate.value) {
 
-            alert("Please select an Inspection Date!");
+            showNotification("Please select an Inspection Date!", "error");
             return;
 
         }
@@ -397,7 +473,7 @@ function handleSubmitButton() {
 
         if (!selectedStatus) {
 
-            alert("Please select a vehicle status!");
+            showNotification("Please select a vehicle status!", "error");
             return;
 
         }
@@ -419,19 +495,44 @@ function handleSubmitButton() {
 
         if (!currentvehicle) {
 
-            alert("Vehicle not found!");
+            showNotification("Vehicle not found!", "error");
             return;
 
         }
 
+        let inspectionData = {
 
-        //await updateVehicleStatus(currentvehicle, selectedStatus);
+            numberplate: numberplate,
+            status: selectedStatus,
+            inspectionType: inspectionType.value,
+            priorityLevel: priorityLevel.value,
+            issues: issuesFound.value.trim(),
+            inspectionDate: inspectionDate.value,
+            checklist: Array.from(document.querySelectorAll('.checklist-item')).map(item => ({
+                name: item.innerText.trim(),
+                checked: item.classList.contains('checked')
 
+            }))
+
+        };
+
+        await submitInspection(inspectionData);
+
+        await updateVehicleStatus(currentvehicle, selectedStatus);
+
+        showNotification("Inspection report submitted successfully!", "success");
 
         currentvehicle.status = selectedStatus;
+
         renderVehicle(currentvehicle);
 
-        alert("Inspection report submitted successfully!");
+
+
+        document.querySelectorAll('.checklist-item')
+            .forEach(item => item.classList.remove('checked'));
+
+        updateProgress();
+        selectedStatus = null;
 
     });
 
@@ -460,9 +561,9 @@ document.addEventListener("DOMContentLoaded", async function() {
             return;
         }
 
-        const dummyData = createDummyDataInput();
+        //const dummyData = createDummyDataInput();
 
-        assignedVehicles = dummyData.assignedvehicles;
+        assignedVehicles = await LoadAssignedVehicles();
 
         renderVehicleDropdown();
 

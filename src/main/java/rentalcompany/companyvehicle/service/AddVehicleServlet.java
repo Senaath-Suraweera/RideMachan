@@ -10,7 +10,7 @@ import rentalcompany.companyvehicle.model.Vehicle;
 import java.io.IOException;
 import java.io.InputStream;
 
-@WebServlet("company/vehicle/add")
+@WebServlet("/company/vehicle/add")
 @MultipartConfig(maxFileSize = 16177215) // 16MB
 public class AddVehicleServlet extends HttpServlet {
     @Override

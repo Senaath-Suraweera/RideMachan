@@ -241,7 +241,7 @@ public class VehicleDAO {
 
     public static int getIdOfVehicle(String numberplatenumber) {
 
-        int vehicleId = -1; // default if not found
+        int vehicleId = -1;
         String sql = "SELECT vehicleid FROM vehicle WHERE numberplatenumber = ?";
 
         try (Connection con = DBConnection.getConnection();

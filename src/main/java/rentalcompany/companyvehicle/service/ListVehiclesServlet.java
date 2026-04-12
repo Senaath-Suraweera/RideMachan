@@ -10,7 +10,7 @@ import com.google.gson.Gson;
 import java.io.IOException;
 import java.util.List;
 
-@WebServlet("company/vehicle/list")
+@WebServlet("/company/vehicle/list")
 @MultipartConfig
 public class ListVehiclesServlet extends HttpServlet {
     @Override

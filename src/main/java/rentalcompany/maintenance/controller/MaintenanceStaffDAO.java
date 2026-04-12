@@ -2,6 +2,8 @@ package rentalcompany.maintenance.controller;
 
 import common.util.DBConnection;
 import rentalcompany.maintenance.model.MaintenanceStaff;
+import rentalcompany.companyvehicle.model.Vehicle;
+import rentalcompany.companyvehicle.dao.VehicleDAO;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -311,5 +313,120 @@ public class MaintenanceStaffDAO {
 
 
 
+
+
+
+
+
+    //inspection after
+
+    public static List<Vehicle> getAssignedVehicles(int staffId) {
+
+        List<Vehicle> vehicles = new ArrayList<>();
+
+        String sql = "SELECT vehicle.vehicleid, vehicle.vehiclebrand, vehicle.vehiclemodel, " +
+                     "vehicle.numberplatenumber, vehicle.manufacture_year, vehicle.availability_status " +
+                     "FROM vehicle " +
+                     "INNER JOIN maintenance_vehicle_assignment " +
+                     "ON vehicle.vehicleid = maintenance_vehicle_assignment.vehicleid " +
+                     "WHERE maintenance_vehicle_assignment.maintenanceid = ?";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, staffId);
+
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+
+                Vehicle v = new Vehicle();
+
+                v.setVehicleId(rs.getInt("vehicleid"));
+                v.setVehicleBrand(rs.getString("vehiclebrand"));
+                v.setVehicleModel(rs.getString("vehiclemodel"));
+                v.setNumberPlateNumber(rs.getString("numberplatenumber"));
+
+                int year = rs.getInt("manufacture_year");
+
+                if (rs.wasNull() || year == 0) {
+                    year = 2026;
+                }
+
+                v.setYear(year);
+
+                v.setStatus(rs.getString("availability_status"));
+                v.setType("");
+                v.setMilage("");
+                v.setLastServiceDate("");
+                v.setNextServiceDate("");
+
+                vehicles.add(v);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return vehicles;
+    }
+
+    public static boolean updateVehicleStatus(String numberplate, String status) {
+
+        boolean result = false;
+
+        String sql = "UPDATE vehicle SET availability_status = ? WHERE numberplatenumber = ?";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, status);
+            ps.setString(2, numberplate);
+
+            int rows = ps.executeUpdate();
+
+            result = rows > 0;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return result;
+    }
+
+    public static boolean saveInspection(int maintenanceId,String numberplate,String status,String inspectionType,String priority,String issues,String inspectionDate,String checklist) {
+
+        boolean result = false;
+
+
+        String sql = "INSERT INTO vehicle_inspection " +
+                     "(maintenanceid, vehicleid, inspection_type, priority, issues, status, inspection_date) " +
+                     "VALUES (?, ?, ?, ?, ?, ?, ?)";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+
+            ps.setInt(1, maintenanceId);
+
+
+            int vehicleId = VehicleDAO.getIdOfVehicle(numberplate);
+            ps.setInt(2, vehicleId);
+
+            ps.setString(3, inspectionType);
+            ps.setString(4, priority);
+            ps.setString(5, issues);
+            ps.setString(6, status);
+            ps.setString(7, inspectionDate);
+
+            int rows = ps.executeUpdate();
+            result = rows > 0;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return result;
+    }
 
 }

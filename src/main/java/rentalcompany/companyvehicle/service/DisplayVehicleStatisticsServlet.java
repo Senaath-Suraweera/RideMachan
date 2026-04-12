@@ -11,7 +11,7 @@ import rentalcompany.companyvehicle.model.Vehicle;
 
 import java.io.IOException;
 
-@WebServlet("company/displayvehiclestatistics")
+@WebServlet("/company/displayvehiclestatistics")
 public class DisplayVehicleStatisticsServlet extends HttpServlet {
 
     @Override

@@ -8,7 +8,7 @@ import rentalcompany.companyvehicle.dao.VehicleDAO;
 
 import java.io.IOException;
 
-@WebServlet("company/vehicle/delete")
+@WebServlet("/company/vehicle/delete")
 @MultipartConfig
 public class DeleteVehicleServlet extends HttpServlet {
     @Override

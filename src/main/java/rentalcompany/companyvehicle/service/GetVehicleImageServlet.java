@@ -9,7 +9,7 @@ import java.io.OutputStream;
 import java.sql.*;
 import common.util.DBConnection;
 
-@WebServlet("company/vehicle/image")
+@WebServlet("/company/vehicle/image")
 public class GetVehicleImageServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)

@@ -9,7 +9,7 @@ import rentalcompany.companyvehicle.model.Vehicle;
 
 import java.io.IOException;
 
-@WebServlet("company/vehicle/update")
+@WebServlet("/company/vehicle/update")
 @MultipartConfig
 public class UpdateVehicleServlet extends HttpServlet {
     @Override

@@ -31,10 +31,8 @@ public class LoadAssignedVehicleswServlet extends HttpServlet {
 
             List<Vehicle> vehicles = MaintenanceStaffDAO.getAssignedVehicles(staffId);
 
-
             resp.setContentType("application/json");
             resp.setCharacterEncoding("UTF-8");
-
 
             String json = "[";
 
@@ -51,7 +49,12 @@ public class LoadAssignedVehicleswServlet extends HttpServlet {
                 String lastServiceDate = v.getLastServiceDate();
                 String nextServiceDate = v.getNextServiceDate();
 
+                if (type == null) type = "";
+                if (lastServiceDate == null) lastServiceDate = "";
+                if (nextServiceDate == null) nextServiceDate = "";
+
                 json += "{"
+                        + "\"vehicleId\":" + v.getVehicleId() + ","
                         + "\"numberplate\":\"" + numberplate + "\","
                         + "\"type\":\"" + type + "\","
                         + "\"brand\":\"" + brand + "\","
@@ -63,16 +66,12 @@ public class LoadAssignedVehicleswServlet extends HttpServlet {
                         + "}";
 
                 if (i < vehicles.size() - 1) {
-
                     json += ",";
-
                 }
 
             }
 
-
             json += "]";
-
 
             resp.getWriter().write(json);
 
