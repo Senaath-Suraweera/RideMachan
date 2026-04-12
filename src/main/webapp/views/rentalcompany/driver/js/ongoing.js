@@ -4,14 +4,14 @@ let currentFilter = 'all';
 let currentBookingDetails = null;
 
 // Initialize page on load
-document.addEventListener('DOMContentLoaded', function() {
-    initializePage();
+document.addEventListener('DOMContentLoaded', async function() {
+    await initializePage();
 });
 
 // Initialize all page functionality
-function initializePage() {
+async function initializePage() {
     setupEventListeners();
-    loadBookings();
+    await loadBookings();
 }
 
 // Setup all event listeners
