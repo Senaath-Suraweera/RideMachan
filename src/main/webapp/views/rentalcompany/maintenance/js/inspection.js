@@ -2,7 +2,7 @@ async function checkLogin() {
 
     try {
 
-        const response = await fetch("/checklogin");
+        const response = await fetch("/check/login/maintenance");
         const data = await response.json();
 
         if (!data.loggedIn) {
@@ -13,7 +13,7 @@ async function checkLogin() {
 
             document.getElementById("loginOkBtn").onclick = () => {
 
-                window.location.href = "/maintenancelogin";
+                window.location.href = "/views/landing/maintenancelogin.html";
 
             };
 
@@ -454,11 +454,11 @@ document.addEventListener("DOMContentLoaded", async function() {
 
     try {
 
-        /*const loggedIn = await checkLogin();
+        const loggedIn = await checkLogin();
 
         if (!loggedIn) {
             return;
-        }*/
+        }
 
         const dummyData = createDummyDataInput();
 

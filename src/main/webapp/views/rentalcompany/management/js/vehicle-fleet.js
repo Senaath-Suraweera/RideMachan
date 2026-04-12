@@ -45,7 +45,7 @@ async function loadVehicleStatistics() {
 
     try {
 
-        const response = await fetch("/displayvehiclestatistics", {method: "POST"});
+        const response = await fetch("/company/displayvehiclestatistics", {method: "POST"});
         console.log(response);
 
         if (!response.ok) {
@@ -101,7 +101,7 @@ async function loadVehicles(searchQuery = "") {
 
     try {
 
-        const response = await fetch(`${BASE_URL}/vehicle/list?company_id=${companyId}`);
+        const response = await fetch(`${BASE_URL}/company/vehicle/list?company_id=${companyId}`);
 
         if (!response.ok) {
             throw new Error("Failed to fetch vehicles");
@@ -183,7 +183,7 @@ async function removeVehicle(vehicleId) {
 
     try {
 
-        const response = await fetch(`${BASE_URL}/vehicle/delete`, {
+        const response = await fetch(`${BASE_URL}/company/vehicle/delete`, {
 
             method: "POST",
             headers: { "Content-Type": "application/x-www-form-urlencoded" },
@@ -258,7 +258,7 @@ async function openEditModal(vehicleId) {
 
         const response = await fetch(
 
-            `${BASE_URL}/vehicle/list?vehicleid=${vehicleId}`
+            `${BASE_URL}/company/vehicle/list?vehicleid=${vehicleId}`
 
         );
 
@@ -374,7 +374,7 @@ document.getElementById("addVehicleForm").addEventListener("submit", async funct
 
         try {
 
-            const response = await fetch(`${BASE_URL}/vehicle/add?company_id=${companyId}`, {
+            const response = await fetch(`${BASE_URL}/company/vehicle/add?company_id=${companyId}`, {
 
                 method: "POST",
                 body: formData,
@@ -421,7 +421,7 @@ document.getElementById("editVehicleForm").addEventListener("submit", async func
 
     try {
 
-        const response = await fetch(`${BASE_URL}/vehicle/update`, {
+        const response = await fetch(`${BASE_URL}/company/vehicle/update`, {
             method: "POST",
             body: formData,
 
