@@ -208,9 +208,15 @@ function renderMaintenanceStaff(maintenanceStaffs) {
                                       <i class="fas fa-comment"></i>
                                       Message
                               </button>
-                              <button class="action-btn primary" data-staff-id="${maintenanceStaff.staffId}" onclick="viewStaffDetails('${maintenanceStaff.staffId}')">
-                                      View Details
-                              </button>                                                           
+                              <a href="maintenance-vehicle-assignment.html">
+                                  <button class="action-btn primary" data-staff-id="${maintenanceStaff.staffId}">
+                                          View Assign Vehicles
+                                  </button> 
+                              </a>
+                              
+                              <!--<button class="action-btn primary" data-staff-id="${maintenanceStaff.staffId}" onclick="viewAssignedVehicles('${maintenanceStaff.staffId}')">
+                                      View Assign Vehicles
+                              </button> -->                                                          
                           </div>                         
                        `;
 

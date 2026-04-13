@@ -1,3 +1,11 @@
+const BASE_URL = "http://localhost:8080";
+let companyId = null;
+
+
+let vehicle;
+let AllMaintenanceStaff;
+let AllVehicles;
+
 async function checkLogin() {
 
     try {
@@ -21,6 +29,8 @@ async function checkLogin() {
 
         }
 
+        companyId = data.companyId;
+
         console.log("User is logged in.");
         return true;
 
@@ -33,32 +43,88 @@ async function checkLogin() {
 
 }
 
-
-let vehicle;
-
-async function LoadVehicleDetails(numberplate,date) {
+async function LoadVehicles() {
 
     try {
 
-        const response = await fetch("/getvehicledetails", {
+        const response = await fetch(`${BASE_URL}/vehicle/list?company_id=${companyId}`);
+
+        if (!response.ok) {
+            throw new Error("Failed to fetch vehicles");
+        }
+
+        let data = await response.json();
+
+        console.log(data);
+
+        return data;
+
+
+    } catch (err) {
+
+        console.log(err);
+
+    }
+
+}
+
+async function assignStaff(staffId) {
+
+    try {
+
+        const vehicleId = getVehicleIdFromURL();
+
+        const response = await fetch(`${BASE_URL}/assignstaff`, {
             method: "POST",
             headers: {
-                "Content-Type": "application/json"
+                "Content-Type": "application/x-www-form-urlencoded"
             },
-            body: JSON.stringify({ numberplate, date })
+            body: `staffId=${encodeURIComponent(staffId)}&vehicleId=${encodeURIComponent(vehicleId)}`
         });
 
         if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
+            throw new Error("Failed to assign staff");
         }
 
         const data = await response.json();
 
-        console.log("Vehicle's details:", data);
+        console.log(data);
+
+        showNotification("Assigned successfully", "success");
+
+        AllMaintenanceStaff = await loadAllMaintenanceStaff();
+        renderAllMaintenanceStaffWithAssociatedVehicleNumberPlate(AllMaintenanceStaff);
+
+    } catch (err) {
+
+        console.error(err);
+        showNotification("Assign failed", "error");
+
+    }
+
+}
+
+
+async function loadAllMaintenanceStaff() {
+
+    try {
+
+        const response = await fetch("/display/maintenancestaff", {
+            method: "POST"
+        });
+
+        if(!response.ok){
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        let data = await response.json();
+
+        console.log(data);
+
 
         return data;
 
-    } catch (err) {
+    }catch(err) {
 
         console.log(err);
 
@@ -174,6 +240,30 @@ function showNotification(message, type = "info") {
 
 
 
+function getVehicleIdFromURL() {
+
+    const params = new URLSearchParams(window.location.search);
+    return params.get("vehicleId");
+
+}
+
+function getVehicle(vehicleId) {
+
+    for (let i = 0; i < AllVehicles.length; i++) {
+
+        if (AllVehicles[i].vehicleId == vehicleId) {
+
+            return AllVehicles[i];
+
+        }
+
+    }
+
+    return null;
+
+}
+
+
 function findTodayDate() {
 
     const today = new Date();
@@ -209,6 +299,69 @@ function handleDateSection() {
 
 }
 
+function openStaffModal() {
+
+    const modal = document.getElementById("staffModal");
+    modal.style.display = "flex";
+
+    renderAllMaintenanceStaffWithAssociatedVehicleNumberPlate(AllMaintenanceStaff);
+
+}
+
+function closeStaffModal() {
+
+    document.getElementById("staffModal").style.display = "none";
+
+}
+
+function renderAllMaintenanceStaffWithAssociatedVehicleNumberPlate(allMaintenanceStaff) {
+
+    const container = document.getElementById("staffContainer");
+
+    if (!container) {
+        console.log("staffContainer not found");
+        return;
+    }
+
+    container.innerHTML = "";
+
+    if (!allMaintenanceStaff || allMaintenanceStaff.length === 0) {
+        container.innerHTML = "<p>No maintenance staff available</p>";
+        return;
+    }
+
+    allMaintenanceStaff.forEach(staff => {
+
+        const card = document.createElement("div");
+        card.className = "staff-card";
+
+        let vehicleText = "No assigned vehicles";
+
+        if (staff.vehicles && staff.vehicles.length > 0) {
+            vehicleText = staff.vehicles.join(", ");
+        }
+
+        card.innerHTML = `
+            <h3>${staff.firstname} ${staff.lastname}</h3>
+
+            <p><b>ID:</b> ${staff.staffId}</p>
+
+            <p><b>Experience:</b> ${staff.yearsOfExperience} years</p>
+
+            <p><b>Vehicles:</b> ${vehicleText}</p>
+
+            <span class="staff-status ${staff.status ? staff.status.toLowerCase() : "unknown"}">
+                ${staff.status}
+            </span>
+
+            <button class="assign-staff-btn" data-id="${staff.staffId}">
+                Assign
+            </button>
+        `;
+        container.appendChild(card);
+    });
+
+}
 
 function renderVehicleCard(vehicle) {
 
@@ -232,11 +385,11 @@ function renderVehicleCard(vehicle) {
                          </div>
                         
                          <div class="vehicle-details">
-                            <h3>${vehicle.brand} ${vehicle.model} ${vehicle.year}</h3>
+                            <h3>${vehicle.vehicleBrand} ${vehicle.vehicleModel} ${vehicle.year}</h3>
                             <div class="vehicle-status">
                                 <span class="status-label">Current Status:</span>
-                                <span class="status-badge ${vehicle.status.toLowerCase()}">
-                                    ${vehicle.status}
+                                <span class="status-badge ${vehicle.availabilityStatus.toLowerCase()}">
+                                    ${vehicle.availabilityStatus}
                                 </span>
                             </div>
                         </div>      
@@ -309,29 +462,37 @@ function findSlotWork(schedule, hour) {
 
     let result = "Available";
 
-    schedule.bookings.forEach(booking => {
+    if(schedule.bookings) {
 
-        let startHour = splitOnlyHourPartStartTime(booking.startTime);
-        let endHour = splitOnlyHourPartEndTime(booking.endTime);
+        schedule.bookings.forEach(booking => {
 
-        if (hour >= startHour && hour <= endHour) {
-            result = { ...booking, type: "booking" };
+            let startHour = splitOnlyHourPartStartTime(booking.startTime);
+            let endHour = splitOnlyHourPartEndTime(booking.endTime);
 
-        }
+            if (hour >= startHour && hour <= endHour) {
+                result = {...booking, type: "booking"};
 
-    });
+            }
 
-    schedule.maintenance.forEach(task => {
+        });
 
-        let startHour = splitOnlyHourPartStartTime(task.startTime);
-        let endHour = splitOnlyHourPartEndTime(task.endTime);
+    }
+
+    if (schedule.maintenance) {
+
+        schedule.maintenance.forEach(task => {
+
+            let startHour = splitOnlyHourPartStartTime(task.startTime);
+            let endHour = splitOnlyHourPartEndTime(task.endTime);
 
 
-        if (hour >= startHour && hour <= endHour) {
-            result = { ...task, type: "maintenance", maintenanceType: task.type }; // include startHour, endHour
-        }
+            if (hour >= startHour && hour <= endHour) {
+                result = {...task, type: "maintenance", maintenanceType: task.type}; // include startHour, endHour
+            }
 
-    });
+        });
+
+    }
 
     return result;
 }
@@ -450,9 +611,11 @@ document.addEventListener("DOMContentLoaded", async function () {
 
         const dummyData = createDummyDataInput();
 
+        AllVehicles = await LoadVehicles();
 
-        vehicle = dummyData.vehicle;
-        //vehicle = LoadVehicleDetails("ABC-1234", selectedDate);
+        let vehicleIdFromURL = getVehicleIdFromURL();
+        vehicle = getVehicle(vehicleIdFromURL);
+
 
 
         renderVehicleCard(vehicle);
@@ -468,6 +631,7 @@ document.addEventListener("DOMContentLoaded", async function () {
             renderStatistics(stats)
         }
 
+        AllMaintenanceStaff = await loadAllMaintenanceStaff();
 
     } catch (err) {
 
@@ -478,6 +642,21 @@ document.addEventListener("DOMContentLoaded", async function () {
 });
 
 
+document.getElementById("Vehicleassgin").addEventListener("click", openStaffModal);
+
+
+document.addEventListener("click", async function (e) {
+
+    if (e.target.classList.contains("assign-staff-btn")) {
+
+        const staffId = e.target.getAttribute("data-id");
+
+        console.log("Assign clicked for staff:", staffId);
+
+        await assignStaff(staffId);
+    }
+
+});
 
 
 
@@ -510,7 +689,7 @@ function createDummyDataInput() {
                     id: "BK001",
                     customer: "John Smith",
                     driver: "Mike Johnson",
-                    startTime: "8:55",
+                    startTime: "08:55",
                     endTime: "11:48",
                     status: "Ongoing"
                 },
@@ -520,22 +699,29 @@ function createDummyDataInput() {
                     driver: "Mike Johnson",
                     startTime: "16:00",
                     endTime: "18:00",
-                    status: "Ongoing"
-                }
-            ],
-            maintenance: [
-                {
-                    type: "Oil Change",
-                    startTime: "13:15",
-                    endTime: "15:34",
-                    status: "Scheduled"
+                   status: "Ongoing"
                 }
             ]
         },
-        stats: {
-            totalTripsToday: 2,
-            maintenanceTasksToday: 1,
-            assignedDriversToday: 1
-        }
+        maintenanceStaff: [
+            {
+                id: 1,
+                name: "Kamal Perera",
+                status: "Available",
+                vehicles: ["ABC-1234", "KJ-8890"]
+            },
+            {
+                id: 2,
+                name: "Nimal Silva",
+                status: "Busy",
+                vehicles: ["LM-7788"]
+            },
+            {
+                id: 3,
+                name: "Suresh Fernando",
+                status: "Available",
+                vehicles: []
+            }
+        ]
     };
 }

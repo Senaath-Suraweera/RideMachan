@@ -2,6 +2,8 @@ package rentalcompany.management.controller;
 
 import common.util.DBConnection;
 import rentalcompany.management.model.RentalCompany;
+import rentalcompany.companyvehicle.model.Vehicle;
+import rentalcompany.maintenance.model.MaintenanceStaff;
 
 import java.sql.*;
 
@@ -129,4 +131,41 @@ public class RentalCompanyDAO {
 
         return status;
     }
+
+    public static Vehicle getVehicleDetails(int companyId, String numberplate, String date) {
+
+        Vehicle vehicle = null;
+
+        String sql = "SELECT * FROM vehicle WHERE company_id=? AND numberplatenumber=?";
+
+
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setInt(1, companyId);
+            ps.setString(2, numberplate);
+
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+
+                vehicle = new Vehicle();
+
+                vehicle.setVehicleId(rs.getInt("vehicleid"));
+                vehicle.setVehicleBrand(rs.getString("vehiclebrand"));
+                vehicle.setVehicleModel(rs.getString("vehiclemodel"));
+                vehicle.setNumberPlateNumber(rs.getString("numberplatenumber"));
+                vehicle.setYear(rs.getInt("manufacture_year"));
+                vehicle.setStatus(rs.getString("availability_status"));
+
+            }
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return vehicle;
+    }
+
 }
