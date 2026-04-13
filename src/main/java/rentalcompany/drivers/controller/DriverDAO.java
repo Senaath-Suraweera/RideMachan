@@ -649,7 +649,7 @@ public class DriverDAO {
     }
 
     // Get notification count for driver
-    public static int getNotificationCount(int driverId) {
+    /*public static int getNotificationCount(int driverId) {
 
         String sql = "SELECT COUNT(*) as count FROM Notification " +
                 "WHERE driver_id = ? AND is_read = 0";
@@ -692,7 +692,7 @@ public class DriverDAO {
         }
         return 0;
 
-    }
+    }*/
 
     // ==========================================
     // Calendar View Methods
@@ -839,31 +839,58 @@ public class DriverDAO {
                 booking.setDistance(rs.getDouble("distance"));
                 booking.setTotalAmount(rs.getDouble("total_amount"));
 
-                // IMPORTANT: always send frontend status as upcoming
-                booking.setStatus("upcoming");
-
                 booking.setVehicleModel(rs.getString("vehicle_model"));
                 booking.setNumberPlate(rs.getString("vehicle_plate"));
 
                 booking.setSpecialInstructions(rs.getString("special_instructions"));
                 booking.setCreatedAt(rs.getTimestamp("created_at"));
 
+                // =====================================================
+                // STEP 2: INSERT INTO driver_booking_status (NO DUPLICATES)
+                // =====================================================
+                String checkSql =
+                        "SELECT 1 FROM driver_booking_status WHERE booking_id = ?";
+
+                PreparedStatement checkPs = con.prepareStatement(checkSql);
+                checkPs.setInt(1, bookingId);
+
+                ResultSet checkRs = checkPs.executeQuery();
+
+                if (!checkRs.next()) {
+
+                    String insertSql =
+                            "INSERT INTO driver_booking_status " +
+                                    "(booking_id, driverid, ride_id, status, assigned_at) " +
+                                    "VALUES (?, ?, ?, 'upcoming', NOW())";
+
+                    PreparedStatement insertPs = con.prepareStatement(insertSql);
+                    insertPs.setInt(1, bookingId);
+                    insertPs.setInt(2, driverId);
+                    insertPs.setString(3, booking.getRideId());
+
+                    insertPs.executeUpdate();
+
+                    System.out.println("Inserted driver_booking_status for bookingId: " + bookingId);
+                }
+
+                // =====================================================
+                // STEP 3: GET REAL STATUS FROM driver_booking_status
+                // =====================================================
+                String statusSql =
+                        "SELECT status FROM driver_booking_status WHERE booking_id = ?";
+
+                PreparedStatement statusPs = con.prepareStatement(statusSql);
+                statusPs.setInt(1, bookingId);
+
+                ResultSet statusRs = statusPs.executeQuery();
+
+                if (statusRs.next()) {
+                    booking.setStatus(statusRs.getString("status"));
+                } else {
+                    booking.setStatus("upcoming");
+                }
+
                 bookings.add(booking);
-
-                // =========================
-                // STEP 2: INSERT INTO STATUS TABLE
-                // =========================
-                String sql2 =
-                        "INSERT INTO driver_booking_status (booking_id, driverid, status) " +
-                                "VALUES (?, ?, 'upcoming')";
-
-                PreparedStatement ps2 = con.prepareStatement(sql2);
-                ps2.setInt(1, bookingId);
-                ps2.setInt(2, driverId);
-
-                int rows = ps2.executeUpdate();
-
-                System.out.println("Inserted rows: " + rows + " for bookingId: " + bookingId);
             }
 
         } catch (Exception e) {
@@ -918,23 +945,103 @@ public class DriverDAO {
 
     public static boolean updateBookingStatus(String rideId, String newStatus, int driverId) {
 
-        String sql = "UPDATE companybookings SET status = ? WHERE ride_id = ? AND driverid = ?";
+        String updateDriverSql =
+                "UPDATE driver_booking_status " +
+                        "SET status = ?, " +
+                        "started_at = CASE WHEN ? = 'in-progress' THEN NOW() ELSE started_at END, " +
+                        "completed_at = CASE WHEN ? = 'completed' THEN NOW() ELSE completed_at END " +
+                        "WHERE ride_id = ? AND driverid = ?";
 
-        try (Connection con = DBConnection.getConnection();
-             PreparedStatement ps = con.prepareStatement(sql)) {
+        String getBookingIdSql =
+                "SELECT booking_id FROM driver_booking_status " +
+                        "WHERE ride_id = ? AND driverid = ?";
 
-            ps.setString(1, newStatus);
-            ps.setString(2, rideId);
-            ps.setInt(3, driverId);
+        String updateCompanySql =
+                "UPDATE companybookings SET status = 'completed' WHERE booking_id = ?";
 
-            return ps.executeUpdate() > 0;
+        Connection con = null;
+
+        try {
+            con = DBConnection.getConnection();
+            con.setAutoCommit(false); // 🔥 transaction
+
+            int bookingId = -1;
+
+            // 🔹 Step 1: Update driver table
+            try (PreparedStatement ps = con.prepareStatement(updateDriverSql)) {
+
+                ps.setString(1, newStatus.trim());
+                ps.setString(2, newStatus.trim());
+                ps.setString(3, newStatus.trim());
+                ps.setString(4, rideId.trim());
+                ps.setInt(5, driverId);
+
+                int rows = ps.executeUpdate();
+
+                if (rows == 0) {
+                    con.rollback();
+                    return false;
+                }
+            }
+
+            // 🔹 Step 2: Get booking_id into variable
+            try (PreparedStatement ps2 = con.prepareStatement(getBookingIdSql)) {
+
+                ps2.setString(1, rideId.trim());
+                ps2.setInt(2, driverId);
+
+                ResultSet rs = ps2.executeQuery();
+
+                if (rs.next()) {
+                    bookingId = rs.getInt("booking_id");
+                    System.out.println("Booking ID: " + bookingId);
+                } else {
+                    con.rollback();
+                    return false;
+                }
+            }
+
+            // 🔥 Step 3: ONLY if completed → update companybookings
+            if ("completed".equalsIgnoreCase(newStatus.trim())) {
+
+                try (PreparedStatement ps3 = con.prepareStatement(updateCompanySql)) {
+
+                    ps3.setInt(1, bookingId);
+
+                    int updated = ps3.executeUpdate();
+                    System.out.println("Company updated: " + updated);
+
+                    if (updated == 0) {
+                        con.rollback();
+                        return false;
+                    }
+                }
+            }
+
+            con.commit(); // ✅ success
+            return true;
 
         } catch (Exception e) {
             e.printStackTrace();
+
+            try {
+                if (con != null) con.rollback();
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+
+        } finally {
+            try {
+                if (con != null) {
+                    con.setAutoCommit(true);
+                    con.close();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
 
         return false;
-
     }
 
 
@@ -1033,7 +1140,7 @@ public class DriverDAO {
 
     public static int createIssue(Issue issue) {
 
-        String sql = "INSERT INTO Issue (driver_id, category, location, description, " +
+        String sql = "INSERT INTO issue (driver_id, category, location, description, " +
                 "booking_id, plate_number, photo_path, is_driveable, status) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
@@ -1049,14 +1156,17 @@ public class DriverDAO {
             ps.setString(7, issue.getPhotoPath());
 
             if (issue.getIsDriveable() != null) {
-                ps.setBoolean(8, issue.getIsDriveable());
+                ps.setInt(8, issue.getIsDriveable() ? 1 : 0);
             } else {
-                ps.setNull(8, Types.BOOLEAN);
+                ps.setNull(8, Types.TINYINT);
             }
 
             ps.setString(9, issue.getStatus() != null ? issue.getStatus() : "pending");
 
-            if (ps.executeUpdate() > 0) {
+            int rows = ps.executeUpdate();
+            System.out.println("ROWS INSERTED = " + rows);
+
+            if (rows > 0) {
                 try (ResultSet keys = ps.getGeneratedKeys()) {
                     if (keys.next()) {
                         return keys.getInt(1);
@@ -1075,34 +1185,42 @@ public class DriverDAO {
 
     public static List<Issue> getIssuesByDriverId(int driverId) {
 
-        String sql = "SELECT * FROM Issue WHERE driver_id = ? ORDER BY created_at DESC";
+        String sql = "SELECT * FROM issue WHERE driver_id = ?";
+
         List<Issue> issues = new ArrayList<>();
 
         try (Connection con = DBConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
 
             ps.setInt(1, driverId);
-            ResultSet rs = ps.executeQuery();
 
-            while (rs.next()) {
-                Issue issue = new Issue();
-                issue.setIssueId(rs.getInt("issue_id"));
-                issue.setDriverId(rs.getInt("driver_id"));
-                issue.setCategory(rs.getString("category"));
-                issue.setLocation(rs.getString("location"));
-                issue.setDescription(rs.getString("description"));
-                issue.setBookingId(rs.getString("booking_id"));
-                issue.setPlateNumber(rs.getString("plate_number"));
-                issue.setPhotoPath(rs.getString("photo_path"));
+            try (ResultSet rs = ps.executeQuery()) {
 
-                Boolean driveable = rs.getBoolean("is_driveable");
-                if (!rs.wasNull()) issue.setIsDriveable(driveable);
+                while (rs.next()) {
 
-                issue.setStatus(rs.getString("status"));
-                issue.setCreatedAt(rs.getTimestamp("created_at"));
-                issue.setUpdatedAt(rs.getTimestamp("updated_at"));
+                    Issue issue = new Issue();
 
-                issues.add(issue);
+                    issue.setIssueId(rs.getInt("issue_id"));
+                    issue.setDriverId(rs.getInt("driver_id"));
+                    issue.setCategory(rs.getString("category"));
+                    issue.setLocation(rs.getString("location"));
+                    issue.setDescription(rs.getString("description"));
+                    issue.setBookingId(rs.getString("booking_id"));
+                    issue.setPlateNumber(rs.getString("plate_number"));
+                    issue.setPhotoPath(rs.getString("photo_path"));
+
+                    boolean driveableValue = rs.getBoolean("is_driveable");
+                    if (!rs.wasNull()) {
+                        issue.setIsDriveable(driveableValue);
+                    }
+
+                    issue.setStatus(rs.getString("status"));
+
+                    issue.setCreatedAt(rs.getTimestamp("created_at"));
+                    issue.setUpdatedAt(rs.getTimestamp("updated_at"));
+
+                    issues.add(issue);
+                }
             }
 
         } catch (Exception e) {
@@ -1110,13 +1228,11 @@ public class DriverDAO {
         }
 
         return issues;
-
     }
-
 
     public static Issue getIssueById(int issueId, int driverId) {
 
-        String sql = "SELECT * FROM Issue WHERE issue_id = ? AND driver_id = ?";
+        String sql = "SELECT * FROM issue WHERE issue_id = ? AND driver_id = ?";
 
         try (Connection con = DBConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
@@ -1157,7 +1273,7 @@ public class DriverDAO {
      * Update issue status
      */
     public static boolean updateIssueStatus(int issueId, int driverId, String status) {
-        String sql = "UPDATE Issue SET status = ? WHERE issue_id = ? AND driver_id = ?";
+        String sql = "UPDATE issue SET status = ? WHERE issue_id = ? AND driver_id = ?";
 
         try (Connection con = DBConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
@@ -1177,7 +1293,7 @@ public class DriverDAO {
 
     public static boolean deleteIssue(int issueId, int driverId) {
 
-        String sql = "DELETE FROM Issue WHERE issue_id = ? AND driver_id = ?";
+        String sql = "DELETE FROM issue WHERE issue_id = ? AND driver_id = ?";
 
         try (Connection con = DBConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
@@ -1227,35 +1343,54 @@ public class DriverDAO {
     public static List<RentalCompanyBookings> getPastBookings(int driverId, String dateRange, String status, String searchQuery) {
 
         StringBuilder sql = new StringBuilder();
-        sql.append("SELECT * FROM companybookings WHERE driverid = ? ");
-        sql.append("AND status IN ('completed', 'cancelled') ");
+        sql.append("SELECT ");
+        sql.append("cb.booking_id, cb.ride_id, cb.customer_name, cb.customer_phone, cb.customer_email, ");
+        sql.append("cb.pickup_location, cb.drop_location, cb.booked_Date, cb.start_time, ");
+        sql.append("cb.estimated_duration, cb.distance, cb.total_amount, ");
+        sql.append("cb.vehicle_model, cb.vehicle_plate, cb.special_instructions, ");
+        sql.append("cb.created_at, ");
+        sql.append("dbs.status AS driver_status, ");
+        sql.append("dbs.assigned_at, dbs.started_at, dbs.completed_at ");
+
+        sql.append("FROM driver_booking_status dbs ");
+        sql.append("INNER JOIN companybookings cb ON cb.booking_id = dbs.booking_id ");
+
+        sql.append("WHERE dbs.driverid = ? ");
+        sql.append("AND dbs.status IN ('completed','cancelled') ");
+
 
         if (dateRange != null && !dateRange.equals("all")) {
             switch (dateRange) {
+
                 case "today":
-                    sql.append("AND DATE(booked_Date) = CURDATE() ");
+                    sql.append("AND cb.trip_end_date >= CURDATE() ");
+                    sql.append("AND cb.trip_end_date < CURDATE() + INTERVAL 1 DAY ");
                     break;
+
                 case "week":
-                    sql.append("AND booked_Date >= DATE_SUB(CURDATE(), INTERVAL 7 DAY) ");
+                    sql.append("AND cb.trip_end_date >= DATE_SUB(CURDATE(), INTERVAL 7 DAY) ");
                     break;
+
                 case "month":
-                    sql.append("AND booked_Date >= DATE_SUB(CURDATE(), INTERVAL 1 MONTH) ");
+                    sql.append("AND cb.trip_end_date >= DATE_SUB(CURDATE(), INTERVAL 1 MONTH) ");
                     break;
+
                 case "year":
-                    sql.append("AND booked_Date >= DATE_SUB(CURDATE(), INTERVAL 1 YEAR) ");
+                    sql.append("AND cb.trip_end_date >= DATE_SUB(CURDATE(), INTERVAL 1 YEAR) ");
                     break;
             }
         }
 
         if (status != null && !status.equals("all")) {
-            sql.append("AND status = ? ");
+            sql.append("AND dbs.status = ? ");
         }
 
         if (searchQuery != null && !searchQuery.trim().isEmpty()) {
-            sql.append("AND (customer_name LIKE ? OR ride_id LIKE ?) ");
+            sql.append("AND (cb.customer_name LIKE ? OR cb.ride_id LIKE ? OR CAST(cb.booking_id AS CHAR) LIKE ?) ");
         }
 
-        sql.append("ORDER BY booked_Date DESC, start_time DESC");
+
+        sql.append("ORDER BY cb.trip_start_date DESC, cb.start_time DESC");
 
         List<RentalCompanyBookings> bookings = new ArrayList<>();
 
@@ -1263,6 +1398,7 @@ public class DriverDAO {
              PreparedStatement ps = con.prepareStatement(sql.toString())) {
 
             int index = 1;
+
             ps.setInt(index++, driverId);
 
             if (status != null && !status.equals("all")) {
@@ -1278,10 +1414,14 @@ public class DriverDAO {
             ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
+
                 RentalCompanyBookings booking = new RentalCompanyBookings();
+
+                // ======================
+                // FROM companybookings
+                // ======================
                 booking.setBookingId(rs.getInt("booking_id"));
                 booking.setRideId(rs.getString("ride_id"));
-                booking.setDriverId(rs.getInt("driverid"));
 
                 booking.setCustomerName(rs.getString("customer_name"));
                 booking.setCustomerPhoneNumber(rs.getString("customer_phone"));
@@ -1296,15 +1436,23 @@ public class DriverDAO {
                 booking.setEstimatedDuration(rs.getInt("estimated_duration"));
                 booking.setDistance(rs.getDouble("distance"));
                 booking.setTotalAmount(rs.getDouble("total_amount"));
-                booking.setStatus(rs.getString("status"));
 
                 booking.setVehicleModel(rs.getString("vehicle_model"));
                 booking.setNumberPlate(rs.getString("vehicle_plate"));
-                booking.setSpecialInstructions(rs.getString("special_instructions"));
 
-                try {
-                    booking.setCreatedAt(rs.getTimestamp("created_at"));
-                } catch (SQLException ignored) {}
+                booking.setSpecialInstructions(rs.getString("special_instructions"));
+                booking.setCreatedAt(rs.getTimestamp("created_at"));
+
+                // ======================
+                // FROM driver_booking_status
+                // ======================
+                booking.setDriverId(driverId);
+                booking.setStatus(rs.getString("driver_status"));
+
+                // optional lifecycle timestamps (if your model supports it)
+                // booking.setAssignedAt(rs.getTimestamp("assigned_at"));
+                // booking.setStartedAt(rs.getTimestamp("started_at"));
+                // booking.setCompletedAt(rs.getTimestamp("completed_at"));
 
                 bookings.add(booking);
             }

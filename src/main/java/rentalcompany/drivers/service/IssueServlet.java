@@ -48,6 +48,8 @@ public class IssueServlet extends HttpServlet {
         int driverId = (int) session.getAttribute("driverId");
         String action = req.getParameter("action");
 
+        System.out.println("Driver ID from session = " + driverId);
+
         try {
             if ("getAll".equals(action)) {
 
@@ -97,17 +99,24 @@ public class IssueServlet extends HttpServlet {
         if (session == null || session.getAttribute("driverId") == null) {
             resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             out.print("{\"success\":false,\"message\":\"Unauthorized\"}");
-            out.flush();
             return;
         }
 
         int driverId = (int) session.getAttribute("driverId");
+
         String action = req.getParameter("action");
 
+        System.out.println("POST ACTION = " + action);
+
         try {
-            if ("create".equals(action)) {
+
+            // ============================
+            // CREATE ISSUE
+            // ============================
+            if ("create".equalsIgnoreCase(action)) {
 
                 Issue issue = new Issue();
+
                 issue.setDriverId(driverId);
                 issue.setCategory(req.getParameter("category"));
                 issue.setLocation(req.getParameter("location"));
@@ -116,40 +125,55 @@ public class IssueServlet extends HttpServlet {
                 issue.setPlateNumber(req.getParameter("plateNumber"));
                 issue.setStatus("pending");
 
+                // driveable
                 String driveable = req.getParameter("driveable");
-                if (driveable != null) {
-                    issue.setIsDriveable("yes".equalsIgnoreCase(driveable));
-                }
+                issue.setIsDriveable("yes".equalsIgnoreCase(driveable));
 
+                // photo upload
                 Part photo = req.getPart("photo");
                 if (photo != null && photo.getSize() > 0) {
                     issue.setPhotoPath(saveFile(photo));
                 }
 
-                int id = DriverDAO.createIssue(issue);
+                // DEBUG LOGS (VERY IMPORTANT)
+                System.out.println("Creating issue for driver = " + driverId);
+                System.out.println("Category = " + issue.getCategory());
+                System.out.println("Location = " + issue.getLocation());
 
-                Map<String, Object> result = new HashMap<>();
-                result.put("success", id > 0);
-                result.put("issueId", id);
+                int issueId = DriverDAO.createIssue(issue);
 
-                out.print(gson.toJson(result));
+                System.out.println("Inserted Issue ID = " + issueId);
 
-            } else if ("delete".equals(action)) {
+                if (issueId > 0) {
+                    out.print("{\"success\":true,\"issueId\":" + issueId + "}");
+                } else {
+                    out.print("{\"success\":false,\"message\":\"Insert failed\"}");
+                }
+
+            }
+
+            // ============================
+            // DELETE ISSUE
+            // ============================
+            else if ("delete".equalsIgnoreCase(action)) {
 
                 int issueId = Integer.parseInt(req.getParameter("issueId"));
+
                 boolean deleted = DriverDAO.deleteIssue(issueId, driverId);
 
                 out.print("{\"success\":" + deleted + "}");
 
-            } else {
+            }
+
+            else {
                 resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                out.print("{\"success\":false}");
+                out.print("{\"success\":false,\"message\":\"Invalid action\"}");
             }
 
         } catch (Exception e) {
             e.printStackTrace();
             resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            out.print("{\"success\":false}");
+            out.print("{\"success\":false,\"message\":\"Server error\"}");
         }
 
         out.flush();

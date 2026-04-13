@@ -14,6 +14,9 @@ async function initializePage() {
     await loadBookings();
 }
 
+
+
+
 // Setup all event listeners
 function setupEventListeners() {
     // Sidebar toggle
@@ -542,7 +545,7 @@ async function completeRide(rideId) {
     btn.disabled = true;
 
     try {
-        const response = await fetch('/Ridemachan/driver/ongoing', {
+        const response = await fetch('/driver/ongoing', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',

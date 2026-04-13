@@ -3,6 +3,7 @@
   <component name="WebContextManager">
     <option name="state">
       <map>
+        <entry key="file://$PROJECT_DIR$/src/main/webapp/views/rentalcompany/driver/pages/pastbooking.html" value="file://$PROJECT_DIR$/src/main/webapp/views/rentalcompany/driver/pages" />
         <entry key="file://$PROJECT_DIR$/src/main/webapp/views/rentalcompany/maintenance/html/inspection.html" value="file://$PROJECT_DIR$/src/main/webapp/views/rentalcompany/maintenance/html" />
         <entry key="file://$PROJECT_DIR$/src/main/webapp/views/rentalcompany/management/html/booking-management.html" value="file://$PROJECT_DIR$/src/main/webapp/views/rentalcompany/management/html" />
       </map>

@@ -180,7 +180,7 @@ function createBookingCard(booking) {
     const statusClass = booking.status.toLowerCase();
     const statusText = booking.status.charAt(0).toUpperCase() + booking.status.slice(1);
 
-    const formattedDate = formatDate(booking.tripStartDate);
+    const formattedDate = formatDate(booking.bookingDate);
     const formattedTime = formatTime(booking.startTime);
 
     card.innerHTML = `
@@ -214,11 +214,11 @@ function createBookingCard(booking) {
                     <span class="detail-label">Fare:</span>
                     <span class="detail-value">Rs. ${booking.totalAmount.toLocaleString()}</span>
                 </div>
-                <div class="detail-item">
+                <!--<div class="detail-item">
                     <i class="fas fa-star"></i>
                     <span class="detail-label">Rating:</span>
                     <span class="detail-value">N/A</span>
-                </div>
+                </div>-->
             </div>
             
             <div class="location-info">
@@ -228,7 +228,7 @@ function createBookingCard(booking) {
                 </div>
                 <div class="location-item dropoff">
                     <i class="fas fa-map-marker-alt dropoff-icon"></i>
-                    <span class="location-text">${booking.dropLocation}</span>
+                    <span class="location-text">${booking.dropoffLocation}</span>
                 </div>
             </div>
         </div>
@@ -250,7 +250,7 @@ function viewBookingDetails(rideId) {
     if (!booking) return;
 
     const modalContent = document.getElementById('modalBookingDetails');
-    const formattedDate = formatDate(booking.tripStartDate);
+    const formattedDate = formatDate(booking.bookingDate);
     const formattedTime = formatTime(booking.startTime);
     const statusClass = booking.status.toLowerCase();
     const statusColor = statusClass === 'completed' ? '#28a745' : '#dc3545';
@@ -335,7 +335,7 @@ function viewBookingDetails(rideId) {
                             <div style="font-size: 12px; color: var(--text-light); margin-bottom: 8px;">Dropoff Location</div>
                             <div style="display: flex; align-items: center; gap: 8px; background: rgba(247, 37, 133, 0.05); padding: 10px; border-radius: 6px; border-left: 4px solid var(--danger);">
                                 <i class="fas fa-map-marker-alt" style="color: var(--danger);"></i>
-                                <span style="font-weight: 500;">${booking.dropLocation}</span>
+                                <span style="font-weight: 500;">${booking.dropoffLocation}</span>
                             </div>
                         </div>
                         ${booking.specialInstructions ? `

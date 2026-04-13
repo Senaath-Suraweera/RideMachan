@@ -78,8 +78,8 @@ public class DriverDashboardServlet extends HttpServlet {
             dashboardData.put("dailyHoursChart", DriverDAO.getDailyHoursChart(driverId));
 
             // Notification and Message Counts
-            dashboardData.put("notificationCount", DriverDAO.getNotificationCount(driverId));
-            dashboardData.put("messageCount", DriverDAO.getMessageCount(driverId));
+            //dashboardData.put("notificationCount", DriverDAO.getNotificationCount(driverId));
+            //dashboardData.put("messageCount", DriverDAO.getMessageCount(driverId));
 
             out.print(gson.toJson(dashboardData));
 
