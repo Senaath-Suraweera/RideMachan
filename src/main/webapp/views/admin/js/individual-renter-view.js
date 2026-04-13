@@ -16,11 +16,27 @@
   let vehicles = [];
   let editVehicleId = null;
 
+  // Track selected files for upload
+  let selectedRegDoc = null;
+  let selectedVehicleImages = [];
+
   async function apiJson(url, method = "GET", bodyObj) {
     const opts = { method, headers: { "Content-Type": "application/json" } };
     if (bodyObj !== undefined) opts.body = JSON.stringify(bodyObj);
 
     const res = await fetch(url, opts);
+    const payload = await res.json().catch(() => ({}));
+
+    if (!res.ok) {
+      throw new Error(
+        payload.error || payload.message || `Request failed (${res.status})`,
+      );
+    }
+    return payload;
+  }
+
+  async function apiMultipart(url, method, formData) {
+    const res = await fetch(url, { method, body: formData });
     const payload = await res.json().catch(() => ({}));
 
     if (!res.ok) {
@@ -50,6 +66,7 @@
     }
   }
 
+  // ─── Profile Rendering ────────────────────────────────────
   function renderProfile() {
     const root = $("#renterProfile");
     if (!root || !provider) return;
@@ -92,7 +109,7 @@
         <div class="profile-contact">
           <div>📞 ${esc(phone)}</div>
           <div>📧 ${esc(email)}</div>
-          <div class="status-badge ${status === "pending" ? "status-pending" : ""}">
+          <div class="status-badge ${status === "pending" ? "status-pending" : status === "suspended" ? "status-suspended" : ""}">
             ${esc(status.toUpperCase())}
           </div>
         </div>
@@ -105,12 +122,21 @@
     }
   }
 
+  // ─── Vehicle Cards ────────────────────────────────────────
   function renderVehicles() {
     const grid = $("#vehiclesGrid");
     if (!grid) return;
 
     if (!vehicles.length) {
-      grid.innerHTML = `<div style="padding:12px;color:#6b7280;">No vehicles listed for this provider.</div>`;
+      grid.innerHTML = `<div class="empty-state">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="1.5">
+          <rect x="1" y="3" width="15" height="13" rx="2"/>
+          <polygon points="16 8 20 12 20 16 16 16 16 8"/>
+          <circle cx="5.5" cy="18.5" r="2.5"/>
+          <circle cx="18.5" cy="18.5" r="2.5"/>
+        </svg>
+        <p>No vehicles listed for this provider.</p>
+      </div>`;
       return;
     }
 
@@ -121,21 +147,62 @@
       card.className = "vehicle-card";
       card.dataset.vehicleId = v.id;
 
+      const availability = (v.availabilityStatus || "unknown").toLowerCase();
+      let statusClass = "status-available";
+      if (availability === "unavailable") statusClass = "status-unavailable";
+      else if (availability === "maintenance")
+        statusClass = "status-maintenance";
+
+      // Build thumbnail from vehicle image if available
+      const thumbSrc = v.hasImages
+        ? `${API}/${providerId}/vehicles/${v.id}/image`
+        : null;
+
       card.innerHTML = `
-        <h4>${esc(v.make || "—")} ${esc(v.model || "—")}</h4>
-        <div class="vehicle-meta">
-          <span>Reg: ${esc(v.regNo || "—")}</span>
-          <span>Seats: ${esc(v.seats ?? "—")}</span>
-          <span>Price/Day: Rs. ${Number(v.pricePerDay || 0).toLocaleString()}</span>
-          <span>Fuel: ${esc(v.fuelType || "—")}</span>
-          <span>Transmission: ${esc(v.transmission || "—")}</span>
-          <span>Status: ${esc(v.availabilityStatus || "—")}</span>
-          <span>Rented under: <strong>${esc(v.rentalCompany || "Not assigned")}</strong></span>
+        <div class="vehicle-card-header">
+          ${
+            thumbSrc
+              ? `<div class="vehicle-thumb"><img src="${thumbSrc}" alt="${esc(v.make)} ${esc(v.model)}" onerror="this.parentElement.innerHTML='<div class=\\'vehicle-thumb-placeholder\\'>${esc((v.make || "?")[0])}</div>'"/></div>`
+              : `<div class="vehicle-thumb"><div class="vehicle-thumb-placeholder">${esc((v.make || "?")[0])}</div></div>`
+          }
+          <div class="vehicle-card-title">
+            <h4>${esc(v.make || "—")} ${esc(v.model || "—")}</h4>
+            <span class="vehicle-year">${esc(v.manufactureYear || "—")}</span>
+          </div>
+          <span class="availability-badge ${statusClass}">${esc(availability)}</span>
         </div>
-        <div class="vehicle-actions">
-          <button class="btn btn-secondary" data-action="view">View</button>
-          <button class="btn btn-primary" data-action="edit">Edit</button>
-          <button class="btn btn-danger" data-action="delete">Delete</button>
+        <div class="vehicle-card-body">
+          <div class="vehicle-spec-grid">
+            <div class="spec-item">
+              <span class="spec-label">Reg. No</span>
+              <span class="spec-value">${esc(v.regNo || "—")}</span>
+            </div>
+            <div class="spec-item">
+              <span class="spec-label">Seats</span>
+              <span class="spec-value">${esc(v.seats ?? "—")}</span>
+            </div>
+            <div class="spec-item">
+              <span class="spec-label">Price/Day</span>
+              <span class="spec-value price">Rs. ${Number(v.pricePerDay || 0).toLocaleString()}</span>
+            </div>
+            <div class="spec-item">
+              <span class="spec-label">Fuel</span>
+              <span class="spec-value">${esc(v.fuelType || "—")}</span>
+            </div>
+            <div class="spec-item">
+              <span class="spec-label">Transmission</span>
+              <span class="spec-value">${esc(v.transmission || "—")}</span>
+            </div>
+            <div class="spec-item">
+              <span class="spec-label">Company</span>
+              <span class="spec-value">${esc(v.rentalCompany || "Not assigned")}</span>
+            </div>
+          </div>
+        </div>
+        <div class="vehicle-card-footer">
+          <button class="btn btn-sm btn-secondary" data-action="view">View Details</button>
+          <button class="btn btn-sm btn-primary" data-action="edit">Edit</button>
+          <button class="btn btn-sm btn-danger" data-action="delete">Delete</button>
         </div>
       `;
       grid.appendChild(card);
@@ -147,6 +214,7 @@
     renderVehicles();
   }
 
+  // ─── Profile Form ─────────────────────────────────────────
   function openProfileForm() {
     if (!provider) return;
 
@@ -203,28 +271,105 @@
     modal.setAttribute("aria-hidden", "true");
   };
 
+  // ─── Vehicle Details Modal (Professional) ─────────────────
   function openVehicleModal(v) {
     const body = $("#vehicleModalBody");
+    const title = $("#vehicleModalTitle");
+    title.textContent = `${v.make || "—"} ${v.model || "—"} — Details`;
+
+    const availability = (v.availabilityStatus || "unknown").toLowerCase();
+    let statusClass = "status-available";
+    if (availability === "unavailable") statusClass = "status-unavailable";
+    else if (availability === "maintenance") statusClass = "status-maintenance";
+
+    // Build image URLs
+    const regDocUrl = v.hasRegDoc
+      ? `${API}/${providerId}/vehicles/${v.id}/regdoc`
+      : null;
+    const vehicleImageUrl = v.hasImages
+      ? `${API}/${providerId}/vehicles/${v.id}/image`
+      : null;
 
     body.innerHTML = `
-      <div style="display:grid;gap:10px;">
-        <div><strong>Make:</strong> ${esc(v.make || "—")}</div>
-        <div><strong>Model:</strong> ${esc(v.model || "—")}</div>
-        <div><strong>Registration No:</strong> ${esc(v.regNo || "—")}</div>
-        <div><strong>Year:</strong> ${esc(v.manufactureYear || "—")}</div>
-        <div><strong>Color:</strong> ${esc(v.color || "—")}</div>
-        <div><strong>Seats:</strong> ${esc(v.seats ?? "—")}</div>
-        <div><strong>Engine Capacity:</strong> ${esc(v.engineCapacity || "—")}</div>
-        <div><strong>Engine Number:</strong> ${esc(v.engineNumber || "—")}</div>
-        <div><strong>Chassis Number:</strong> ${esc(v.chasisNumber || "—")}</div>
-        <div><strong>Mileage:</strong> ${esc(v.milage || "—")}</div>
-        <div><strong>Price per day:</strong> Rs. ${Number(v.pricePerDay || 0).toLocaleString()}</div>
-        <div><strong>Location:</strong> ${esc(v.location || "—")}</div>
-        <div><strong>Fuel Type:</strong> ${esc(v.fuelType || "—")}</div>
-        <div><strong>Transmission:</strong> ${esc(v.transmission || "—")}</div>
-        <div><strong>Availability:</strong> ${esc(v.availabilityStatus || "—")}</div>
-        <div><strong>Description:</strong> ${esc(v.description || "—")}</div>
-        <div><strong>Rental Company:</strong> ${esc(v.rentalCompany || "Not assigned")}</div>
+      <div class="detail-layout">
+        <!-- Vehicle Images Section -->
+        <div class="detail-images-section">
+          ${
+            vehicleImageUrl
+              ? `<div class="detail-main-image">
+                <img src="${vehicleImageUrl}" alt="${esc(v.make)} ${esc(v.model)}"
+                     onclick="openLightbox(this.src)"
+                     onerror="this.parentElement.innerHTML='<div class=\\'no-image-placeholder\\'>No Vehicle Image</div>'" />
+                <span class="click-hint">Click to enlarge</span>
+              </div>`
+              : `<div class="detail-main-image"><div class="no-image-placeholder">No Vehicle Image Available</div></div>`
+          }
+        </div>
+
+        <!-- Vehicle Info Section -->
+        <div class="detail-info-section">
+          <div class="detail-title-row">
+            <div>
+              <h2 class="detail-vehicle-name">${esc(v.make || "")} ${esc(v.model || "")}</h2>
+              <p class="detail-vehicle-year">${esc(v.manufactureYear || "—")} · ${esc(v.color || "—")}</p>
+            </div>
+            <span class="availability-badge ${statusClass}">${esc(availability)}</span>
+          </div>
+
+          <div class="detail-price">
+            <span class="price-amount">Rs. ${Number(v.pricePerDay || 0).toLocaleString()}</span>
+            <span class="price-unit">/ day</span>
+          </div>
+
+          <div class="detail-specs">
+            <div class="detail-spec-group">
+              <h4>Identification</h4>
+              <div class="spec-row"><span>Registration No.</span><strong>${esc(v.regNo || "—")}</strong></div>
+              <div class="spec-row"><span>Engine Number</span><strong>${esc(v.engineNumber || "—")}</strong></div>
+              <div class="spec-row"><span>Chassis Number</span><strong>${esc(v.chasisNumber || "—")}</strong></div>
+            </div>
+
+            <div class="detail-spec-group">
+              <h4>Specifications</h4>
+              <div class="spec-row"><span>Seats</span><strong>${esc(v.seats ?? "—")}</strong></div>
+              <div class="spec-row"><span>Engine Capacity</span><strong>${esc(v.engineCapacity || "—")} cc</strong></div>
+              <div class="spec-row"><span>Fuel Type</span><strong>${esc(v.fuelType || "—")}</strong></div>
+              <div class="spec-row"><span>Transmission</span><strong>${esc(v.transmission || "—")}</strong></div>
+              <div class="spec-row"><span>Mileage</span><strong>${esc(v.milage || "—")}</strong></div>
+            </div>
+
+            <div class="detail-spec-group">
+              <h4>Location &amp; Company</h4>
+              <div class="spec-row"><span>Location</span><strong>${esc(v.location || "—")}</strong></div>
+              <div class="spec-row"><span>Rental Company</span><strong>${esc(v.rentalCompany || "Not assigned")}</strong></div>
+            </div>
+          </div>
+
+          ${
+            v.description
+              ? `
+          <div class="detail-description">
+            <h4>Description</h4>
+            <p>${esc(v.description)}</p>
+          </div>`
+              : ""
+          }
+        </div>
+      </div>
+
+      <!-- Registration Documentation Section -->
+      <div class="detail-documents-section">
+        <h4>Registration Documentation</h4>
+        ${
+          regDocUrl
+            ? `<div class="doc-preview">
+              <img src="${regDocUrl}" alt="Registration Document"
+                   onclick="openLightbox(this.src)"
+                   onerror="this.parentElement.innerHTML='<div class=\\'no-doc-placeholder\\'>Document could not be loaded (may be PDF format)</div>'" />
+              <span class="click-hint">Click to enlarge</span>
+            </div>`
+            : `<div class="no-doc-placeholder">No registration documentation uploaded</div>`
+        }
       </div>
     `;
 
@@ -237,13 +382,146 @@
     $("#vehicleModal").setAttribute("aria-hidden", "true");
   };
 
+  // ─── Image Lightbox ───────────────────────────────────────
+  window.openLightbox = function (src) {
+    const lb = $("#imageLightbox");
+    const img = $("#lightboxImage");
+    img.src = src;
+    lb.classList.add("active");
+  };
+
+  window.closeLightbox = function () {
+    const lb = $("#imageLightbox");
+    lb.classList.remove("active");
+    $("#lightboxImage").src = "";
+  };
+
+  // ─── File Upload Handlers ────────────────────────────────
+  window.handleRegDocSelect = function (input) {
+    if (!input.files || !input.files[0]) return;
+    selectedRegDoc = input.files[0];
+
+    const preview = $("#regDocPreview");
+    const placeholder = $("#regDocPlaceholder");
+    const img = $("#regDocPreviewImg");
+    const filename = $("#regDocFilename");
+
+    filename.textContent = selectedRegDoc.name;
+
+    if (selectedRegDoc.type.startsWith("image/")) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        img.src = e.target.result;
+        img.style.display = "block";
+      };
+      reader.readAsDataURL(selectedRegDoc);
+    } else {
+      // PDF or other
+      img.style.display = "none";
+    }
+
+    placeholder.style.display = "none";
+    preview.style.display = "flex";
+  };
+
+  window.clearRegDoc = function () {
+    selectedRegDoc = null;
+    $("#vf_regDoc").value = "";
+    $("#regDocPreview").style.display = "none";
+    $("#regDocPlaceholder").style.display = "flex";
+    $("#regDocPreviewImg").src = "";
+  };
+
+  window.handleVehicleImgSelect = function (input) {
+    if (!input.files || !input.files.length) return;
+    selectedVehicleImages = Array.from(input.files);
+
+    const previewGrid = $("#vehicleImgPreview");
+    const placeholder = $("#vehicleImgPlaceholder");
+
+    previewGrid.innerHTML = "";
+
+    selectedVehicleImages.forEach((file, idx) => {
+      const item = document.createElement("div");
+      item.className = "upload-preview-item";
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        item.innerHTML = `
+          <img src="${e.target.result}" alt="Vehicle image ${idx + 1}" />
+          <button type="button" class="remove-img-btn" onclick="removeVehicleImg(${idx})">×</button>
+          <span class="img-filename">${esc(file.name)}</span>
+        `;
+      };
+      reader.readAsDataURL(file);
+      previewGrid.appendChild(item);
+    });
+
+    placeholder.style.display = selectedVehicleImages.length ? "none" : "flex";
+
+    // Add "Add More" button
+    if (selectedVehicleImages.length > 0) {
+      const addMore = document.createElement("div");
+      addMore.className = "upload-preview-item add-more-item";
+      addMore.innerHTML = `<span>+ Add More</span>`;
+      addMore.onclick = () => document.getElementById("vf_vehicleImg").click();
+      previewGrid.appendChild(addMore);
+    }
+  };
+
+  window.removeVehicleImg = function (idx) {
+    selectedVehicleImages.splice(idx, 1);
+
+    // Re-render preview
+    const fakeInput = { files: selectedVehicleImages };
+    if (selectedVehicleImages.length === 0) {
+      $("#vehicleImgPreview").innerHTML = "";
+      $("#vehicleImgPlaceholder").style.display = "flex";
+    } else {
+      handleVehicleImgSelect(fakeInput);
+    }
+  };
+
+  // ─── Vehicle Form ─────────────────────────────────────────
+  function setVehicleFormMode(isEdit) {
+    const readonlyInputIds = [
+      "vf_make",
+      "vf_model",
+      "vf_reg",
+      "vf_year",
+      "vf_color",
+      "vf_enginecapacity",
+      "vf_engineno",
+      "vf_chasisno",
+    ];
+    const disabledSelectIds = ["vf_fuel", "vf_trans"];
+
+    readonlyInputIds.forEach((id) => {
+      const el = document.getElementById(id);
+      if (el) el.readOnly = isEdit;
+    });
+    disabledSelectIds.forEach((id) => {
+      const el = document.getElementById(id);
+      if (el) el.disabled = isEdit;
+    });
+  }
+
   function openVehicleForm(vOrNull) {
     const isEdit = !!vOrNull;
     editVehicleId = isEdit ? Number(vOrNull.id) : null;
 
+    // Reset file selections
+    selectedRegDoc = null;
+    selectedVehicleImages = [];
+    clearRegDoc();
+    $("#vehicleImgPreview").innerHTML = "";
+    $("#vehicleImgPlaceholder").style.display = "flex";
+    $("#vf_vehicleImg").value = "";
+
     $("#vehicleFormTitle").textContent = isEdit
       ? "Edit Vehicle"
       : "Add Vehicle";
+    setVehicleFormMode(isEdit);
 
     if (isEdit) {
       $("#vf_make").value = vOrNull.make || "";
@@ -263,9 +541,53 @@
       $("#vf_availability").value = vOrNull.availabilityStatus || "available";
       $("#vf_companyId").value = vOrNull.companyId || "";
       $("#vf_description").value = vOrNull.description || "";
+
+      // Show existing reg doc as read-only in edit mode
+      const regDocZone = $("#regDocZone");
+      if (regDocZone) regDocZone.classList.add("upload-disabled");
+      if (vOrNull.hasRegDoc) {
+        const preview = $("#regDocPreview");
+        const placeholder = $("#regDocPlaceholder");
+        const img = $("#regDocPreviewImg");
+        const filename = $("#regDocFilename");
+        img.src = `${API}/${providerId}/vehicles/${vOrNull.id}/regdoc`;
+        img.style.display = "block";
+        filename.textContent = "Registration document (read-only)";
+        placeholder.style.display = "none";
+        preview.style.display = "flex";
+        // Hide the remove button for reg doc in edit mode
+        const removeBtn = preview.querySelector(".btn-danger");
+        if (removeBtn) removeBtn.style.display = "none";
+      } else {
+        // No existing doc — hide the upload placeholder too
+        $("#regDocPlaceholder").style.display = "none";
+      }
+
+      if (vOrNull.hasImages) {
+        const previewGrid = $("#vehicleImgPreview");
+        const placeholder = $("#vehicleImgPlaceholder");
+        previewGrid.innerHTML = `
+          <div class="upload-preview-item existing-img">
+            <img src="${API}/${providerId}/vehicles/${vOrNull.id}/image" alt="Existing vehicle image"
+                 onerror="this.parentElement.style.display='none'" />
+            <span class="img-filename">Current image</span>
+          </div>
+          <div class="upload-preview-item add-more-item" id="replaceImgBtn">
+            <span>Replace Image</span>
+          </div>
+        `;
+        placeholder.style.display = "none";
+        // Bind replace button
+        $("#replaceImgBtn").onclick = () =>
+          document.getElementById("vf_vehicleImg").click();
+      }
     } else {
       $("#vehicleForm").reset();
+      const regDocZone = $("#regDocZone");
+      if (regDocZone) regDocZone.classList.remove("upload-disabled");
       $("#vf_availability").value = "available";
+      $("#vf_companyId").value =
+        provider?.companyId || provider?.company_id || "";
     }
 
     $("#vehicleFormSubmitBtn").onclick = async () => {
@@ -296,49 +618,67 @@
   async function submitVehicleForm() {
     const companyIdRaw = $("#vf_companyId").value.trim();
 
-    const payload = {
-      make: $("#vf_make").value.trim(),
-      model: $("#vf_model").value.trim(),
-      regNo: $("#vf_reg").value.trim(),
-      manufactureYear: $("#vf_year").value ? Number($("#vf_year").value) : null,
-      color: $("#vf_color").value.trim(),
-      seats: $("#vf_seats").value ? Number($("#vf_seats").value) : null,
-      engineCapacity: $("#vf_enginecapacity").value
-        ? Number($("#vf_enginecapacity").value)
-        : null,
-      engineNumber: $("#vf_engineno").value.trim(),
-      chasisNumber: $("#vf_chasisno").value.trim(),
-      milage: $("#vf_milage").value.trim(),
-      pricePerDay: $("#vf_rate").value ? Number($("#vf_rate").value) : null,
-      location: $("#vf_location").value.trim(),
-      fuelType: $("#vf_fuel").value,
-      transmission: $("#vf_trans").value,
-      availabilityStatus: $("#vf_availability").value,
-      companyId: companyIdRaw ? Number(companyIdRaw) : null,
-      description: $("#vf_description").value.trim(),
-    };
+    // Validate required fields
+    const make = $("#vf_make").value.trim();
+    const model = $("#vf_model").value.trim();
+    const regNo = $("#vf_reg").value.trim();
+    const seats = $("#vf_seats").value ? Number($("#vf_seats").value) : null;
+    const pricePerDay = $("#vf_rate").value
+      ? Number($("#vf_rate").value)
+      : null;
 
     if (
-      !payload.make ||
-      !payload.model ||
-      !payload.regNo ||
-      !Number.isFinite(payload.seats) ||
-      !Number.isFinite(payload.pricePerDay)
+      !make ||
+      !model ||
+      !regNo ||
+      !Number.isFinite(seats) ||
+      !Number.isFinite(pricePerDay)
     ) {
       throw new Error("Please fill all required vehicle fields.");
     }
 
+    // Use FormData for multipart upload
+    const fd = new FormData();
+    fd.append("make", make);
+    fd.append("model", model);
+    fd.append("regNo", regNo);
+    fd.append("manufactureYear", $("#vf_year").value || "");
+    fd.append("color", $("#vf_color").value.trim());
+    fd.append("seats", seats);
+    fd.append("engineCapacity", $("#vf_enginecapacity").value || "0");
+    fd.append("engineNumber", $("#vf_engineno").value.trim());
+    fd.append("chasisNumber", $("#vf_chasisno").value.trim());
+    fd.append("milage", $("#vf_milage").value.trim());
+    fd.append("pricePerDay", pricePerDay);
+    fd.append("location", $("#vf_location").value.trim());
+    fd.append("fuelType", $("#vf_fuel").value);
+    fd.append("transmission", $("#vf_trans").value);
+    fd.append("availabilityStatus", $("#vf_availability").value);
+    fd.append("companyId", companyIdRaw || "");
+    fd.append("description", $("#vf_description").value.trim());
+
+    // Attach files
+    if (selectedRegDoc) {
+      fd.append("registrationDoc", selectedRegDoc);
+    }
+    if (selectedVehicleImages.length > 0) {
+      selectedVehicleImages.forEach((file) => {
+        fd.append("vehicleImages", file);
+      });
+    }
+
     if (!editVehicleId) {
-      await apiJson(`${API}/${providerId}/vehicles`, "POST", payload);
+      await apiMultipart(`${API}/${providerId}/vehicles`, "POST", fd);
     } else {
-      await apiJson(
+      await apiMultipart(
         `${API}/${providerId}/vehicles/${editVehicleId}`,
         "PUT",
-        payload,
+        fd,
       );
     }
   }
 
+  // ─── Ban / Unban ──────────────────────────────────────────
   async function banUser() {
     const status = String(provider?.status || "pending").toLowerCase();
     const isSuspended = status === "suspended";
@@ -357,6 +697,7 @@
     }
   }
 
+  // ─── Event Binding ────────────────────────────────────────
   function bind() {
     $("#backToRentersBtn")?.addEventListener("click", () => {
       window.location.href = "individual-renters.html";
@@ -390,8 +731,16 @@
         }
       }
     });
+
+    // Close lightbox on Escape
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        closeLightbox();
+      }
+    });
   }
 
+  // ─── Init ─────────────────────────────────────────────────
   (async function init() {
     if (!providerId) {
       alert("Missing provider id in URL");

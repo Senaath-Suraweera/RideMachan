@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Rental Company Request - Ride Machan</title>
+
+    <link rel="stylesheet" href="css/styles.css" />
+    <link rel="stylesheet" href="css/sidebar.css" />
+    <link rel="stylesheet" href="css/rental-company-request-view.css" />
+
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div class="container">
+      <main class="main-content">
+        <nav class="topbar">
+          <a class="back-link" href="rental-company-requests.html">
+            ← Back to Requests
+          </a>
+
+          <div class="topbar-actions" id="topbarActions">
+            <button class="btn btn-accept" id="approveRequestBtn" type="button">
+              Approve Request
+            </button>
+            <button class="btn btn-reject" id="rejectRequestBtn" type="button">
+              Reject Request
+            </button>
+          </div>
+        </nav>
+
+        <section id="requestView" class="request-profile-content">
+          <!-- populated by JS -->
+        </section>
+      </main>
+    </div>
+
+    <script src="js/sidebar.js"></script>
+    <script src="js/rental-company-request-view.js" defer></script>
+  </body>
+</html>

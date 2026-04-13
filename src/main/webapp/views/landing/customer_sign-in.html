@@ -1,340 +1,1212 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Customer Sign Up | RideMachan</title>
-    <link rel="stylesheet" href="styles.css" />
+    <title>Customer Registration - Ride Machan</title>
+
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+
     <style>
-      .hidden {
-        display: none;
+      :root {
+        --primary: #3a0ca3;
+        --primary-light: #4361ee;
+        --secondary: #7209b7;
+        --success: #4cc9f0;
+        --danger: #f72585;
+        --warning: #f8961e;
+        --info: #4895ef;
+        --dark: #1a1a2e;
+        --light: #f8f9fa;
+        --border: #e9ecef;
+        --text: #2d3748;
+        --text-light: #718096;
+        --shadow:
+          0 10px 15px -3px rgba(0, 0, 0, 0.1),
+          0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        --shadow-lg:
+          0 20px 25px -5px rgba(0, 0, 0, 0.1),
+          0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        --radius: 10px;
+        --radius-sm: 6px;
+        --transition: all 0.3s ease;
       }
-      body {
-        font-family: "Poppins", sans-serif;
-        background-color: #f7f7f7;
-        color: #333;
+
+      * {
         margin: 0;
         padding: 0;
+        box-sizing: border-box;
+        font-family: "Poppins", sans-serif;
       }
+
+      body {
+        background: linear-gradient(
+          135deg,
+          #0e152b 0%,
+          #1e3a5f 50%,
+          #3b82f6 100%
+        );
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+      }
+
       .container {
-        max-width: 700px;
-        margin: 50px auto;
-        background: #fff;
-        border-radius: 12px;
-        padding: 30px 40px;
-        box-shadow: 0 5px 10px rgba(0, 0, 0, 0.15);
+        background: white;
+        border-radius: var(--radius);
+        box-shadow: var(--shadow-lg);
+        padding: 40px;
+        max-width: 900px;
+        width: 100%;
+        animation: fadeInUp 0.6s ease-out;
+        position: relative;
+        z-index: 3;
       }
-      h2 {
+
+      .header {
         text-align: center;
-        color: #222;
-        margin-bottom: 25px;
+        margin-bottom: 30px;
       }
-      label {
-        display: block;
-        margin: 10px 0 5px;
+
+      .logo {
+        color: var(--primary);
+        font-size: 32px;
+        font-weight: 700;
+        margin-bottom: 10px;
+      }
+
+      .subtitle {
+        color: var(--text-light);
+        font-size: 16px;
+        margin-bottom: 20px;
+      }
+
+      .step-indicator {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 0;
+        margin-bottom: 30px;
+      }
+
+      .step {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .step-circle {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        font-size: 14px;
+        border: 2px solid var(--border);
+        color: var(--text-light);
+        background: #fff;
+        transition: var(--transition);
+      }
+
+      .step.active .step-circle {
+        background: linear-gradient(
+          135deg,
+          var(--primary),
+          var(--primary-light)
+        );
+        color: #fff;
+        border-color: var(--primary);
+      }
+
+      .step.completed .step-circle {
+        background: #10b981;
+        color: #fff;
+        border-color: #10b981;
+      }
+
+      .step-label {
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--text-light);
+        transition: var(--transition);
+      }
+
+      .step.active .step-label {
+        color: var(--primary);
         font-weight: 600;
       }
-      input,
-      select {
+
+      .step.completed .step-label {
+        color: #10b981;
+      }
+
+      .step-line {
+        width: 60px;
+        height: 2px;
+        background: var(--border);
+        margin: 0 12px;
+        transition: var(--transition);
+      }
+
+      .step-line.completed {
+        background: #10b981;
+      }
+
+      .form-section {
+        display: none;
+      }
+
+      .form-section.active {
+        display: block;
+        animation: fadeInUp 0.4s ease-out;
+      }
+
+      .form-row {
+        display: flex;
+        gap: 20px;
+        margin-bottom: 20px;
+      }
+
+      .form-group {
+        flex: 1;
+        margin-bottom: 20px;
+      }
+
+      .form-group.full-width {
         width: 100%;
-        padding: 10px;
-        border-radius: 5px;
-        border: 1px solid #ccc;
-        font-size: 15px;
       }
-      button {
-        background-color: #007bff;
-        color: white;
-        font-size: 16px;
-        border: none;
-        border-radius: 5px;
-        padding: 10px 20px;
+
+      .hidden {
+        display: none !important;
+      }
+
+      label {
+        display: block;
+        margin-bottom: 8px;
+        color: var(--text);
+        font-weight: 500;
+        font-size: 14px;
+      }
+
+      input[type="text"],
+      input[type="email"],
+      input[type="tel"],
+      input[type="password"],
+      select,
+      input[type="file"] {
+        width: 100%;
+        padding: 12px 16px;
+        border: 2px solid var(--border);
+        border-radius: var(--radius-sm);
+        font-size: 14px;
+        font-family: "Poppins", sans-serif;
+        transition: var(--transition);
+        background-color: #fff;
+      }
+
+      input:focus,
+      select:focus {
+        outline: none;
+        border-color: var(--primary-light);
+        box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+      }
+
+      .password-container {
+        position: relative;
+      }
+
+      .password-container input {
+        padding-right: 44px;
+      }
+
+      .password-toggle {
+        position: absolute;
+        right: 14px;
+        top: 50%;
+        transform: translateY(-50%);
         cursor: pointer;
-        margin-top: 15px;
+        color: var(--text-light);
       }
-      button:hover {
-        background-color: #0056b3;
+
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 12px 24px;
+        border-radius: var(--radius);
+        font-weight: 500;
+        cursor: pointer;
+        transition: var(--transition);
+        border: none;
+        outline: none;
+        font-size: 16px;
+        position: relative;
+        overflow: hidden;
+        font-family: "Poppins", sans-serif;
       }
-      button:disabled {
-        background-color: #ccc;
+
+      .btn::after {
+        content: "";
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: -100%;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(255, 255, 255, 0.2),
+          transparent
+        );
+        transition: 0.5s;
+      }
+
+      .btn:hover::after {
+        left: 100%;
+      }
+
+      .btn i {
+        margin-right: 8px;
+        font-size: 16px;
+      }
+
+      .btn-primary {
+        background: linear-gradient(
+          135deg,
+          var(--primary),
+          var(--primary-light)
+        );
+        color: white;
+        box-shadow: 0 3px 6px rgba(0, 0, 0, 0.08);
+        width: 100%;
+      }
+
+      .btn-primary:hover {
+        background: linear-gradient(135deg, var(--secondary), var(--primary));
+        transform: translateY(-2px);
+        box-shadow: 0 6px 15px rgba(14, 21, 43, 0.2);
+      }
+
+      .btn-primary:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+      }
+
+      .btn-outline {
+        border: 2px solid var(--border);
+        color: var(--text);
+        background: transparent;
+        width: 100%;
+      }
+
+      .btn-outline:hover {
+        border-color: var(--primary-light);
+        color: var(--primary);
+      }
+
+      .btn-row {
+        display: flex;
+        gap: 12px;
+        margin-top: 30px;
+      }
+
+      .otp-section {
+        text-align: center;
+        padding: 20px 0;
+      }
+
+      .otp-section p {
+        color: var(--text-light);
+        margin-bottom: 8px;
+        font-size: 14px;
+      }
+
+      .otp-section .email-display {
+        font-weight: 600;
+        color: var(--primary);
+        font-size: 16px;
+        margin-bottom: 24px;
+      }
+
+      .otp-inputs {
+        display: flex;
+        justify-content: center;
+        gap: 12px;
+        margin-bottom: 24px;
+      }
+
+      .otp-inputs input {
+        width: 52px;
+        height: 56px;
+        text-align: center;
+        font-size: 22px;
+        font-weight: 600;
+        border: 2px solid var(--border);
+        border-radius: var(--radius-sm);
+        transition: var(--transition);
+      }
+
+      .otp-inputs input:focus {
+        border-color: var(--primary-light);
+        box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+        outline: none;
+      }
+
+      .resend-row {
+        margin-top: 16px;
+        font-size: 14px;
+        color: var(--text-light);
+      }
+
+      .resend-row a {
+        color: var(--primary);
+        text-decoration: none;
+        font-weight: 500;
+        cursor: pointer;
+      }
+
+      .resend-row a:hover {
+        text-decoration: underline;
+      }
+
+      .resend-row a.disabled {
+        color: var(--text-light);
+        pointer-events: none;
         cursor: not-allowed;
       }
-      .error-message {
-        color: #dc3545;
-        background: #f8d7da;
-        padding: 10px;
-        border-radius: 5px;
-        margin-bottom: 15px;
-        display: none;
+
+      .toast {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 14px 24px;
+        border-radius: var(--radius-sm);
+        color: #fff;
+        font-size: 14px;
+        font-weight: 500;
+        z-index: 9999;
+        opacity: 0;
+        transform: translateY(-10px);
+        transition: all 0.3s ease;
+        max-width: 400px;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
       }
-      .success-message {
-        color: #155724;
-        background: #d4edda;
-        padding: 10px;
-        border-radius: 5px;
-        margin-bottom: 15px;
-        display: none;
+
+      .toast.show {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      .toast.success {
+        background: linear-gradient(135deg, #10b981, #059669);
+      }
+
+      .toast.error {
+        background: linear-gradient(135deg, #ef4444, #dc2626);
+      }
+
+      .toast.info {
+        background: linear-gradient(
+          135deg,
+          var(--primary-light),
+          var(--primary)
+        );
+      }
+
+      .spinner {
+        display: inline-block;
+        width: 18px;
+        height: 18px;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-radius: 50%;
+        border-top-color: #fff;
+        animation: spin 0.7s linear infinite;
+        margin-right: 8px;
+        vertical-align: middle;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      .success-screen {
+        text-align: center;
+        padding: 40px 20px;
+      }
+
+      .success-icon {
+        width: 80px;
+        height: 80px;
+        background: linear-gradient(135deg, #10b981, #059669);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 24px;
+        color: #fff;
+        font-size: 36px;
+      }
+
+      .success-screen h2 {
+        color: var(--dark);
+        margin-bottom: 12px;
+        font-size: 24px;
+      }
+
+      .success-screen p {
+        color: var(--text-light);
+        line-height: 1.7;
+        max-width: 500px;
+        margin: 0 auto 24px;
+      }
+
+      .info-box {
+        background: #f0f4ff;
+        border: 1px solid #c7d2fe;
+        border-radius: var(--radius-sm);
+        padding: 14px 18px;
+        margin-bottom: 20px;
+        font-size: 13px;
+        color: #4338ca;
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+      }
+
+      .info-box i {
+        margin-top: 2px;
+        flex-shrink: 0;
+      }
+
+      .section-title {
+        margin: 10px 0 18px;
+        color: var(--dark);
+        font-size: 18px;
+        font-weight: 600;
+      }
+
+      @keyframes fadeInUp {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @media (max-width: 768px) {
+        .container {
+          padding: 30px 20px;
+          margin: 10px;
+        }
+
+        .form-row {
+          flex-direction: column;
+          gap: 0;
+        }
+
+        .step-label {
+          display: none;
+        }
+
+        .step-line {
+          width: 30px;
+        }
+
+        .otp-inputs input {
+          width: 44px;
+          height: 48px;
+          font-size: 18px;
+        }
+
+        .btn-row {
+          flex-direction: column;
+        }
       }
     </style>
   </head>
-
   <body>
+    <div id="toast" class="toast"></div>
+
     <div class="container">
-      <h2>Customer Sign Up</h2>
+      <div class="header">
+        <div class="logo"><i class="fas fa-car"></i> Ride Machan</div>
+        <h2 class="subtitle">Customer Registration</h2>
+      </div>
 
-      <div id="errorMessage" class="error-message"></div>
-      <div id="successMessage" class="success-message"></div>
-
-      <form id="registrationForm" enctype="multipart/form-data">
-        <label>Username</label>
-        <input
-          type="text"
-          name="username"
-          placeholder="Enter username"
-          required
-        />
-
-        <label>First Name</label>
-        <input
-          type="text"
-          name="firstname"
-          placeholder="Enter first name"
-          required
-        />
-
-        <label>Last Name</label>
-        <input
-          type="text"
-          name="lastname"
-          placeholder="Enter last name"
-          required
-        />
-
-        <label>Email</label>
-        <input type="email" name="email" placeholder="Enter email" required />
-
-        <label>Mobile Number</label>
-        <input
-          type="text"
-          name="mobileNumber"
-          placeholder="Enter mobile number"
-          required
-        />
-
-        <label>Password</label>
-        <input
-          type="password"
-          id="password"
-          name="password"
-          placeholder="Enter password"
-          required
-        />
-
-        <label>Confirm Password</label>
-        <input
-          type="password"
-          id="confirmPassword"
-          placeholder="Re-enter password"
-          required
-        />
-
-        <label>Customer Type</label>
-        <select id="customerType" name="customerType" required>
-          <option value="">-- Select Type --</option>
-          <option value="LOCAL">Local</option>
-          <option value="FOREIGN">Foreign</option>
-        </select>
-
-        <!-- Local Fields -->
-        <div id="localFields" class="hidden">
-          <label>NIC Number</label>
-          <input type="text" name="nicNumber" placeholder="Enter NIC number" />
-
-          <label>Driver's License Number</label>
-          <input
-            type="text"
-            name="driversLicenseNumber"
-            placeholder="Enter driver's license number"
-          />
-
-          <label>NIC Image</label>
-          <input type="file" name="nicImage" accept="image/*" />
-
-          <label>Driver's License Image</label>
-          <input type="file" name="driversLicenseImage" accept="image/*" />
+      <div class="step-indicator">
+        <div class="step active" id="step-ind-1">
+          <span class="step-circle">1</span>
+          <span class="step-label">Customer Info</span>
         </div>
-
-        <!-- Foreign Fields -->
-        <div id="foreignFields" class="hidden">
-          <label>Passport Number</label>
-          <input
-            type="text"
-            name="passportNumber"
-            placeholder="Enter passport number"
-          />
-
-          <label>International Driver's License Number</label>
-          <input
-            type="text"
-            name="internationalDriversLicenseNumber"
-            placeholder="Enter international license number"
-          />
-
-          <label>Driver's License Image</label>
-          <input type="file" name="driversLicenseImage" accept="image/*" />
-
-          <label>Passport Image</label>
-          <input type="file" name="passportImage" accept="image/*" />
+        <div class="step-line" id="step-line-1"></div>
+        <div class="step" id="step-ind-2">
+          <span class="step-circle">2</span>
+          <span class="step-label">Verify Email</span>
         </div>
+        <div class="step-line" id="step-line-2"></div>
+        <div class="step" id="step-ind-3">
+          <span class="step-circle">3</span>
+          <span class="step-label">Done</span>
+        </div>
+      </div>
 
-        <h3 style="margin-top: 20px">Address</h3>
-        <label>Street</label>
-        <input
-          type="text"
-          name="street"
-          placeholder="Street address"
-          required
-        />
+      <!-- STEP 1 -->
+      <div class="form-section active" id="step-1">
+        <form id="registrationForm" enctype="multipart/form-data">
+          <div class="info-box">
+            <i class="fas fa-circle-info"></i>
+            <div>
+              Fill in your details below. After submitting, your OTP
+              verification will happen on this same page.
+            </div>
+          </div>
 
-        <label>City</label>
-        <input type="text" name="city" placeholder="City" required />
+          <div class="form-row">
+            <div class="form-group">
+              <label for="username">Username *</label>
+              <input type="text" id="username" name="username" required />
+            </div>
+            <div class="form-group">
+              <label for="email">Email Address *</label>
+              <input type="email" id="email" name="email" required />
+            </div>
+          </div>
 
-        <label>ZIP Code</label>
-        <input
-          type="text"
-          name="zipCode"
-          placeholder="ZIP / Postal Code"
-          required
-        />
+          <div class="form-row">
+            <div class="form-group">
+              <label for="firstname">First Name *</label>
+              <input type="text" id="firstname" name="firstname" required />
+            </div>
+            <div class="form-group">
+              <label for="lastname">Last Name *</label>
+              <input type="text" id="lastname" name="lastname" required />
+            </div>
+          </div>
 
-        <label>Country</label>
-        <input type="text" name="country" placeholder="Country" required />
+          <div class="form-row">
+            <div class="form-group">
+              <label for="mobileNumber">Mobile Number *</label>
+              <input
+                type="text"
+                id="mobileNumber"
+                name="mobileNumber"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label for="customerType">Customer Type *</label>
+              <select id="customerType" name="customerType" required>
+                <option value="">-- Select Type --</option>
+                <option value="LOCAL">Local</option>
+                <option value="FOREIGN">Foreign</option>
+              </select>
+            </div>
+          </div>
 
-        <button type="submit" id="submitBtn">Register</button>
-      </form>
+          <div id="localFields" class="hidden">
+            <div class="section-title">Local Customer Details</div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="nicNumber">NIC Number *</label>
+                <input type="text" id="nicNumber" name="nicNumber" />
+              </div>
+              <div class="form-group">
+                <label for="driversLicenseNumber"
+                  >Driver's License Number *</label
+                >
+                <input
+                  type="text"
+                  id="driversLicenseNumber"
+                  name="driversLicenseNumber"
+                />
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="nicImage">NIC Image *</label>
+                <input
+                  type="file"
+                  id="nicImage"
+                  name="nicImage"
+                  accept="image/*"
+                />
+              </div>
+              <div class="form-group">
+                <label for="localDriversLicenseImage"
+                  >Driver's License Image *</label
+                >
+                <input
+                  type="file"
+                  id="localDriversLicenseImage"
+                  name="driversLicenseImage"
+                  accept="image/*"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div id="foreignFields" class="hidden">
+            <div class="section-title">Foreign Customer Details</div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="passportNumber">Passport Number *</label>
+                <input type="text" id="passportNumber" name="passportNumber" />
+              </div>
+              <div class="form-group">
+                <label for="internationalDriversLicenseNumber">
+                  International Driver's License Number *
+                </label>
+                <input
+                  type="text"
+                  id="internationalDriversLicenseNumber"
+                  name="internationalDriversLicenseNumber"
+                />
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="foreignDriversLicenseImage"
+                  >Driver's License Image *</label
+                >
+                <input
+                  type="file"
+                  id="foreignDriversLicenseImage"
+                  name="driversLicenseImage"
+                  accept="image/*"
+                />
+              </div>
+              <div class="form-group">
+                <label for="passportImage">Passport Image *</label>
+                <input
+                  type="file"
+                  id="passportImage"
+                  name="passportImage"
+                  accept="image/*"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div class="section-title">Address</div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="street">Street *</label>
+              <input type="text" id="street" name="street" required />
+            </div>
+            <div class="form-group">
+              <label for="city">City *</label>
+              <input type="text" id="city" name="city" required />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="zipCode">ZIP Code *</label>
+              <input type="text" id="zipCode" name="zipCode" required />
+            </div>
+            <div class="form-group">
+              <label for="country">Country *</label>
+              <input type="text" id="country" name="country" required />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="password">Password *</label>
+              <div class="password-container">
+                <input
+                  type="password"
+                  id="password"
+                  name="password"
+                  required
+                  minlength="6"
+                />
+                <i
+                  class="fas fa-eye password-toggle"
+                  onclick="togglePassword('password')"
+                ></i>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="confirmPassword">Confirm Password *</label>
+              <div class="password-container">
+                <input
+                  type="password"
+                  id="confirmPassword"
+                  required
+                  minlength="6"
+                />
+                <i
+                  class="fas fa-eye password-toggle"
+                  onclick="togglePassword('confirmPassword')"
+                ></i>
+              </div>
+            </div>
+          </div>
+
+          <div class="btn-row">
+            <button type="submit" class="btn btn-primary" id="btnSubmit">
+              <i class="fas fa-arrow-right"></i> Continue to Verification
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- STEP 2 -->
+      <div class="form-section" id="step-2">
+        <div class="otp-section">
+          <p>We sent a 6-digit verification code to:</p>
+          <div class="email-display" id="otpEmailDisplay"></div>
+
+          <div class="otp-inputs">
+            <input
+              type="text"
+              maxlength="1"
+              class="otp-input"
+              data-index="0"
+              inputmode="numeric"
+            />
+            <input
+              type="text"
+              maxlength="1"
+              class="otp-input"
+              data-index="1"
+              inputmode="numeric"
+            />
+            <input
+              type="text"
+              maxlength="1"
+              class="otp-input"
+              data-index="2"
+              inputmode="numeric"
+            />
+            <input
+              type="text"
+              maxlength="1"
+              class="otp-input"
+              data-index="3"
+              inputmode="numeric"
+            />
+            <input
+              type="text"
+              maxlength="1"
+              class="otp-input"
+              data-index="4"
+              inputmode="numeric"
+            />
+            <input
+              type="text"
+              maxlength="1"
+              class="otp-input"
+              data-index="5"
+              inputmode="numeric"
+            />
+          </div>
+
+          <div class="btn-row">
+            <button
+              type="button"
+              class="btn btn-outline"
+              onclick="goBackToForm()"
+            >
+              <i class="fas fa-arrow-left"></i> Back
+            </button>
+            <button
+              type="button"
+              class="btn btn-primary"
+              id="btnVerify"
+              onclick="verifyOTP()"
+            >
+              <i class="fas fa-check"></i> Verify & Submit
+            </button>
+          </div>
+
+          <div class="resend-row">
+            Didn't receive the code?
+            <a id="resendLink" onclick="resendOTP()">Resend OTP</a>
+            <span id="resendTimer"></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 3 -->
+      <div class="form-section" id="step-3">
+        <div class="success-screen">
+          <div class="success-icon">
+            <i class="fas fa-check"></i>
+          </div>
+          <h2>Registration Successful!</h2>
+          <p>
+            Your customer account has been created successfully. You can now
+            sign in and continue using RideMachan.
+          </p>
+          <a
+            href="/views/landing/index.html"
+            class="btn btn-primary"
+            style="max-width: 300px; margin: 0 auto"
+          >
+            <i class="fas fa-home"></i> Back to Home
+          </a>
+        </div>
+      </div>
     </div>
 
     <script>
-      // Show/hide fields based on customer type
-      const customerType = document.getElementById("customerType");
-      const localFields = document.getElementById("localFields");
-      const foreignFields = document.getElementById("foreignFields");
+      const BASE_URL = "http://localhost:8080";
+      let resendCooldown = 0;
+      let resendInterval = null;
 
-      customerType.addEventListener("change", () => {
-        const type = customerType.value;
+      function showToast(message, type = "info") {
+        const toast = document.getElementById("toast");
+        toast.textContent = message;
+        toast.className = "toast " + type;
+        toast.classList.add("show");
+        setTimeout(() => toast.classList.remove("show"), 4000);
+      }
+
+      function togglePassword(fieldId) {
+        const field = document.getElementById(fieldId);
+        const icon = field.nextElementSibling;
+
+        if (field.type === "password") {
+          field.type = "text";
+          icon.classList.replace("fa-eye", "fa-eye-slash");
+        } else {
+          field.type = "password";
+          icon.classList.replace("fa-eye-slash", "fa-eye");
+        }
+      }
+
+      function setStep(stepNumber) {
+        document
+          .querySelectorAll(".form-section")
+          .forEach((section) => section.classList.remove("active"));
+
+        document.getElementById("step-" + stepNumber).classList.add("active");
+
+        for (let i = 1; i <= 3; i++) {
+          const step = document.getElementById("step-ind-" + i);
+          step.classList.remove("active", "completed");
+
+          if (i < stepNumber) {
+            step.classList.add("completed");
+          } else if (i === stepNumber) {
+            step.classList.add("active");
+          }
+        }
+
+        document
+          .querySelectorAll(".step-line")
+          .forEach((line) => line.classList.remove("completed"));
+
+        for (let i = 1; i < stepNumber; i++) {
+          const line = document.getElementById("step-line-" + i);
+          if (line) line.classList.add("completed");
+        }
+      }
+
+      function updateCustomerTypeFields() {
+        const type = document.getElementById("customerType").value;
+        const localFields = document.getElementById("localFields");
+        const foreignFields = document.getElementById("foreignFields");
+
+        const nicNumber = document.getElementById("nicNumber");
+        const driversLicenseNumber = document.getElementById(
+          "driversLicenseNumber",
+        );
+        const nicImage = document.getElementById("nicImage");
+        const localDriversLicenseImage = document.getElementById(
+          "localDriversLicenseImage",
+        );
+
+        const passportNumber = document.getElementById("passportNumber");
+        const internationalDriversLicenseNumber = document.getElementById(
+          "internationalDriversLicenseNumber",
+        );
+        const foreignDriversLicenseImage = document.getElementById(
+          "foreignDriversLicenseImage",
+        );
+        const passportImage = document.getElementById("passportImage");
+
         if (type === "LOCAL") {
           localFields.classList.remove("hidden");
           foreignFields.classList.add("hidden");
-          // Make local fields required
-          document.querySelector('input[name="nicNumber"]').required = true;
-          document.querySelector(
-            'input[name="driversLicenseNumber"]'
-          ).required = true;
-          document.querySelector('input[name="nicImage"]').required = true;
-          document.querySelectorAll(
-            '#localFields input[type="file"]'
-          )[1].required = true;
-          // Remove foreign field requirements
-          document.querySelector(
-            'input[name="passportNumber"]'
-          ).required = false;
-          document.querySelector(
-            'input[name="internationalDriversLicenseNumber"]'
-          ).required = false;
-          document
-            .querySelectorAll('#foreignFields input[type="file"]')
-            .forEach((f) => (f.required = false));
+
+          nicNumber.required = true;
+          driversLicenseNumber.required = true;
+          nicImage.required = true;
+          localDriversLicenseImage.required = true;
+
+          passportNumber.required = false;
+          internationalDriversLicenseNumber.required = false;
+          foreignDriversLicenseImage.required = false;
+          passportImage.required = false;
         } else if (type === "FOREIGN") {
           foreignFields.classList.remove("hidden");
           localFields.classList.add("hidden");
-          // Make foreign fields required
-          document.querySelector(
-            'input[name="passportNumber"]'
-          ).required = true;
-          document.querySelector(
-            'input[name="internationalDriversLicenseNumber"]'
-          ).required = true;
-          document
-            .querySelectorAll('#foreignFields input[type="file"]')
-            .forEach((f) => (f.required = true));
-          // Remove local field requirements
-          document.querySelector('input[name="nicNumber"]').required = false;
-          document.querySelector(
-            'input[name="driversLicenseNumber"]'
-          ).required = false;
-          document
-            .querySelectorAll('#localFields input[type="file"]')
-            .forEach((f) => (f.required = false));
+
+          passportNumber.required = true;
+          internationalDriversLicenseNumber.required = true;
+          foreignDriversLicenseImage.required = true;
+          passportImage.required = true;
+
+          nicNumber.required = false;
+          driversLicenseNumber.required = false;
+          nicImage.required = false;
+          localDriversLicenseImage.required = false;
         } else {
           localFields.classList.add("hidden");
           foreignFields.classList.add("hidden");
-        }
-      });
 
-      // Handle form submission
+          nicNumber.required = false;
+          driversLicenseNumber.required = false;
+          nicImage.required = false;
+          localDriversLicenseImage.required = false;
+
+          passportNumber.required = false;
+          internationalDriversLicenseNumber.required = false;
+          foreignDriversLicenseImage.required = false;
+          passportImage.required = false;
+        }
+      }
+
+      function setupOTPInputs() {
+        const inputs = document.querySelectorAll(".otp-input");
+
+        inputs.forEach((input, index) => {
+          input.addEventListener("input", (e) => {
+            e.target.value = e.target.value.replace(/[^0-9]/g, "");
+            if (e.target.value && index < inputs.length - 1) {
+              inputs[index + 1].focus();
+            }
+          });
+
+          input.addEventListener("keydown", (e) => {
+            if (e.key === "Backspace" && !e.target.value && index > 0) {
+              inputs[index - 1].focus();
+            }
+          });
+
+          input.addEventListener("paste", (e) => {
+            e.preventDefault();
+            const pasted = (e.clipboardData || window.clipboardData)
+              .getData("text")
+              .replace(/\D/g, "")
+              .slice(0, 6);
+
+            pasted.split("").forEach((char, i) => {
+              if (inputs[i]) inputs[i].value = char;
+            });
+
+            const nextIndex = Math.min(pasted.length, 5);
+            inputs[nextIndex].focus();
+          });
+        });
+      }
+
+      function startResendCooldown() {
+        resendCooldown = 60;
+        const link = document.getElementById("resendLink");
+        const timer = document.getElementById("resendTimer");
+
+        link.classList.add("disabled");
+        timer.textContent = " (60s)";
+
+        if (resendInterval) clearInterval(resendInterval);
+
+        resendInterval = setInterval(() => {
+          resendCooldown--;
+          timer.textContent = " (" + resendCooldown + "s)";
+          if (resendCooldown <= 0) {
+            clearInterval(resendInterval);
+            timer.textContent = "";
+            link.classList.remove("disabled");
+          }
+        }, 1000);
+      }
+
+      async function verifyOTP() {
+        const inputs = document.querySelectorAll(".otp-input");
+        let code = "";
+        inputs.forEach((inp) => (code += inp.value));
+
+        if (code.length !== 6) {
+          showToast("Please enter the full 6-digit code.", "error");
+          return;
+        }
+
+        const btn = document.getElementById("btnVerify");
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner"></span> Verifying...';
+
+        try {
+          const verifyResp = await fetch(BASE_URL + "/code", {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: "code=" + encodeURIComponent(code),
+            credentials: "include",
+          });
+
+          const verifyResult = await verifyResp.json();
+
+          if (verifyResult.status !== "success") {
+            showToast(verifyResult.message || "Invalid OTP", "error");
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-check"></i> Verify & Submit';
+            return;
+          }
+
+          setStep(3);
+          showToast("Customer account created successfully!", "success");
+        } catch (err) {
+          console.error(err);
+          showToast("Network error. Please try again.", "error");
+          btn.disabled = false;
+          btn.innerHTML = '<i class="fas fa-check"></i> Verify & Submit';
+        }
+      }
+
+      async function resendOTP() {
+        if (resendCooldown > 0) return;
+
+        try {
+          const resp = await fetch(BASE_URL + "/verify", {
+            method: "POST",
+            credentials: "include",
+          });
+
+          const result = await resp.json();
+
+          if (result.status === "success") {
+            showToast("New verification code sent!", "success");
+            startResendCooldown();
+            document
+              .querySelectorAll(".otp-input")
+              .forEach((inp) => (inp.value = ""));
+            document.querySelector(".otp-input").focus();
+          } else {
+            showToast(result.message || "Failed to resend OTP", "error");
+          }
+        } catch (err) {
+          console.error(err);
+          showToast("Network error. Please try again.", "error");
+        }
+      }
+
+      function goBackToForm() {
+        setStep(1);
+        if (resendInterval) clearInterval(resendInterval);
+      }
+
+      document
+        .getElementById("customerType")
+        .addEventListener("change", updateCustomerTypeFields);
+
       document
         .getElementById("registrationForm")
-        .addEventListener("submit", async (e) => {
+        .addEventListener("submit", async function (e) {
           e.preventDefault();
-
-          const errorMessage = document.getElementById("errorMessage");
-          const successMessage = document.getElementById("successMessage");
-          const submitBtn = document.getElementById("submitBtn");
-
-          // Hide previous messages
-          errorMessage.style.display = "none";
-          successMessage.style.display = "none";
 
           const password = document.getElementById("password").value;
           const confirmPassword =
             document.getElementById("confirmPassword").value;
 
           if (password !== confirmPassword) {
-            errorMessage.textContent = "Passwords do not match!";
-            errorMessage.style.display = "block";
+            showToast("Passwords do not match!", "error");
             return;
           }
 
-          const formData = new FormData(e.target);
+          if (password.length < 6) {
+            showToast("Password must be at least 6 characters.", "error");
+            return;
+          }
 
-          // Disable submit button
-          submitBtn.disabled = true;
-          submitBtn.textContent = "Registering...";
+          const customerType = document.getElementById("customerType").value;
+          if (!customerType) {
+            showToast("Please select a customer type.", "error");
+            return;
+          }
+
+          const btn = document.getElementById("btnSubmit");
+          btn.disabled = true;
+          btn.innerHTML = '<span class="spinner"></span> Submitting...';
 
           try {
-            const response = await fetch("/customer/signup", {
+            const formData = new FormData(this);
+
+            const signupResp = await fetch(BASE_URL + "/customer/signup", {
               method: "POST",
               body: formData,
-              credentials: "include", // Important for session management
+              credentials: "include",
             });
 
-            const result = await response.json();
+            const signupResult = await signupResp.json();
 
-            if (result.status === "success") {
-              successMessage.textContent =
-                "Registration successful! Redirecting to OTP verification...";
-              successMessage.style.display = "block";
-
-              // Redirect to OTP page after 1 second
-              setTimeout(() => {
-                window.location.href = "otp.html";
-              }, 1000);
-            } else {
-              errorMessage.textContent =
-                "Signup failed: " + (result.message || "Unknown error");
-              errorMessage.style.display = "block";
-              submitBtn.disabled = false;
-              submitBtn.textContent = "Register";
+            if (signupResult.status !== "success") {
+              showToast(signupResult.message || "Signup failed", "error");
+              btn.disabled = false;
+              btn.innerHTML =
+                '<i class="fas fa-arrow-right"></i> Continue to Verification';
+              return;
             }
-          } catch (error) {
-            console.error(error);
-            errorMessage.textContent =
-              "Server connection failed. Please try again.";
-            errorMessage.style.display = "block";
-            submitBtn.disabled = false;
-            submitBtn.textContent = "Register";
+
+            const otpResp = await fetch(BASE_URL + "/verify", {
+              method: "POST",
+              credentials: "include",
+            });
+
+            const otpResult = await otpResp.json();
+
+            if (otpResult.status !== "success") {
+              showToast(otpResult.message || "Failed to send OTP", "error");
+              btn.disabled = false;
+              btn.innerHTML =
+                '<i class="fas fa-arrow-right"></i> Continue to Verification';
+              return;
+            }
+
+            document.getElementById("otpEmailDisplay").textContent =
+              document.getElementById("email").value;
+
+            setStep(2);
+            startResendCooldown();
+            showToast("Verification code sent to your email!", "success");
+            document.querySelector(".otp-input").focus();
+          } catch (err) {
+            console.error(err);
+            showToast("Network error. Please try again.", "error");
+          } finally {
+            btn.disabled = false;
+            btn.innerHTML =
+              '<i class="fas fa-arrow-right"></i> Continue to Verification';
           }
         });
+
+      setupOTPInputs();
+      updateCustomerTypeFields();
     </script>
   </body>
 </html>

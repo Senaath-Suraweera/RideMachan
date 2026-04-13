@@ -83,8 +83,8 @@
 .stat-card.bookings::before {
   background: linear-gradient(
     to bottom,
-    var(--info, #4895ef),
-    var(--success, #4cc9f0)
+    var(--secondary, #7209b7),
+    var(--primary-light, #4361ee)
   );
 }
 
@@ -108,6 +108,12 @@
   color: white;
   box-shadow: 0 6px 10px rgba(0, 0, 0, 0.1);
   transition: var(--transition, all 0.3s ease);
+  flex-shrink: 0;
+}
+
+.stat-icon i {
+  font-size: 22px;
+  line-height: 1;
 }
 
 .stat-card:hover .stat-icon {
@@ -123,7 +129,11 @@
 }
 
 .stat-card.bookings .stat-icon {
-  background: linear-gradient(135deg, var(--info, #4895ef), #4cc9f0);
+  background: linear-gradient(
+    135deg,
+    var(--secondary, #7209b7),
+    var(--primary-light, #4361ee)
+  );
 }
 
 .stat-content {
@@ -138,8 +148,12 @@
   transition: var(--transition, all 0.3s ease);
 }
 
-.stat-card:hover .stat-value {
+.stat-card.income:hover .stat-value {
   color: var(--primary, #3a0ca3);
+}
+
+.stat-card.bookings:hover .stat-value {
+  color: var(--secondary, #7209b7);
 }
 
 .stat-label {
@@ -158,7 +172,7 @@
 }
 
 .stat-change.positive {
-  color: var(--success, #10b981);
+  color: var(--primary-light, #4361ee);
 }
 
 .stat-change.negative {

@@ -83,4 +83,24 @@ public class VehicleProviderDAO {
         }
         return null;
     }
+
+    public static boolean updatePassword(int providerId, String newPassword) {
+        String sql = "UPDATE VehicleProvider SET hashedpassword = ?, salt = ? WHERE providerid = ?";
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            String newSalt = PasswordServices.generateSalt();
+            String newHash = PasswordServices.hashPassword(newPassword, newSalt);
+
+            ps.setString(1, newHash);
+            ps.setString(2, newSalt);
+            ps.setInt(3, providerId);
+
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
 }

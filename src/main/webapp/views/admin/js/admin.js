@@ -1,9 +1,8 @@
-// Admins Manager - with validation and email uniqueness check
+// Admins Manager - direct signup without OTP
 class AdminsManager {
   constructor() {
     this.admins = [];
     this.filteredAdmins = [];
-    this.tempSignupData = null;
     this.emailCheckTimeout = null;
     this.init();
   }
@@ -21,14 +20,12 @@ class AdminsManager {
         this.registerAdmin();
       });
 
-      // Live validation on input fields
       const fields = regForm.querySelectorAll(".form-control");
       fields.forEach((field) => {
         field.addEventListener("input", () => this.validateFieldLive(field));
         field.addEventListener("blur", () => this.validateFieldLive(field));
       });
 
-      // Async email check with debounce
       const emailField = regForm.querySelector('[name="email"]');
       if (emailField) {
         emailField.addEventListener("input", () => {
@@ -41,17 +38,14 @@ class AdminsManager {
     }
   }
 
-  // ---------- Live Field Validation ----------
   validateFieldLive(field) {
     const name = field.name;
     const value = field.value.trim();
     const group = field.closest(".form-group");
     if (!group) return;
 
-    // Clear previous state
     this.clearFieldState(group, field);
 
-    // Don't validate empty on live (only on submit)
     if (value.length === 0) return;
 
     switch (name) {
@@ -66,7 +60,6 @@ class AdminsManager {
         break;
       case "password":
         this.validatePassword(value, group, field);
-        // Also revalidate confirm password if it has a value
         const confirmField = document.querySelector(
           '#registerAdminForm [name="confirmPassword"]',
         );
@@ -107,12 +100,10 @@ class AdminsManager {
       this.setFieldError(group, field, "Please enter a valid email address");
       return false;
     }
-    // Don't set success yet — email availability check will handle it
     return true;
   }
 
   validatePhone(value, group, field) {
-    // Remove spaces and dashes for validation
     const cleaned = value.replace(/[\s\-()]/g, "");
     if (!/^\+?\d{7,15}$/.test(cleaned)) {
       this.setFieldError(
@@ -135,7 +126,6 @@ class AdminsManager {
       special: /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(value),
     };
 
-    // Update strength meter if present
     this.updatePasswordStrength(group, checks);
 
     const passed = Object.values(checks).filter(Boolean).length;
@@ -172,16 +162,14 @@ class AdminsManager {
     return true;
   }
 
-  // ---------- Async Email Check ----------
   async checkEmailAvailability(field) {
     const value = field.value.trim();
     const group = field.closest(".form-group");
     if (!group) return;
 
     const emailRegex = /^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/;
-    if (!emailRegex.test(value)) return; // Skip if invalid format
+    if (!emailRegex.test(value)) return;
 
-    // Show checking state
     this.setFieldChecking(group, field, "Checking availability...");
 
     try {
@@ -192,7 +180,6 @@ class AdminsManager {
       });
       const result = await res.json();
 
-      // Only update if the field value hasn't changed during the request
       if (field.value.trim() === value) {
         if (result.exists) {
           this.setFieldError(
@@ -206,12 +193,10 @@ class AdminsManager {
       }
     } catch (err) {
       console.error("Email check failed:", err);
-      // Don't show error for network issues — will be caught on submit
       this.clearFieldState(group, field);
     }
   }
 
-  // ---------- Field State Management ----------
   setFieldError(group, field, message) {
     group.classList.remove("field-success", "field-checking");
     group.classList.add("field-error");
@@ -277,7 +262,6 @@ class AdminsManager {
       meter = document.createElement("div");
       meter.className = "password-strength";
       meter.innerHTML = `<div class="strength-bar"><div class="strength-fill"></div></div><span class="strength-label"></span>`;
-      // Insert after the input
       const input = group.querySelector("input");
       if (input) input.after(meter);
     }
@@ -304,7 +288,6 @@ class AdminsManager {
     }
   }
 
-  // ---------- Full Form Validation (on submit) ----------
   validateForm() {
     const form = document.getElementById("registerAdminForm");
     const data = Object.fromEntries(new FormData(form).entries());
@@ -312,7 +295,6 @@ class AdminsManager {
 
     this.clearAllErrors("#registerAdminForm");
 
-    // Full Name
     const nameField = form.querySelector('[name="fullName"]');
     const nameGroup = nameField?.closest(".form-group");
     if (!data.fullName || data.fullName.trim().length === 0) {
@@ -322,7 +304,6 @@ class AdminsManager {
       isValid = false;
     }
 
-    // Email
     const emailField = form.querySelector('[name="email"]');
     const emailGroup = emailField?.closest(".form-group");
     if (!data.email || data.email.trim().length === 0) {
@@ -331,11 +312,9 @@ class AdminsManager {
     } else if (!this.validateEmail(data.email.trim(), emailGroup, emailField)) {
       isValid = false;
     } else if (emailGroup.classList.contains("field-error")) {
-      // Email exists error is already set from async check
       isValid = false;
     }
 
-    // Phone
     const phoneField = form.querySelector('[name="phone"]');
     const phoneGroup = phoneField?.closest(".form-group");
     if (!data.phone || data.phone.trim().length === 0) {
@@ -345,7 +324,6 @@ class AdminsManager {
       isValid = false;
     }
 
-    // Password
     const pwField = form.querySelector('[name="password"]');
     const pwGroup = pwField?.closest(".form-group");
     if (!data.password || data.password.trim().length === 0) {
@@ -355,7 +333,6 @@ class AdminsManager {
       isValid = false;
     }
 
-    // Confirm Password
     const cpField = form.querySelector('[name="confirmPassword"]');
     const cpGroup = cpField?.closest(".form-group");
     if (!data.confirmPassword || data.confirmPassword.trim().length === 0) {
@@ -388,7 +365,6 @@ class AdminsManager {
       );
   }
 
-  // ---------- Load & Render Admins ----------
   async loadAdmins() {
     try {
       const res = await fetch("/admin/list");
@@ -417,9 +393,9 @@ class AdminsManager {
       return matchName && matchId;
     });
 
-    // Sort
     const sortOrder =
       document.getElementById("sortOrder")?.value || "ascending";
+
     switch (sortOrder) {
       case "ascending":
         this.filteredAdmins.sort((a, b) =>
@@ -484,19 +460,19 @@ class AdminsManager {
       .slice(0, 2);
 
     card.innerHTML = `
-    <div class="admin-info">
-      <div class="admin-id" title="Admin #${admin.adminId}">${initials}</div>
-      <div class="admin-details">
-        <h3 class="admin-name">${this.escape(admin.username)}</h3>
-        <p class="admin-permission">${this.escape(admin.email)}</p>
-        <p>${this.escape(admin.phoneNumber)}</p>
+      <div class="admin-info">
+        <div class="admin-id" title="Admin #${admin.adminId}">${initials}</div>
+        <div class="admin-details">
+          <h3 class="admin-name">${this.escape(admin.username)}</h3>
+          <p class="admin-permission">${this.escape(admin.email)}</p>
+          <p>${this.escape(admin.phoneNumber)}</p>
+        </div>
       </div>
-    </div>
-    <div class="admin-actions">
-      <button class="btn btn-secondary btn-sm" data-action="edit">Edit</button>
-      <button class="btn btn-danger btn-sm" data-action="delete">Delete</button>
-    </div>
-  `;
+      <div class="admin-actions">
+        <button class="btn btn-secondary btn-sm" data-action="edit">Edit</button>
+        <button class="btn btn-danger btn-sm" data-action="delete">Delete</button>
+      </div>
+    `;
 
     const editBtn = card.querySelector('[data-action="edit"]');
     if (editBtn) {
@@ -569,15 +545,12 @@ class AdminsManager {
     if (title) title.textContent = `Admins (${this.filteredAdmins.length})`;
   }
 
-  // ---------- Modals ----------
   openRegisterAdminModal() {
     const modal = document.getElementById("registerAdminModal");
     modal.classList.add("show");
     document.body.style.overflow = "hidden";
-    // Reset form and validation states
     this.clearAllErrors("#registerAdminForm");
     document.getElementById("registerAdminForm")?.reset();
-    // Remove any lingering password strength meters
     document
       .querySelectorAll("#registerAdminForm .password-strength")
       .forEach((m) => m.remove());
@@ -606,22 +579,7 @@ class AdminsManager {
     document.body.style.overflow = "";
   }
 
-  openOtpModal() {
-    const modal = document.getElementById("otpModal");
-    modal.classList.add("show");
-    document.body.style.overflow = "hidden";
-  }
-
-  closeOtpModal() {
-    const modal = document.getElementById("otpModal");
-    modal.classList.remove("show");
-    document.body.style.overflow = "";
-    document.getElementById("otpInput").value = "";
-  }
-
-  // ---------- Register Admin ----------
   async registerAdmin() {
-    // Run full validation
     if (!this.validateForm()) {
       this.toast("Please fix the errors in the form", "error");
       return;
@@ -637,7 +595,6 @@ class AdminsManager {
       password: data.password.trim(),
     };
 
-    // Final server-side email check before submitting
     try {
       const emailCheck = await fetch("/admin/check-email", {
         method: "POST",
@@ -645,6 +602,7 @@ class AdminsManager {
         body: JSON.stringify({ email: payload.email }),
       });
       const emailResult = await emailCheck.json();
+
       if (emailResult.exists) {
         const emailField = form.querySelector('[name="email"]');
         const emailGroup = emailField?.closest(".form-group");
@@ -662,7 +620,6 @@ class AdminsManager {
       return;
     }
 
-    // Disable submit button during request
     const submitBtn = document.querySelector(
       "#registerAdminModal .modal-footer .btn-primary",
     );
@@ -672,8 +629,7 @@ class AdminsManager {
     }
 
     try {
-      // STEP 1: SIGNUP REQUEST
-      const signupRes = await fetch("/admin/signup", {
+      const signupRes = await fetch("/admin/direct-signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
@@ -682,26 +638,9 @@ class AdminsManager {
       const signupResult = await signupRes.json();
 
       if (signupResult.status === "success") {
-        this.tempSignupData = payload;
         this.closeRegisterAdminModal();
-
-        // STEP 2: Request OTP
-        const otpRes = await fetch("/verify", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-        });
-
-        const otpResult = await otpRes.json();
-
-        if (otpResult.status === "success") {
-          this.openOtpModal();
-          this.toast("OTP sent to email. Please check your inbox.", "success");
-        } else {
-          this.toast(
-            "Failed to send OTP: " + (otpResult.message || "Unknown error"),
-            "error",
-          );
-        }
+        this.toast("Admin registered successfully!", "success");
+        await this.loadAdmins();
       } else {
         this.toast(
           "Error: " + (signupResult.message || "Signup failed"),
@@ -709,7 +648,7 @@ class AdminsManager {
         );
       }
     } catch (err) {
-      console.error("Registration process failed:", err);
+      console.error("Registration failed:", err);
       this.toast("Server error during registration", "error");
     } finally {
       if (submitBtn) {
@@ -719,7 +658,6 @@ class AdminsManager {
     }
   }
 
-  // ---------- Toast ----------
   toast(message, type = "info") {
     const colors = {
       success: { bg: "#059669", icon: "✓" },
@@ -733,7 +671,6 @@ class AdminsManager {
     el.innerHTML = `<span class="toast-icon">${cfg.icon}</span><span>${this.escape(message)}</span>`;
     document.body.appendChild(el);
 
-    // Trigger reflow for animation
     requestAnimationFrame(() => el.classList.add("toast-show"));
 
     setTimeout(() => {
@@ -753,7 +690,6 @@ class AdminsManager {
   }
 }
 
-// ---------- Global helpers ----------
 window.addEventListener("DOMContentLoaded", () => {
   window.adminsManager = new AdminsManager();
 });
@@ -776,55 +712,4 @@ function closeEditAdminModal() {
 
 function updateAdmin() {
   window.adminsManager?.updateAdmin();
-}
-
-function openOtpModal() {
-  window.adminsManager?.openOtpModal();
-}
-
-function closeOtpModal() {
-  window.adminsManager?.closeOtpModal();
-}
-
-// --- Submit OTP to /code ---
-async function submitOtpCode() {
-  const otp = document.getElementById("otpInput").value.trim();
-  if (otp.length === 0) {
-    window.adminsManager.toast("Please enter the OTP", "error");
-    return;
-  }
-
-  if (!/^\d{4,6}$/.test(otp)) {
-    window.adminsManager.toast("OTP must be 4-6 digits", "error");
-    return;
-  }
-
-  try {
-    const res = await fetch("/code", {
-      method: "POST",
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: `code=${encodeURIComponent(otp)}`,
-    });
-
-    const result = await res.json();
-
-    if (result.status === "success") {
-      closeOtpModal();
-      window.adminsManager.toast(
-        "Admin verified & registered successfully!",
-        "success",
-      );
-      setTimeout(async () => {
-        await window.adminsManager.loadAdmins();
-      }, 1000);
-    } else {
-      window.adminsManager.toast(
-        "Invalid OTP: " + (result.message || "Please try again"),
-        "error",
-      );
-    }
-  } catch (err) {
-    console.error("OTP verify error:", err);
-    window.adminsManager.toast("Server error during verification", "error");
-  }
 }

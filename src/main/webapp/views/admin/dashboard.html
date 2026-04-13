@@ -24,18 +24,66 @@
   <body>
     <div class="container">
       <main class="main-content">
-        <header class="page-header">
-          <div class="header-content">
-            <h1 class="page-title">Admin Dashboard</h1>
-            <div class="header-actions">
-              <div class="notification-icon">🔔</div>
-              <div class="user-profile">
-                <span class="user-avatar">👤</span>
-                <span class="user-name">Admin User</span>
+        <!-- ====== Header (matches Provider Dashboard) ====== -->
+        <div class="page-header">
+          <div>
+            <h1>Admin Dashboard</h1>
+            <span class="last-updated">Last updated: —</span>
+          </div>
+
+          <div class="header-actions">
+            <!-- Notifications Bell -->
+            <div class="notification" id="notifBtn" title="Notifications">
+              <i class="fas fa-bell"></i>
+              <div class="badge" id="notifBadge" style="display: none">0</div>
+            </div>
+
+            <!-- Messages -->
+            <div
+              class="notification"
+              onclick="window.location.href = 'messages.html'"
+              title="Messages"
+            >
+              <i class="fas fa-envelope"></i>
+              <div class="badge" id="messageBadge">0</div>
+            </div>
+
+            <!-- User Profile -->
+            <div class="user-profile" id="profileToggle">
+              <div class="profile-img" id="profileInitial">A</div>
+              <div class="user-info">
+                <div class="user-name" id="userName">Admin</div>
+              </div>
+              <div class="profile-dropdown" id="profileDropdown">
+                <a href="admin-profile.html"
+                  ><i class="fas fa-user"></i> My Profile</a
+                >
+                <hr />
+                <a href="#" id="logoutLink"
+                  ><i class="fas fa-sign-out-alt"></i> Logout</a
+                >
               </div>
             </div>
           </div>
-        </header>
+        </div>
+
+        <!-- Notifications Popup -->
+        <div class="notif-popover" id="notifPopover" style="display: none">
+          <div class="notif-header">
+            <h3>Notifications</h3>
+            <button class="notif-close-btn" id="notifCloseBtn" title="Close">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+          <div class="notif-list" id="notifList">
+            <!-- filled by JS -->
+          </div>
+          <div class="notif-footer">
+            <button class="btn btn-sm btn-outline" id="markAllSeenBtn">
+              Mark all as seen
+            </button>
+          </div>
+        </div>
 
         <!-- Stats Overview -->
         <section class="stats-section">
@@ -93,7 +141,6 @@
               <h3 class="card-title">Top Customers</h3>
             </div>
             <div class="top-list">
-              <!-- Will be populated by JavaScript -->
               <div style="padding: 20px; text-align: center; color: #999">
                 Loading...
               </div>
@@ -106,7 +153,6 @@
               <h3 class="card-title">Top Renters</h3>
             </div>
             <div class="top-list">
-              <!-- Will be populated by JavaScript -->
               <div style="padding: 20px; text-align: center; color: #999">
                 Loading...
               </div>
@@ -130,9 +176,6 @@
 
     <script src="js/sidebar.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="js/dashboard.js?v=2"></script>
-
-    <!-- Cache busting: Add ?v=2 to force reload of new JavaScript -->
-    <script src="js/dashboard.js?v=2"></script>
+    <script src="js/dashboard.js?v=3"></script>
   </body>
 </html>

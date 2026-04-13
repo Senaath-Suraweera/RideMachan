@@ -579,3 +579,27 @@ textarea.form-control {
     height: 60px;
   }
 }
+
+/* === Font Awesome Icon Styling === */
+
+.company-avatar i {
+  color: #fff;
+  font-size: 22px;
+}
+
+.meta-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.meta-icon {
+  color: var(--primary, #3a0ca3);
+  font-size: 13px;
+  min-width: 14px;
+}
+
+/* Hover effect for icons */
+.company-card:hover .meta-icon {
+  color: var(--primary-light, #4361ee);
+}

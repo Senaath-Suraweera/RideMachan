@@ -789,4 +789,77 @@ ALTER TABLE maintenanceJobs
 ALTER TABLE maintenanceJobs
     ADD COLUMN type ENUM('Oil Change', 'Brake Services', 'Tire Services',  'Other Services') NOT NULL DEFAULT 'Other Services';
 
+-- ============================================================
+-- RideMachan – Driver Profile Image Table Migration
+-- Run AFTER your existing create_ridemachan.sql
+-- ============================================================
 
+USE `RideMachan`;
+
+CREATE TABLE IF NOT EXISTS `DriverProfileImage` (
+                                                    `image_id`    INT NOT NULL AUTO_INCREMENT,
+                                                    `driver_id`   INT NOT NULL,
+                                                    `image_data`  LONGBLOB NOT NULL,
+                                                    `mime_type`   VARCHAR(50) NOT NULL DEFAULT 'image/jpeg',
+    `created_at`  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updated_at`  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (`image_id`),
+    UNIQUE KEY `uniq_driver_profile` (`driver_id`),
+    CONSTRAINT `fk_profile_image_driver`
+    FOREIGN KEY (`driver_id`)
+    REFERENCES `Driver` (`driverid`)
+                                                               ON DELETE CASCADE
+                                                               ON UPDATE CASCADE
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE maintenance_vehicle_assignment (
+                                                assignment_id INT AUTO_INCREMENT PRIMARY KEY,
+
+                                                maintenanceid INT NOT NULL,
+                                                vehicleid INT NOT NULL,
+
+                                                assigned_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+                                                status VARCHAR(20) DEFAULT 'assigned',
+
+                                                description VARCHAR(255),
+
+                                                priority VARCHAR(20) DEFAULT 'normal'
+);
+
+CREATE TABLE vehicle_inspection (
+                                    inspection_id INT AUTO_INCREMENT PRIMARY KEY,
+                                    maintenanceid INT NOT NULL,
+                                    vehicleid INT NOT NULL,
+                                    inspection_type VARCHAR(50),
+                                    priority VARCHAR(20),
+                                    issues TEXT,
+                                    status VARCHAR(20),
+                                    inspection_date DATE,
+                                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE driver_booking_status (
+                                       id INT AUTO_INCREMENT PRIMARY KEY,
+                                       ride_id VARCHAR(50) NOT NULL,
+                                       driverid INT NOT NULL,
+                                       status VARCHAR(20) NOT NULL,
+                                       assigned_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                                       started_at TIMESTAMP NULL,
+                                       completed_at TIMESTAMP NULL
+);
+
+ALTER TABLE driver_booking_status
+    MODIFY status ENUM('upcoming','in-progress');
+
+ALTER TABLE driver_booking_status
+    ADD booking_id INT;
+
+ALTER TABLE driver_booking_status
+    MODIFY ride_id VARCHAR(50) NULL;
+
+ALTER TABLE driver_booking_status
+    MODIFY status ENUM('upcoming','in-progress','completed');
+
+ALTER TABLE driver_booking_status
+    MODIFY status ENUM('upcoming', 'in-progress', 'completed', 'cancelled');

@@ -140,9 +140,9 @@
       </div>
     </div>
 
-    <!-- Vehicle Details Modal -->
+    <!-- Vehicle Details Modal (Professional) -->
     <div class="modal" id="vehicleModal" aria-hidden="true">
-      <div class="modal-content">
+      <div class="modal-content modal-lg">
         <div class="modal-header">
           <h3 id="vehicleModalTitle">Vehicle Details</h3>
           <button class="modal-close" onclick="closeVehicleModal()">×</button>
@@ -156,48 +156,58 @@
       </div>
     </div>
 
+    <!-- Image Lightbox -->
+    <div class="lightbox-overlay" id="imageLightbox" onclick="closeLightbox()">
+      <div class="lightbox-content" onclick="event.stopPropagation()">
+        <button class="lightbox-close" onclick="closeLightbox()">×</button>
+        <img id="lightboxImage" src="" alt="Preview" />
+      </div>
+    </div>
+
     <!-- Vehicle Add/Edit Form Modal -->
     <div class="modal" id="vehicleFormModal" aria-hidden="true">
-      <div class="modal-content">
+      <div class="modal-content modal-lg">
         <div class="modal-header">
           <h3 id="vehicleFormTitle">Add Vehicle</h3>
           <button class="modal-close" onclick="closeVehicleForm()">×</button>
         </div>
         <div class="modal-body">
-          <form id="vehicleForm">
+          <form id="vehicleForm" enctype="multipart/form-data">
             <div class="form-grid">
               <div class="form-group">
                 <label class="form-label" for="vf_make">Make *</label>
-                <input class="form-control" id="vf_make" readonly />
+                <input class="form-control" id="vf_make" required />
               </div>
 
               <div class="form-group">
                 <label class="form-label" for="vf_model">Model *</label>
-                <input class="form-control" id="vf_model" readonly />
+                <input class="form-control" id="vf_model" required />
               </div>
 
               <div class="form-group">
                 <label class="form-label" for="vf_reg"
                   >Registration No. *</label
                 >
-                <input class="form-control" id="vf_reg" readonly />
+                <input class="form-control" id="vf_reg" required />
               </div>
 
               <div class="form-group">
-                <label class="form-label" for="vf_year">Manufacture Year</label>
+                <label class="form-label" for="vf_year"
+                  >Manufacture Year *</label
+                >
                 <input
                   class="form-control"
                   id="vf_year"
                   type="number"
                   min="1900"
                   max="2099"
-                  readonly
+                  required
                 />
               </div>
 
               <div class="form-group">
-                <label class="form-label" for="vf_color">Color</label>
-                <input class="form-control" id="vf_color" readonly />
+                <label class="form-label" for="vf_color">Color *</label>
+                <input class="form-control" id="vf_color" required />
               </div>
 
               <div class="form-group">
@@ -213,34 +223,34 @@
 
               <div class="form-group">
                 <label class="form-label" for="vf_enginecapacity"
-                  >Engine Capacity</label
+                  >Engine Capacity *</label
                 >
                 <input
                   class="form-control"
                   id="vf_enginecapacity"
                   type="number"
                   min="0"
-                  readonly
+                  required
                 />
               </div>
 
               <div class="form-group">
                 <label class="form-label" for="vf_engineno"
-                  >Engine Number</label
+                  >Engine Number *</label
                 >
-                <input class="form-control" id="vf_engineno" readonly />
+                <input class="form-control" id="vf_engineno" required />
               </div>
 
               <div class="form-group">
                 <label class="form-label" for="vf_chasisno"
-                  >Chassis Number</label
+                  >Chassis Number *</label
                 >
-                <input class="form-control" id="vf_chasisno" readonly />
+                <input class="form-control" id="vf_chasisno" required />
               </div>
 
               <div class="form-group">
-                <label class="form-label" for="vf_milage">Mileage</label>
-                <input class="form-control" id="vf_milage" />
+                <label class="form-label" for="vf_milage">Mileage *</label>
+                <input class="form-control" id="vf_milage" required />
               </div>
 
               <div class="form-group">
@@ -256,13 +266,13 @@
               </div>
 
               <div class="form-group">
-                <label class="form-label" for="vf_location">Location</label>
-                <input class="form-control" id="vf_location" />
+                <label class="form-label" for="vf_location">Location *</label>
+                <input class="form-control" id="vf_location" required />
               </div>
 
               <div class="form-group">
-                <label class="form-label" for="vf_fuel">Fuel Type</label>
-                <select class="form-select" id="vf_fuel" disabled>
+                <label class="form-label" for="vf_fuel">Fuel Type *</label>
+                <select class="form-select" id="vf_fuel" required>
                   <option value="">Choose…</option>
                   <option value="Petrol">Petrol</option>
                   <option value="Diesel">Diesel</option>
@@ -272,8 +282,8 @@
               </div>
 
               <div class="form-group">
-                <label class="form-label" for="vf_trans">Transmission</label>
-                <select class="form-select" id="vf_trans" disabled>
+                <label class="form-label" for="vf_trans">Transmission *</label>
+                <select class="form-select" id="vf_trans" required>
                   <option value="">Choose…</option>
                   <option value="Auto">Auto</option>
                   <option value="Manual">Manual</option>
@@ -285,9 +295,9 @@
                   >Availability</label
                 >
                 <select class="form-select" id="vf_availability">
-                  <option value="available">available</option>
-                  <option value="unavailable">unavailable</option>
-                  <option value="maintenance">maintenance</option>
+                  <option value="available">Available</option>
+                  <option value="unavailable">Unavailable</option>
+                  <option value="maintenance">Maintenance</option>
                 </select>
               </div>
 
@@ -304,13 +314,109 @@
 
               <div class="form-group" style="grid-column: 1 / -1">
                 <label class="form-label" for="vf_description"
-                  >Description</label
+                  >Description *</label
                 >
                 <textarea
                   class="form-control"
                   id="vf_description"
-                  rows="4"
+                  rows="3"
+                  required
                 ></textarea>
+              </div>
+
+              <!-- Registration Documentation Upload -->
+              <div class="form-group" style="grid-column: 1 / -1">
+                <label class="form-label">Registration Documentation</label>
+                <div class="file-upload-zone" id="regDocZone">
+                  <input
+                    type="file"
+                    id="vf_regDoc"
+                    accept="image/*,.pdf"
+                    class="file-input-hidden"
+                    onchange="handleRegDocSelect(this)"
+                  />
+                  <div
+                    class="upload-placeholder"
+                    id="regDocPlaceholder"
+                    onclick="document.getElementById('vf_regDoc').click()"
+                  >
+                    <svg
+                      width="40"
+                      height="40"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="1.5"
+                    >
+                      <path
+                        d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
+                      />
+                      <polyline points="14 2 14 8 20 8" />
+                      <line x1="12" y1="18" x2="12" y2="12" />
+                      <line x1="9" y1="15" x2="12" y2="12" />
+                      <line x1="15" y1="15" x2="12" y2="12" />
+                    </svg>
+                    <span>Click to upload registration document</span>
+                    <small>Supports images (JPG, PNG) and PDF files</small>
+                  </div>
+                  <div
+                    class="upload-preview"
+                    id="regDocPreview"
+                    style="display: none"
+                  >
+                    <img
+                      id="regDocPreviewImg"
+                      src=""
+                      alt="Registration Doc Preview"
+                    />
+                    <div class="preview-actions">
+                      <span class="preview-filename" id="regDocFilename"></span>
+                      <button
+                        type="button"
+                        class="btn btn-sm btn-danger"
+                        onclick="clearRegDoc()"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Vehicle Images Upload -->
+              <div class="form-group" style="grid-column: 1 / -1">
+                <label class="form-label">Vehicle Images</label>
+                <div class="file-upload-zone" id="vehicleImgZone">
+                  <input
+                    type="file"
+                    id="vf_vehicleImg"
+                    accept="image/*"
+                    multiple
+                    class="file-input-hidden"
+                    onchange="handleVehicleImgSelect(this)"
+                  />
+                  <div
+                    class="upload-placeholder"
+                    id="vehicleImgPlaceholder"
+                    onclick="document.getElementById('vf_vehicleImg').click()"
+                  >
+                    <svg
+                      width="40"
+                      height="40"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="1.5"
+                    >
+                      <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                      <circle cx="8.5" cy="8.5" r="1.5" />
+                      <polyline points="21 15 16 10 5 21" />
+                    </svg>
+                    <span>Click to upload vehicle images</span>
+                    <small>You can select multiple images (JPG, PNG)</small>
+                  </div>
+                  <div class="upload-preview-grid" id="vehicleImgPreview"></div>
+                </div>
               </div>
             </div>
           </form>

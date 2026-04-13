@@ -7,13 +7,28 @@
     <link rel="stylesheet" href="css/styles.css" />
     <link rel="stylesheet" href="css/sidebar.css" />
     <link rel="stylesheet" href="css/customers.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    />
   </head>
   <body>
     <div class="container">
       <main class="main-content">
         <header class="page-header">
           <div class="header-content">
-            <h1 class="page-title">Customer</h1>
+            <div>
+              <h1 class="page-title">Customers</h1>
+              <p class="page-subtitle">
+                Manage customer accounts, review profiles, and filter customer
+                records.
+              </p>
+            </div>
+
             <div class="header-actions">
               <button class="btn btn-primary" onclick="openRegisterModal()">
                 + Register Customer
@@ -22,7 +37,6 @@
           </div>
         </header>
 
-        <!-- Search and Filter Section -->
         <div class="search-filter-section" role="search">
           <h3 class="section-title">Search & Filter Customers</h3>
 
@@ -74,11 +88,11 @@
                 id="ratingFilter"
                 aria-label="Minimum rating"
               >
-                <span class="star" data-value="1">⭐</span>
-                <span class="star" data-value="2">⭐</span>
-                <span class="star" data-value="3">⭐</span>
-                <span class="star" data-value="4">⭐</span>
-                <span class="star" data-value="5">⭐</span>
+                <span class="star" data-value="1"></span>
+                <span class="star" data-value="2"></span>
+                <span class="star" data-value="3"></span>
+                <span class="star" data-value="4"></span>
+                <span class="star" data-value="5"></span>
               </div>
               <small class="rating-text"
                 >Click a star to set the minimum rating</small
@@ -136,7 +150,6 @@
           </div>
         </div>
 
-        <!-- Customer List -->
         <div class="customers-section">
           <div class="section-header">
             <h3 class="section-title">Customer List (0)</h3>
@@ -158,7 +171,6 @@
           </button>
         </div>
 
-        <!-- Step Indicator -->
         <div class="step-indicator">
           <div class="step active" data-step="1">
             <div class="step-number">1</div>
@@ -178,7 +190,6 @@
 
         <div class="modal-body">
           <form id="registerForm" enctype="multipart/form-data">
-            <!-- ───── STEP 1: Account Info ───── -->
             <div class="form-step active" id="step1">
               <div class="step-title">Account Information</div>
 
@@ -222,7 +233,7 @@
                       class="toggle-pw"
                       onclick="togglePassword(this)"
                     >
-                      👁
+                      <i class="fa-solid fa-eye"></i>
                     </button>
                   </div>
                 </div>
@@ -242,7 +253,7 @@
                       class="toggle-pw"
                       onclick="togglePassword(this)"
                     >
-                      👁
+                      <i class="fa-solid fa-eye"></i>
                     </button>
                   </div>
                 </div>
@@ -270,7 +281,6 @@
               </div>
             </div>
 
-            <!-- ───── STEP 2: Personal & Address ───── -->
             <div class="form-step" id="step2">
               <div class="step-title">Personal & Address Details</div>
 
@@ -344,11 +354,9 @@
               </div>
             </div>
 
-            <!-- ───── STEP 3: Identity Documents ───── -->
             <div class="form-step" id="step3">
               <div class="step-title">Identity Documents</div>
 
-              <!-- LOCAL fields -->
               <div id="localFields" style="display: none">
                 <div class="form-row">
                   <div class="form-group">
@@ -411,7 +419,6 @@
                 </div>
               </div>
 
-              <!-- FOREIGN fields -->
               <div id="foreignFields" style="display: none">
                 <div class="form-row">
                   <div class="form-group">
@@ -425,13 +432,13 @@
                   </div>
                   <div class="form-group">
                     <label class="form-label"
-                      >Int'l Driver's License No. *</label
+                      >International License No. *</label
                     >
                     <input
                       type="text"
                       class="form-control"
                       name="internationalDriversLicenseNumber"
-                      placeholder="International license number"
+                      placeholder="License number"
                     />
                   </div>
                 </div>
@@ -439,7 +446,7 @@
                 <div class="form-row">
                   <div class="form-group">
                     <label class="form-label">Passport Image *</label>
-                    <div class="file-upload-area">
+                    <div class="file-upload-area" id="passportImageArea">
                       <input
                         type="file"
                         name="passportImage"
@@ -456,11 +463,13 @@
                     </div>
                   </div>
                   <div class="form-group">
-                    <label class="form-label">Driver's License Image *</label>
-                    <div class="file-upload-area">
+                    <label class="form-label"
+                      >International License Image *</label
+                    >
+                    <div class="file-upload-area" id="intlLicenseImageArea">
                       <input
                         type="file"
-                        name="driversLicenseImage"
+                        name="internationalLicenseImage"
                         accept="image/*"
                         class="file-input"
                       />
@@ -476,11 +485,9 @@
                 </div>
               </div>
 
-              <!-- No type selected message -->
-              <div id="noTypeMsg" class="no-type-msg">
-                <span class="no-type-icon">ℹ️</span>
-                Please select a customer type in Step 1 to see the required
-                documents.
+              <div id="noTypeMsg" class="no-type-message">
+                Select the customer type in Step 1 to continue with identity
+                details.
               </div>
             </div>
           </form>
@@ -488,165 +495,49 @@
 
         <div class="modal-footer">
           <button
-            class="btn btn-secondary"
             id="prevStepBtn"
+            class="btn btn-secondary"
             onclick="prevStep()"
             style="display: none"
           >
-            ← Back
+            Previous
           </button>
-          <div style="flex: 1"></div>
-          <button class="btn btn-secondary" onclick="closeRegisterModal()">
-            Cancel
-          </button>
-          <button class="btn btn-primary" id="nextStepBtn" onclick="nextStep()">
-            Next →
+          <button id="nextStepBtn" class="btn btn-primary" onclick="nextStep()">
+            Next
           </button>
           <button
-            class="btn btn-primary"
             id="submitRegBtn"
+            class="btn btn-primary"
             onclick="submitRegistration()"
             style="display: none"
           >
             <span
-              class="btn-spinner"
               id="regSpinner"
-              style="display: none"
-            ></span>
-            Submit & Verify Email
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <!-- ===================== OTP VERIFICATION MODAL ===================== -->
-    <div class="modal" id="otpModal">
-      <div class="modal-content modal-sm">
-        <div class="modal-header otp-header">
-          <h3>Verify Your Email</h3>
-          <button class="modal-close" onclick="closeOtpModal()">&times;</button>
-        </div>
-        <div class="modal-body otp-body">
-          <div class="otp-icon-wrapper">
-            <div class="otp-icon">✉️</div>
-          </div>
-          <p class="otp-desc">We've sent a 6-digit verification code to</p>
-          <p class="otp-email" id="otpEmailDisplay">—</p>
-
-          <div class="otp-inputs" id="otpInputs">
-            <input
-              type="text"
-              maxlength="1"
-              class="otp-box"
-              data-index="0"
-              inputmode="numeric"
-              autocomplete="one-time-code"
-            />
-            <input
-              type="text"
-              maxlength="1"
-              class="otp-box"
-              data-index="1"
-              inputmode="numeric"
-            />
-            <input
-              type="text"
-              maxlength="1"
-              class="otp-box"
-              data-index="2"
-              inputmode="numeric"
-            />
-            <input
-              type="text"
-              maxlength="1"
-              class="otp-box"
-              data-index="3"
-              inputmode="numeric"
-            />
-            <input
-              type="text"
-              maxlength="1"
-              class="otp-box"
-              data-index="4"
-              inputmode="numeric"
-            />
-            <input
-              type="text"
-              maxlength="1"
-              class="otp-box"
-              data-index="5"
-              inputmode="numeric"
-            />
-          </div>
-
-          <div class="otp-error" id="otpError" style="display: none">
-            Invalid code. Please try again.
-          </div>
-
-          <div class="otp-timer">
-            Code expires in <span id="otpCountdown">5:00</span>
-          </div>
-
-          <button
-            class="btn btn-primary otp-submit-btn"
-            id="otpSubmitBtn"
-            onclick="verifyOtp()"
-          >
-            <span
               class="btn-spinner"
-              id="otpSpinner"
               style="display: none"
             ></span>
-            Verify
-          </button>
-
-          <button
-            class="otp-resend"
-            id="resendBtn"
-            onclick="resendOtp()"
-            disabled
-          >
-            Resend Code
+            Submit Registration
           </button>
         </div>
       </div>
     </div>
 
-    <!-- ===================== SUCCESS MODAL ===================== -->
     <div class="modal" id="successModal">
       <div class="modal-content modal-sm">
-        <div class="modal-body success-body">
-          <div class="success-checkmark">
-            <div class="check-circle">
-              <svg viewBox="0 0 52 52">
-                <circle
-                  cx="26"
-                  cy="26"
-                  r="25"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                />
-                <path
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="3"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M14 27l7 7 16-16"
-                />
-              </svg>
-            </div>
-          </div>
-          <h3 class="success-title">Registration Complete!</h3>
-          <p class="success-desc">
+        <div class="modal-header">
+          <h3>Customer Registered</h3>
+          <button class="modal-close" onclick="closeSuccessModal()">
+            &times;
+          </button>
+        </div>
+        <div class="modal-body success-modal-body">
+          <div class="success-icon">✓</div>
+          <p>
             The customer account has been created and verified successfully.
           </p>
-          <button
-            class="btn btn-primary"
-            onclick="closeSuccessModal()"
-            style="margin-top: 20px"
-          >
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-primary" onclick="closeSuccessModal()">
             Done
           </button>
         </div>

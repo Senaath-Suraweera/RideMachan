@@ -1,4 +1,4 @@
-// js/customers.js  (API-wired version with signup + OTP flow)
+// js/customers.js  (API-wired version with direct signup flow)
 
 class CustomersManager {
   constructor() {
@@ -13,8 +13,6 @@ class CustomersManager {
     // Registration state
     this.currentStep = 1;
     this.totalSteps = 3;
-    this.otpTimer = null;
-    this.otpSeconds = 300; // 5 minutes
 
     this.init();
   }
@@ -23,7 +21,6 @@ class CustomersManager {
     this.cacheEls();
     this.initializeRatingFilter();
     this.setupEventListeners();
-    this.setupOtpInputs();
     this.setupFileInputs();
     this.loadCustomers();
   }
@@ -106,11 +103,8 @@ class CustomersManager {
     document.querySelectorAll(".modal").forEach((modal) => {
       modal.addEventListener("click", (e) => {
         if (e.target === modal) {
-          // Don't close OTP modal on backdrop click (prevent accidental close)
-          if (modal.id !== "otpModal") {
-            modal.classList.remove("show");
-            document.body.style.overflow = "";
-          }
+          modal.classList.remove("show");
+          document.body.style.overflow = "";
         }
       });
     });
@@ -180,60 +174,6 @@ class CustomersManager {
   }
 
   /* ================================================================
-     OTP INPUT BOXES
-     ================================================================ */
-  setupOtpInputs() {
-    const boxes = document.querySelectorAll(".otp-box");
-    boxes.forEach((box, i) => {
-      box.addEventListener("input", (e) => {
-        const val = e.target.value.replace(/\D/g, "");
-        e.target.value = val;
-        if (val) {
-          e.target.classList.add("filled");
-          // Move to next
-          if (i < boxes.length - 1) boxes[i + 1].focus();
-        } else {
-          e.target.classList.remove("filled");
-        }
-        // Hide error on typing
-        document.getElementById("otpError").style.display = "none";
-        boxes.forEach((b) => b.classList.remove("error"));
-      });
-
-      box.addEventListener("keydown", (e) => {
-        if (e.key === "Backspace" && !e.target.value && i > 0) {
-          boxes[i - 1].focus();
-          boxes[i - 1].value = "";
-          boxes[i - 1].classList.remove("filled");
-        }
-        // Enter to submit
-        if (e.key === "Enter") {
-          e.preventDefault();
-          verifyOtp();
-        }
-      });
-
-      // Paste support
-      box.addEventListener("paste", (e) => {
-        e.preventDefault();
-        const paste = (e.clipboardData.getData("text") || "")
-          .replace(/\D/g, "")
-          .slice(0, 6);
-        paste.split("").forEach((ch, j) => {
-          if (boxes[j]) {
-            boxes[j].value = ch;
-            boxes[j].classList.add("filled");
-          }
-        });
-        if (paste.length > 0) {
-          const target = Math.min(paste.length, boxes.length) - 1;
-          boxes[target].focus();
-        }
-      });
-    });
-  }
-
-  /* ================================================================
      FILE INPUT STYLING
      ================================================================ */
   setupFileInputs() {
@@ -246,23 +186,24 @@ class CustomersManager {
         const textEl = area.querySelector(".file-text");
         if (file) {
           area.classList.add("has-file");
+          area.classList.remove("error-border");
           if (textEl) textEl.textContent = file.name;
         } else {
           area.classList.remove("has-file");
-          if (textEl)
+          if (textEl) {
             textEl.textContent =
-              area.querySelector(".file-text")?.dataset.default ||
-              "Drop file or click to browse";
+              textEl.dataset.default || "Drop file or click to browse";
+          }
         }
       });
 
-      // Drag events
       ["dragover", "dragenter"].forEach((evt) =>
         area.addEventListener(evt, (e) => {
           e.preventDefault();
           area.classList.add("dragover");
         }),
       );
+
       ["dragleave", "drop"].forEach((evt) =>
         area.addEventListener(evt, () => area.classList.remove("dragover")),
       );
@@ -300,14 +241,12 @@ class CustomersManager {
   goToStep(n) {
     this.currentStep = n;
 
-    // Update step content
     document
       .querySelectorAll(".form-step")
       .forEach((el) => el.classList.remove("active"));
     const target = document.getElementById(`step${n}`);
     if (target) target.classList.add("active");
 
-    // Update step indicator
     document.querySelectorAll(".step-indicator .step").forEach((el) => {
       const s = Number(el.dataset.step);
       el.classList.remove("active", "completed");
@@ -315,20 +254,17 @@ class CustomersManager {
       else if (s < n) el.classList.add("completed");
     });
 
-    // Update step lines
     const lines = document.querySelectorAll(".step-indicator .step-line");
     lines.forEach((line, i) => {
       line.classList.toggle("done", i + 1 < n);
     });
 
-    // Show/hide buttons
     document.getElementById("prevStepBtn").style.display = n > 1 ? "" : "none";
     document.getElementById("nextStepBtn").style.display =
       n < this.totalSteps ? "" : "none";
     document.getElementById("submitRegBtn").style.display =
       n === this.totalSteps ? "" : "none";
 
-    // If step 3, update identity fields based on type
     if (n === 3) this.updateIdentityFields();
   }
 
@@ -336,19 +272,23 @@ class CustomersManager {
     const step = document.getElementById(`step${this.currentStep}`);
     if (!step) return true;
 
-    // Check required fields only within the visible step
-    const requiredInputs = step.querySelectorAll("[required]");
     let valid = true;
 
-    requiredInputs.forEach((input) => {
+    step.querySelectorAll(".form-control, .form-select").forEach((input) => {
       input.classList.remove("error");
-      if (!input.value.trim()) {
+    });
+    step.querySelectorAll(".file-upload-area").forEach((area) => {
+      area.classList.remove("error-border");
+    });
+
+    const requiredInputs = step.querySelectorAll("[required]");
+    requiredInputs.forEach((input) => {
+      if (!String(input.value || "").trim()) {
         input.classList.add("error");
         valid = false;
       }
     });
 
-    // Step 1 extra: password match
     if (this.currentStep === 1) {
       const pw = step.querySelector('input[name="password"]');
       const cpw = step.querySelector('input[name="confirmPassword"]');
@@ -359,25 +299,27 @@ class CustomersManager {
       }
     }
 
-    // Step 3: check identity fields based on customer type
     if (this.currentStep === 3) {
       const type =
         document.querySelector('select[name="customerType"]')?.value || "";
+
       if (!type) {
         this.toast("Please select a customer type in Step 1");
         valid = false;
       } else {
         const containerId = type === "LOCAL" ? "localFields" : "foreignFields";
         const container = document.getElementById(containerId);
+
         if (container) {
           const inputs = container.querySelectorAll("input[type='text']");
           inputs.forEach((input) => {
+            input.classList.remove("error");
             if (!input.value.trim()) {
               input.classList.add("error");
               valid = false;
             }
           });
-          // Check file inputs
+
           const fileInputs = container.querySelectorAll("input[type='file']");
           fileInputs.forEach((fi) => {
             if (!fi.files || !fi.files.length) {
@@ -424,7 +366,6 @@ class CustomersManager {
       submitBtn.disabled = true;
       spinner.style.display = "";
 
-      // STEP 1: Check whether email already exists
       const emailCheck = await this.checkEmailExists(email);
 
       if (emailCheck.status !== "success") {
@@ -436,8 +377,7 @@ class CustomersManager {
         throw new Error("This email is already registered");
       }
 
-      // STEP 2: Proceed with signup
-      const res = await fetch("/customer/signup", {
+      const res = await fetch("/customer/direct-signup", {
         method: "POST",
         credentials: "include",
         body: formData,
@@ -449,22 +389,9 @@ class CustomersManager {
         throw new Error(data.message || "Signup request failed");
       }
 
-      // STEP 3: Send OTP
-      const otpRes = await fetch("/verify", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ email }),
-      });
-
-      const otpData = await otpRes.json().catch(() => ({}));
-
-      if (otpData.status !== "success") {
-        throw new Error(otpData.message || "Failed to send OTP");
-      }
-
       this.closeRegisterModal();
-      this.openOtpModal(email);
+      this.openSuccessModal();
+      this.loadCustomers();
     } catch (err) {
       console.error("Registration error:", err);
       this.toast(err.message || "Registration failed. Please try again.");
@@ -475,185 +402,29 @@ class CustomersManager {
   }
 
   /* ================================================================
-     OTP MODAL
-     ================================================================ */
-  openOtpModal(email) {
-    const modal = document.getElementById("otpModal");
-    if (!modal) return;
-
-    // Set email display
-    document.getElementById("otpEmailDisplay").textContent = email || "—";
-
-    // Clear inputs
-    document.querySelectorAll(".otp-box").forEach((b) => {
-      b.value = "";
-      b.classList.remove("filled", "error");
-    });
-    document.getElementById("otpError").style.display = "none";
-
-    modal.classList.add("show");
-    document.body.style.overflow = "hidden";
-
-    // Focus first box
-    setTimeout(() => document.querySelector(".otp-box")?.focus(), 100);
-
-    // Start countdown
-    this.startOtpTimer();
-  }
-
-  closeOtpModal() {
-    const modal = document.getElementById("otpModal");
-    if (!modal) return;
-    modal.classList.remove("show");
-    document.body.style.overflow = "";
-    this.stopOtpTimer();
-  }
-
-  startOtpTimer() {
-    this.stopOtpTimer();
-    this.otpSeconds = 300;
-    const countdownEl = document.getElementById("otpCountdown");
-    const resendBtn = document.getElementById("resendBtn");
-    resendBtn.disabled = true;
-
-    const tick = () => {
-      const m = Math.floor(this.otpSeconds / 60);
-      const s = this.otpSeconds % 60;
-      countdownEl.textContent = `${m}:${String(s).padStart(2, "0")}`;
-
-      if (this.otpSeconds <= 0) {
-        this.stopOtpTimer();
-        countdownEl.textContent = "0:00";
-        resendBtn.disabled = false;
-      } else {
-        this.otpSeconds--;
-      }
-    };
-
-    tick();
-    this.otpTimer = setInterval(tick, 1000);
-  }
-
-  stopOtpTimer() {
-    if (this.otpTimer) {
-      clearInterval(this.otpTimer);
-      this.otpTimer = null;
-    }
-  }
-
-  async verifyOtp() {
-    const boxes = document.querySelectorAll(".otp-box");
-    const code = Array.from(boxes)
-      .map((b) => b.value)
-      .join("");
-
-    if (code.length < 6) {
-      boxes.forEach((b) => {
-        if (!b.value) b.classList.add("error");
-      });
-      document.getElementById("otpError").textContent =
-        "Please enter the full 6-digit code.";
-      document.getElementById("otpError").style.display = "block";
-      return;
-    }
-
-    const submitBtn = document.getElementById("otpSubmitBtn");
-    const spinner = document.getElementById("otpSpinner");
-
-    try {
-      submitBtn.disabled = true;
-      spinner.style.display = "";
-
-      const res = await fetch("/code", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ code: code }),
-      });
-
-      const data = await res.json().catch(() => ({}));
-
-      if (data.status === "success") {
-        this.closeOtpModal();
-        this.openSuccessModal();
-        this.loadCustomers(); // Refresh list
-      } else {
-        boxes.forEach((b) => b.classList.add("error"));
-        const errEl = document.getElementById("otpError");
-        errEl.textContent = data.message || "Invalid code. Please try again.";
-        errEl.style.display = "block";
-      }
-    } catch (err) {
-      console.error("OTP verification error:", err);
-      this.toast("Verification failed. Please try again.");
-    } finally {
-      submitBtn.disabled = false;
-      spinner.style.display = "none";
-    }
-  }
-
-  async resendOtp() {
-    const email = document.getElementById("otpEmailDisplay")?.textContent || "";
-    if (!email || email === "—") return;
-
-    try {
-      const res = await fetch("/verify", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ email: email }),
-      });
-
-      const data = await res.json().catch(() => ({}));
-
-      if (data.status === "success") {
-        this.toast("New code sent!");
-        this.startOtpTimer();
-        // Clear inputs
-        document.querySelectorAll(".otp-box").forEach((b) => {
-          b.value = "";
-          b.classList.remove("filled", "error");
-        });
-        document.getElementById("otpError").style.display = "none";
-        document.querySelector(".otp-box")?.focus();
-      } else {
-        this.toast(data.message || "Failed to resend code");
-      }
-    } catch (err) {
-      this.toast("Failed to resend code");
-    }
-  }
-
-  /* ================================================================
      MODAL HELPERS
      ================================================================ */
   openRegisterModal() {
     const modal = document.getElementById("registerModal");
     if (!modal) return;
-    // Reset form & step
+
     document.getElementById("registerForm")?.reset();
     this.goToStep(1);
     this.updateIdentityFields();
-    // Clear any error highlights
+
     document
-      .querySelectorAll(".form-control.error")
+      .querySelectorAll(".form-control.error, .form-select.error")
       .forEach((el) => el.classList.remove("error"));
+
     document
-      .querySelectorAll(".file-upload-area.has-file")
-      .forEach((el) => el.classList.remove("has-file"));
+      .querySelectorAll(".file-upload-area")
+      .forEach((el) =>
+        el.classList.remove("has-file", "error-border", "dragover"),
+      );
+
     document.querySelectorAll(".file-upload-area .file-text").forEach((el) => {
-      if (el.textContent !== el.dataset?.default) {
-        // Restore default text
-        const parent = el.closest(".file-upload-area");
-        if (parent) {
-          const hint = parent.querySelector(".file-hint");
-          el.textContent = el.textContent.includes("NIC")
-            ? "Drop NIC image or click to browse"
-            : el.textContent.includes("passport")
-              ? "Drop passport image or click to browse"
-              : "Drop license image or click to browse";
-        }
-      }
+      const fallback = el.dataset.default || "Drop file or click to browse";
+      el.textContent = fallback;
     });
 
     modal.classList.add("show");
@@ -787,10 +558,22 @@ class CustomersManager {
       <div class="customer-info">
         <h4 class="customer-name">${this.esc(c.name || "—")}</h4>
         <div class="customer-details">
-          <div class="detail-item"><span class="detail-icon">NIC:</span><span class="detail-text">${this.esc(c.nic || "—")}</span></div>
-          <div class="detail-item"><span class="detail-icon">📧</span><span class="detail-text">${this.esc(c.email || "—")}</span></div>
-          <div class="detail-item"><span class="detail-icon">📞</span><span class="detail-text">${this.esc(c.phone || "—")}</span></div>
-          <div class="detail-item"><span class="detail-icon">📍</span><span class="detail-text">${this.esc(c.location || "—")}</span></div>
+          <div class="detail-item">
+            <span class="detail-icon"><i class="fa-regular fa-id-card"></i></span>
+            <span class="detail-text">${this.esc(c.nic || "—")}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-icon"><i class="fa-regular fa-envelope"></i></span>
+            <span class="detail-text">${this.esc(c.email || "—")}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-icon"><i class="fa-solid fa-phone"></i></span>
+            <span class="detail-text">${this.esc(c.phone || "—")}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-icon"><i class="fa-solid fa-location-dot"></i></span>
+            <span class="detail-text">${this.esc(c.location || "—")}</span>
+          </div>
         </div>
         <div class="customer-description"><p>${this.esc(c.description || "")}</p></div>
         <div class="customer-rating">
@@ -808,7 +591,7 @@ class CustomersManager {
     const filled = Math.round(rating);
     return Array.from(
       { length: 5 },
-      (_, i) => `<span class="star ${i < filled ? "active" : ""}">⭐</span>`,
+      (_, i) => `<span class="star ${i < filled ? "active" : ""}"></span>`,
     ).join("");
   }
 
@@ -881,6 +664,7 @@ window.addEventListener("DOMContentLoaded", () => {
 function searchCustomers() {
   mgr?.loadCustomers();
 }
+
 function clearFilters() {
   mgr?.clearFiltersAndReload();
 }
@@ -888,6 +672,7 @@ function clearFilters() {
 function openRegisterModal() {
   mgr?.openRegisterModal();
 }
+
 function closeRegisterModal() {
   mgr?.closeRegisterModal();
 }
@@ -911,28 +696,20 @@ function submitRegistration() {
   mgr?.submitRegistration();
 }
 
-function closeOtpModal() {
-  mgr?.closeOtpModal();
-}
-function verifyOtp() {
-  mgr?.verifyOtp();
-}
-function resendOtp() {
-  mgr?.resendOtp();
-}
-
 function closeSuccessModal() {
   mgr?.closeSuccessModal();
 }
 
 function togglePassword(btn) {
   const input = btn.previousElementSibling;
-  if (!input) return;
+  const icon = btn.querySelector("i");
+  if (!input || !icon) return;
+
   if (input.type === "password") {
     input.type = "text";
-    btn.textContent = "🙈";
+    icon.className = "fa-solid fa-eye-slash";
   } else {
     input.type = "password";
-    btn.textContent = "👁";
+    icon.className = "fa-solid fa-eye";
   }
 }

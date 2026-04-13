@@ -1,46 +1,124 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="utf-8" />
     <title>Customer | RideMachan Admin</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <!-- Shared theme + customers look & feel -->
     <link rel="stylesheet" href="css/styles.css" />
     <link rel="stylesheet" href="css/sidebar.css" />
     <link rel="stylesheet" href="css/customers.css" />
     <link rel="stylesheet" href="css/customer-view.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    />
   </head>
   <body>
-    <!-- Sidebar auto-injects -->
     <script src="js/sidebar.js"></script>
 
     <main class="main-content">
-      <header class="page-header">
-        <div
-          class="header-actions"
-          style="display: flex; align-items: center; gap: 12px"
-        >
-          <h1 class="page-title" style="flex: 1">Customer</h1>
-          <button id="backToCustomersBtn" class="btn btn-secondary">
-            ← Back to Customers
-          </button>
-          <button id="banCustomerBtn" class="btn btn-danger">
-            Ban Customer
-          </button>
+      <header class="page-header page-header-detail">
+        <div class="detail-header-bar">
+          <div class="detail-header-title">
+            <h1 class="page-title">Customer Details</h1>
+            <p class="page-subtitle">
+              Review customer profile information and booking history.
+            </p>
+          </div>
+
+          <div class="detail-header-actions">
+            <button id="backToCustomersBtn" class="btn btn-secondary">
+              <i class="fa-solid fa-arrow-left"></i> Back to Customers
+            </button>
+            <button
+              id="editCustomerBtn"
+              class="btn btn-primary"
+              onclick="openEditModal()"
+            >
+              <i class="fa-solid fa-pen-to-square"></i> Edit Customer
+            </button>
+            <button id="banCustomerBtn" class="btn btn-danger">
+              Ban Customer
+            </button>
+          </div>
         </div>
       </header>
 
-      <section id="customerView" class="card">
+      <!-- ===== Profile Card ===== -->
+      <section id="customerView" class="customer-profile-card">
         <!-- Filled by customer-view.js -->
       </section>
 
-      <section class="card">
+      <!-- ===== Detail Info Cards ===== -->
+      <div class="detail-cards-grid">
+        <!-- Account Info -->
+        <section class="detail-info-card" id="accountInfoCard">
+          <div class="detail-card-header">
+            <div class="detail-card-icon">
+              <i class="fa-solid fa-user-shield"></i>
+            </div>
+            <h3>Account Information</h3>
+          </div>
+          <div class="detail-card-body" id="accountInfoBody">
+            <!-- Filled by JS -->
+          </div>
+        </section>
+
+        <!-- Address Info -->
+        <section class="detail-info-card" id="addressInfoCard">
+          <div class="detail-card-header">
+            <div class="detail-card-icon">
+              <i class="fa-solid fa-location-dot"></i>
+            </div>
+            <h3>Address Details</h3>
+          </div>
+          <div class="detail-card-body" id="addressInfoBody">
+            <!-- Filled by JS -->
+          </div>
+        </section>
+
+        <!-- Identity Documents -->
+        <section class="detail-info-card" id="identityInfoCard">
+          <div class="detail-card-header">
+            <div class="detail-card-icon">
+              <i class="fa-solid fa-id-card"></i>
+            </div>
+            <h3>Identity Documents</h3>
+          </div>
+          <div class="detail-card-body" id="identityInfoBody">
+            <!-- Filled by JS -->
+          </div>
+        </section>
+
+        <!-- Booking Stats -->
+        <section class="detail-info-card" id="statsInfoCard">
+          <div class="detail-card-header">
+            <div class="detail-card-icon">
+              <i class="fa-solid fa-chart-bar"></i>
+            </div>
+            <h3>Booking Statistics</h3>
+          </div>
+          <div class="detail-card-body" id="statsInfoBody">
+            <!-- Filled by JS -->
+          </div>
+        </section>
+      </div>
+
+      <!-- ===== Bookings Tabs ===== -->
+      <section class="booking-history-card">
         <div class="tabs">
           <button class="tab active" data-tab="ongoing">
-            Ongoing Bookings
+            <i class="fa-solid fa-clock"></i> Ongoing Bookings
           </button>
-          <button class="tab" data-tab="past">Past Bookings</button>
+          <button class="tab" data-tab="past">
+            <i class="fa-solid fa-history"></i> Past Bookings
+          </button>
         </div>
+
         <div class="tab-panels">
           <div class="tab-panel active" id="panel-ongoing">
             <iframe
@@ -59,6 +137,390 @@
         </div>
       </section>
     </main>
+
+    <!-- ===================== EDIT CUSTOMER MODAL ===================== -->
+    <div class="modal" id="editModal">
+      <div class="modal-content modal-lg">
+        <div class="modal-header">
+          <h3><i class="fa-solid fa-pen-to-square"></i> Edit Customer</h3>
+          <button class="modal-close" onclick="closeEditModal()">
+            &times;
+          </button>
+        </div>
+
+        <div class="step-indicator" id="editStepIndicator">
+          <div class="step active" data-step="1">
+            <div class="step-number">1</div>
+            <span class="step-label">Account</span>
+          </div>
+          <div class="step-line"></div>
+          <div class="step" data-step="2">
+            <div class="step-number">2</div>
+            <span class="step-label">Personal</span>
+          </div>
+          <div class="step-line"></div>
+          <div class="step" data-step="3">
+            <div class="step-number">3</div>
+            <span class="step-label">Identity</span>
+          </div>
+        </div>
+
+        <div class="modal-body">
+          <form id="editForm">
+            <!-- Step 1: Account -->
+            <div class="form-step active" id="editStep1">
+              <div class="step-title">Account Information</div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Username</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    name="username"
+                    placeholder="Username"
+                  />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Email Address *</label>
+                  <input
+                    type="email"
+                    class="form-control"
+                    name="email"
+                    required
+                    placeholder="you@example.com"
+                  />
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Mobile Number *</label>
+                  <input
+                    type="tel"
+                    class="form-control"
+                    name="mobileNumber"
+                    required
+                    placeholder="+94 7X XXX XXXX"
+                  />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Customer Type *</label>
+                  <select class="form-select" name="customerType" required>
+                    <option value="">Select type</option>
+                    <option value="LOCAL">Local</option>
+                    <option value="FOREIGN">Foreign</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Status</label>
+                  <select class="form-select" name="status">
+                    <option value="active">Active</option>
+                    <option value="inactive">Inactive</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Verified</label>
+                  <select class="form-select" name="verified">
+                    <option value="false">Not Verified</option>
+                    <option value="true">Verified</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <!-- Step 2: Personal & Address -->
+            <div class="form-step" id="editStep2">
+              <div class="step-title">Personal & Address Details</div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">First Name *</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    name="firstname"
+                    required
+                    placeholder="First name"
+                  />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Last Name *</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    name="lastname"
+                    required
+                    placeholder="Last name"
+                  />
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Street</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    name="street"
+                    placeholder="Street address"
+                  />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">City</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    name="city"
+                    placeholder="City"
+                  />
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Zip Code</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    name="zipCode"
+                    placeholder="Postal code"
+                  />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Country</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    name="country"
+                    placeholder="Country"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <!-- Step 3: Identity -->
+            <div class="form-step" id="editStep3">
+              <div class="step-title">Identity Documents</div>
+
+              <div id="editLocalFields" style="display: none">
+                <div class="form-row">
+                  <div class="form-group">
+                    <label class="form-label">NIC Number</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      name="nicNumber"
+                      placeholder="e.g., 200012345678"
+                    />
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Driver's License No.</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      name="driversLicenseNumber"
+                      placeholder="License number"
+                    />
+                  </div>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group">
+                    <label class="form-label">NIC Image</label>
+                    <div class="file-upload-area" id="editNicImageArea">
+                      <input
+                        type="file"
+                        name="nicImage"
+                        accept="image/*"
+                        class="file-input"
+                      />
+                      <div class="file-upload-content">
+                        <span class="file-icon"
+                          ><i class="fa-solid fa-cloud-arrow-up"></i
+                        ></span>
+                        <span
+                          class="file-text"
+                          data-default="Drop NIC image or click to browse"
+                          >Drop NIC image or click to browse</span
+                        >
+                        <span class="file-hint"
+                          >JPG, PNG — Max 5 MB (leave empty to keep
+                          current)</span
+                        >
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Driver's License Image</label>
+                    <div class="file-upload-area" id="editDlImageArea">
+                      <input
+                        type="file"
+                        name="driversLicenseImage"
+                        accept="image/*"
+                        class="file-input"
+                      />
+                      <div class="file-upload-content">
+                        <span class="file-icon"
+                          ><i class="fa-solid fa-cloud-arrow-up"></i
+                        ></span>
+                        <span
+                          class="file-text"
+                          data-default="Drop license image or click to browse"
+                          >Drop license image or click to browse</span
+                        >
+                        <span class="file-hint"
+                          >JPG, PNG — Max 5 MB (leave empty to keep
+                          current)</span
+                        >
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div id="editForeignFields" style="display: none">
+                <div class="form-row">
+                  <div class="form-group">
+                    <label class="form-label">Passport Number</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      name="passportNumber"
+                      placeholder="Passport number"
+                    />
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">International License No.</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      name="internationalDriversLicenseNumber"
+                      placeholder="License number"
+                    />
+                  </div>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group">
+                    <label class="form-label">Passport Image</label>
+                    <div class="file-upload-area" id="editPassportImageArea">
+                      <input
+                        type="file"
+                        name="passportImage"
+                        accept="image/*"
+                        class="file-input"
+                      />
+                      <div class="file-upload-content">
+                        <span class="file-icon"
+                          ><i class="fa-solid fa-cloud-arrow-up"></i
+                        ></span>
+                        <span
+                          class="file-text"
+                          data-default="Drop passport image or click to browse"
+                          >Drop passport image or click to browse</span
+                        >
+                        <span class="file-hint"
+                          >JPG, PNG — Max 5 MB (leave empty to keep
+                          current)</span
+                        >
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label"
+                      >International License Image</label
+                    >
+                    <div class="file-upload-area" id="editIntlLicenseImageArea">
+                      <input
+                        type="file"
+                        name="internationalLicenseImage"
+                        accept="image/*"
+                        class="file-input"
+                      />
+                      <div class="file-upload-content">
+                        <span class="file-icon"
+                          ><i class="fa-solid fa-cloud-arrow-up"></i
+                        ></span>
+                        <span
+                          class="file-text"
+                          data-default="Drop license image or click to browse"
+                          >Drop license image or click to browse</span
+                        >
+                        <span class="file-hint"
+                          >JPG, PNG — Max 5 MB (leave empty to keep
+                          current)</span
+                        >
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div id="editNoTypeMsg" class="no-type-message">
+                Select the customer type in Step 1 to continue with identity
+                details.
+              </div>
+            </div>
+          </form>
+        </div>
+
+        <div class="modal-footer">
+          <button
+            id="editPrevBtn"
+            class="btn btn-secondary"
+            onclick="editPrevStep()"
+            style="display: none"
+          >
+            <i class="fa-solid fa-arrow-left"></i> Previous
+          </button>
+          <button
+            id="editNextBtn"
+            class="btn btn-primary"
+            onclick="editNextStep()"
+          >
+            Next <i class="fa-solid fa-arrow-right"></i>
+          </button>
+          <button
+            id="editSubmitBtn"
+            class="btn btn-primary"
+            onclick="submitEdit()"
+            style="display: none"
+          >
+            <span
+              id="editSpinner"
+              class="btn-spinner"
+              style="display: none"
+            ></span>
+            <i class="fa-solid fa-check"></i> Save Changes
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== Edit Success Modal ===== -->
+    <div class="modal" id="editSuccessModal">
+      <div class="modal-content modal-sm">
+        <div class="modal-header">
+          <h3>Customer Updated</h3>
+          <button class="modal-close" onclick="closeEditSuccessModal()">
+            &times;
+          </button>
+        </div>
+        <div class="modal-body success-modal-body">
+          <div class="success-icon">✓</div>
+          <p>Customer details have been updated successfully.</p>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-primary" onclick="closeEditSuccessModal()">
+            Done
+          </button>
+        </div>
+      </div>
+    </div>
 
     <script src="js/customer-view.js"></script>
   </body>

@@ -25,8 +25,10 @@
       </nav>
 
       <main class="driver-view" id="driverView">
-        <!-- Edit Driver Modal -->
+        <!-- Rendered by JS -->
       </main>
+
+      <!-- ==================== EDIT DRIVER MODAL ==================== -->
       <div class="modal" id="editDriverModal" aria-hidden="true">
         <div
           class="modal-content"
@@ -43,30 +45,69 @@
 
           <form id="editDriverForm">
             <div class="modal-body">
+              <!-- ===== Image Uploads ===== -->
+              <div class="form-section-title">Profile & Document Images</div>
+              <div class="image-uploads-row">
+                <div class="image-upload-card">
+                  <div class="image-upload-preview" id="profilePreview">
+                    <img id="profilePreviewImg" alt="Profile" />
+                    <span class="image-upload-placeholder">No Photo</span>
+                  </div>
+                  <label class="form-label">Profile Photo</label>
+                  <input
+                    id="edProfileImage"
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp"
+                    class="form-control file-input"
+                  />
+                  <span class="file-hint">Max 5MB</span>
+                </div>
+
+                <div class="image-upload-card">
+                  <div class="image-upload-preview" id="nicPreview">
+                    <img id="nicPreviewImg" alt="NIC" />
+                    <span class="image-upload-placeholder">No NIC</span>
+                  </div>
+                  <label class="form-label">NIC Document</label>
+                  <input
+                    id="edNicImage"
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp,application/pdf"
+                    class="form-control file-input"
+                  />
+                  <span class="file-hint">Max 5MB</span>
+                </div>
+
+                <div class="image-upload-card">
+                  <div class="image-upload-preview" id="licensePreview">
+                    <img id="licensePreviewImg" alt="License" />
+                    <span class="image-upload-placeholder">No License</span>
+                  </div>
+                  <label class="form-label">Driver's License</label>
+                  <input
+                    id="edLicenseImage"
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp,application/pdf"
+                    class="form-control file-input"
+                  />
+                  <span class="file-hint">Max 5MB</span>
+                </div>
+              </div>
+
+              <!-- ===== Editable Fields ===== -->
+              <div class="form-section-title">Editable Details</div>
               <div class="form-row">
                 <div class="form-group">
-                  <label class="form-label" for="edName">Full name</label
-                  ><input id="edName" class="form-control" required />
+                  <label class="form-label" for="edName">Full Name</label>
+                  <input id="edName" class="form-control" required />
                 </div>
                 <div class="form-group">
-                  <label class="form-label" for="edCompany">Company</label
-                  ><input id="edCompany" class="form-control" />
+                  <label class="form-label" for="edPhone">Mobile Number</label>
+                  <input id="edPhone" class="form-control" />
                 </div>
                 <div class="form-group">
-                  <label class="form-label" for="edPhone">Phone</label
-                  ><input id="edPhone" class="form-control" />
-                </div>
-                <div class="form-group">
-                  <label class="form-label" for="edEmail">Email</label
-                  ><input id="edEmail" class="form-control" type="email" />
-                </div>
-                <div class="form-group">
-                  <label class="form-label" for="edLocation">Location</label
-                  ><input id="edLocation" class="form-control" />
-                </div>
-                <div class="form-group">
-                  <label class="form-label" for="edAge">Age</label
-                  ><input
+                  <label class="form-label" for="edAge">Age</label>
+                  <input
                     id="edAge"
                     class="form-control"
                     type="number"
@@ -76,7 +117,8 @@
                 <div class="form-group">
                   <label class="form-label" for="edExp"
                     >Experience (years)</label
-                  ><input
+                  >
+                  <input
                     id="edExp"
                     class="form-control"
                     type="number"
@@ -84,78 +126,135 @@
                   />
                 </div>
                 <div class="form-group">
-                  <label class="form-label" for="edRating">Rating</label
-                  ><input
-                    id="edRating"
+                  <label class="form-label" for="edArea">Area</label>
+                  <input id="edArea" class="form-control" />
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="edAssignedArea"
+                    >Assigned Area</label
+                  >
+                  <input id="edAssignedArea" class="form-control" />
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="edHomeAddress"
+                    >Home Address</label
+                  >
+                  <input id="edHomeAddress" class="form-control" />
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="edStatus">Status</label>
+                  <select id="edStatus" class="form-control">
+                    <option value="Available">Available</option>
+                    <option value="Busy">Busy</option>
+                    <option value="Offline">Offline</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="edAvailability"
+                    >Availability</label
+                  >
+                  <select id="edAvailability" class="form-control">
+                    <option value="available">Available</option>
+                    <option value="unavailable">Unavailable</option>
+                    <option value="on_trip">On Trip</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="edShiftTime">Shift Time</label>
+                  <input
+                    id="edShiftTime"
                     class="form-control"
-                    type="number"
-                    min="0"
-                    max="5"
-                    step="0.1"
+                    placeholder="e.g., Day / Night"
                   />
                 </div>
                 <div class="form-group">
-                  <label class="form-label" for="edReviews">Reviews</label
-                  ><input
-                    id="edReviews"
+                  <label class="form-label" for="edReportingManager"
+                    >Reporting Manager</label
+                  >
+                  <input id="edReportingManager" class="form-control" />
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="edLicenseExpiry"
+                    >License Expiry Date</label
+                  >
+                  <input
+                    id="edLicenseExpiry"
                     class="form-control"
-                    type="number"
-                    min="0"
+                    type="date"
                   />
                 </div>
                 <div class="form-group">
-                  <label class="form-label" for="edRides">Total rides</label
-                  ><input
-                    id="edRides"
+                  <label class="form-label" for="edLicenseCategories"
+                    >License Categories</label
+                  >
+                  <input
+                    id="edLicenseCategories"
                     class="form-control"
-                    type="number"
-                    min="0"
-                    disabled
+                    placeholder="e.g., A, B1, B"
                   />
                 </div>
-                <div class="form-group">
-                  <label class="form-label" for="edKm">Total KM</label
-                  ><input
-                    id="edKm"
-                    class="form-control"
-                    type="number"
-                    min="0"
-                    disabled
-                  />
-                </div>
-
-                <div class="form-group">
-                  <label class="form-label" for="edStatus">Status</label
-                  ><input
-                    id="edStatus"
-                    class="form-control"
-                    placeholder="active / inactive"
-                  />
-                </div>
-                <div class="form-group">
-                  <label class="form-label" for="edApplied">Joined</label
-                  ><input id="edApplied" class="form-control" />
-                </div>
-                <div class="form-group">
-                  <label class="form-label" for="edNIC">NIC</label
-                  ><input id="edNIC" class="form-control" />
-                </div>
-                <div class="form-group">
-                  <label class="form-label" for="edLicense">License</label
-                  ><input id="edLicense" class="form-control" />
-                </div>
-                <div class="form-group">
-                  <label class="form-label" for="edExpiry">License expiry</label
-                  ><input id="edExpiry" class="form-control" />
-                </div>
-
                 <div class="form-group" style="grid-column: 1/-1">
-                  <label class="form-label" for="edDesc">Description</label
-                  ><textarea
+                  <label class="form-label" for="edDesc">Description</label>
+                  <textarea
                     id="edDesc"
                     class="form-control"
                     rows="3"
                   ></textarea>
+                </div>
+              </div>
+
+              <!-- ===== Read-Only Fields ===== -->
+              <div class="form-section-title readonly-title">
+                Read-Only Details
+              </div>
+              <div class="readonly-fields">
+                <div class="readonly-item">
+                  <span class="readonly-label">Driver ID</span>
+                  <span class="readonly-value" id="edIdDisplay">—</span>
+                </div>
+                <div class="readonly-item">
+                  <span class="readonly-label">Username</span>
+                  <span class="readonly-value" id="edUsernameDisplay">—</span>
+                </div>
+                <div class="readonly-item">
+                  <span class="readonly-label">Email</span>
+                  <span class="readonly-value" id="edEmailDisplay">—</span>
+                </div>
+                <div class="readonly-item">
+                  <span class="readonly-label">Company</span>
+                  <span class="readonly-value" id="edCompanyDisplay">—</span>
+                </div>
+                <div class="readonly-item">
+                  <span class="readonly-label">Rating</span>
+                  <span class="readonly-value" id="edRatingDisplay">—</span>
+                </div>
+                <div class="readonly-item">
+                  <span class="readonly-label">Reviews</span>
+                  <span class="readonly-value" id="edReviewsDisplay">—</span>
+                </div>
+                <div class="readonly-item">
+                  <span class="readonly-label">Joined Date</span>
+                  <span class="readonly-value" id="edAppliedDisplay">—</span>
+                </div>
+                <div class="readonly-item">
+                  <span class="readonly-label">NIC Number</span>
+                  <span class="readonly-value" id="edNICDisplay">—</span>
+                </div>
+                <div class="readonly-item">
+                  <span class="readonly-label">License Number</span>
+                  <span class="readonly-value" id="edLicenseDisplay">—</span>
+                </div>
+                <div class="readonly-item">
+                  <span class="readonly-label">Total Rides</span>
+                  <span class="readonly-value" id="edRidesDisplay">—</span>
+                </div>
+                <div class="readonly-item">
+                  <span class="readonly-label">Total KM</span>
+                  <span class="readonly-value" id="edKmDisplay">—</span>
+                </div>
+                <div class="readonly-item">
+                  <span class="readonly-label">On-Time %</span>
+                  <span class="readonly-value" id="edOnTimeDisplay">—</span>
                 </div>
               </div>
             </div>
@@ -169,6 +268,34 @@
               </button>
             </div>
           </form>
+        </div>
+      </div>
+
+      <!-- ==================== DOCUMENT VIEW MODAL ==================== -->
+      <div class="modal" id="documentViewModal" aria-hidden="true">
+        <div
+          class="modal-content document-modal-content"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="docViewTitle"
+        >
+          <div class="modal-header">
+            <h3 id="documentViewTitle">Document</h3>
+            <button
+              class="modal-close"
+              id="closeDocumentView"
+              aria-label="Close"
+            >
+              &times;
+            </button>
+          </div>
+          <div class="modal-body document-modal-body">
+            <img
+              id="documentViewImage"
+              alt="Document"
+              class="document-full-image"
+            />
+          </div>
         </div>
       </div>
     </div>

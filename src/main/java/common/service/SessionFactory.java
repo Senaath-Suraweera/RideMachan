@@ -33,7 +33,7 @@ public class SessionFactory {
         }
         else if (role.equalsIgnoreCase("company")) {
             // Remove context path from RequestDispatcher
-            RequestDispatcher rd = req.getRequestDispatcher("/admin/save");
+            RequestDispatcher rd = req.getRequestDispatcher("/company/save");
             rd.forward(req, resp);
         }
         else if (role.equalsIgnoreCase("driver")) {
@@ -46,7 +46,7 @@ public class SessionFactory {
             rd.forward(req, resp);
         }else if (role.equalsIgnoreCase("provider")) {
             // Remove context path from RequestDispatcher
-            RequestDispatcher rd = req.getRequestDispatcher("/admin/save");
+            RequestDispatcher rd = req.getRequestDispatcher("/provider/save");
             rd.forward(req, resp);
         }
     }

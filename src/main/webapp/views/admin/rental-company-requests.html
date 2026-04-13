@@ -3,12 +3,12 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Pending Rental Company Requests - Ride Machan</title>
+    <title>Rental Company Requests - Ride Machan</title>
 
     <link rel="stylesheet" href="css/styles.css" />
     <link rel="stylesheet" href="css/sidebar.css" />
-
     <link rel="stylesheet" href="css/rental-company-requests.css" />
+
     <link
       href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
       rel="stylesheet"
@@ -20,13 +20,37 @@
         <section class="requests-card">
           <div class="card-header">
             <div class="titles">
-              <h1 class="page-title">Pending Rental Company Requests</h1>
+              <h1 class="page-title">Rental Company Requests</h1>
               <p class="page-subtitle">
-                Review and manage company registration requests
+                Review pending requests and view rejected registration requests
               </p>
             </div>
 
             <div class="card-controls">
+              <div
+                class="chip-group"
+                id="statusFilter"
+                role="group"
+                aria-label="Request status filter"
+              >
+                <button
+                  class="chip active"
+                  data-status="PENDING"
+                  type="button"
+                  title="Show pending requests"
+                >
+                  Pending
+                </button>
+                <button
+                  class="chip"
+                  data-status="REJECTED"
+                  type="button"
+                  title="Show rejected requests"
+                >
+                  Rejected
+                </button>
+              </div>
+
               <div
                 class="chip-group"
                 id="alphaSort"
@@ -81,7 +105,7 @@
             <table
               class="requests-table"
               id="requestsTable"
-              aria-label="Pending rental company requests"
+              aria-label="Rental company requests"
             >
               <thead>
                 <tr>
@@ -89,12 +113,29 @@
                   <th>Company Name</th>
                   <th>Email</th>
                   <th>Phone</th>
-                  <th style="width: 160px">Submitted Date</th>
-                  <th style="width: 160px">Actions</th>
+                  <th style="width: 140px">Status</th>
+                  <th style="width: 170px">Submitted Date</th>
+                  <th style="width: 180px">Actions</th>
                 </tr>
               </thead>
               <tbody id="requestsTbody"></tbody>
             </table>
+          </div>
+
+          <div class="pagination-bar" id="paginationBar">
+            <div class="pagination-info" id="paginationInfo">
+              Showing 0 of 0
+            </div>
+
+            <div class="pagination-controls">
+              <button type="button" class="page-btn" id="prevPageBtn">
+                Prev
+              </button>
+              <div class="page-numbers" id="pageNumbers"></div>
+              <button type="button" class="page-btn" id="nextPageBtn">
+                Next
+              </button>
+            </div>
           </div>
         </section>
       </main>

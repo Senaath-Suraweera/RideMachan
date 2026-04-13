@@ -195,6 +195,25 @@ public class AdminController {
         }
     }
 
+    public static boolean updatePassword(int adminId, String newPassword) {
+        String sql = "UPDATE Admin SET hashedpassword = ?, salt = ? WHERE adminid = ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            String newSalt = PasswordServices.generateSalt();
+            String newHash = PasswordServices.hashPassword(newPassword, newSalt);
+
+            ps.setString(1, newHash);
+            ps.setString(2, newSalt);
+            ps.setInt(3, adminId);
+
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
 
 
 }

@@ -1,14 +1,11 @@
-// rental-companies.js — list, filters, + register company modal (NOW uses backend)
+// rental-companies.js — list, filters, + register company modal (backend-driven)
 
 class RentalCompaniesApp {
   constructor() {
     this.companies = [];
     this.filteredCompanies = [];
     this.minRating = 0;
-
-    // backend endpoint created in your servlet
     this.API_LIST = "/admin/rentalcompanies";
-
     this.init();
   }
 
@@ -17,7 +14,6 @@ class RentalCompaniesApp {
     this.initializeRatingFilter();
     this.bindEventListeners();
     this.bindRegisterCompanyModal();
-
     await this.loadCompanies();
     this.populateLocationFilter();
     this.applyFilters();
@@ -35,7 +31,6 @@ class RentalCompaniesApp {
     this.reviewsMinEl = document.getElementById("reviewsMin");
     this.ratingEl = document.getElementById("ratingFilter");
 
-    // modal bits
     this.btnOpenRegister = document.getElementById("btnOpenRegisterCompany");
     this.modal = document.getElementById("registerCompanyModal");
     this.btnCloseRegister = document.getElementById("closeRegisterCompany");
@@ -48,15 +43,12 @@ class RentalCompaniesApp {
 
   async loadCompanies() {
     this.countEl.textContent = "Loading companies...";
-
     try {
       const res = await fetch(this.API_LIST, {
         method: "GET",
         headers: { Accept: "application/json" },
       });
-
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
-
       const data = await res.json();
       if (
         !data ||
@@ -65,9 +57,6 @@ class RentalCompaniesApp {
       ) {
         throw new Error("Unexpected response from server");
       }
-
-      // server already returns fields matching UI:
-      // id, name, rating, reviews, location, offersDriver, fleets, phone, email, description
       this.companies = data.companies.map((c) => ({
         id: Number(c.id),
         name: c.name || "",
@@ -76,11 +65,12 @@ class RentalCompaniesApp {
         location: c.location || "",
         offersDriver: Boolean(c.offersDriver),
         fleets: Number(c.fleets || 0),
+        driverCount: Number(c.driverCount || 0),
+        maintenanceCount: Number(c.maintenanceCount || 0),
         phone: c.phone || "",
         email: c.email || "",
         description: c.description || "",
       }));
-
       this.filteredCompanies = [...this.companies];
       this.updateCount();
     } catch (err) {
@@ -97,14 +87,11 @@ class RentalCompaniesApp {
     const locations = [
       ...new Set(this.companies.map((c) => c.location).filter(Boolean)),
     ].sort();
-
-    // ensure "All" stays on top; we clear and rebuild
     this.locationEl.innerHTML = "";
     const all = document.createElement("option");
     all.value = "";
     all.textContent = "All";
     this.locationEl.appendChild(all);
-
     locations.forEach((loc) => {
       const opt = document.createElement("option");
       opt.value = loc;
@@ -142,28 +129,23 @@ class RentalCompaniesApp {
   bindEventListeners() {
     const onChange = () => this.applyFilters();
     const onType = this.debounce(() => this.applyFilters(), 300);
-
     this.nameEl.addEventListener("input", onType);
     this.fleetMinEl.addEventListener("input", onType);
     this.fleetMaxEl.addEventListener("input", onType);
     this.reviewsMinEl.addEventListener("input", onType);
-
     this.locationEl.addEventListener("change", onChange);
     this.sortEl.addEventListener("change", onChange);
     this.driverEl.addEventListener("change", onChange);
-
     this.searchBtn.addEventListener("click", (e) => {
       e.preventDefault();
       this.applyFilters();
     });
-
     this.resetBtn.addEventListener("click", (e) => {
       e.preventDefault();
       this.resetFilters();
     });
   }
 
-  /* ===== Register Company modal (unchanged; uses your existing signup endpoint) ===== */
   bindRegisterCompanyModal() {
     const open = () => {
       this.modal.classList.add("show");
@@ -184,7 +166,6 @@ class RentalCompaniesApp {
 
     this.formRegister?.addEventListener("submit", async (e) => {
       e.preventDefault();
-
       const companyname =
         document.getElementById("rcCompanyName")?.value?.trim() || "";
       const companyemail =
@@ -200,11 +181,9 @@ class RentalCompaniesApp {
       const terms = document.getElementById("rcTerms")?.value?.trim() || "";
       const password = document.getElementById("rcPassword")?.value || "";
       const password2 = document.getElementById("rcPassword2")?.value || "";
-
-      const certificateInput = document.getElementById("rcCertificate");
-      const taxDocInput = document.getElementById("rcTaxDoc");
-      const certificateFile = certificateInput?.files?.[0];
-      const taxDocFile = taxDocInput?.files?.[0];
+      const certificateFile =
+        document.getElementById("rcCertificate")?.files?.[0];
+      const taxDocFile = document.getElementById("rcTaxDoc")?.files?.[0];
 
       if (!companyname || !companyemail || !city) {
         alert("Please fill Company name, Company email, and City.");
@@ -242,7 +221,6 @@ class RentalCompaniesApp {
           method: "POST",
           body: fd,
         });
-
         if (!res.ok) {
           const ct = res.headers.get("content-type") || "";
           const msg = ct.includes("application/json")
@@ -250,11 +228,8 @@ class RentalCompaniesApp {
             : await res.text().catch(() => "");
           throw new Error(msg || `Signup failed (HTTP ${res.status})`);
         }
-
         alert("Company registration submitted successfully!");
         close();
-
-        // refresh list after signup (in case your admin auto-creates company)
         await this.loadCompanies();
         this.populateLocationFilter();
         this.applyFilters();
@@ -278,26 +253,21 @@ class RentalCompaniesApp {
 
     this.filteredCompanies = this.companies.filter((c) => {
       const desc = (c.description || "").toLowerCase();
-
       if (
         filters.name &&
         !c.name.toLowerCase().includes(filters.name) &&
         !desc.includes(filters.name)
       )
         return false;
-
       if (filters.location && c.location !== filters.location) return false;
       if (filters.withDriver && !c.offersDriver) return false;
-
       if (filters.fleetMin !== null && c.fleets < filters.fleetMin)
         return false;
       if (filters.fleetMax !== null && c.fleets > filters.fleetMax)
         return false;
-
       if (filters.reviewsMin !== null && c.reviews < filters.reviewsMin)
         return false;
       if (filters.minRating > 0 && c.rating < filters.minRating) return false;
-
       return true;
     });
 
@@ -336,25 +306,54 @@ class RentalCompaniesApp {
   createCompanyCard(company) {
     const initials = this.getInitials(company.name);
     const stars = this.renderStars(company.rating);
+
     return `
-      <div class="company-card" data-company-id="${company.id}" onclick="app.viewCompany(${company.id})">
-        <div class="company-avatar"><span class="avatar-text">${initials}</span></div>
-        <div class="company-info">
-          <h3 class="company-name">${this.escapeHtml(company.name)}</h3>
-          <div class="company-meta">
-            <div class="meta-item">📍 ${this.escapeHtml(company.location)}</div>
-            <div class="meta-item">👨‍✈️ ${company.offersDriver ? "Driver available" : "Self-drive only"}</div>
-            <div class="meta-item">🚗 ${company.fleets} vehicles</div>
+    <div class="company-card" data-company-id="${company.id}" onclick="app.viewCompany(${company.id})">
+      
+      <!-- Avatar -->
+      <div class="company-avatar">
+        <i class="fas fa-building"></i>
+      </div>
+
+      <!-- Info -->
+      <div class="company-info">
+        <h3 class="company-name">${this.escapeHtml(company.name)}</h3>
+
+        <div class="company-meta">
+          <div class="meta-item">
+            <i class="fas fa-location-dot meta-icon"></i>
+            ${this.escapeHtml(company.location)}
           </div>
-          <p class="company-desc">${this.escapeHtml(company.description || "")}</p>
-          <div class="company-rating">
-            <div class="rating-stars">${stars}</div>
-            <span class="rating-value">${Number(company.rating || 0).toFixed(1)}</span>
-            <span class="review-count">(${company.reviews || 0})</span>
+
+          <div class="meta-item">
+            <i class="fas fa-car meta-icon"></i>
+            ${company.fleets} vehicles
+          </div>
+
+          <div class="meta-item">
+            <i class="fas fa-user-tie meta-icon"></i>
+            ${company.driverCount} drivers
+          </div>
+
+          <div class="meta-item">
+            <i class="fas fa-screwdriver-wrench meta-icon"></i>
+            ${company.maintenanceCount} staff
           </div>
         </div>
+
+        <p class="company-desc">
+          ${this.escapeHtml(company.description || "")}
+        </p>
+
+        <div class="company-rating">
+          <div class="rating-stars">${stars}</div>
+          <span class="rating-value">${Number(company.rating || 0).toFixed(1)}</span>
+          <span class="review-count">(${company.reviews || 0})</span>
+        </div>
       </div>
-    `;
+
+    </div>
+  `;
   }
 
   updateCount() {
@@ -378,26 +377,20 @@ class RentalCompaniesApp {
 
   viewCompany(id) {
     const c = this.companies.find((x) => x.id === id);
-
-    // optional cache (used only if needed)
-    if (c) {
+    if (c)
       sessionStorage.setItem(
         "selectedCompany",
         JSON.stringify({ id: c.id, name: c.name }),
       );
-    }
-
     const url = new URL("rental-company-view.html", location.href);
     url.searchParams.set("id", String(id));
     location.href = url.toString();
   }
 
-  // utils
   parseNumber(v) {
     const n = parseFloat(v);
     return Number.isNaN(n) ? null : n;
   }
-
   getInitials(name) {
     return String(name || "")
       .split(" ")
@@ -407,7 +400,6 @@ class RentalCompaniesApp {
       .toUpperCase()
       .slice(0, 2);
   }
-
   renderStars(r) {
     const full = Math.floor(Number(r || 0));
     return Array.from(
@@ -415,13 +407,11 @@ class RentalCompaniesApp {
       (_, i) => `<span class="star ${i < full ? "active" : ""}"></span>`,
     ).join("");
   }
-
   escapeHtml(t) {
     const d = document.createElement("div");
     d.textContent = t;
     return d.innerHTML;
   }
-
   debounce(fn, wait) {
     let t;
     return (...a) => {
