@@ -3,7 +3,6 @@
 =================== -->
 <div class="header">
   <div class="hi">
-    <!-- replaced placeholder with element expected by header.js -->
     <h1 id="pageTitle">Dashboard</h1>
   </div>
 
@@ -11,33 +10,31 @@
     <!-- Notifications -->
     <div class="notification" onclick="showNotifications()">
       <i class="fas fa-bell"></i>
-      <div class="badge" id="notificationCount">3</div>
+      <div class="badge" id="notificationCount">0</div>
     </div>
 
     <div class="notification" onclick="showMessages()">
       <i class="fas fa-envelope"></i>
-      <div class="badge" id="messageCount">5</div>
+      <div class="badge" id="messageCount">0</div>
     </div>
 
     <!-- User Profile -->
     <div class="user-profile" id="userProfile">
-      <div class="profile-img" id="profileInitial">K</div>
+      <div class="profile-img" id="profileInitial">?</div>
       <div class="user-info">
-        <div class="user-name" id="userName">Kamal</div>
+        <div class="user-name" id="userName">Loading...</div>
       </div>
       <div class="profile-dropdown" id="profileDropdown">
         <a href="../pages/settings.html"><i class="fas fa-cog"></i> Settings</a>
         <a href="../pages/bookings.html"><i class="fas fa-calendar"></i> My Bookings</a>
         <hr>
-        <a href="#" onclick="handleLogout()"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        <a href="#" onclick="handleLogout(); return false;"><i class="fas fa-sign-out-alt"></i> Logout</a>
       </div>
     </div>
   </div>
 </div>
 
 <style>
-  /* Header Styles */
-
   .header {
     grid-column: 2;
     background-color: white;
@@ -61,7 +58,6 @@
     align-items: center;
   }
 
-  /* Notification Icons */
   .notification {
     position: relative;
     margin: 0 15px;
@@ -108,7 +104,6 @@
     font-weight: 600;
   }
 
-  /* User Profile */
   .user-profile {
     display: flex;
     align-items: center;
@@ -149,7 +144,6 @@
     font-size: 14px;
   }
 
-  /* Profile Dropdown */
   .profile-dropdown {
     position: absolute;
     top: 100%;
@@ -206,7 +200,6 @@
     border-radius: 0 0 var(--radius) var(--radius);
   }
 
-  /* Responsive */
   @media (max-width: 992px) {
     .header {
       grid-column: 1 / -1;
