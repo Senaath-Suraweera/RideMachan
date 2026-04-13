@@ -557,3 +557,238 @@ window.onclick = function (event) {
         document.body.style.overflow = 'auto';
     }
 };
+
+// =========================================================================
+// ADDITIONS to bookings.js for the Report feature
+// Append this block at the END of bookings.js (before the closing of file).
+// Also: add the Report button to buildBookingCard (see section B below).
+// =========================================================================
+
+// ---------- State for report modal ----------
+let reportState = {
+    rideId: null,
+    driverId: null,
+    driverName: null,
+    companyId: null,
+    companyName: null,
+    target: 'DRIVER',      // DRIVER or COMPANY
+    selectedImages: []     // File[]
+};
+
+// ---------- Open ----------
+function openReportModal(rideId) {
+    const b = findBooking(rideId);
+    if (!b) return;
+
+    const isSelfDrive = b.rentalType === 'self-drive';
+
+    reportState = {
+        rideId: rideId,
+        driverId: b.driverId || null,
+        driverName: b.driverName || null,
+        companyId: b.companyId || null,
+        companyName: b.companyName || null,
+        target: isSelfDrive ? 'COMPANY' : 'DRIVER',
+        selectedImages: []
+    };
+
+    // Subtitle
+    document.getElementById('reportSubtitle').textContent =
+        `Report an issue with your booking: ${b.vehicleModel || 'Vehicle'} (${rideId})`;
+
+    // Populate target names
+    const driverBtn = document.querySelector('.report-target-btn[data-target="DRIVER"]');
+    const companyBtn = document.querySelector('.report-target-btn[data-target="COMPANY"]');
+
+    document.getElementById('reportDriverName').textContent =
+        reportState.driverName || (isSelfDrive ? 'N/A' : 'Unknown');
+    document.getElementById('reportCompanyName').textContent =
+        reportState.companyName || 'Unknown';
+
+    // For self-drive there's no driver to report -> disable driver button
+    if (isSelfDrive || !reportState.driverId) {
+        driverBtn.classList.add('disabled');
+        driverBtn.classList.remove('active');
+        companyBtn.classList.add('active');
+    } else {
+        driverBtn.classList.remove('disabled');
+        driverBtn.classList.add('active');
+        companyBtn.classList.remove('active');
+    }
+
+    // Reset form
+    document.getElementById('reportCategory').value = '';
+    document.getElementById('reportSubject').value = '';
+    document.getElementById('reportDescription').value = '';
+    document.getElementById('reportImageInput').value = '';
+    document.getElementById('reportImagePreview').innerHTML = '';
+
+    document.getElementById('reportModal').style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+}
+
+function closeReportModal() {
+    document.getElementById('reportModal').style.display = 'none';
+    document.body.style.overflow = 'auto';
+    reportState.selectedImages = [];
+}
+
+// ---------- Target toggle ----------
+function selectReportTarget(target) {
+    // Don't allow clicks on disabled
+    const btn = document.querySelector(`.report-target-btn[data-target="${target}"]`);
+    if (!btn || btn.classList.contains('disabled')) return;
+
+    reportState.target = target;
+    document.querySelectorAll('.report-target-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+}
+
+// ---------- Image handling ----------
+function handleReportImageSelect(event) {
+    const files = Array.from(event.target.files || []);
+    const maxFiles = 5;
+    const maxSize = 10 * 1024 * 1024; // 10MB
+
+    files.forEach(file => {
+        if (reportState.selectedImages.length >= maxFiles) {
+            showNotification(`Maximum ${maxFiles} images allowed`, 'warning');
+            return;
+        }
+        if (file.size > maxSize) {
+            showNotification(`${file.name} is too large (max 10MB)`, 'warning');
+            return;
+        }
+        reportState.selectedImages.push(file);
+    });
+
+    renderReportImagePreviews();
+    event.target.value = ''; // allow re-selecting same file
+}
+
+function renderReportImagePreviews() {
+    const container = document.getElementById('reportImagePreview');
+    container.innerHTML = '';
+    reportState.selectedImages.forEach((file, idx) => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const item = document.createElement('div');
+            item.className = 'preview-item';
+            item.innerHTML = `
+                <img src="${e.target.result}" alt="preview" />
+                <button type="button" class="preview-remove" onclick="removeReportImage(${idx})">
+                    <i class="fas fa-times"></i>
+                </button>`;
+            container.appendChild(item);
+        };
+        reader.readAsDataURL(file);
+    });
+}
+
+function removeReportImage(idx) {
+    reportState.selectedImages.splice(idx, 1);
+    renderReportImagePreviews();
+}
+
+// ---------- Submit ----------
+function submitReport() {
+    const category = document.getElementById('reportCategory').value;
+    const subject = document.getElementById('reportSubject').value.trim();
+    const description = document.getElementById('reportDescription').value.trim();
+
+    // Validation
+    if (!category) {
+        showNotification('Please select a category', 'warning');
+        return;
+    }
+    if (!subject) {
+        showNotification('Please enter a subject', 'warning');
+        return;
+    }
+    if (!description) {
+        showNotification('Please describe the issue', 'warning');
+        return;
+    }
+
+    // Resolve reportedId based on target
+    const reportedRole = reportState.target;
+    const reportedId = reportedRole === 'DRIVER' ? reportState.driverId : reportState.companyId;
+
+    if (!reportedId) {
+        showNotification(`Cannot report ${reportedRole.toLowerCase()} — missing ID`, 'warning');
+        return;
+    }
+
+    // Disable submit button
+    const btn = document.getElementById('reportSubmitBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
+
+    const payload = {
+        category: category,
+        subject: subject,
+        description: description + `\n\n[Booking ID: ${reportState.rideId}]`,
+        reportedRole: reportedRole,
+        reportedId: reportedId
+    };
+
+    fetch('../../../customer/report/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'same-origin',
+        body: JSON.stringify(payload)
+    })
+        .then(res => {
+            if (res.status === 401) {
+                showNotification('Please login to file a report', 'warning');
+                throw new Error('Unauthorized');
+            }
+            return res.json();
+        })
+        .then(data => {
+            if (!data.success) {
+                throw new Error(data.message || 'Failed to submit report');
+            }
+            const reportId = data.reportId;
+
+            // If no images, we're done
+            if (reportState.selectedImages.length === 0) {
+                finishReportSubmission();
+                return;
+            }
+
+            // Upload images
+            const formData = new FormData();
+            formData.append('reportId', reportId);
+            reportState.selectedImages.forEach(f => formData.append('images', f));
+
+            return fetch('../../../report/image/upload', {
+                method: 'POST',
+                credentials: 'same-origin',
+                body: formData
+            })
+                .then(r => r.json())
+                .then(imgRes => {
+                    if (imgRes.status !== 'success') {
+                        showNotification('Report filed, but image upload failed', 'warning');
+                    }
+                    finishReportSubmission();
+                });
+        })
+        .catch(err => {
+            console.error('Report submit error:', err);
+            if (err.message !== 'Unauthorized') {
+                showNotification(err.message || 'Could not submit report', 'warning');
+            }
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-flag"></i> Submit Report';
+        });
+}
+
+function finishReportSubmission() {
+    const btn = document.getElementById('reportSubmitBtn');
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fas fa-flag"></i> Submit Report';
+    closeReportModal();
+    showNotification('Report filed successfully. Our team will review it shortly.', 'success');
+}
