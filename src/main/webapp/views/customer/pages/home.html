@@ -99,6 +99,9 @@
                 <a href="../pages/bookings.html" class="action-btn outline">
                     <i class="fas fa-calendar"></i> View Bookings
                 </a>
+                <a href="../pages/support.html" class="action-btn outline">
+                    <i class="fas fa-headset"></i> Report Issue
+                </a>
                 <button class="action-btn outline" onclick="showEmergencyContact()">
                     <i class="fas fa-phone"></i> Emergency Help
                 </button>
@@ -186,7 +189,7 @@
     /* ---------- Dashboard Data from Backend ---------- */
     async function loadDashboardData() {
         try {
-            const response = await fetch('/RideMachan/customer/dashboard-stats');
+            const response = await fetch('../../../customer/dashboard-stats');
             if (!response.ok) throw new Error('Failed');
             const data = await response.json();
 
