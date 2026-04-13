@@ -29,7 +29,7 @@ public class DriverSignupServlet extends HttpServlet {
 
             if(session == null || session.getAttribute("companyId") == null) {
                 String requestedPage = request.getRequestURI();
-                response.sendRedirect(request.getContextPath() + "companylogin.html?redirect=" + requestedPage);
+                response.sendRedirect(request.getContextPath() + "/companylogin.html?redirect=" + requestedPage);
                 return;
             }
 
