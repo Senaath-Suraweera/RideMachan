@@ -270,12 +270,7 @@ function displayVehicles(vehicles) {
                 </div>
             </div>
 
-            <div class="vehicle-actions">
-                <button class="message-btn"
-                    onclick="event.stopPropagation(); sendMessage(${vehicle.vehicleId}, '${vehicle.vehicleBrand} ${vehicle.vehicleModel}')">
-                    Message
-                </button>
-            </div>
+            
         `;
 
         container.appendChild(vehicleCard);

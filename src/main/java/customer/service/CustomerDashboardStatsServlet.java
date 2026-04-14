@@ -23,30 +23,48 @@ public class CustomerDashboardStatsServlet extends HttpServlet {
         response.setCharacterEncoding("UTF-8");
 
         HttpSession session = request.getSession(false);
-        if (session == null || session.getAttribute("customerid") == null) {
+        if (session == null || session.getAttribute("customerId") == null) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.getWriter().write("{\"error\": \"Not authenticated\"}");
             return;
         }
 
-        int customerId = (int) session.getAttribute("customerid");
+        int customerId = (int) session.getAttribute("customerId");
 
         try (Connection conn = DBConnection.getConnection()) {
 
+            // ACTIVE: trip is currently in progress, not cancelled
             int active = getCount(conn,
-                    "SELECT COUNT(*) FROM companybookings WHERE customerid = ? AND status = 'active'",
+                    "SELECT COUNT(*) FROM companybookings " +
+                            "WHERE customerid = ? " +
+                            "AND (status IS NULL OR status NOT IN ('cancelled')) " +
+                            "AND TIMESTAMP(trip_start_date, start_time) <= NOW() " +
+                            "AND TIMESTAMP(trip_end_date, end_time) >= NOW()",
                     customerId);
 
+            // UPCOMING: trip starts in the future, not cancelled
             int upcoming = getCount(conn,
-                    "SELECT COUNT(*) FROM companybookings WHERE customerid = ? AND status = 'confirmed' AND trip_start_date > CURDATE()",
+                    "SELECT COUNT(*) FROM companybookings " +
+                            "WHERE customerid = ? " +
+                            "AND (status IS NULL OR status NOT IN ('cancelled')) " +
+                            "AND TIMESTAMP(trip_start_date, start_time) > NOW()",
                     customerId);
 
+            // COMPLETED: trip has already ended, not cancelled
             int completed = getCount(conn,
-                    "SELECT COUNT(*) FROM companybookings WHERE customerid = ? AND status = 'completed'",
+                    "SELECT COUNT(*) FROM companybookings " +
+                            "WHERE customerid = ? " +
+                            "AND (status IS NULL OR status NOT IN ('cancelled')) " +
+                            "AND TIMESTAMP(trip_end_date, end_time) < NOW()",
                     customerId);
 
+            // MONTHLY SPEND: total for non-cancelled bookings in the current month
             double monthlySpend = getSum(conn,
-                    "SELECT COALESCE(SUM(total_amount), 0) FROM companybookings WHERE customerid = ? AND status = 'completed' AND MONTH(booked_Date) = MONTH(CURDATE()) AND YEAR(booked_Date) = YEAR(CURDATE())",
+                    "SELECT COALESCE(SUM(total_amount), 0) FROM companybookings " +
+                            "WHERE customerid = ? " +
+                            "AND (status IS NULL OR status NOT IN ('cancelled')) " +
+                            "AND MONTH(trip_start_date) = MONTH(CURDATE()) " +
+                            "AND YEAR(trip_start_date) = YEAR(CURDATE())",
                     customerId);
 
             JsonObject json = new JsonObject();

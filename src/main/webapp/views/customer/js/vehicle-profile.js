@@ -19,6 +19,18 @@ document.addEventListener('DOMContentLoaded', function() {
     loadVehicleDetails();
 });
 
+// =====================================================
+// HELPER: Format date to yyyy-MM-dd using LOCAL time
+// This fixes the timezone bug where toISOString() shifts
+// dates back by 1 day in UTC+ timezones like Sri Lanka
+// =====================================================
+function toLocalDateString(date) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+}
+
 async function loadVehicleDetails() {
     // Get vehicle ID from URL parameter
     const urlParams = new URLSearchParams(window.location.search);
@@ -226,11 +238,11 @@ function generateNearbyLocations(city) {
 function updateStars(containerId, rating) {
     const container = document.getElementById(containerId);
     let starsHTML = '';
-    
+
     for (let i = 1; i <= 5; i++) {
         starsHTML += i <= rating ? '<i class="fas fa-star"></i>' : '<i class="far fa-star"></i>';
     }
-    
+
     container.innerHTML = starsHTML;
 }
 
@@ -246,7 +258,7 @@ function showBookingPopup(vehicle) {
     const locationOptions = (vehicle.pickupLocations || [vehicle.location]).map(loc =>
         `<option value="${loc}"${loc === vehicle.location ? ' selected' : ''}>${loc}</option>`
     ).join('');
-    
+
     const popup = document.createElement('div');
     popup.className = 'popup-overlay';
     popup.innerHTML = `
@@ -428,7 +440,7 @@ function showBookingPopup(vehicle) {
         </div>
     `;
     document.body.appendChild(popup);
-    
+
     setTimeout(() => {
         renderCalendar();
     }, 100);
@@ -438,71 +450,75 @@ function renderCalendar() {
     if (!vehicleData) return;
 
     const vehicle = vehicleData;
-    const bookedDates = vehicle.bookedDates || []; // Empty for now, can be fetched from bookings table later
+    const bookedDates = vehicle.bookedDates || [];
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    
+
     const month = currentCalendarMonth.getMonth();
     const year = currentCalendarMonth.getFullYear();
-    
+
     const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
-                        'July', 'August', 'September', 'October', 'November', 'December'];
-    
+        'July', 'August', 'September', 'October', 'November', 'December'];
+
     document.getElementById('calendarMonthYear').textContent = `${monthNames[month]} ${year}`;
-    
+
     const firstDay = new Date(year, month, 1).getDay();
     const daysInMonth = new Date(year, month + 1, 0).getDate();
-    
+
     const grid = document.getElementById('calendarGrid');
     let html = '';
-    
+
     // Day headers
     const dayHeaders = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
     dayHeaders.forEach(day => {
         html += `<div class="calendar-day-header">${day}</div>`;
     });
-    
+
     // Empty cells before month starts
     for (let i = 0; i < firstDay; i++) {
         html += '<div class="calendar-day other-month"></div>';
     }
-    
+
     // Get selected dates
     const selectedPickupDate = document.getElementById('pickupDate').value;
     const selectedReturnDate = document.getElementById('returnDate').value;
-    
+
+    // Today's date string using LOCAL time
+    const todayStr = toLocalDateString(today);
+
     // Days of month
     for (let day = 1; day <= daysInMonth; day++) {
         const date = new Date(year, month, day);
         date.setHours(0, 0, 0, 0);
-        const dateStr = date.toISOString().split('T')[0];
-        
-        const isToday = dateStr === today.toISOString().split('T')[0];
+
+        const dateStr = toLocalDateString(date);
+
+        const isToday = dateStr === todayStr;
         const isBooked = bookedDates.includes(dateStr);
         const isPastDate = date < today;
         const isPickupSelected = dateStr === selectedPickupDate;
         const isReturnSelected = dateStr === selectedReturnDate;
-        
+
         let classes = 'calendar-day';
         let clickable = true;
-        
+
         if (isBooked || isPastDate) {
             classes += ' disabled';
             clickable = false;
         }
-        
+
         if (isToday && !isBooked && !isPastDate) {
             classes += ' today';
         }
-        
+
         if (isPickupSelected || isReturnSelected) {
             classes += ' selected';
         }
-        
+
         const onclick = clickable ? `onclick="selectDate('${dateStr}')"` : '';
         html += `<div class="${classes}" ${onclick}>${day}</div>`;
     }
-    
+
     grid.innerHTML = html;
 }
 
@@ -524,7 +540,7 @@ function focusReturnDate() {
 function selectDate(dateStr) {
     const pickupDate = document.getElementById('pickupDate').value;
     const returnDate = document.getElementById('returnDate').value;
-    
+
     // If selecting pickup date
     if (selectingPickup || !pickupDate) {
         document.getElementById('pickupDate').value = dateStr;
@@ -536,18 +552,15 @@ function selectDate(dateStr) {
     }
     // If selecting return date
     else {
-        const pickup = new Date(pickupDate);
-        const selected = new Date(dateStr);
-        
-        if (selected <= pickup) {
+        if (dateStr <= pickupDate) {
             showNotification('Drop-off date must be after pick-up date', 'warning');
             return;
         }
-        
+
         document.getElementById('returnDate').value = dateStr;
         updateReturnDisplay();
     }
-    
+
     renderCalendar();
     calculateDuration();
 }
@@ -556,9 +569,10 @@ function updatePickupDisplay() {
     const dateValue = document.getElementById('pickupDate').value;
     const timeValue = document.getElementById('pickupTime').value;
     const displayInput = document.getElementById('pickupDateDisplay');
-    
+
     if (dateValue) {
-        const date = new Date(dateValue);
+        const parts = dateValue.split('-');
+        const date = new Date(parts[0], parts[1] - 1, parts[2]);
         const formatted = formatDateForDisplay(date);
         displayInput.value = timeValue ? `${formatted}, ${formatTimeDisplay(timeValue)}` : formatted;
         displayInput.classList.add('filled');
@@ -566,7 +580,7 @@ function updatePickupDisplay() {
         displayInput.value = '';
         displayInput.classList.remove('filled');
     }
-    
+
     validateBookingForm();
 }
 
@@ -574,9 +588,10 @@ function updateReturnDisplay() {
     const dateValue = document.getElementById('returnDate').value;
     const timeValue = document.getElementById('returnTime').value;
     const displayInput = document.getElementById('returnDateDisplay');
-    
+
     if (dateValue) {
-        const date = new Date(dateValue);
+        const parts = dateValue.split('-');
+        const date = new Date(parts[0], parts[1] - 1, parts[2]);
         const formatted = formatDateForDisplay(date);
         displayInput.value = timeValue ? `${formatted}, ${formatTimeDisplay(timeValue)}` : formatted;
         displayInput.classList.add('filled');
@@ -584,7 +599,7 @@ function updateReturnDisplay() {
         displayInput.value = '';
         displayInput.classList.remove('filled');
     }
-    
+
     validateBookingForm();
 }
 
@@ -606,14 +621,13 @@ function formatTimeDisplay(timeStr) {
 function previousMonth() {
     const today = new Date();
     currentCalendarMonth.setMonth(currentCalendarMonth.getMonth() - 1);
-    
-    // Don't allow going before current month
+
     if (currentCalendarMonth < new Date(today.getFullYear(), today.getMonth(), 1)) {
         currentCalendarMonth.setMonth(currentCalendarMonth.getMonth() + 1);
         showNotification('Cannot select past dates', 'warning');
         return;
     }
-    
+
     renderCalendar();
 }
 
@@ -644,11 +658,11 @@ function selectMode(mode) {
         opt.classList.remove('active');
     });
     document.querySelector(`[data-mode="${mode}"]`).classList.add('active');
-    
+
     const rate = mode === 'self-drive' ? vehicle.hourlyRate : vehicle.hourlyRateWithDriver;
     document.getElementById('selectedModeText').textContent = mode === 'self-drive' ? 'Self Drive' : 'With Driver';
     document.getElementById('hourlyRate').textContent = `LKR ${rate.toLocaleString()}`;
-    
+
     calculateDuration();
 }
 
@@ -657,7 +671,7 @@ function calculateDuration() {
     const pickupTime = document.getElementById('pickupTime').value;
     const returnDate = document.getElementById('returnDate').value;
     const returnTime = document.getElementById('returnTime').value;
-    
+
     if (!pickupDate || !pickupTime || !returnDate || !returnTime) {
         document.getElementById('durationSummaryContainer').style.display = 'none';
         document.getElementById('durationText').textContent = '0 hours';
@@ -665,32 +679,32 @@ function calculateDuration() {
         validateBookingForm();
         return;
     }
-    
+
     const pickup = new Date(`${pickupDate}T${pickupTime}`);
     const returnDT = new Date(`${returnDate}T${returnTime}`);
-    
+
     if (returnDT <= pickup) {
         showNotification('Drop-off date/time must be after pick-up date/time', 'warning');
         document.getElementById('durationSummaryContainer').style.display = 'none';
         validateBookingForm();
         return;
     }
-    
+
     const diffMs = returnDT - pickup;
     const hours = Math.ceil(diffMs / (1000 * 60 * 60));
-    
+
     if (!vehicleData) return;
     const vehicle = vehicleData;
     const rate = selectedMode === 'self-drive' ? vehicle.hourlyRate : vehicle.hourlyRateWithDriver;
     const serviceFee = 500;
     const subtotal = hours * rate;
     const total = subtotal + serviceFee;
-    
+
     document.getElementById('totalHours').textContent = `${hours} hour${hours > 1 ? 's' : ''}`;
     document.getElementById('durationText').textContent = `${hours} hour${hours > 1 ? 's' : ''}`;
     document.getElementById('totalCost').textContent = `LKR ${total.toLocaleString()}`;
     document.getElementById('durationSummaryContainer').style.display = 'block';
-    
+
     const days = Math.floor(hours / 24);
     const remainingHours = hours % 24;
     let note = '';
@@ -701,7 +715,7 @@ function calculateDuration() {
         }
     }
     document.getElementById('durationNote').textContent = note;
-    
+
     bookingData = {
         pickupDate,
         pickupTime,
@@ -712,7 +726,7 @@ function calculateDuration() {
         serviceFee,
         total
     };
-    
+
     validateBookingForm();
 }
 
@@ -722,10 +736,9 @@ function validateBookingForm() {
     const returnDate = document.getElementById('returnDate').value;
     const returnTime = document.getElementById('returnTime').value;
     const pickupLocation = document.getElementById('pickupLocation').value;
-    
+
     const confirmBtn = document.getElementById('confirmBookingBtn');
-    
-    // Enable button only if all fields are filled
+
     if (pickupDate && pickupTime && returnDate && returnTime && pickupLocation) {
         confirmBtn.disabled = false;
         confirmBtn.style.opacity = '1';
@@ -737,7 +750,7 @@ function validateBookingForm() {
     }
 }
 
-function confirmBooking() {
+async function confirmBooking() {
     if (!vehicleData) {
         showNotification('Vehicle data not loaded', 'error');
         return;
@@ -745,42 +758,26 @@ function confirmBooking() {
 
     const vehicle = vehicleData;
     const pickupLocation = document.getElementById('pickupLocation').value.trim();
-    
-    if (!pickupLocation || !bookingData.pickupDate || !bookingData.pickupTime || 
+
+    if (!pickupLocation || !bookingData.pickupDate || !bookingData.pickupTime ||
         !bookingData.returnDate || !bookingData.returnTime) {
         showNotification('Please fill in all booking details', 'warning');
         return;
     }
-    
-    const pickupDateTime = new Date(`${bookingData.pickupDate}T${bookingData.pickupTime}`);
-    const returnDateTime = new Date(`${bookingData.returnDate}T${bookingData.returnTime}`);
-    
-    const finalBookingData = {
+
+    const confirmBtn = document.getElementById('confirmBookingBtn');
+    confirmBtn.disabled = true;
+    confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+
+    const requestBody = {
         vehicleId: vehicle.vehicleId,
+        companyId: vehicle.companyId,
         vehicleName: vehicle.name,
-        company: vehicle.company,
         mode: selectedMode,
-        modeDisplay: selectedMode === 'self-drive' ? 'Self Drive' : 'With Driver',
         pickupDate: bookingData.pickupDate,
-        pickupTime: bookingData.pickupTime,
-        pickupDateTime: pickupDateTime.toLocaleString('en-US', { 
-            weekday: 'short', 
-            year: 'numeric', 
-            month: 'short', 
-            day: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit'
-        }),
         returnDate: bookingData.returnDate,
+        pickupTime: bookingData.pickupTime,
         returnTime: bookingData.returnTime,
-        returnDateTime: returnDateTime.toLocaleString('en-US', { 
-            weekday: 'short', 
-            year: 'numeric', 
-            month: 'short', 
-            day: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit'
-        }),
         pickupLocation: pickupLocation,
         hours: bookingData.hours,
         hourlyRate: selectedMode === 'self-drive' ? vehicle.hourlyRate : vehicle.hourlyRateWithDriver,
@@ -788,15 +785,81 @@ function confirmBooking() {
         serviceFee: bookingData.serviceFee,
         totalCost: bookingData.total
     };
-    
-    // Store in window object for next page
-    window.bookingDetails = finalBookingData;
-    
-    // Navigate to payment page
-    showNotification('Proceeding to payment...', 'success');
-    setTimeout(() => {
-        window.location.href = 'payment.html';
-    }, 1000);
+
+    try {
+        const response = await fetch('/customer/create-booking', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(requestBody)
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            showNotification('Booking created! Ride ID: ' + result.rideId, 'success');
+
+            // Build booking details object for payment page
+            const pParts = bookingData.pickupDate.split('-');
+            const rParts = bookingData.returnDate.split('-');
+            const pickupDateTime = new Date(pParts[0], pParts[1] - 1, pParts[2],
+                ...bookingData.pickupTime.split(':').map(Number));
+            const returnDateTime = new Date(rParts[0], rParts[1] - 1, rParts[2],
+                ...bookingData.returnTime.split(':').map(Number));
+
+            const bookingDetailsObj = {
+                rideId: result.rideId,
+                vehicleId: vehicle.vehicleId,
+                vehicleName: vehicle.name,
+                company: vehicle.company,
+                mode: selectedMode,
+                modeDisplay: selectedMode === 'self-drive' ? 'Self Drive' : 'With Driver',
+                pickupDate: bookingData.pickupDate,
+                pickupTime: bookingData.pickupTime,
+                pickupDateTime: pickupDateTime.toLocaleString('en-US', {
+                    weekday: 'short', year: 'numeric', month: 'short', day: 'numeric',
+                    hour: '2-digit', minute: '2-digit'
+                }),
+                returnDate: bookingData.returnDate,
+                returnTime: bookingData.returnTime,
+                returnDateTime: returnDateTime.toLocaleString('en-US', {
+                    weekday: 'short', year: 'numeric', month: 'short', day: 'numeric',
+                    hour: '2-digit', minute: '2-digit'
+                }),
+                pickupLocation: pickupLocation,
+                hours: bookingData.hours,
+                hourlyRate: selectedMode === 'self-drive' ? vehicle.hourlyRate : vehicle.hourlyRateWithDriver,
+                subtotal: bookingData.subtotal,
+                serviceFee: bookingData.serviceFee,
+                totalCost: bookingData.total
+            };
+
+            // Store in BOTH memory and sessionStorage so the data survives page navigation
+            window.bookingDetails = bookingDetailsObj;
+            try {
+                sessionStorage.setItem('bookingDetails', JSON.stringify(bookingDetailsObj));
+            } catch (e) {
+                console.error('Failed to save booking details to sessionStorage', e);
+            }
+
+            // Navigate to payment page
+            setTimeout(() => {
+                window.location.href = 'payment.html';
+            }, 1500);
+
+        } else {
+            showNotification(result.message || 'Booking failed', 'error');
+            confirmBtn.disabled = false;
+            confirmBtn.innerHTML = '<i class="fas fa-arrow-right"></i> Proceed to Payment';
+        }
+
+    } catch (error) {
+        console.error('Booking error:', error);
+        showNotification('Failed to create booking. Please try again.', 'error');
+        confirmBtn.disabled = false;
+        confirmBtn.innerHTML = '<i class="fas fa-arrow-right"></i> Proceed to Payment';
+    }
 }
 
 function messageOwner() {
@@ -806,7 +869,7 @@ function messageOwner() {
 function toggleWishlist() {
     const btn = document.getElementById('wishlistBtn');
     const icon = btn.querySelector('i');
-    
+
     if (!isWishlisted) {
         icon.classList.replace('far', 'fas');
         btn.style.background = 'var(--danger)';
@@ -829,8 +892,7 @@ function toggleWishlist() {
 function closePopup() {
     const popup = document.querySelector('.popup-overlay');
     if (popup) popup.remove();
-    
-    // Reset booking data
+
     bookingData = {
         pickupDate: null,
         pickupTime: null,
@@ -842,8 +904,7 @@ function closePopup() {
         serviceFee: 500,
         total: 500
     };
-    
-    // Reset calendar month
+
     currentCalendarMonth = new Date();
     selectingPickup = true;
 }
@@ -862,14 +923,11 @@ function goBack() {
 
 function handleLogout() {
     if (confirm('Are you sure you want to logout?')) {
-        // Call backend servlet
         fetch('/customer/logout', { method: 'GET' })
             .then(response => {
-                // Follow redirect from servlet
                 if (response.redirected) {
                     window.location.href = response.url;
                 } else {
-                    // Manual fallback
                     window.location.href = '/views/landing/index.html';
                 }
             })
@@ -883,17 +941,17 @@ function handleLogout() {
 
 function showNotification(message, type) {
     const notification = document.createElement('div');
-    
-    const bgColor = type === 'success' ? 'var(--success)' : 
-                    type === 'warning' ? 'var(--warning)' : 
-                    type === 'error' ? 'var(--danger)' : 
-                    'var(--info)';
-    
-    const icon = type === 'success' ? 'fa-check-circle' : 
-                 type === 'warning' ? 'fa-exclamation-triangle' : 
-                 type === 'error' ? 'fa-times-circle' : 
-                 'fa-info-circle';
-    
+
+    const bgColor = type === 'success' ? 'var(--success)' :
+        type === 'warning' ? 'var(--warning)' :
+            type === 'error' ? 'var(--danger)' :
+                'var(--info)';
+
+    const icon = type === 'success' ? 'fa-check-circle' :
+        type === 'warning' ? 'fa-exclamation-triangle' :
+            type === 'error' ? 'fa-times-circle' :
+                'fa-info-circle';
+
     notification.style.cssText = `
         position: fixed;
         top: 20px;
@@ -911,14 +969,14 @@ function showNotification(message, type) {
         animation: slideInRight 0.3s ease;
         max-width: 400px;
     `;
-    
+
     notification.innerHTML = `
         <i class="fas ${icon}"></i>
         <span>${message}</span>
     `;
-    
+
     document.body.appendChild(notification);
-    
+
     setTimeout(() => {
         notification.style.animation = 'slideOutRight 0.3s ease';
         setTimeout(() => notification.remove(), 300);

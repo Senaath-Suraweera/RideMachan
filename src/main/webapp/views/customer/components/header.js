@@ -1,123 +1,149 @@
-// ================= HEADER INITIALIZATION =================
-function initializeHeader() {
-  loadUserData();
-  updateNotificationCounts();
+// ================= HEADER COMPONENT LOGIC =================
+// Exposes: initializeHeader, setPageTitle, showNotifications,
+//          showMessages, handleLogout (all on window)
 
-  // Attach programmatic click listener to user profile (reliable after injection)
-  const userProfileEl = document.getElementById("userProfile");
-  if (userProfileEl && !userProfileEl.__pmListAttached) {
-    userProfileEl.addEventListener("click", function (e) {
-      e.stopPropagation(); // prevent document-level handler from closing immediately
-      toggleProfileDropdown(); // programmatic call (no event needed)
-    });
-    userProfileEl.__pmListAttached = true;
+(function () {
+
+  // ---- CONFIG: adjust to match your backend ----
+  var PROFILE_ENDPOINT = '/customer/profile/info';
+  var LOGOUT_ENDPOINT  = '/customer/logout';
+  var LOGIN_PAGE       = '../pages/login.html';
+  // ----------------------------------------------
+
+  /**
+   * Main entry point — called by content-all.js after header.html is injected.
+   */
+  function initializeHeader() {
+    wireDropdown();
+    loadUserData();
   }
 
-  // Close dropdown when clicking outside (add only once)
-  if (!window.__rideMachanHeaderInit) {
-    document.addEventListener("click", function () {
-      const dropdown = document.getElementById("profileDropdown");
-      if (dropdown) {
-        dropdown.classList.remove("show");
+  /**
+   * Wire the profile dropdown toggle + outside-click close.
+   */
+  function wireDropdown() {
+    var profile  = document.getElementById('userProfile');
+    var dropdown = document.getElementById('profileDropdown');
+    if (!profile || !dropdown) return;
+
+    // Avoid double-binding if header is reloaded
+    if (profile.dataset.dropdownWired === 'true') return;
+    profile.dataset.dropdownWired = 'true';
+
+    profile.addEventListener('click', function (e) {
+      // Don't toggle when clicking links inside the dropdown
+      if (e.target.closest('.profile-dropdown a')) return;
+      e.stopPropagation();
+      dropdown.classList.toggle('show');
+    });
+
+    document.addEventListener('click', function (e) {
+      if (!profile.contains(e.target)) {
+        dropdown.classList.remove('show');
       }
     });
-    window.__rideMachanHeaderInit = true;
-  }
-}
 
-// ================= LOAD USER =================
-function loadUserData() {
-  fetch("/customer/profile/info", {
-    method: "GET",
-    credentials: "include"
-  })
-      .then(response => {
-        if (!response.ok) throw new Error("Not logged in");
-        return response.json();
-      })
-      .then(userData => {
-        const firstName = userData.firstname?.trim();
-
-        const userNameEl = document.getElementById("userName");
-        const profileInitialEl = document.getElementById("profileInitial");
-
-        // 🔥 FORCE overwrite (removes old Kamal)
-        if (userNameEl) userNameEl.textContent = firstName || "User";
-        if (profileInitialEl)
-          profileInitialEl.textContent = (firstName || "U").charAt(0).toUpperCase();
-
-        setPageTitle(`Welcome back ${firstName || ""}`.trim());
-      })
-      .catch(() => {
-        // Guest fallback
-        const userNameEl = document.getElementById("userName");
-        const profileInitialEl = document.getElementById("profileInitial");
-
-        if (userNameEl) userNameEl.textContent = "Guest";
-        if (profileInitialEl) profileInitialEl.textContent = "G";
-
-        setPageTitle("Welcome back");
-      });
-}
-
-// ================= PAGE TITLE =================
-function setPageTitle(title) {
-  const pageTitleEl = document.getElementById("pageTitle");
-  if (pageTitleEl) {
-    pageTitleEl.textContent = title;
+    // Close on Escape
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') dropdown.classList.remove('show');
+    });
   }
 
-  document.title = `${title} - Ride Machan`;
-}
+  /**
+   * Fetch the logged-in customer's profile and populate the header.
+   */
+  function loadUserData() {
+    fetch(PROFILE_ENDPOINT, {
+      method: 'GET',
+      credentials: 'include',
+      headers: { 'Accept': 'application/json' }
+    })
+        .then(function (res) {
+          if (!res.ok) throw new Error('HTTP ' + res.status);
+          return res.json();
+        })
+        .then(function (data) {
+          // Try common field name variations — adjust if your backend differs
+          var firstName =
+              data.firstname ||
+              data.firstName ||
+              data.first_name ||
+              data.fname ||
+              (data.name     ? String(data.name).trim().split(/\s+/)[0]     : null) ||
+              (data.fullName ? String(data.fullName).trim().split(/\s+/)[0] : null) ||
+              'Customer';
 
-// ================= NOTIFICATIONS =================
-function updateNotificationCounts() {
-  const counts = { notifications: 3, messages: 5 };
+          var nameEl = document.getElementById('userName');
+          var initEl = document.getElementById('profileInitial');
+          if (nameEl) nameEl.textContent = firstName;
+          if (initEl) initEl.textContent = firstName.charAt(0).toUpperCase();
 
-  const n = document.getElementById("notificationCount");
-  const m = document.getElementById("messageCount");
+          // On the dashboard, show "Welcome back <Name>"
+          var path     = window.location.pathname;
+          var filename = path.substring(path.lastIndexOf('/') + 1) || 'index.html';
+          if (filename === 'dashboard.html' || filename === 'index.html' || filename === 'home.html') {
+            setPageTitle('Welcome back, ' + firstName);
+          }
 
-  if (n) n.textContent = counts.notifications;
-  if (m) m.textContent = counts.messages;
-}
-
-// ================= DROPDOWN =================
-function toggleProfileDropdown(event) {
-  // Support both inline callers that pass an event and programmatic callers that don't.
-  if (event && typeof event.stopPropagation === "function") {
-    event.stopPropagation();
+          // Optional: notification / message counts if backend returns them
+          if (typeof data.notificationCount === 'number') {
+            var nc = document.getElementById('notificationCount');
+            if (nc) nc.textContent = data.notificationCount;
+          }
+          if (typeof data.messageCount === 'number') {
+            var mc = document.getElementById('messageCount');
+            if (mc) mc.textContent = data.messageCount;
+          }
+        })
+        .catch(function (err) {
+          console.error('Profile fetch failed:', err);
+          var nameEl = document.getElementById('userName');
+          var initEl = document.getElementById('profileInitial');
+          if (nameEl) nameEl.textContent = 'Guest';
+          if (initEl) initEl.textContent = 'G';
+        });
   }
 
-  const dropdown = document.getElementById("profileDropdown");
-  if (dropdown) {
-    dropdown.classList.toggle("show");
+  /**
+   * Update the header <h1> title.
+   */
+  function setPageTitle(title) {
+    var el = document.getElementById('pageTitle');
+    if (el) el.textContent = title;
+    document.title = title + ' | RideMachan';
   }
-}
 
-// ================= ACTIONS =================
-function showNotifications() {
-  window.location.href = "../pages/notifications.html";
-}
+  // ---------- Action handlers ----------
 
-function showMessages() {
-  alert("Messages feature coming soon!");
-}
+  function showNotifications() {
+    window.location.href = '../pages/notifications.html';
+  }
 
-function handleLogout() {
-  if (!confirm("Are you sure you want to logout?")) return;
+  function showMessages() {
+    window.location.href = '../pages/messages.html';
+  }
 
-  fetch("/customer/logout")
-      .then(() => {
-        window.location.href = "/views/landing/index.html";
-      })
-      .catch(() => {
-        window.location.href = "/views/landing/index.html";
-      });
-}
+  function handleLogout() {
+    if (!confirm('Are you sure you want to log out?')) return;
 
-// Expose functions globally so onclick attributes and dynamic loader can call them
-window.initializeHeader = initializeHeader;
-window.toggleProfileDropdown = toggleProfileDropdown;
-window.showNotifications = showNotifications;
-window.showMessages = showMessages;
-window.handleLogout = handleLogout;
+    fetch(LOGOUT_ENDPOINT, {
+      method: 'POST',
+      credentials: 'include'
+    })
+        .then(function () {
+          window.location.href = LOGIN_PAGE;
+        })
+        .catch(function (err) {
+          console.error('Logout failed:', err);
+          // Redirect anyway so the user isn't stuck
+          window.location.href = LOGIN_PAGE;
+        });
+  }
+
+  // ---- Expose globals (the loader and inline onclick handlers need these) ----
+  window.initializeHeader  = initializeHeader;
+  window.setPageTitle      = setPageTitle;
+  window.showNotifications = showNotifications;
+  window.showMessages      = showMessages;
+  window.handleLogout      = handleLogout;
+})();

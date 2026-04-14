@@ -1,12 +1,9 @@
 package customer.controller;
 
-import common.util.DBConnection;
 import common.util.PasswordServices;
 import customer.model.Customer;
 
 import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class CustomerController {
@@ -79,20 +76,4 @@ public class CustomerController {
     public boolean deleteCustomer(int id) throws SQLException {
         return customerDAO.deleteCustomer(id);
     }
-
-    public static boolean emailExists(String email) {
-        String sql = "SELECT COUNT(*) FROM Customer WHERE email = ?";
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, email);
-            ResultSet rs = ps.executeQuery();
-            if (rs.next()) {
-                return rs.getInt(1) > 0;
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return false;
-    }
-
 }
