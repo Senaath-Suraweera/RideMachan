@@ -205,4 +205,56 @@ public class RentalCompanyBookingsDAO {
 
     }
 
+
+
+
+    public static List<RentalCompanyBookings> loadBookingsByVehicleAndDate(int companyId, int vehicleId, String date) {
+
+        List<RentalCompanyBookings> list = new ArrayList<>();
+
+        String sql =
+                "SELECT booking_id, customer_name, driverid, vehicleid, " +
+                        "start_time, end_time, status " +
+                        "FROM companybookings " +
+                        "WHERE companyid = ? " +
+                        "AND vehicleid = ? " +
+                        "AND trip_start_date <= ? " +
+                        "AND trip_end_date >= ?";
+
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setInt(1, companyId);
+            ps.setInt(2, vehicleId);
+            ps.setDate(3, java.sql.Date.valueOf(date));
+            ps.setDate(4, java.sql.Date.valueOf(date));
+
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+
+                RentalCompanyBookings b = new RentalCompanyBookings();
+
+                b.setBookingId(rs.getInt("booking_id"));
+                b.setCustomerName(rs.getString("customer_name"));
+                b.setDriverId(rs.getInt("driverid"));
+                b.setVehicleId(rs.getInt("vehicleid"));
+
+                Time st = rs.getTime("start_time");
+                Time et = rs.getTime("end_time");
+
+                b.setStartTimeStr(st != null ? st.toString().substring(0,5) : null);
+                b.setEndTimeStr(et != null ? et.toString().substring(0,5) : null);
+
+                b.setStatus(rs.getString("status"));
+
+                list.add(b);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return list;
+    }
 }

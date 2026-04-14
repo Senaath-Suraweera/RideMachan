@@ -133,25 +133,24 @@ async function loadAllMaintenanceStaff() {
 }
 
 
-async function LoadAllSchedule(date) {
+async function LoadAllSchedule(date, vehicleId) {
 
     try {
 
         const response = await fetch("/getallschedule", {
             method: "POST",
             headers: {
-                "Content-Type": "application/json"
+                "Content-Type": "application/x-www-form-urlencoded"
             },
-            body: JSON.stringify({ date })
+            body: `date=${encodeURIComponent(date)}&vehicleId=${encodeURIComponent(vehicleId)}`
         });
 
         if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
+            throw new Error("Failed to fetch schedule");
         }
 
         const data = await response.json();
-
-        console.log("All schedule data:", data);
+        console.log("Schedule response:", data);
 
         return data;
 
@@ -608,21 +607,18 @@ document.addEventListener("DOMContentLoaded", async function () {
         handleDateSection();
 
         const selectedDate = document.getElementById("calendarDate").value;
+        const vehicleId = getVehicleIdFromURL();
 
         const dummyData = createDummyDataInput();
 
         AllVehicles = await LoadVehicles();
-
-        let vehicleIdFromURL = getVehicleIdFromURL();
-        vehicle = getVehicle(vehicleIdFromURL);
-
-
+        vehicle = getVehicle(vehicleId);
 
         renderVehicleCard(vehicle);
 
-        let schedule = createDummyDataInput().schedule;
-        //let schedule = LoadAllSchedule(selectedDate);
-        renderScheduleSection(schedule);
+        //let schedule = createDummyDataInput().schedule;
+        const scheduleData = await LoadAllSchedule(selectedDate, vehicleId);
+        renderScheduleSection(schedule.schedule);
 
         let stats = dummyData.stats;
         //let stats = LoadStatistics(selectedDate);
@@ -689,17 +685,34 @@ function createDummyDataInput() {
                     id: "BK001",
                     customer: "John Smith",
                     driver: "Mike Johnson",
-                    startTime: "08:55",
-                    endTime: "11:48",
+                    startTime: "08:00",
+                    endTime: "10:00",
                     status: "Ongoing"
                 },
                 {
                     id: "BK002",
                     customer: "Sarah Wilson",
-                    driver: "Mike Johnson",
+                    driver: "David Perera",
+                    startTime: "14:00",
+                    endTime: "16:00",
+                    status: "Confirmed"
+                }
+            ],
+
+            maintenance: [
+                {
+                    id: "MT001",
+                    type: "Engine Check",
+                    startTime: "11:30",
+                    endTime: "13:00",
+                    status: "Scheduled"
+                },
+                {
+                    id: "MT002",
+                    type: "Oil Change",
                     startTime: "16:00",
-                    endTime: "18:00",
-                   status: "Ongoing"
+                    endTime: "17:00",
+                    status: "In Progress"
                 }
             ]
         },
