@@ -168,4 +168,25 @@ public class RentalCompanyDAO {
         return vehicle;
     }
 
+    public static boolean assignStaffToVehicle(int staffId, int vehicleId, int companyId) {
+
+        boolean status = false;
+
+        String sql = "INSERT INTO maintenance_vehicle_assignment (maintenanceid, vehicleid, assigned_date, status) VALUES (?, ?, NOW(), 'assigned')";
+
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setInt(1, staffId);
+            ps.setInt(2, vehicleId);
+
+            status = ps.executeUpdate() > 0;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return status;
+    }
+
 }

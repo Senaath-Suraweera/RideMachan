@@ -6,6 +6,8 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 
+import rentalcompany.management.controller.RentalCompanyDAO;
+
 
 @WebServlet("/assignstaff")
 public class AssignStaffServlet extends HttpServlet {
@@ -37,7 +39,10 @@ public class AssignStaffServlet extends HttpServlet {
 
             }
 
-            boolean success = assignStaffToVehicle(staffId, vehicleId, companyId);
+            int staffId = Integer.parseInt(staffIdStr);
+            int vehicleId = Integer.parseInt(vehicleIdStr);
+
+            boolean success = RentalCompanyDAO.assignStaffToVehicle(staffId, vehicleId, companyId);
 
 
             if (success) {
