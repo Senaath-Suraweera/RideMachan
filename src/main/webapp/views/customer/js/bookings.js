@@ -187,17 +187,20 @@ function buildBookingCard(b, category) {
         actionsBlock = `
             <button class="btn btn-outline btn-sm" onclick="navigateToDetails(this.closest('.booking-card'))"><i class="fas fa-eye"></i> View Details</button>
             <button class="btn btn-primary btn-sm" onclick="openMessageModal('${id}')"><i class="fas fa-message"></i> ${msgLabel}</button>
-            <button class="btn btn-success btn-sm" onclick="openCallModal('${id}')"><i class="fas fa-phone"></i> ${isSelfDrive ? 'Call Company' : 'Call Driver'}</button>`;
+            <button class="btn btn-success btn-sm" onclick="openCallModal('${id}')"><i class="fas fa-phone"></i> ${isSelfDrive ? 'Call Company' : 'Call Driver'}</button>
+            <button class="btn btn-report btn-sm" onclick="openReportModal('${id}')"><i class="fas fa-flag"></i> Report</button>`;
     } else if (category === 'upcoming') {
         actionsBlock = `
             <button class="btn btn-outline btn-sm" onclick="navigateToDetails(this.closest('.booking-card'))"><i class="fas fa-eye"></i> View Details</button>
             <button class="btn btn-warning btn-sm" onclick="openMessageModal('${id}')"><i class="fas fa-message"></i> ${msgLabel}</button>
-            <button class="btn btn-danger btn-sm" onclick="openCancelModal('${id}')"><i class="fas fa-times"></i> Cancel</button>`;
+            <button class="btn btn-danger btn-sm" onclick="openCancelModal('${id}')"><i class="fas fa-times"></i> Cancel</button>
+            <button class="btn btn-report btn-sm" onclick="openReportModal('${id}')"><i class="fas fa-flag"></i> Report</button>`;
     } else {
         actionsBlock = `
             <button class="btn btn-outline btn-sm" onclick="navigateToDetails(this.closest('.booking-card'))"><i class="fas fa-eye"></i> View Details</button>
             <button class="btn btn-primary btn-sm" onclick="openRatingModal('${id}')"><i class="fas fa-star"></i> Rate Experience</button>
-            <button class="btn btn-success btn-sm" onclick="openRebookModal('${id}')"><i class="fas fa-redo"></i> Book Again</button>`;
+            <button class="btn btn-success btn-sm" onclick="openRebookModal('${id}')"><i class="fas fa-redo"></i> Book Again</button>
+            <button class="btn btn-report btn-sm" onclick="openReportModal('${id}')"><i class="fas fa-flag"></i> Report</button>`;
     }
 
     card.innerHTML = `
@@ -559,9 +562,7 @@ window.onclick = function (event) {
 };
 
 // =========================================================================
-// ADDITIONS to bookings.js for the Report feature
-// Append this block at the END of bookings.js (before the closing of file).
-// Also: add the Report button to buildBookingCard (see section B below).
+// Report feature
 // =========================================================================
 
 // ---------- State for report modal ----------

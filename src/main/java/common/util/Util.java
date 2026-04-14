@@ -34,4 +34,8 @@ public class Util{
         return threadMap.get(email);
     }
 
+    public static void clearCode(String email) {
+        threadMap.remove(email);
+    }
+
 }

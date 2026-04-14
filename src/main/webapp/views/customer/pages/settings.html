@@ -171,8 +171,8 @@
             <script src="../js/settings.js"></script>
 
             <!-- ===================
-                 Change Password Section
-            =================== -->
+     Change Password Section
+=================== -->
             <div class="settings-card">
                 <div class="card-header">
                     <div class="card-title">
@@ -184,21 +184,47 @@
                     <div class="form-grid password-grid">
                         <div class="form-group full-width">
                             <label>Current Password</label>
-                            <input type="password" placeholder="Enter your current password">
+                            <input type="password" id="currentPassword" placeholder="Enter your current password">
+                        </div>
+                        <div class="form-group full-width" style="display:flex; gap:10px;">
+                            <button class="btn btn-outline" id="verifyCurrentBtn" type="button">
+                                <i class="fas fa-check"></i> Verify Current Password
+                            </button>
+                            <span id="currentPwStatus" style="align-self:center;"></span>
                         </div>
                         <div class="form-group full-width">
                             <label>New Password</label>
-                            <input type="password" placeholder="Enter your new password">
+                            <input type="password" id="newPassword" placeholder="Enter your new password" disabled>
                         </div>
                         <div class="form-group full-width">
                             <label>Confirm New Password</label>
-                            <input type="password" placeholder="Confirm your new password">
+                            <input type="password" id="confirmPassword" placeholder="Confirm your new password" disabled>
                         </div>
                     </div>
-                    <button class="btn btn-primary update-password-btn">
+                    <button class="btn btn-primary update-password-btn" id="updatePasswordBtn" disabled>
                         <i class="fas fa-key"></i>
                         Update Password
                     </button>
+                </div>
+            </div>
+
+            <!-- ===================
+                 OTP Modal
+            =================== -->
+            <div id="otpModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:10000; align-items:center; justify-content:center;">
+                <div style="background:#fff; padding:30px; border-radius:12px; width:90%; max-width:400px; box-shadow:0 10px 40px rgba(0,0,0,.2);">
+                    <h3 style="margin-top:0;"><i class="fas fa-envelope"></i> Enter OTP</h3>
+                    <p style="color:#666; font-size:14px;">We've sent a 6-digit code to your email. Enter it below to confirm the password change.</p>
+                    <input type="text" id="otpInput" maxlength="6" placeholder="6-digit code"
+                           style="width:100%; padding:12px; font-size:18px; letter-spacing:4px; text-align:center; border:1px solid #ddd; border-radius:8px; margin:10px 0;">
+                    <div id="otpError" style="color:#e74c3c; font-size:13px; min-height:18px;"></div>
+                    <div style="display:flex; gap:10px; margin-top:15px;">
+                        <button class="btn btn-primary" id="confirmOtpBtn" style="flex:1;">Verify & Update</button>
+                        <button class="btn btn-outline" id="cancelOtpBtn">Cancel</button>
+                    </div>
+                    <p style="text-align:center; margin-top:15px; font-size:13px;">
+                        <a href="#" id="resendOtpLink" style="color:#6b46ff;">Resend code</a>
+                    </p>
                 </div>
             </div>
 
@@ -247,46 +273,9 @@
             });
         });
 
-        // Update password button functionality
-        const updatePasswordBtn = document.querySelector('.update-password-btn');
-        if (updatePasswordBtn) {
-            updatePasswordBtn.addEventListener('click', function() {
-                const passwordInputs = document.querySelectorAll('.password-grid input');
-                let allFilled = true;
-                let currentPassword = '';
-                let newPassword = '';
-                let confirmPassword = '';
-
-                passwordInputs.forEach((input, index) => {
-                    if (!input.value.trim()) {
-                        allFilled = false;
-                    } else {
-                        if (index === 0) currentPassword = input.value;
-                        if (index === 1) newPassword = input.value;
-                        if (index === 2) confirmPassword = input.value;
-                    }
-                });
-
-                if (!allFilled) {
-                    showNotification('Please fill in all password fields.', 'error');
-                    return;
-                }
-
-                if (newPassword !== confirmPassword) {
-                    showNotification('New passwords do not match.', 'error');
-                    return;
-                }
-
-                if (newPassword.length < 8) {
-                    showNotification('New password must be at least 8 characters long.', 'error');
-                    return;
-                }
-
-                // Simulate password update
-                showNotification('Password updated successfully!', 'success');
-                passwordInputs.forEach(input => input.value = '');
-            });
-        }
+        // NOTE: Password update logic has moved to js/settings.js
+        // (verifyCurrentBtn -> OTP flow -> updatePasswordBtn).
+        // Do not re-bind updatePasswordBtn here or it will conflict.
 
         // Security buttons
         document.querySelectorAll('.security-item .btn').forEach(btn => {

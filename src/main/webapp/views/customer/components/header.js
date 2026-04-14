@@ -7,7 +7,7 @@
   // ---- CONFIG: adjust to match your backend ----
   var PROFILE_ENDPOINT = '/customer/profile/info';
   var LOGOUT_ENDPOINT  = '/customer/logout';
-  var LOGIN_PAGE       = '../pages/login.html';
+  var LOGIN_PAGE       = '../../landing/customer_sign-in.html';
   // ----------------------------------------------
 
   /**
@@ -59,6 +59,11 @@
       headers: { 'Accept': 'application/json' }
     })
         .then(function (res) {
+          if (res.status === 401) {
+            // Not logged in → bounce to login page
+            window.location.href = LOGIN_PAGE;
+            throw new Error('HTTP 401');
+          }
           if (!res.ok) throw new Error('HTTP ' + res.status);
           return res.json();
         })
@@ -97,6 +102,9 @@
         })
         .catch(function (err) {
           console.error('Profile fetch failed:', err);
+          // If it was a 401 we've already redirected — don't overwrite the UI
+          if (err.message === 'HTTP 401') return;
+
           var nameEl = document.getElementById('userName');
           var initEl = document.getElementById('profileInitial');
           if (nameEl) nameEl.textContent = 'Guest';

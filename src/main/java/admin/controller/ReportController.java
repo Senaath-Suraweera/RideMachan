@@ -280,4 +280,41 @@ public class ReportController {
         return stats;
     }
 
+ //=========================================================================
+
+    public static int createReport(Report r) {
+        try {
+            con = DBConnection.getConnection();
+
+            String sql = "INSERT INTO Report " +
+                    "(category, status, priority, subject, description, " +
+                    " reported_role, reported_id, reporter_role, reporter_id, " +
+                    " reporter_name, reporter_email, reporter_phone) " +
+                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+            PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            ps.setString(1, r.getCategory());                                     // vehicle/behavior/payment/app/safety
+            ps.setString(2, r.getStatus() == null ? "Pending" : r.getStatus());   // default Pending
+            ps.setString(3, r.getPriority() == null ? "Low" : r.getPriority());   // default Low
+            ps.setString(4, r.getSubject());
+            ps.setString(5, r.getDescription());
+            ps.setString(6, r.getReportedRole());    // DRIVER / COMPANY
+            ps.setInt(7, r.getReportedId());
+            ps.setString(8, r.getReporterRole());    // CUSTOMER
+            ps.setInt(9, r.getReporterId());
+            ps.setString(10, r.getReporterName());
+            ps.setString(11, r.getReporterEmail());
+            ps.setString(12, r.getReporterPhone());
+
+            int rows = ps.executeUpdate();
+            if (rows > 0) {
+                ResultSet keys = ps.getGeneratedKeys();
+                if (keys.next()) return keys.getInt(1);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return -1;
+    }
+
 }
