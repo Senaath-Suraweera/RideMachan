@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ongoing Bookings - Driver Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/ongoing.css">
+    <script src="../js/issuereporting.js"></script>
+</head>
+<body>
+<div class="container">
+    <!-- Sidebar Navigation -->
+    <div class="sidebar" id="sidebar">
+        <div class="logo">
+            <img src="../logo.png" alt="Logo" class="logo">
+        </div>
+        <div class="nav-menu">
+            <div class="nav-item">
+                <i class="fas fa-house"></i>
+                <a href="dashboard.html"><span>Home</span></a>
+            </div>
+            <div class="nav-item">
+                <i class="fas fa-calendar-alt"></i>
+                <a href="drivercalview.html"><span>Calendar</span></a>
+            </div>
+            <div class="nav-item active">
+                <i class="fas fa-clock"></i>
+                <a href="ongoing.html"><span>Ongoing Bookings</span></a>
+            </div>
+            <div class="nav-item">
+                <i class="fas fa-history"></i>
+                <a href="pastbooking.html"><span>Past Bookings</span></a>
+            </div>
+            <div class="logout">
+                <i class="fas fa-sign-out"></i>
+                <span>Logout</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Header Section -->
+    <div class="header">
+        <div class="header-left">
+            <button class="sidebar-toggle" id="sidebarToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+            <h1>Ongoing Bookings</h1>
+        </div>
+        <div class="header-actions">
+            <a href="notification.html" class="notification" id="bellNotification" title="Notifications">
+                <i class="fas fa-bell"></i>
+                <div class="badge" id="bellBadge">3</div>
+            </a>
+            <a href="messages.html" class="notification" id="messageNotification" title="Messages">
+                <i class="fas fa-envelope"></i>
+                <div class="badge" id="messageBadge">5</div>
+            </a>
+            <div class="user-profile" id="userProfile">
+                <a href="profile.html"><div class="profile-img" id="profileInitial">K</div></a>
+                <div class="user-info">
+                    <div class="user-name" id="userName">Loading...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Page Title & Stats -->
+        <div class="page-title">
+            <div class="title">Active Bookings</div>
+            <div class="booking-stats">
+                <div class="stat-item">
+                    <span class="stat-number" id="totalActive">0</span>
+                    <span class="stat-label">Total Active</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number" id="inProgressCount">0</span>
+                    <span class="stat-label">In Progress</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number" id="upcomingCount">0</span>
+                    <span class="stat-label">Upcoming</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filter Section -->
+        <div class="filter-section">
+            <div class="filter-group">
+                <button class="filter-btn active" data-filter="all">All Bookings</button>
+                <button class="filter-btn" data-filter="in-progress">In Progress</button>
+                <button class="filter-btn" data-filter="upcoming">Upcoming</button>
+                <button class="filter-btn vehicle-issues-btn" onclick="navigateToIssueReporting()">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    Vehicle Issues
+                </button>
+            </div>
+            <div class="sort-dropdown">
+                <select id="sortBookings">
+                    <option value="time-asc">Time (Earliest First)</option>
+                    <option value="time-desc">Time (Latest First)</option>
+                    <option value="status">Status</option>
+                    <option value="fare">Fare Amount</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Loading Spinner -->
+        <div id="loadingSpinner" style="text-align: center; padding: 50px; display: none;">
+            <i class="fas fa-spinner fa-spin" style="font-size: 48px; color: var(--primary);"></i>
+            <p style="margin-top: 20px; color: var(--text-light);">Loading bookings...</p>
+        </div>
+
+        <!-- Empty State -->
+        <div id="emptyState" style="text-align: center; padding: 50px; display: none;">
+            <i class="fas fa-calendar-times" style="font-size: 64px; color: var(--text-light); margin-bottom: 20px;"></i>
+            <h3 style="color: var(--text); margin-bottom: 10px;">No Active Bookings</h3>
+            <p style="color: var(--text-light);">You don't have any ongoing or upcoming bookings at the moment.</p>
+        </div>
+
+        <!-- Bookings Grid -->
+        <div class="bookings-grid" id="bookingsGrid">
+            <!-- Booking cards will be dynamically loaded here -->
+        </div>
+    </div>
+</div>
+
+<!-- Booking Details Modal -->
+<div id="bookingDetailsModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 id="modal-title">Booking Details</h3>
+            <span class="close" onclick="closeModal()">&times;</span>
+        </div>
+        <div class="modal-body">
+            <div class="details-tabs">
+                <button class="tab-btn active" data-tab="booking-info">Trip Info</button>
+                <button class="tab-btn" data-tab="customer-details">Customer</button>
+                <button class="tab-btn" data-tab="route-details">Route</button>
+            </div>
+
+            <div id="booking-info" class="tab-content active">
+                <div class="info-section">
+                    <h4>Booking Information</h4>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <label>Booking ID</label>
+                            <span id="modal-booking-id">#RID-2024-001</span>
+                        </div>
+                        <div class="info-item">
+                            <label>Current Status</label>
+                            <span id="modal-status" class="status-badge in-progress">In Progress</span>
+                        </div>
+                        <div class="info-item">
+                            <label>Date & Time</label>
+                            <span id="modal-datetime">Today, Sep 19 - 10:30 AM</span>
+                        </div>
+                        <div class="info-item">
+                            <label>Estimated Duration</label>
+                            <span id="modal-duration">45 minutes</span>
+                        </div>
+                        <div class="info-item">
+                            <label>Total Fare</label>
+                            <span id="modal-fare">LKR 2,500</span>
+                        </div>
+                        <div class="info-item">
+                            <label>Distance</label>
+                            <span id="modal-distance">32 km</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-section">
+                    <h4>Special Instructions</h4>
+                    <div class="instructions-list" id="modal-instructions">
+                        <!-- Instructions will be loaded dynamically -->
+                    </div>
+                </div>
+            </div>
+
+            <div id="customer-details" class="tab-content">
+                <div class="info-section">
+                    <h4>Customer Profile</h4>
+                    <div class="customer-profile">
+                        <div class="profile-img-large" id="modal-customer-initial">S</div>
+                        <div class="customer-info">
+                            <h5 id="modal-customer-name">Sivajani Perera</h5>
+                        </div>
+                    </div>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <label>Phone Number</label>
+                            <span id="modal-customer-phone">+94 77-123-4567</span>
+                        </div>
+                        <div class="info-item">
+                            <label>Email</label>
+                            <span id="modal-customer-email">sivajani.p@email.com</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="route-details" class="tab-content">
+                <div class="info-section">
+                    <h4>Route Information</h4>
+                    <div class="route-details">
+                        <div class="route-point pickup">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <div class="route-info">
+                                <label>Pickup Location</label>
+                                <span id="modal-pickup">Colombo Fort Railway Station</span>
+                            </div>
+                        </div>
+                        <div class="route-divider">
+                            <i class="fas fa-route"></i>
+                        </div>
+                        <div class="route-point dropoff">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <div class="route-info">
+                                <label>Drop-off Location</label>
+                                <span id="modal-dropoff">Bandaranaike International Airport</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-section">
+                    <h4>Vehicle Details</h4>
+                    <div class="vehicle-display">
+                        <div class="vehicle-icon">
+                            <i class="fas fa-car"></i>
+                        </div>
+                        <div class="vehicle-info">
+                            <h5 id="modal-vehicle-model">Toyota Camry 2022</h5>
+                            <p id="modal-vehicle-plate">License: ND-4357</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="closeModal()">Close</button>
+            <button class="btn btn-outline" onclick="contactCustomer()">
+                <i class="fas fa-phone"></i> Call Customer
+            </button>
+            <button class="btn btn-primary" id="primaryActionBtn" onclick="primaryAction()">
+                <i class="fas fa-check"></i> Complete Ride
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Include the external JavaScript file -->
+<script src="../js/ongoing.js"></script>
+</body>
+</html>

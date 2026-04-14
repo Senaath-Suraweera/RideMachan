@@ -1,5 +1,7 @@
 package rentalcompany.drivers.model;
 
+import java.sql.Date;
+
 public class Driver {
     private int driverId;
     private String username;
@@ -15,6 +17,15 @@ public class Driver {
     private byte[] nicPdf;
     private byte[] driversLicence;
     private int companyId;
+    private String homeAddress;
+    private String licenseNumber;
+    private String companyName;
+    private Date joinedDate;
+    private String assignedArea;
+    private String shiftTime;
+    private String reportingManager;
+    private String profilePicture; // Base64 encoded image or URL
+    private String availability; // NEW: For calendar availability status
 
     // Constructor for registration
     public Driver(String username, String firstName, String lastName, String email,
@@ -37,6 +48,11 @@ public class Driver {
     public Driver(String username, String password) {
         this.username = username;
         this.password = password;
+    }
+
+    // Default constructor
+    public Driver() {
+
     }
 
     // Getters & Setters
@@ -81,4 +97,44 @@ public class Driver {
 
     public int getCompanyId() { return companyId; }
     public void setCompanyId(int companyId) { this.companyId = companyId; }
+
+    public String getHomeAddress() { return homeAddress; }
+    public void setHomeAddress(String homeAddress) { this.homeAddress = homeAddress; }
+
+    public String getLicenseNumber() { return licenseNumber; }
+    public void setLicenseNumber(String licenseNumber) { this.licenseNumber = licenseNumber; }
+
+    public String getCompanyName() { return companyName; }
+    public void setCompanyName(String companyName) { this.companyName = companyName; }
+
+    public Date getJoinedDate() { return joinedDate; }
+    public void setJoinedDate(Date joinedDate) { this.joinedDate = joinedDate; }
+
+    public String getAssignedArea() { return assignedArea; }
+    public void setAssignedArea(String assignedArea) { this.assignedArea = assignedArea; }
+
+    public String getShiftTime() { return shiftTime; }
+    public void setShiftTime(String shiftTime) { this.shiftTime = shiftTime; }
+
+    public String getReportingManager() { return reportingManager; }
+    public void setReportingManager(String reportingManager) { this.reportingManager = reportingManager; }
+
+    public String getProfilePicture() { return profilePicture; }
+    public void setProfilePicture(String profilePicture) { this.profilePicture = profilePicture; }
+
+    public String getAvailability() { return availability; }
+    public void setAvailability(String availability) { this.availability = availability; }
+
+    // Get full name
+    public String getFullName() {
+        if (firstName != null && lastName != null) {
+            return firstName + " " + lastName;
+        } else if (firstName != null) {
+            return firstName;
+        } else if (lastName != null) {
+            return lastName;
+        } else {
+            return username;
+        }
+    }
 }

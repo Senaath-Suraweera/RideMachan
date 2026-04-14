@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebContextManager">
+    <option name="state">
+      <map>
+        <entry key="file://$PROJECT_DIR$/src/main/webapp/views/rentalcompany/driver/pages/dashboard.html" value="file://$PROJECT_DIR$/src/main/webapp/views/rentalcompany/driver/pages" />
+        <entry key="file://$PROJECT_DIR$/src/main/webapp/views/rentalcompany/driver/pages/issuereporting.html" value="file://$PROJECT_DIR$/src/main/webapp/views/rentalcompany/driver/pages" />
+        <entry key="file://$PROJECT_DIR$/src/main/webapp/views/rentalcompany/driver/pages/profile.html" value="file://$PROJECT_DIR$/src/main/webapp/views/rentalcompany/driver/pages" />
+      </map>
+    </option>
+  </component>
+</project>

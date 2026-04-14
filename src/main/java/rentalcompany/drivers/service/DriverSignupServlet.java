@@ -8,7 +8,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.Part;
 import rentalcompany.drivers.model.Driver;
-import rentalcompany.drivers.dao.DriverDAO;
+import rentalcompany.drivers.controller.DriverDAO;
 
 
 import java.io.*;
