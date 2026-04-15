@@ -141,17 +141,8 @@
             <button class="modal-close" onclick="closeRatingModal()">&times;</button>
         </div>
         <div class="action-modal-body">
-            <div class="rating-section">
-                <label>Overall Experience</label>
-                <div class="star-rating" id="overallRating">
-                    <i class="far fa-star" data-rating="1"></i>
-                    <i class="far fa-star" data-rating="2"></i>
-                    <i class="far fa-star" data-rating="3"></i>
-                    <i class="far fa-star" data-rating="4"></i>
-                    <i class="far fa-star" data-rating="5"></i>
-                </div>
-            </div>
-            <div class="rating-section">
+            <!-- Driver/Service rating (hidden for self-drive) -->
+            <div class="rating-section" id="driverRatingSection">
                 <label>Driver/Service Quality</label>
                 <div class="star-rating" id="serviceRating">
                     <i class="far fa-star" data-rating="1"></i>
@@ -178,7 +169,7 @@
         </div>
         <div class="action-modal-footer">
             <button class="btn btn-outline" onclick="closeRatingModal()">Cancel</button>
-            <button class="btn btn-primary" onclick="submitRating()">Submit Rating</button>
+            <button class="btn btn-primary" id="submitRatingBtn" onclick="submitRating()">Submit Rating</button>
         </div>
     </div>
 </div>

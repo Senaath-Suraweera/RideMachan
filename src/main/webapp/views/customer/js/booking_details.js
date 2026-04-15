@@ -29,13 +29,26 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     loadComponent('header-container', '../components/header.html', () => {
-        const pageTitle = document.querySelector('.hi h1');
-        if (pageTitle) {
-            pageTitle.textContent = 'Booking Details';
-            const subtitle = document.querySelector('.subtitle');
-            if (subtitle) subtitle.textContent = 'Complete information about your reservation';
-        }
+        loadHeaderScript(() => {
+            if (typeof initializeHeader === 'function') initializeHeader();
+            if (typeof setPageTitle === 'function') {
+                setPageTitle('Booking Details');
+            } else {
+                const pageTitle = document.getElementById('pageTitle');
+                if (pageTitle) pageTitle.textContent = 'Booking Details';
+            }
+        });
     });
+
+    // Loads header.js manually — <script> tags inside innerHTML do NOT execute
+    function loadHeaderScript(cb) {
+        if (window.initializeHeader) { cb(); return; }
+        const s = document.createElement('script');
+        s.src = '../components/header.js';
+        s.onload = cb;
+        s.onerror = () => { console.error('Failed to load header.js'); cb(); };
+        document.head.appendChild(s);
+    }
 
     setTimeout(() => {
         loadBookingDetails();
@@ -114,8 +127,18 @@ function renderBooking(booking) {
 
     // Vehicle
     document.getElementById('vehicleName').textContent = booking.vehicle || '-';
-    document.getElementById('companyName').textContent =
-        (booking.company && booking.company.name) || '-';
+    const companyEl = document.getElementById('companyName');
+    if (booking.company && booking.company.name && booking.company.id) {
+        companyEl.textContent = booking.company.name;
+        companyEl.style.cursor = 'pointer';
+        companyEl.style.color = 'var(--primary)';
+        companyEl.style.textDecoration = 'underline';
+        companyEl.title = 'View company profile';
+        companyEl.onclick = navigateToCompany;
+    } else {
+        companyEl.textContent = (booking.company && booking.company.name) || '-';
+        companyEl.onclick = null;
+    }
     document.getElementById('vehicleTypeText').textContent = booking.vehicleType || '-';
     document.getElementById('vehiclePlateText').textContent = booking.vehiclePlate || '-';
     document.getElementById('rentalTypeText').textContent =
@@ -245,9 +268,11 @@ function updateSupportModal(booking) {
 // Navigation / action handlers (unchanged)
 // ─────────────────────────────────────────────
 function navigateToCompany() {
-    if (currentBooking && currentBooking.company) {
+    if (currentBooking && currentBooking.company && currentBooking.company.id) {
         sessionStorage.setItem('selectedCompanyId', currentBooking.company.id);
-        window.location.href = `company-profile.html?company=${currentBooking.company.id}`;
+        window.location.href = `company-profile.html?companyId=${encodeURIComponent(currentBooking.company.id)}`;
+    } else {
+        showNotification('Company information not available', 'warning');
     }
 }
 

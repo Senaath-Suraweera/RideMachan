@@ -5,7 +5,7 @@
 
 let allBookings = [];
 let currentBookingId = null;
-let ratings = { overall: 0, service: 0, vehicle: 0 };
+let ratings = { service: 0, vehicle: 0 };
 
 // ---------- Component loading (navbar + header) ----------
 function loadComponent(elementId, filePath, callback) {
@@ -452,6 +452,15 @@ function confirmCancellation() {
 // ---------- Rating ----------
 function openRatingModal(rideId) {
     currentBookingId = rideId;
+    const b = findBooking(rideId);
+    if (!b) return;
+
+    // Hide driver rating section for self-drive bookings
+    const driverSection = document.getElementById('driverRatingSection');
+    if (driverSection) {
+        driverSection.style.display = (b.rentalType === 'self-drive') ? 'none' : 'block';
+    }
+
     document.getElementById('ratingModal').style.display = 'flex';
     document.body.style.overflow = 'hidden';
 }
@@ -482,14 +491,14 @@ function initializeRatingModal() {
         });
         ratingDiv.addEventListener('mouseleave', function () {
             const type = ratingDiv.id.replace('Rating', '');
-            const current = ratings[type];
+            const current = ratings[type] || 0;
             stars.forEach((s, idx) => { s.style.color = idx < current ? '#f8961e' : ''; });
         });
     });
 }
 
 function resetRatings() {
-    ratings = { overall: 0, service: 0, vehicle: 0 };
+    ratings = { service: 0, vehicle: 0 };
     document.querySelectorAll('.star-rating i').forEach(s => {
         s.classList.remove('fas'); s.classList.add('far'); s.style.color = '';
     });
@@ -498,24 +507,91 @@ function resetRatings() {
 }
 
 function submitRating() {
-    if (ratings.overall === 0 || ratings.service === 0 || ratings.vehicle === 0) {
-        showNotification('Please provide all ratings', 'warning');
+    const b = findBooking(currentBookingId);
+    if (!b) {
+        showNotification('Booking not found', 'warning');
         return;
     }
-    showNotification('Submitting your rating...', 'info');
-    setTimeout(() => {
-        showNotification('Thank you for your feedback!', 'success');
-        closeRatingModal();
-        const card = document.querySelector(`[data-booking-id="${currentBookingId}"]`);
-        if (card) {
-            const rateBtn = card.querySelector('.btn-primary');
-            if (rateBtn) {
-                rateBtn.innerHTML = '<i class="fas fa-check"></i> Rated';
-                rateBtn.disabled = true;
-                rateBtn.style.opacity = '0.6';
+
+    const isSelfDrive = b.rentalType === 'self-drive';
+
+    // Validate
+    if (ratings.vehicle === 0) {
+        showNotification('Please rate the vehicle condition', 'warning');
+        return;
+    }
+    if (!isSelfDrive && ratings.service === 0) {
+        showNotification('Please rate the driver/service quality', 'warning');
+        return;
+    }
+
+    const review = (document.getElementById('ratingComments').value || '').trim();
+
+    const payload = {
+        rideId:        b.rideId,
+        vehicleId:     b.vehicleId,
+        driverId:      b.driverId || 0,
+        companyId:     b.companyId,
+        driverRating:  isSelfDrive ? 0 : ratings.service,
+        vehicleRating: ratings.vehicle,
+        review:        review || null
+    };
+
+    // Disable submit button
+    const btn = document.getElementById('submitRatingBtn');
+    if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
+    }
+
+    fetch('../../../customer/rating/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'same-origin',
+        body: JSON.stringify(payload)
+    })
+        .then(res => {
+            if (res.status === 401) {
+                showNotification('Please login to submit a rating', 'warning');
+                throw new Error('Unauthorized');
             }
-        }
-    }, 1000);
+            return res.json();
+        })
+        .then(data => {
+            if (btn) {
+                btn.disabled = false;
+                btn.innerHTML = 'Submit Rating';
+            }
+
+            if (data.success) {
+                showNotification('Thank you for your feedback!', 'success');
+                closeRatingModal();
+
+                // Update the Rate button on the card to show "Rated"
+                const card = document.querySelector(`[data-booking-id="${currentBookingId}"]`);
+                if (card) {
+                    const rateBtn = card.querySelector('.btn-primary');
+                    if (rateBtn) {
+                        rateBtn.innerHTML = '<i class="fas fa-check"></i> Rated';
+                        rateBtn.disabled = true;
+                        rateBtn.style.opacity = '0.6';
+                        rateBtn.onclick = null;
+                    }
+                }
+            } else {
+                showNotification(data.message || 'Failed to submit rating', 'warning');
+            }
+        })
+        .catch(err => {
+            console.error('Rating submit error:', err);
+            if (btn) {
+                btn.disabled = false;
+                btn.innerHTML = 'Submit Rating';
+            }
+            if (err.message !== 'Unauthorized') {
+                showNotification('Could not connect to server', 'warning');
+            }
+        });
 }
 
 // ---------- Rebook ----------
