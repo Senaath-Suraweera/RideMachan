@@ -8,11 +8,13 @@
     <link rel="stylesheet" href="../css/profile.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <script type="module" src="../js/profile.js" defer></script>
 </head>
 <body>
     <div class="dashboard-container">
         
-                     <!-- Sidebar -->
+        <!-- Sidebar -->
         <aside class="sidebar">
             <div class="logo-section">
                 <img src="../assets/ridemachan-logo.png" alt="RideMachan Logo" class="logo">
@@ -26,12 +28,6 @@
                             <span>Dashboard</span>
                         </a>
                     </li>
-                    <!--<li class="nav-item">
-                        <a href="vehicle-fleet.html" class="nav-link">
-                            <i class="fas fa-building"></i>
-                            <span>Entity Registration</span>
-                        </a>
-                    </li>--> 
                     <li class="nav-item">
                         <a href="booking-management.html" class="nav-link">
                             <i class="fas fa-box"></i>
@@ -56,10 +52,6 @@
                             <span>Drivers</span>
                         </a>
                     </li>
-                    
-                    
-                    
-                    
                 </ul>
             </nav>
             
@@ -88,10 +80,12 @@
                             <span class="notification-badge">1</span>
                         </a>
                     </div>
-                    <div class="user-profile">
-                        <div class="user-avatar">A</div>
-                        <span>ABC Rentals</span>
-                    </div>
+                    <a href="profile.html">
+                        <div class="user-profile" >
+                            <div class="user-avatar"></div>
+                            <span></span>
+                        </div>
+                    </a>
                 </div>
             </header>
 
@@ -119,8 +113,7 @@
                                 Update Picture
                             </button>
                             <div class="profile-name">
-                                <h4>ABC (pvt) Ltd</h4>
-                                <p>John Smith</p>
+                                <h4 id="company">ABC (pvt) Ltd</h4>
                             </div>
                         </div>
                     </div>
@@ -135,23 +128,23 @@
                                 
                                 <div class="form-group">
                                     <label for="companyName">Company Name</label>
-                                    <input type="text" id="companyName" name="companyName" value="ABC (pvt) Ltd">
+                                    <input type="text" id="companyName" name="companyName" value="">
                                 </div>
                                 
                                 <div class="form-row">
                                     <div class="form-group">
                                         <label for="phoneNumber">Phone Number</label>
-                                        <input type="tel" id="phoneNumber" name="phoneNumber" value="+1-555-0123">
+                                        <input type="tel" id="phoneNumber" name="phoneNumber" value="">
                                     </div>
                                     <div class="form-group">
                                         <label for="emailAddress">Email Address</label>
-                                        <input type="email" id="emailAddress" name="emailAddress" value="john@abcrentals.com">
+                                        <input type="email" id="emailAddress" name="emailAddress" value="">
                                     </div>
                                 </div>
                                 
                                 <div class="form-group">
                                     <label for="businessAddress">Business Address</label>
-                                    <input type="text" id="businessAddress" name="businessAddress" value="123 Business Street, City Center, State 12345">
+                                    <input type="text" id="businessAddress" name="businessAddress" value="">
                                 </div>
                                 
                                 <button type="submit" class="save-changes-btn">
@@ -209,7 +202,15 @@
         </div>
     </div>
 
-    <script src="../js/profile.js"></script>
-    <script src="../js/sidebar.js"></script>
+
+    <div id="loginModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%;
+    background: rgba(0,0,0,0.5); justify-content:center; align-items:center; z-index:1000;">
+        <div style="background:white; padding:20px; border-radius:8px; text-align:center; width:300px;">
+            <p style="margin-bottom:20px;">Login First</p>
+            <button id="loginOkBtn" style="padding:8px 16px; cursor:pointer;">OK</button>
+        </div>
+    </div>
+
+
 </body>
 </html>

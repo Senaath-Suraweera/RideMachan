@@ -4,6 +4,7 @@ import jakarta.servlet.*;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 import rentalcompany.maintenance.controller.CalendarEventDAO;
+import rentalcompany.companyvehicle.dao.VehicleDAO;
 import rentalcompany.maintenance.model.CalendarEvent;
 import common.util.DBConnection;
 import com.google.gson.Gson;
@@ -49,7 +50,15 @@ public class AddCalendarEventServlet extends HttpServlet {
                 JsonObject jsonObject = gson.fromJson(sb.toString(), JsonObject.class);
 
                 // Set all fields from JSON
-                event.setVehicleId(jsonObject.get("vehicle_id").getAsInt());
+                String vehicleNumberPlate = jsonObject.get("vehicle_id").getAsString();
+                int vehicleId = VehicleDAO.getIdOfVehicle(vehicleNumberPlate);
+                if(vehicleId == -1){
+                    resp.getWriter().write("{\"status\":\"error\",\"message\":\"Invalid vehicle number plate\"}");
+                    return;
+                }
+                event.setVehicleId(vehicleId);
+
+                //set other fields
                 event.setServiceType(jsonObject.get("service_type").getAsString());
                 event.setStatus(jsonObject.has("status") ?
                         jsonObject.get("status").getAsString() : "scheduled");

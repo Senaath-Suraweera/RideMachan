@@ -1,279 +1,278 @@
-// Maintenance Log JavaScript
-document.addEventListener("DOMContentLoaded", () => {
-  // Initialize page
-  initializePage()
+let AllVehicles;
+let vehicle;
+const BASE_URL = "http://localhost:8080";
+let companyId = null;
 
-  // Event listeners
-  setupEventListeners()
-})
+async function checkLogin() {
 
-function initializePage() {
-  console.log("[v0] Maintenance log page initialized")
+    try {
 
-  // Load vehicle data
-  loadVehicleData()
+        const response = await fetch("/checklogin");
+        const data = await response.json();
 
-  // Load maintenance records
-  loadMaintenanceRecords()
-}
+        if (!data.loggedIn) {
 
-function setupEventListeners() {
-  // Vehicle selector change
-  const vehicleSelect = document.getElementById("vehicleSelect")
-  if (vehicleSelect) {
-    vehicleSelect.addEventListener("change", handleVehicleChange)
-  }
+            const modal = document.getElementById("loginModal");
+            modal.style.display = "flex";
 
-  // Search button
-  const searchBtns = document.querySelectorAll(".search-btn")
-  searchBtns.forEach((btn) => {
-    btn.addEventListener("click", handleSearch)
-  })
 
-  // Filter change
-  const filterSelect = document.querySelector(".filter-select")
-  if (filterSelect) {
-    filterSelect.addEventListener("change", handleFilterChange)
-  }
+            document.getElementById("loginOkBtn").onclick = () => {
 
-  // Quick access cards
-  const accessCards = document.querySelectorAll(".access-card")
-  accessCards.forEach((card) => {
-    card.addEventListener("click", handleQuickAccess)
-  })
+                window.location.href = "/companylogin";
 
-  // Go back button
-  const goBackBtn = document.querySelector(".go-back-btn")
-  if (goBackBtn) {
-    goBackBtn.addEventListener("click", goBack)
-  }
-}
+            };
 
-function handleVehicleChange(event) {
-  const selectedVehicle = event.target.value
-  console.log("[v0] Vehicle changed to:", selectedVehicle)
+            return false;
 
-  // Update vehicle details
-  updateVehicleDetails(selectedVehicle)
+        }
 
-  // Reload maintenance records 
-  loadMaintenanceRecords(selectedVehicle)
-}
+        companyId = data.companyId;
 
-function handleSearch() {
-  const vehicleInput = document.querySelector(".search-form .form-input")
-  const typeSelect = document.querySelector(".search-form .form-select")
+        console.log("User is logged in.");
+        return true;
 
-  if (vehicleInput && typeSelect) {
-    const vehicleNo = vehicleInput.value.trim()
-    const vehicleType = typeSelect.value
+    } catch (err) {
 
-    console.log("[v0] Searching for vehicle:", vehicleNo, "Type:", vehicleType)
+        console.error("Error checking login:", err);
+        return false;
 
-    if (vehicleNo) {
-      searchVehicle(vehicleNo, vehicleType)
-    } else {
-      showError("Please enter a vehicle registration number")
     }
-  }
+
 }
 
-function handleFilterChange(event) {
-  const filterValue = event.target.value
-  console.log("[v0] Filter changed to:", filterValue)
 
-  filterMaintenanceRecords(filterValue)
-}
 
-function handleQuickAccess(event) {
-  const card = event.currentTarget
-  const documentType = card.querySelector("h4").textContent
+async function LoadVehicles() {
 
-  console.log("[v0] Quick access clicked:", documentType)
+     try {
 
-  // Show document or download
-  showDocument(documentType)
-}
+        const response = await fetch(`${BASE_URL}/vehicle/list?company_id=${companyId}`);
 
-function loadVehicleData() {
-  // Simulate loading vehicle data
-  const vehicleData = {
-    "WP CAB 2156": {
-      model: "Toyota Prius 2020",
-      status: "Under Service",
-      lastService: "2023-12-15",
-      nextService: "2024-03-15",
-      insuranceExpiry: "2024-05-11",
-      emissionTest: "overdue/passed",
-      statusClass: "status-under-service",
-    },
-    "ABC 123": {
-      model: "Honda Civic 2021",
-      status: "Available",
-      lastService: "2023-11-20",
-      nextService: "2024-02-20",
-      insuranceExpiry: "2024-06-15",
-      emissionTest: "passed",
-      statusClass: "status-available",
-    },
-  }
+        if (!response.ok) {
+            throw new Error("Failed to fetch vehicles");
+        }
 
-  // Store data globally
-  window.vehicleData = vehicleData
-}
+        let data = await response.json();
 
-function updateVehicleDetails(vehicleId) {
-  const vehicleData = window.vehicleData[vehicleId]
-  if (!vehicleData) return
+        console.log(data);
 
-  // Update vehicle info
-  const vehicleInfo = document.querySelector(".vehicle-info h3")
-  const statusBadge = document.querySelector(".status-badge")
-  const statValues = document.querySelectorAll(".stat-value")
+        return data;
 
-  if (vehicleInfo) vehicleInfo.textContent = vehicleData.model
-  if (statusBadge) {
-    statusBadge.textContent = vehicleData.status
-    statusBadge.className = `status-badge ${vehicleData.statusClass}`
-  }
 
-  // Update stats
-  if (statValues.length >= 6) {
-    statValues[1].textContent = vehicleData.lastService
-    statValues[2].textContent = vehicleData.nextService
-    statValues[3].textContent = vehicleData.insuranceExpiry
-    statValues[4].textContent = vehicleData.emissionTest
-    statValues[5].textContent = vehicleData.model
-  }
-}
+    } catch (err) {
 
-function loadMaintenanceRecords(vehicleId = "WP CAB 2156") {
-  // Simulate loading maintenance records
-  const records = {
-    "WP CAB 2156": [
-      {
-        date: "2023-12-15",
-        id: "MR001",
-        service: "Oil change",
-        cost: "$95",
-        description: "Regular oil change and filter replacement",
-        mileage: "45,230 km",
-        status: "Completed",
-      },
-      {
-        date: "2023-11-20",
-        id: "MR002",
-        service: "Brake check",
-        cost: "$180",
-        description: "Brake inspection and pad replacement",
-        mileage: "44,800 km",
-        status: "Completed",
-      },
-    ],
-  }
+         console.log(err);
 
-  const vehicleRecords = records[vehicleId] || []
-  renderMaintenanceRecords(vehicleRecords)
-}
-
-function renderMaintenanceRecords(records) {
-  const tableBody = document.querySelector(".table-body")
-  if (!tableBody) return
-
-  tableBody.innerHTML = records
-    .map(
-      (record) => `
-        <div class="table-row">
-            <div class="col-date">
-                <div class="date">${record.date}</div>
-                <div class="id">ID: ${record.id}</div>
-            </div>
-            <div class="col-service">
-                <div class="service-name">${record.service}</div>
-                <div class="service-cost">${record.cost}</div>
-            </div>
-            <div class="col-description">
-                <div class="description">${record.description}</div>
-                <div class="mileage">Mileage: ${record.mileage}</div>
-            </div>
-            <div class="col-action">
-                <span class="status-badge status-completed">${record.status}</span>
-            </div>
-        </div>
-    `,
-    )
-    .join("")
-}
-
-function filterMaintenanceRecords(filterValue) {
-  const rows = document.querySelectorAll(".table-row")
-
-  rows.forEach((row) => {
-    const status = row.querySelector(".status-badge").textContent.toLowerCase()
-
-    if (filterValue === "all" || status.includes(filterValue.toLowerCase())) {
-      row.style.display = "grid"
-    } else {
-      row.style.display = "none"
     }
-  })
+
 }
 
-function searchVehicle(vehicleNo, vehicleType) {
-  // Simulate vehicle search
-  const found = Math.random() > 0.5 // Random for demo
+async function LoadMaintenanceRecords(vehicleId) {
 
-  if (found) {
-    showSuccess(`Vehicle ${vehicleNo} found!`)
-    // Load vehicle data
-    loadVehicleData()
-  } else {
-    showError("Vehicle not found in fleet or no legal documents available.")
-  }
+    try {
+
+        const response = await fetch(`${BASE_URL}/maintenancerecords/list?vehicleId=${vehicleId}`);
+
+        if (!response.ok) {
+            throw new Error("Failed to fetch maintenance records");
+        }
+
+        let data = await response.json();
+
+        console.log(data);
+
+        return data;
+
+    } catch (err) {
+
+        console.error(err);
+
+    }
+
 }
 
-function showDocument(documentType) {
-  // Simulate document viewing
-  alert(`Opening ${documentType}...`)
+function showNotification(message, type = "info") {
+
+    const notification = document.createElement("div");
+
+    notification.textContent = message;
+
+    // basic styling
+    notification.style.position = "fixed";
+    notification.style.top = "20px";
+    notification.style.right = "20px";
+    notification.style.padding = "12px 18px";
+    notification.style.borderRadius = "8px";
+    notification.style.color = "#fff";
+    notification.style.fontSize = "14px";
+    notification.style.zIndex = "9999";
+    notification.style.boxShadow = "0 4px 12px rgba(0,0,0,0.2)";
+    notification.style.transition = "0.3s ease";
+
+    // color based on type
+    if (type === "success") {
+        notification.style.background = "#28a745";
+    } else if (type === "error") {
+        notification.style.background = "#dc3545";
+    } else if (type === "info") {
+        notification.style.background = "#17a2b8";
+    } else {
+        notification.style.background = "#333";
+    }
+
+    document.body.appendChild(notification);
+
+    // auto remove after 3 seconds
+    setTimeout(() => {
+
+        notification.style.opacity = "0";
+        setTimeout(() => notification.remove(), 300);
+
+    }, 3000);
+
 }
 
-function showError(message) {
-  const errorDiv = document.querySelector(".error-message")
-  if (errorDiv) {
-    errorDiv.innerHTML = `<i class="fas fa-times-circle"></i> ${message}`
-    errorDiv.style.display = "flex"
-  }
+
+function renderVehicle(vehicle) {
+
+    if (!vehicle) {
+        return;
+    }
+
+    const container = document.querySelector(".vehicle-info");
+    container.innerHTML = `
+
+                <div class="vehicle-image">
+                    <i class="fas fa-car"></i>
+                </div>
+                <h3>${vehicle.vehicleBrand} ${vehicle.vehicleModel}</h3>
+                <div class="status-badge status-${vehicle.status.toLowerCase()}">${vehicle.status}</div>
+                <div class="vehicle-stats">
+                    <div class="stat-item"><span class="stat-label">AssignedStaff:</span> <span class="stat-value">${vehicle.lastService || 'NA'}</span></div>
+                    <div class="stat-item"><span class="stat-label">Last Service:</span> <span class="stat-value">${vehicle.lastService || 'NA'}</span></div>
+                    <div class="stat-item"><span class="stat-label">Next Service:</span> <span class="stat-value">${vehicle.nextService || 'NA'}</span></div>
+                    <div class="stat-item"><span class="stat-label">Insurance Expiry:</span> <span class="stat-value">${vehicle.insuranceExpiry || 'NA'}</span></div>
+                    <div class="stat-item"><span class="stat-label">Emission Test:</span> <span class="stat-value">${vehicle.emissionTest || 'NA'}</span></div>
+                </div>
+            `;
+
 }
 
-function showSuccess(message) {
-  // Create temporary success message
-  const successDiv = document.createElement("div")
-  successDiv.className = "success-message"
-  successDiv.innerHTML = `<i class="fas fa-check-circle"></i> ${message}`
-  successDiv.style.cssText = `
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 0.5rem;
-        color: #2ed573;
-        font-weight: 500;
-        margin-bottom: 2rem;
-        padding: 1rem;
-        background: #f0fff4;
-        border-radius: 8px;
-        border: 1px solid #9ae6b4;
-    `
+function renderMaintenanceLogs(maintenanceLogs) {
 
-  const errorDiv = document.querySelector(".error-message")
-  if (errorDiv) {
-    errorDiv.parentNode.insertBefore(successDiv, errorDiv)
-    setTimeout(() => successDiv.remove(), 3000)
-  }
+    const tableBody = document.getElementsByClassName("table-body")[0];
+    tableBody.innerHTML = "";
+
+
+    if (!maintenanceLogs || maintenanceLogs.length === 0) {
+
+        let emptyDivTag = document.createElement("div");
+        emptyDivTag.className = 'empty-div';
+        emptyDivTag.innerHTML = `<p>No maintenance records found for this vehicle.</p>`;
+        tableBody.appendChild(emptyDivTag);
+        return;
+
+    }
+
+
+    let status;
+
+    maintenanceLogs.forEach(log => {
+
+        if (log.status === 'pending') {
+
+            status = 'Pending';
+
+        } if(log.status === 'onJob') {
+
+            status = 'On Job';
+
+        }else if (log.status === 'completed') {
+
+            status = 'Completed';
+
+        }if(log.status === 'overdue') {
+
+            status = 'Overdue';
+
+        }
+
+        tableBody.innerHTML += `
+
+                    <div className="table-row">
+                        <div className="col-date">
+                            <div className="date">${log.date}</div>
+                            <div className="id">ID: ${log.recordId}</div>
+                        </div>
+                        <div className="col-service">
+                            <div className="service-name">${log.serviceName}</div>
+                        </div>
+                        <div className="col-description">
+                            <div className="description">${log.description}</div>
+                            <div className="mileage">Mileage: ${log.mileage} km</div>
+                        </div>
+                        <div className="col-action">
+                            <span className="status-badge status-${log.status.toLowerCase()}">${status}</span>
+                        </div>
+                    </div>
+
+                `
+        ;
+
+    });
+
 }
 
-function goBack() {
-  window.history.back()
+function getVehicleIdFromURL() {
+
+    const params = new URLSearchParams(window.location.search);
+    return params.get("vehicleId");
+
 }
 
-// Export functions for global access
-window.goBack = goBack
+function getVehicle(vehicleId) {
+
+    for (let i = 0; i < AllVehicles.length; i++) {
+
+        if (AllVehicles[i].vehicleId == vehicleId) {
+
+            return AllVehicles[i];
+
+        }
+
+    }
+
+    return null;
+
+}
+
+
+document.addEventListener("DOMContentLoaded", async () => {
+
+    try {
+
+        const loggedIn = await checkLogin();
+
+        if (!loggedIn) {
+            return;    // stop here if not logged in
+        }
+
+
+        AllVehicles = await LoadVehicles();
+
+        let vehicleIdFromURL = getVehicleIdFromURL();
+        let selectedVehicle = getVehicle(vehicleIdFromURL);
+
+        renderVehicle(selectedVehicle);
+
+
+        const maintenanceRecords = await LoadMaintenanceRecords(vehicleIdFromURL);
+        renderMaintenanceLogs(maintenanceRecords);
+
+    } catch (err) {
+
+        console.error("Error during initialization:", err);
+
+    }
+
+});

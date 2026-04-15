@@ -1,22 +1,28 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ride Machan - Vehicle Records</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../css/dashboard.css">
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <title>Ride Machan - Vehicle Records</title>
+
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="../css/dashboard.css">
 </head>
 <body> 
     <div class="container">
         <!-- Sidebar -->
         <aside class="sidebar">
             <div class="logo-section">
-                <img src="../assets/ridemachan-logo.png" alt="RideMachan Logo" class="logo">
+                <img
+                    src="../assets/ridemachan-logo.png"
+                    alt="RideMachan Logo"
+                    class="logo"
+                />
             </div>
-             
+
             <nav class="nav-menu">
                 <ul>
                     <h3>Main Navigation</h3>
@@ -27,7 +33,6 @@
                             <span>Dashboard</span>
                         </a>
                     </li>
-                    
                     <li class="nav-item">
                         <a href="inspection.html" class="nav-link">
                             <i class="fas fa-tools"></i>
@@ -36,7 +41,7 @@
                     </li>
                     <li class="nav-item">
                         <a href="vehiclerecords.html" class="nav-link">
-                            <i class="fas fa-file"></i> 
+                            <i class="fas fa-file"></i>
                             <span>Vehicle Records</span>
                         </a>
                     </li>
@@ -46,11 +51,9 @@
                             <span>Calendar</span>
                         </a>
                     </li>
-                    
-
                 </ul>
             </nav>
-            
+
             <div class="logout-section">
                 <a href="#" class="nav-link">
                     <i class="fas fa-sign-out-alt"></i>
@@ -63,7 +66,11 @@
         <div class="header">
             <div class="search-bar">
                 <i class="fas fa-search"></i>
-                <input type="text" placeholder="Search vehicles, maintenance records..." id="searchInput">
+                <input
+                    type="text"
+                    placeholder="Search vehicles, maintenance records..."
+                    id="searchInput"
+                />
             </div>
 
             <div class="header-actions">
@@ -82,10 +89,9 @@
         </div>
 
         <!-- ===================
-                 Main Content Area
+            Main Content Area
         =================== -->
         <div class="main-content">
-            
             <!-- Page Title & Actions -->
             <div class="page-title">
                 <div class="title">Dashboard</div>
@@ -93,237 +99,50 @@
 
             <!-- Stats Cards -->
             <div class="stats-cards">
-                <!-- Total Vehicles Serviced Card -->
-                <div class="stat-card">
-                    <div class="card-header">
-                        <div>
-                            <div class="card-value">87</div>
-                            <div class="card-label">Total Vehicles Serviced</div>
-                        </div>
-                        <div class="card-icon purple">
-                            <i class="fas fa-car"></i>
-                        </div>
-                    </div>
-                    <div class="card-change positive">
-                        <i class="fas fa-arrow-up"></i>
-                        <span>+23% from last month</span>
-                    </div>
-                </div>
-
-                <!-- Last Week Jobs Card -->
-                <div class="stat-card">
-                    <div class="card-header">
-                        <div>
-                            <div class="card-value">5</div>
-                            <div class="card-label">Last Week Jobs</div>
-                        </div>
-                        <div class="card-icon blue">
-                            <i class="fas fa-calendar-check"></i>
-                        </div>
-                    </div>
-                    <div class="card-change positive">
-                        <span>Jobs completed</span>
-                    </div>
-                </div>
-
-                <!-- Linked Vehicles Card -->
-                <div class="stat-card">
-                    <div class="card-header">
-                        <div>
-                            <div class="card-value">6</div>
-                            <div class="card-label">Linked Vehicles</div>
-                        </div>
-                        <div class="card-icon green">
-                            <i class="fas fa-car-side"></i>
-                        </div>
-                    </div>
-                    <div class="card-change">
-                        <span>Under management</span>
-                    </div>
-                </div>
-
-                <!-- Pending Maintenance Card -->
-                <div class="stat-card">
-                    <div class="card-header">
-                        <div>
-                            <div class="card-value">2</div>
-                            <div class="card-label">Pending Maintenance</div>
-                        </div>
-                        <div class="card-icon orange">
-                            <i class="fas fa-clock"></i>
-                        </div>
-                    </div>
-                    <div class="card-change">
-                        <span>Require attention</span>
-                    </div>
-                </div>
+                <!--Javascript will render stat card -->
             </div>
 
             <!-- Maintenance Types Distribution -->
-                <div class="content-card distribution-card">
-                    <div class="card-header">
-                        <h3 class="card-title">Maintenance Types Distribution</h3>
-                        <p class="card-subtitle">Breakdown of maintenance activities</p>
-                    </div>
-                    <div class="distribution-list">
-                        <div class="distribution-item">
-                            <div class="distribution-info">
-                                <span class="distribution-label">Oil Changes</span>
-                                <span class="distribution-percentage">35%</span>
-                            </div>
-                            <div class="distribution-bar">
-                                <div class="distribution-fill" data-type="oil" style="width: 35%"></div>
-                            </div>
-                        </div>
-                        <div class="distribution-item">
-                            <div class="distribution-info">
-                                <span class="distribution-label">Brake Services</span>
-                                <span class="distribution-percentage">28%</span>
-                            </div>
-                            <div class="distribution-bar">
-                                <div class="distribution-fill" data-type="brake" style="width: 28%"></div>
-                            </div>
-                        </div>
-                        <div class="distribution-item">
-                            <div class="distribution-info">
-                                <span class="distribution-label">Tire Services</span>
-                                <span class="distribution-percentage">22%</span>
-                            </div>
-                            <div class="distribution-bar">
-                                <div class="distribution-fill" data-type="tire" style="width: 22%"></div>
-                            </div>
-                        </div>
-                        <div class="distribution-item">
-                            <div class="distribution-info">
-                                <span class="distribution-label">Engine Services</span>
-                                <span class="distribution-percentage">15%</span>
-                            </div>
-                            <div class="distribution-bar">
-                                <div class="distribution-fill" data-type="engine" style="width: 15%"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <div class="content-card distribution-card">
+                <!--Javascript will render maintenance distribution-->
+            </div>
 
-
-
-
-            <!-- ===================
-                     Recent Activity Section
+            <!--===================
+                Recent Activity Section
             =================== -->
             <div class="task-sections">
-                <div class="recent-activity">
-                    <h3>Recent Maintenance</h3>
-                    <div class="activity-list">
-                        <div class="activity-item">
-                            <div class="activity-icon success"></div>
-                            <div class="activity-content">
-                                <div class="activity-title">Oil Change - Vehicle ABC-1234</div>
-                                <div class="activity-description">Completed 2 hours ago</div>
-                            </div>
-                            <div class="activity-time">Completed</div>
-                        </div>
-
-                        <div class="activity-item">
-                            <div class="activity-icon success"></div>
-                            <div class="activity-content">
-                                <div class="activity-title">Brake Check - Vehicle XYZ-5678</div>
-                                <div class="activity-description">Completed yesterday</div>
-                            </div>
-                            <div class="activity-time">Completed</div>
-                        </div>
+                <div class="activity">
+                    <div class="recent-activity">
+                        <!--Javascript will render recent activity-->
                     </div>
-                </div>
 
-                <div class="recent-activity">
-                    <h3>Upcoming Tasks</h3>
-                    <div class="activity-list">
-                        <div class="activity-item">
-                            <div class="activity-icon warning"></div>
-                            <div class="activity-content">
-                                <div class="activity-title">Tire Rotation - Vehicle DEF-9012</div>
-                                <div class="activity-description">Due tomorrow</div>
-                            </div>
-                            <div class="activity-time">Pending</div>
-                        </div>
+                    <div class="upcoming-activity">
+                        <!--javascript will render upcoming activity-->
+                    </div>
 
-                        <div class="activity-item">
-                            <div class="activity-icon info"></div>
-                            <div class="activity-content">
-                                <div class="activity-title">Engine Service - Vehicle GHI-3456</div>
-                                <div class="activity-description">Due in 3 days</div>
-                            </div>
-                            <div class="activity-time">Scheduled</div>
-                        </div>
+
+                    <!-- Fleet Health Status -->
+                    <div class="content-card fleet-health-card">
+                        <!--Javascript will render Fleet health-->
                     </div>
                 </div>
             </div>
-
-
-           <!-- Fleet Health Status -->
-            <div class="content-card">
-                <div class="card-header">
-                    <h3 class="card-title">Fleet Health Status</h3>
-                    <p class="card-subtitle">Overall condition of your vehicle fleet</p>
-                </div>
-                <div class="card-content">
-                    <div class="health-item">
-                        <div class="health-info">
-                            <div class="health-indicator excellent"></div>
-                            <span class="health-label">Excellent Condition</span>
-                        </div>
-                        <div class="health-progress">
-                            <div class="progress-bar">
-                                <div class="progress-fill excellent" style="width: 63%"></div>
-                            </div>
-                            <span class="health-count">156 vehicles</span>
-                        </div>
-                    </div>
-
-                    <div class="health-item">
-                        <div class="health-info">
-                            <div class="health-indicator good"></div>
-                            <span class="health-label">Good Condition</span>
-                        </div>
-                        <div class="health-progress">
-                            <div class="progress-bar">
-                                <div class="progress-fill good" style="width: 32%"></div>
-                            </div>
-                            <span class="health-count">79 vehicles</span>
-                        </div>
-                    </div>
-
-                    <div class="health-item">
-                        <div class="health-info">
-                            <div class="health-indicator warning"></div>
-                            <span class="health-label">Needs Attention</span>
-                        </div>
-                        <div class="health-progress">
-                            <div class="progress-bar">
-                                <div class="progress-fill warning" style="width: 3%"></div>
-                            </div>
-                            <span class="health-count">8 vehicles</span>
-                        </div>
-                    </div>
-
-                    <div class="health-item">
-                        <div class="health-info">
-                            <div class="health-indicator critical"></div>
-                            <span class="health-label">Critical</span>
-                        </div>
-                        <div class="health-progress">
-                            <div class="progress-bar">
-                                <div class="progress-fill critical" style="width: 2%"></div>
-                            </div>
-                            <span class="health-count">5 vehicles</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-
         </div>
     </div>
+
+
+
+
+
+    <div id="loginModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%;
+    background: rgba(0,0,0,0.5); justify-content:center; align-items:center; z-index:1000;">
+        <div style="background:white; padding:20px; border-radius:8px; text-align:center; width:300px;">
+            <p style="margin-bottom:20px;">Login First</p>
+            <button id="loginOkBtn" style="padding:8px 16px; cursor:pointer;">OK</button>
+        </div>
+    </div>
+
+
 </body>
 
 

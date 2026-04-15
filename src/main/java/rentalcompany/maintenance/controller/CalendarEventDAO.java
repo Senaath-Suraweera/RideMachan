@@ -1,5 +1,6 @@
 package rentalcompany.maintenance.controller;
 
+import common.util.DBConnection;
 import rentalcompany.maintenance.model.CalendarEvent;
 import java.sql.*;
 import java.util.ArrayList;
@@ -314,4 +315,51 @@ public class CalendarEventDAO {
 
         return events;
     }
+
+
+
+
+
+
+
+    public static List<CalendarEvent> getEventsByVehicleAndDate(int vehicleId, String date) throws SQLException {
+
+        List<CalendarEvent> list = new ArrayList<>();
+
+        String sql =
+                "SELECT eventid, vehicle_id, service_type, status, " +
+                        "scheduled_time, assigned_technician " +
+                        "FROM CalendarEvents " +
+                        "WHERE vehicle_id = ? AND scheduled_date = ?";
+
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setInt(1, vehicleId);
+            ps.setString(2, date);
+
+            try (ResultSet rs = ps.executeQuery()) {
+
+                while (rs.next()) {
+
+                    CalendarEvent e = new CalendarEvent();
+
+                    e.setEventId(rs.getInt("eventid"));
+                    e.setVehicleId(rs.getInt("vehicle_id"));
+                    e.setServiceType(rs.getString("service_type"));
+                    e.setStatus(rs.getString("status"));
+
+                    Time st = rs.getTime("scheduled_time");
+                    e.setScheduledTime(st != null ? st.toString().substring(0, 5) : null);
+
+                    e.setAssignedTechnician(rs.getString("assigned_technician"));
+
+                    list.add(e);
+                }
+            }
+        }
+
+        return list;
+    }
+
 }

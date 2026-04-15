@@ -1,338 +1,334 @@
-// Add click functionality to buttons
-        document.addEventListener('DOMContentLoaded', function() {
-            // Upload photo button functionality
-            const uploadBtn = document.querySelector('.choose-files-btn');
-            const fileInput = document.getElementById('fileInput');
-            const profileAvatar = document.querySelector('.profile-avatar');
+async function checkLogin() {
 
+    try {
 
-            uploadBtn.addEventListener('click', function() {
-                fileInput.click();
-            });
+        const response = await fetch("/check/login/maintenance");
+        const data = await response.json();
 
-            fileInput.addEventListener('change', function(e) {
-                const file = e.target.files[0];
-                if (file && file.type.startsWith('image/')) {
-                    const reader = new FileReader();
-                    reader.onload = function(event) {
-                        profileAvatar.style.backgroundImage = `url('${event.target.result}')`;
-                        profileAvatar.style.backgroundSize = 'cover';
-                        profileAvatar.style.backgroundPosition = 'center';
-                        profileAvatar.style.borderRadius = '50%';
-                        profileAvatar.textContent = '';
-                    };
-                    reader.readAsDataURL(file);
-                }
-            });
+        if (!data.loggedIn) {
 
-            // Account Action Buttons
-            const actionButtons = document.querySelectorAll('.quick-actions .action-btn');
-            
+            const modal = document.getElementById("loginModal");
+            modal.style.display = "flex";
 
-                     // Change Password Modal logic
-            const changePasswordBtn = document.querySelector('.quick-actions .action-btn');
-            const modal = document.getElementById('changePasswordModal');
-            const closeBtn = document.getElementById('closeChangePassword');
-            const submitBtn = document.getElementById('submitNewPassword');
-            const passwordInput = document.getElementById('newPasswordInput');
-            const errorDiv = document.getElementById('passwordError');
 
-            changePasswordBtn.addEventListener('click', function() {
-                modal.style.display = 'flex';
-                passwordInput.value = '';
-                errorDiv.textContent = '';
-                // Modal flex centering
-                modal.style.alignItems = 'center';
-                modal.style.justifyContent = 'center';
-            });
+            document.getElementById("loginOkBtn").onclick = () => {
 
-            closeBtn.addEventListener('click', function() {
-                modal.style.display = 'none';
-            });
+                window.location.href = "/views/landing/maintenancelogin.html";
 
-            submitBtn.addEventListener('click', function() {
-                const newPassword = passwordInput.value.trim();
-                if (newPassword.length < 6) {
-                    errorDiv.textContent = 'Password must be at least 6 characters long';
-                } else {
-                    errorDiv.textContent = '';
-                    modal.style.display = 'none';
-                    
-                }
-            });
-
-
-            submitBtn.style.backgroundColor = '#28a745';
-
-            // Optional: close modal on outside click
-            modal.addEventListener('click', function(e) {
-                if (e.target === modal) {
-                    modal.style.display = 'none';
-                }
-            });
-
-
-           
-            // Update Profile Button (second button)
-            
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-            
-
-            // Notification Settings Button (third button)
-            actionButtons[2].addEventListener('click', function() {
-                const settings = {
-                    email: confirm('Enable email notifications?'),
-                    sms: confirm('Enable SMS notifications?'),
-                    push: confirm('Enable push notifications?')
-                };
-                
-                let settingsText = 'Notification Settings:\n';
-                settingsText += `Email: ${settings.email ? 'Enabled' : 'Disabled'}\n`;
-                settingsText += `SMS: ${settings.sms ? 'Enabled' : 'Disabled'}\n`;
-                settingsText += `Push: ${settings.push ? 'Enabled' : 'Disabled'}`;
-                
-                alert(settingsText + '\n\nSettings would be saved to server');
-                // Here you would send the settings to your server
-            });
-
-            // Logout Button (fourth button)
-            actionButtons[3].addEventListener('click', function() {
-                const confirmLogout = confirm('Are you sure you want to logout?\n\nYou will need to login again to access your account.');
-                if (confirmLogout) {
-                    // Show a brief "logging out" message
-                    alert('Logging out...');
-                    // Here you would typically:
-                    // 1. Clear session/local storage
-                    // 2. Redirect to login page
-                    // 3. Call logout API
-                    setTimeout(() => {
-                        alert('Logout functionality would redirect to login page');
-                    }, 500);
-                }
-            });
-
-            // Navigation links functionality
-            const navItems = document.querySelectorAll('.nav-item');
-            navItems.forEach(item => {
-                item.addEventListener('click', function(e) {
-                    if (this.getAttribute('href') === '#') {
-                        e.preventDefault();
-                        const linkText = this.querySelector('span').textContent;
-                        alert(`${linkText} feature will be available soon`);
-                    }
-                });
-            });
-
-            // Search functionality
-            const searchInput = document.getElementById('searchInput');
-            if (searchInput) {
-                searchInput.addEventListener('keypress', function(e) {
-                    if (e.key === 'Enter') {
-                        const searchTerm = this.value.trim();
-                        if (searchTerm) {
-                            alert(`Search functionality would be implemented here\nSearching for: "${searchTerm}"`);
-                        } else {
-                            alert('Please enter a search term');
-                        }
-                    }
-                });
-            }
-
-            // Notification bell functionality
-            const notificationBell = document.querySelector('.notification');
-            if (notificationBell) {
-                notificationBell.addEventListener('click', function() {
-                    alert('Notifications:\n• Vehicle maintenance due tomorrow\n• New message from supervisor\n• Weekly report ready for review');
-                });
-            }
-
-            // User profile menu functionality
-            const userProfile = document.querySelector('.user-profile');
-            if (userProfile) {
-                userProfile.addEventListener('click', function() {
-                    const menuChoice = confirm('User Menu:\n\nClick OK for Profile Settings\nClick Cancel for Quick Actions');
-                    if (menuChoice) {
-                        
-                    } else {
-                        
-                    }
-                });
-            }
-        });
-
-        // Additional helper functions
-        function showNotifications() {
-            alert('Notifications Panel:\n\n• Vehicle ABC123 maintenance scheduled for tomorrow\n• Message from John (Supervisor)\n• Weekly maintenance report ready\n\nClick on any notification to view details');
-        }
-
-        
-
-
-
-
-
-
-
-
-
-                // Get the search input from header
-        const searchInput = document.getElementById('searchInput');
-
-        if (searchInput) {
-            searchInput.addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    const regNumber = searchInput.value.trim();
-                    if (regNumber) {
-                        // Redirect to vehiclerecords.html with query parameter
-                        window.location.href = `vehiclerecords.html?reg=${encodeURIComponent(regNumber)}`;
-                    }
-                }
-            });
-        }
-           
-
-
-
-
-
-
-
-
-
-
-
-
-        
-        
-
-
-
-
-
-
-
-
-
-
-
-
-
-        // Create modal dynamically
-        const modal = document.createElement('div');
-        modal.id = 'profileModal';
-        modal.style.display = 'none'; // hidden initially
-        modal.style.position = 'fixed';
-        modal.style.top = '0';
-        modal.style.left = '0';
-        modal.style.width = '100%';
-        modal.style.height = '100%';
-        modal.style.backgroundColor = 'rgba(0,0,0,0.5)';
-        modal.style.justifyContent = 'center';
-        modal.style.alignItems = 'center';
-
-        const modalContent = document.createElement('div');
-        modalContent.style.backgroundColor = '#fff';
-        modalContent.style.padding = '20px';
-        modalContent.style.borderRadius = '8px';
-        modalContent.style.width = '300px';
-        modalContent.style.position = 'relative';
-
-        // Close button
-        const closeBtn = document.createElement('span');
-        closeBtn.innerHTML = '&times;';
-        closeBtn.style.position = 'absolute';
-        closeBtn.style.top = '10px';
-        closeBtn.style.right = '15px';
-        closeBtn.style.fontSize = '24px';
-        closeBtn.style.cursor = 'pointer';
-        closeBtn.onclick = () => { modal.style.display = 'none'; };
-
-        // Modal title
-        const title = document.createElement('h3');
-        title.innerText = 'Update Personal Info';
-        title.style.textAlign = 'center';
-        title.style.marginBottom = '15px';
-
-        // Form fields
-        const form = document.createElement('div');
-
-        const fields = [
-            {label: 'Full Name', id: 'fullName', value: 'Mr. Sivajan'},
-            {label: 'Email', id: 'email', value: 'sivajan@ridemachan.com'},
-            {label: 'Phone no', id: 'phoneNo', value: '0771234567'},
-            {label: 'NIC', id: 'nic', value: '123456789V'}
-        ];
-
-        fields.forEach(f => {
-            const div = document.createElement('div');
-            div.style.marginBottom = '10px';
-            const lbl = document.createElement('label');
-            lbl.innerText = f.label;
-            lbl.style.display = 'block';
-            lbl.style.marginBottom = '5px';
-            const input = document.createElement('input');
-            input.type = 'text';
-            input.id = f.id;
-            input.value = f.value;
-            input.style.width = '100%';
-            input.style.padding = '8px';
-            input.style.boxSizing = 'border-box';
-            input.style.border = '1px solid #ccc';
-            input.style.borderRadius = '4px';
-            div.appendChild(lbl);
-            div.appendChild(input);
-            form.appendChild(div);
-        });
-
-        // Save button
-        const saveBtn = document.createElement('button');
-        saveBtn.innerText = 'Save Changes';
-        saveBtn.style.padding = '10px 15px';
-        saveBtn.style.width = '100%';
-        saveBtn.style.background = '#28a745';
-        saveBtn.style.color = '#fff';
-        saveBtn.style.border = 'none';
-        saveBtn.style.borderRadius = '5px';
-        saveBtn.style.cursor = 'pointer';
-        saveBtn.onclick = () => {
-            let updatedValues = '';
-            fields.forEach(f => {
-                updatedValues += `${f.label}: ${document.getElementById(f.id).value}\n`;
-            });
-            
-            modal.style.display = 'none';
-        };
-
-        modalContent.appendChild(closeBtn);
-        modalContent.appendChild(title);
-        modalContent.appendChild(form);
-        modalContent.appendChild(saveBtn);
-        modal.appendChild(modalContent);
-        document.body.appendChild(modal);
-
-        // Button to open modal
-        Array.from(document.getElementsByClassName('outline')).forEach(button => {
-            button.onclick = () => {
-                modal.style.display = 'flex'; // only show on click
             };
+
+            return false;
+
+        }
+
+        console.log("User is logged in.");
+        return true;
+
+    } catch (err) {
+
+        console.error("Error checking login:", err);
+        return false;
+
+    }
+
+}
+
+let profileData;
+
+async function LoadProfile() {
+
+    try {
+
+        let response = await fetch(`/load/maintenance/profile`);
+
+        if(!response.ok){
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        let data = await response.json();
+
+        console.log(data);
+
+
+        return data;
+
+    }catch (err) {
+
+        console.log(err);
+
+    }
+
+}
+
+
+async function UpdateProfile() {
+
+    try {
+
+        const firstname = document.getElementById("firstNameInput").value;
+        const lastname  = document.getElementById("lastNameInput").value;
+        const phone     = document.getElementById("phoneInput").value;
+        const email     = document.getElementById("emailInput").value;
+
+
+        if (!validate(firstname, rules.name, "First Name")) return;
+        if (!validate(lastname, rules.name, "Last Name")) return;
+        if (!validate(phone, rules.phone, "Phone Number")) return;
+        if (!validate(email, rules.email, "Email")) return;
+
+        let params = new URLSearchParams({
+            firstname,
+            lastname,
+            phone,
+            email
         });
 
+        let response = await fetch(`/update/maintenance/profile?${params.toString()}`, {
+            method: "POST"
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        const result = await response.json();
+
+        if (result.success) {
+
+            showNotification("Profile updated successfully!", "success");
+
+        } else {
+
+            showNotification("Update failed!", "error");
+
+        }
+
+    } catch (err) {
+
+        console.log(err);
+
+    }
+
+}
+
+
+function showNotification(message, type = "info") {
+
+    const notification = document.createElement("div");
+
+    notification.textContent = message;
+
+    // basic styling
+    notification.style.position = "fixed";
+    notification.style.top = "20px";
+    notification.style.right = "20px";
+    notification.style.padding = "12px 18px";
+    notification.style.borderRadius = "8px";
+    notification.style.color = "#fff";
+    notification.style.fontSize = "14px";
+    notification.style.zIndex = "9999";
+    notification.style.boxShadow = "0 4px 12px rgba(0,0,0,0.2)";
+    notification.style.transition = "0.3s ease";
+
+    // color based on type
+    if (type === "success") {
+        notification.style.background = "#28a745";
+    } else if (type === "error") {
+        notification.style.background = "#dc3545";
+    } else if (type === "info") {
+        notification.style.background = "#17a2b8";
+    } else {
+        notification.style.background = "#333";
+    }
+
+    document.body.appendChild(notification);
+
+    // auto remove after 3 seconds
+    setTimeout(() => {
+
+        notification.style.opacity = "0";
+        setTimeout(() => notification.remove(), 300);
+
+    }, 3000);
+
+}
+
+function populateProfile(data) {
+
+    if (!data) {
+        return;
+    }
+
+
+    document.getElementById("staffName").innerText = (data.firstname || "") + " " + (data.lastname || "");
+
+    document.getElementById("staffPhone").innerText = data.contactNumber || "";
+    document.getElementById("staffEmail").innerText = data.email || "";
+
+
+    document.getElementById("companyName").innerText = data.companyName || "";
+    document.getElementById("garage").innerText = data.companyCity || "";
+
+
+    document.getElementById("employeeId").innerText = data.staffId || "";
+    document.getElementById("shiftTime").innerText = data.status || "";
+
+
+}
+
+function openStaffEditModel(data) {
+
+
+    const existingModal = document.getElementById("editModal");
+    if(existingModal) {
+        existingModal.remove();
+    }
+
+    let editStaffModel = document.createElement("div");
+    editStaffModel.id = "editModal";
+    editStaffModel.style.position = "fixed";
+    editStaffModel.style.top = "0";
+    editStaffModel.style.left = "0";
+    editStaffModel.style.width = "100%";
+    editStaffModel.style.height = "100vh";
+    editStaffModel.style.background = "rgba(0,0,0,0.5)";
+    editStaffModel.style.display = "flex";
+    editStaffModel.style.justifyContent = "center";
+    editStaffModel.style.alignItems = "center";
+    editStaffModel.style.zIndex = "1000";
+    editStaffModel.style.padding = "2px";
+
+    editStaffModel.innerHTML = `
+                        <div style="
+                            background:white; 
+                            padding:20px;
+                            max-height:70vh;
+                            overflow-y:auto;
+                            border-radius:12px; 
+                            width:720px; 
+                            height: 140vh;
+                            margin: auto 0;
+                            box-shadow: 0 5px 20px rgba(0,0,0,0.3); 
+                            display:flex; 
+                            gap:30px;
+                            flex-direction:column;
+                            align-items:center;
+                        ">
+                            <h3 style="margin-bottom:20px;">Edit Maintenance Staff</h3>
+                
+                            <div class="form-row" style="
+                                width:100%;
+                                display:grid;
+                                grid-template-columns: 1fr 1fr;
+                                gap:15px 30px;
+                            ">
+                            
+                                <div class="form-group" style="display:flex; flex-direction:column;">
+                                    <label>First Name</label>
+                                    <input id="firstNameInput" type="text" value="${data.firstname || ''}"
+                                        style="padding:8px; border-radius:5px; border:1px solid #ccc;"/>
+                                </div>
+                            
+                                <div class="form-group" style="display:flex; flex-direction:column;">
+                                    <label>Last Name</label>
+                                    <input id="lastNameInput" type="text" value="${data.lastname || ''}"
+                                        style="padding:8px; border-radius:5px; border:1px solid #ccc;"/>
+                                </div>
+                            
+                                <div class="form-group" style="display:flex; flex-direction:column;">
+                                    <label>Phone Number</label>
+                                    <input id="phoneInput" type="text" value="${data.contactNumber || ''}"
+                                        style="padding:8px; border-radius:5px; border:1px solid #ccc;"/>
+                                </div>
+                            
+                                <div class="form-group" style="display:flex; flex-direction:column;">
+                                    <label>Email</label>
+                                    <input id="emailInput" type="email" value="${data.email || ''}"
+                                        style="padding:8px; border-radius:5px; border:1px solid #ccc;"/>
+                                </div>                            
+                            </div>
+                
+                            <div style="margin-top:25px; display:flex; gap:10px; width:100%; justify-content:flex-end;">
+                
+                                <button onclick="closeStaffEditModel()"
+                                    style="padding:8px 15px; border:none; border-radius:6px; cursor:pointer; background:#ccc; color:#000;">
+                                    Cancel
+                                </button>
+                
+                                <button id="update-POPUp-btn" style="padding:8px 15px; border:none; border-radius:6px; cursor:pointer; background:linear-gradient(135deg, #3a0ca3, #4361ee); color:white;">
+                                    Update
+                                </button>
+                
+                            </div>
+                        </div>
+                    `;
+
+    document.body.appendChild(editStaffModel);
+
+}
+
+function closeStaffEditModel(){
+
+    document.getElementById('editModal').remove();
+
+}
+
+document.addEventListener("DOMContentLoaded", async function() {
+
+    try {
+
+        const loggedIn = await checkLogin();
+
+        if (!loggedIn) {
+            return;    // stop here if not logged in
+        }
+
+        profileData = await LoadProfile();
+
+        populateProfile(profileData);
+
+        document.getElementById("update-UI-btn").addEventListener("click",() => {
+
+            openStaffEditModel(profileData);
+
+            document.getElementById("update-POPUp-btn").addEventListener("click", async() => {
+
+                await UpdateProfile();
+
+                closeStaffEditModel();
+
+                profileData = await LoadProfile();
+
+                populateProfile(profileData);
+
+            })
+
+        })
+
+
+        document.getElementById("changePasswordUIbtn").addEventListener("click", () =>{
+
+            openPasswordEditModel();
+
+            await ;
+
+        })
+
+
+
+        //handleProfilePictureUpload();
+        //setupChangePassword();
+        //setupUpdateProfileModal();
+
+
+
+    } catch (err) {
+
+        console.error("Error during initialization:", err);
+
+    }
+
+});
 
 
 
@@ -345,58 +341,138 @@
 
 
 
+// ===============================
+// GENERIC VALIDATION FUNCTION
+// ===============================
+function validate(value, rules, fieldName = "Field") {
+
+    value = (value ?? "").toString().trim();
+
+    // REQUIRED CHECK
+    if (rules.required && value === "") {
+        showNotification(`${fieldName} is required`, "error");
+        return false;
+    }
+
+    // MIN LENGTH
+    if (rules.minLength && value.length < rules.minLength) {
+        showNotification(`${fieldName} must be at least ${rules.minLength} characters`, "error");
+        return false;
+    }
+
+    // MAX LENGTH
+    if (rules.maxLength && value.length > rules.maxLength) {
+        showNotification(`${fieldName} must be less than ${rules.maxLength} characters`, "error");
+        return false;
+    }
+
+    // PATTERN CHECK
+    if (rules.pattern && !rules.pattern.test(value)) {
+        showNotification(rules.message || `Invalid ${fieldName}`, "error");
+        return false;
+    }
+
+    return true;
+}
+
+// ===============================
+// VALIDATION RULES
+// ===============================
+const rules = {
+
+    name: {
+        required: true,
+        minLength: 2,
+        maxLength: 50,
+        pattern: /^[A-Za-z\s]+$/,
+        message: "Name must contain only letters"
+    },
+
+    phone: {
+        required: true,
+        pattern: /^(?:\+94|0)(7\d{8})$/,
+        message: "Invalid Sri Lankan phone number"
+    },
+
+    email: {
+        required: true,
+        pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+        message: "Invalid email format"
+    },
+
+    nic: {
+        required: true,
+        minLength: 10,
+        maxLength: 12
+    }
+};
 
 
 
-                    // Select the user-profile div
-            const userProfile = document.querySelector('.user-profile');
 
-            // Create the dropdown menu dynamically
-            const dropdownMenu = document.createElement('div');
-            dropdownMenu.style.position = 'absolute';
-            dropdownMenu.style.top = '60px'; // adjust based on your header height
-            dropdownMenu.style.right = '0';
-            dropdownMenu.style.backgroundColor = '#fff';
-            dropdownMenu.style.border = '1px solid #ccc';
-            dropdownMenu.style.borderRadius = '5px';
-            dropdownMenu.style.width = '150px';
-            dropdownMenu.style.boxShadow = '0 2px 8px rgba(0,0,0,0.2)';
-            dropdownMenu.style.display = 'none';
-            dropdownMenu.style.zIndex = '1000';
-            dropdownMenu.style.fontFamily = 'sans-serif';
 
-            // Create "Profile" item
-            const profileItem = document.createElement('div');
-            profileItem.textContent = 'Profile';
-            profileItem.style.padding = '10px';
-            profileItem.style.cursor = 'pointer';
-            profileItem.addEventListener('click', () => {
-                window.location.href = 'staffprofile.html';
-            });
-            dropdownMenu.appendChild(profileItem);
 
-            // Create "Logout" item
-            const logoutItem = document.createElement('div');
-            logoutItem.textContent = 'Logout';
-            logoutItem.style.padding = '10px';
-            logoutItem.style.cursor = 'pointer';
-            logoutItem.addEventListener('click', () => {
-                alert('Logging out...');
-                window.location.href = 'login.html'; // replace with your logout page
-            });
-            dropdownMenu.appendChild(logoutItem);
+    function openPasswordEditModel() {
 
-            // Append dropdown to userProfile and set relative position
-            userProfile.style.position = 'relative';
-            userProfile.appendChild(dropdownMenu);
+        let existingModal = document.getElementById("editPasswordModal");
+        if (existingModal) {
+            existingModal.remove();
+        }
 
-            // Toggle dropdown visibility when clicking the user profile
-            userProfile.addEventListener('click', (e) => {
-                e.stopPropagation(); // prevent closing immediately
-                dropdownMenu.style.display = dropdownMenu.style.display === 'block' ? 'none' : 'block';
-            });
 
-            // Close dropdown if clicking outside
-            document.addEventListener('click', () => {
-                dropdownMenu.style.display = 'none';
-            });
+        let modal = document.createElement("div");
+        modal.id = "editPasswordModal";
+
+        modal.style.position = "fixed";
+        modal.style.top = "0";
+        modal.style.left = "0";
+        modal.style.width = "100%";
+        modal.style.height = "100vh";
+        modal.style.background = "rgba(0,0,0,0.5)";
+        modal.style.display = "flex";
+        modal.style.justifyContent = "center";
+        modal.style.alignItems = "center";
+        modal.style.zIndex = "1000";
+
+        modal.innerHTML = `
+        <div style="
+            background:white; 
+            padding:20px;
+            border-radius:12px; 
+            width:400px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3); 
+            display:flex; 
+            flex-direction:column;
+            gap:15px;
+        ">
+
+            <h3>Change Password</h3>
+
+            <input id="newPasswordInput" type="password" placeholder="New Password"/>
+            <input id="confirmPasswordInput" type="password" placeholder="Confirm Password"/>
+
+            <div style="display:flex; justify-content:flex-end; gap:10px;">
+
+                <button onclick="closePasswordEditModel()"
+                    style="padding:8px 15px; border:none; border-radius:6px; background:#ccc;">
+                    Cancel
+                </button>
+
+                <button id="change-password-btn"
+                    style="padding:8px 15px; border:none; border-radius:6px; background:linear-gradient(135deg, #3a0ca3, #4361ee); color:white;">
+                    Update
+                </button>
+
+            </div>
+        </div>
+    `;
+
+      document.body.appendChild(modal)
+
+}
+
+function closePasswordEditModel(){
+
+    document.getElementById('editPasswordModal').remove();
+
+}

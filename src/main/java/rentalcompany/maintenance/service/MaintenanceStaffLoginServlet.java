@@ -38,6 +38,7 @@ public class MaintenanceStaffLoginServlet extends HttpServlet {
             if (staff != null && PasswordServices.verifyPassword(password, staff.getSalt(), staff.getHashedPassword())) {
                 HttpSession session = request.getSession();
                 session.setAttribute("staff", staff);
+                session.setAttribute("staff_id", staff.getStaffId());
                 response.getWriter().write("{\"status\":\"success\",\"message\":\"Login successful\"}");
             } else {
                 response.setStatus(401);
