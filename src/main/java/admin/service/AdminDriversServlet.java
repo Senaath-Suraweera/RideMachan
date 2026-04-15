@@ -313,6 +313,7 @@ public class AdminDriversServlet extends HttpServlet {
         String reportingManager = get(body, "reportingManager");
         String licenseExpiry = get(body, "licenseExpiry");
         String licenseCategories = get(body, "licenseCategories");
+        String licenseNumber = get(body, "licenseNumber");
         int age = parseInt(get(body, "age"), 0);
         int experience = parseInt(get(body, "experience"), 0);
 
@@ -324,7 +325,7 @@ public class AdminDriversServlet extends HttpServlet {
                         "firstname=?, lastname=?, mobilenumber=?, Area=?, assignedarea=?, " +
                         "homeaddress=?, status=?, availability=?, description=?, " +
                         "shifttime=?, reportingmanager=?, licenceexpirydate=?, " +
-                        "licensecategories=?, age=?, experience_years=? " +
+                        "licensecategories=?, age=?, experience_years=?, licensenumber=? " +
                         "WHERE driverid=?";
 
         Connection con = null;
@@ -348,7 +349,8 @@ public class AdminDriversServlet extends HttpServlet {
             ps.setString(13, licenseCategories);
             ps.setInt(14, age);
             ps.setInt(15, experience);
-            ps.setInt(16, id);
+            ps.setString(16, licenseNumber);
+            ps.setInt(17, id);
 
             int rows = ps.executeUpdate();
             if (rows > 0) {
@@ -386,6 +388,7 @@ public class AdminDriversServlet extends HttpServlet {
             String reportingManager = safe(req.getParameter("reportingManager"));
             String licenseExpiry = safe(req.getParameter("licenseExpiry"));
             String licenseCategories = safe(req.getParameter("licenseCategories"));
+            String licenseNumber = safe(req.getParameter("licenseNumber"));
             int age = parseInt(req.getParameter("age"), 0);
             int experience = parseInt(req.getParameter("experience"), 0);
 
@@ -401,7 +404,7 @@ public class AdminDriversServlet extends HttpServlet {
                             "firstname=?, lastname=?, mobilenumber=?, Area=?, assignedarea=?, " +
                             "homeaddress=?, status=?, availability=?, description=?, " +
                             "shifttime=?, reportingmanager=?, licenceexpirydate=?, " +
-                            "licensecategories=?, age=?, experience_years=? " +
+                            "licensecategories=?, age=?, experience_years=?, licensenumber=? " +
                             "WHERE driverid=?";
 
             ps = con.prepareStatement(updateSql);
@@ -420,7 +423,8 @@ public class AdminDriversServlet extends HttpServlet {
             ps.setString(13, licenseCategories);
             ps.setInt(14, age);
             ps.setInt(15, experience);
-            ps.setInt(16, id);
+            ps.setString(16, licenseNumber);
+            ps.setInt(17, id);
             ps.executeUpdate();
             ps.close();
 
@@ -482,7 +486,7 @@ public class AdminDriversServlet extends HttpServlet {
         }
     }
 
-    /* ======================= POST (BAN / UNBAN) ======================= */
+    /* ======================= POST (CREATE / BAN / UNBAN) ======================= */
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         addCors(resp);
@@ -490,12 +494,14 @@ public class AdminDriversServlet extends HttpServlet {
         resp.setCharacterEncoding("UTF-8");
 
         String pathInfo = req.getPathInfo();
-        if (pathInfo == null || pathInfo.trim().isEmpty()) {
-            resp.setStatus(400);
-            resp.getWriter().print("{\"success\":false,\"message\":\"Invalid request path\"}");
+
+        // ================= CREATE DRIVER (POST with no sub-path or just /) =================
+        if (pathInfo == null || "/".equals(pathInfo.trim())) {
+            handleCreateDriver(req, resp);
             return;
         }
 
+        // ================= BAN / UNBAN (POST /{id}/ban or /{id}/unban) =================
         String[] parts = pathInfo.split("/");
         if (parts.length < 3) {
             resp.setStatus(400);
@@ -532,6 +538,175 @@ public class AdminDriversServlet extends HttpServlet {
         } finally {
             if (ps != null) try { ps.close(); } catch (SQLException ignored) {}
             if (con != null) try { con.close(); } catch (SQLException ignored) {}
+        }
+    }
+
+    /* ======================= CREATE DRIVER (multipart) ======================= */
+    private void handleCreateDriver(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        Connection con = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+
+        try {
+            String firstName = safe(req.getParameter("firstName"));
+            String lastName = safe(req.getParameter("lastName"));
+            String username = safe(req.getParameter("username"));
+            String email = safe(req.getParameter("email"));
+            String phone = safe(req.getParameter("phone"));
+            String nicNumber = safe(req.getParameter("nicNumber"));
+            String licenseNumber = safe(req.getParameter("licenseNumber"));
+            String licenseExpiry = safe(req.getParameter("licenseExpiry"));
+            String licenseCategories = safe(req.getParameter("licenseCategories"));
+            String description = safe(req.getParameter("description"));
+            String area = safe(req.getParameter("area"));
+            String assignedArea = safe(req.getParameter("assignedArea"));
+            String homeAddress = safe(req.getParameter("homeAddress"));
+            String status = safe(req.getParameter("status"));
+            String availability = safe(req.getParameter("availability"));
+            String shiftTime = safe(req.getParameter("shiftTime"));
+            String reportingManager = safe(req.getParameter("reportingManager"));
+            String password = safe(req.getParameter("password"));
+            int companyId = parseInt(req.getParameter("companyId"), 0);
+            int age = parseInt(req.getParameter("age"), 0);
+            int experience = parseInt(req.getParameter("experience"), 0);
+
+            // Validation
+            if (firstName.isEmpty() || lastName.isEmpty() || email.isEmpty() || username.isEmpty()) {
+                resp.setStatus(400);
+                resp.getWriter().print("{\"success\":false,\"message\":\"First name, last name, username, and email are required.\"}");
+                return;
+            }
+            if (nicNumber.isEmpty()) {
+                resp.setStatus(400);
+                resp.getWriter().print("{\"success\":false,\"message\":\"NIC number is required.\"}");
+                return;
+            }
+            if (password.isEmpty() || password.length() < 6) {
+                resp.setStatus(400);
+                resp.getWriter().print("{\"success\":false,\"message\":\"Password must be at least 6 characters.\"}");
+                return;
+            }
+            if (companyId <= 0) {
+                resp.setStatus(400);
+                resp.getWriter().print("{\"success\":false,\"message\":\"Company ID is required.\"}");
+                return;
+            }
+
+            // Get NIC and license document uploads
+            Part nicPart = getPartSafe(req, "nicImage");
+            Part licensePart = getPartSafe(req, "licenseImage");
+
+            if (nicPart == null || nicPart.getSize() == 0) {
+                resp.setStatus(400);
+                resp.getWriter().print("{\"success\":false,\"message\":\"NIC document is required.\"}");
+                return;
+            }
+            if (licensePart == null || licensePart.getSize() == 0) {
+                resp.setStatus(400);
+                resp.getWriter().print("{\"success\":false,\"message\":\"Driver's license document is required.\"}");
+                return;
+            }
+
+            byte[] nicBytes = nicPart.getInputStream().readAllBytes();
+            byte[] licenseBytes = licensePart.getInputStream().readAllBytes();
+
+            // Hash the password
+            String salt = common.util.PasswordServices.generateSalt();
+            String hashedPassword = common.util.PasswordServices.hashPassword(password, salt);
+
+            con = DBConnection.getConnection();
+            con.setAutoCommit(false);
+
+            String insertSql =
+                    "INSERT INTO Driver " +
+                            "(username, firstname, lastname, email, mobilenumber, description, " +
+                            "hashedpassword, salt, nicnumber, nic, driverslicence, company_id, " +
+                            "status, Area, licenceexpirydate, licensenumber, homeaddress, " +
+                            "assignedarea, shifttime, reportingmanager, joineddate, availability, " +
+                            "age, experience_years, licensecategories, active, banned) " +
+                            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURDATE(), ?, ?, ?, ?, TRUE, FALSE)";
+
+            ps = con.prepareStatement(insertSql, Statement.RETURN_GENERATED_KEYS);
+            ps.setString(1, username);
+            ps.setString(2, firstName);
+            ps.setString(3, lastName);
+            ps.setString(4, email);
+            ps.setString(5, phone);
+            ps.setString(6, description);
+            ps.setString(7, hashedPassword);
+            ps.setString(8, salt);
+            ps.setString(9, nicNumber);
+            ps.setBytes(10, nicBytes);
+            ps.setBytes(11, licenseBytes);
+            ps.setInt(12, companyId);
+            ps.setString(13, status.isEmpty() ? "Available" : status);
+            ps.setString(14, area);
+            setDateOrNull(ps, 15, licenseExpiry);
+            ps.setString(16, licenseNumber);
+            ps.setString(17, homeAddress);
+            ps.setString(18, assignedArea);
+            ps.setString(19, shiftTime);
+            ps.setString(20, reportingManager);
+            ps.setString(21, availability.isEmpty() ? "available" : availability);
+            ps.setInt(22, age);
+            ps.setInt(23, experience);
+            ps.setString(24, licenseCategories);
+
+            ps.executeUpdate();
+
+            rs = ps.getGeneratedKeys();
+            int newDriverId = 0;
+            if (rs.next()) {
+                newDriverId = rs.getInt(1);
+            }
+            rs.close();
+            ps.close();
+
+            // Handle profile image upload (optional)
+            Part profilePart = getPartSafe(req, "profileImage");
+            if (profilePart != null && profilePart.getSize() > 0 && newDriverId > 0) {
+                String mimeType = safe(profilePart.getContentType());
+                if (mimeType.isEmpty()) mimeType = "image/jpeg";
+                byte[] imageBytes = profilePart.getInputStream().readAllBytes();
+
+                String upsertSql =
+                        "INSERT INTO DriverProfileImage (driver_id, image_data, mime_type) " +
+                                "VALUES (?, ?, ?) " +
+                                "ON DUPLICATE KEY UPDATE image_data=VALUES(image_data), mime_type=VALUES(mime_type), updated_at=CURRENT_TIMESTAMP";
+                ps = con.prepareStatement(upsertSql);
+                ps.setInt(1, newDriverId);
+                ps.setBytes(2, imageBytes);
+                ps.setString(3, mimeType);
+                ps.executeUpdate();
+                ps.close();
+            }
+
+            con.commit();
+            resp.getWriter().print("{\"success\":true,\"message\":\"Driver created successfully\",\"driverId\":" + newDriverId + "}");
+
+        } catch (Exception e) {
+            if (con != null) try { con.rollback(); } catch (SQLException ignored) {}
+
+            String msg = e.getMessage() != null ? e.getMessage() : "Unknown error";
+            if (msg.contains("Duplicate entry")) {
+                if (msg.contains("username")) msg = "Username already exists.";
+                else if (msg.contains("email")) msg = "Email already exists.";
+                else if (msg.contains("mobilenumber")) msg = "Phone number already exists.";
+                else if (msg.contains("nicnumber")) msg = "NIC number already exists.";
+                else if (msg.contains("licensenumber")) msg = "License number already exists.";
+                else msg = "A driver with this information already exists.";
+            }
+
+            resp.setStatus(500);
+            resp.getWriter().print("{\"success\":false,\"message\":\"" + esc(msg) + "\"}");
+            e.printStackTrace();
+        } finally {
+            if (rs != null) try { rs.close(); } catch (SQLException ignored) {}
+            if (ps != null) try { ps.close(); } catch (SQLException ignored) {}
+            if (con != null) {
+                try { con.setAutoCommit(true); } catch (SQLException ignored) {}
+                try { con.close(); } catch (SQLException ignored) {}
+            }
         }
     }
 

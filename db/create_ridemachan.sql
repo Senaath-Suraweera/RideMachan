@@ -863,3 +863,19 @@ ALTER TABLE driver_booking_status
 
 ALTER TABLE driver_booking_status
     MODIFY status ENUM('upcoming', 'in-progress', 'completed', 'cancelled');
+
+
+ALTER TABLE companybookings
+    ADD COLUMN ride_id VARCHAR(50) UNIQUE AFTER booking_id,
+    ADD COLUMN customer_name VARCHAR(100) AFTER customerid,
+    ADD COLUMN customer_phone VARCHAR(20) AFTER customer_name,
+    ADD COLUMN customer_email VARCHAR(100) AFTER customer_phone,
+    ADD COLUMN estimated_duration INT AFTER end_time,
+    ADD COLUMN distance DECIMAL(10,2) AFTER estimated_duration,
+    ADD COLUMN vehicle_model VARCHAR(100) AFTER vehicleid,
+    ADD COLUMN vehicle_plate VARCHAR(20) AFTER vehicle_model,
+    ADD COLUMN special_instructions TEXT AFTER drop_location,
+    ADD COLUMN created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP AFTER payment_status;
+
+CREATE INDEX idx_ride_id ON companybookings (ride_id);
+CREATE INDEX idx_driver_status ON companybookings (driverid, status);

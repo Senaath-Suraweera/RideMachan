@@ -417,6 +417,9 @@
                       <button class="btn-icon" title="View" onclick="window.location.href='drivers.html?id=${d.id}'">
                         <i class="fas fa-eye"></i>
                       </button>
+                      <button class="btn-icon" title="Edit" onclick="window._editDriver(${d.id})">
+                        <i class="fas fa-pen"></i>
+                      </button>
                       <button class="btn-icon btn-icon-danger" title="Ban" onclick="window._confirmDelete('driver',${d.id},'${esc(d.name || "")}')">
                         <i class="fas fa-ban"></i>
                       </button>
@@ -808,24 +811,163 @@
   function renderDriverModal() {
     return `
     <div class="modal" id="driverModal">
-      <div class="modal-content">
+      <div class="modal-content" style="max-width:900px">
         <div class="modal-header">
           <h3 id="driverModalTitle">Add Driver</h3>
           <button class="modal-close" onclick="closeModal('driverModal')">&times;</button>
         </div>
-        <form id="driverForm">
+        <form id="driverForm" enctype="multipart/form-data">
+          <input type="hidden" id="dfId" value="">
           <div class="modal-body">
-            <p style="color:var(--text-light);font-size:13px;margin-bottom:16px;">
-              Note: Drivers are registered through the driver registration flow. This form creates a basic driver record.
-            </p>
             <div class="form-row">
-              <div class="form-group"><label class="form-label">First Name</label><input id="dfFirstName" class="form-control" required></div>
-              <div class="form-group"><label class="form-label">Last Name</label><input id="dfLastName" class="form-control" required></div>
-              <div class="form-group"><label class="form-label">Email</label><input id="dfEmail" class="form-control" type="email" required></div>
-              <div class="form-group"><label class="form-label">Phone</label><input id="dfPhone" class="form-control" placeholder="+94 ..."></div>
-              <div class="form-group"><label class="form-label">NIC Number</label><input id="dfNic" class="form-control" required></div>
-              <div class="form-group"><label class="form-label">License Number</label><input id="dfLicense" class="form-control"></div>
-              <div class="form-group" style="grid-column:1/-1"><label class="form-label">Description</label><textarea id="dfDescription" class="form-control" rows="2"></textarea></div>
+
+              <!-- Personal Info -->
+              <div class="form-group">
+                <label class="form-label">First Name</label>
+                <input id="dfFirstName" class="form-control" required>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Last Name</label>
+                <input id="dfLastName" class="form-control" required>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Username</label>
+                <input id="dfUsername" class="form-control" required placeholder="e.g., john_driver">
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Email</label>
+                <input id="dfEmail" class="form-control" type="email" required>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Phone</label>
+                <input id="dfPhone" class="form-control" placeholder="+94 ...">
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Age</label>
+                <input id="dfAge" class="form-control" type="number" min="18" max="70" placeholder="e.g., 30">
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Home Address</label>
+                <input id="dfHomeAddress" class="form-control" placeholder="e.g., No 5, Main St, Colombo">
+              </div>
+
+              <!-- Identity -->
+              <div class="form-group">
+                <label class="form-label">NIC Number</label>
+                <input id="dfNic" class="form-control" required placeholder="e.g., 901234567V">
+              </div>
+
+              <!-- License Info -->
+              <div class="form-group">
+                <label class="form-label">License Number</label>
+                <input id="dfLicense" class="form-control" placeholder="e.g., B1234567">
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">License Expiry</label>
+                <input id="dfLicenseExpiry" class="form-control" type="date">
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">License Categories</label>
+                <input id="dfLicenseCategories" class="form-control" placeholder="e.g., A, B1, B">
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Experience (years)</label>
+                <input id="dfExperience" class="form-control" type="number" min="0" value="0">
+              </div>
+
+              <!-- Work Info -->
+              <div class="form-group">
+                <label class="form-label">Area</label>
+                <input id="dfArea" class="form-control" placeholder="e.g., Colombo">
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Assigned Area</label>
+                <input id="dfAssignedArea" class="form-control" placeholder="e.g., Colombo">
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Shift Time</label>
+                <input id="dfShiftTime" class="form-control" placeholder="e.g., Day / Night">
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Reporting Manager</label>
+                <input id="dfReportingManager" class="form-control" placeholder="e.g., Manager Name">
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Status</label>
+                <select id="dfStatus" class="form-select">
+                  <option value="Available">Available</option>
+                  <option value="On Trip">On Trip</option>
+                  <option value="Offline">Offline</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Availability</label>
+                <select id="dfAvailability" class="form-select">
+                  <option value="available">Available</option>
+                  <option value="unavailable">Unavailable</option>
+                  <option value="on-trip">On Trip</option>
+                </select>
+              </div>
+
+              <div class="form-group" style="grid-column:1/-1">
+                <label class="form-label">Description</label>
+                <textarea id="dfDescription" class="form-control" rows="2" placeholder="Brief description about the driver"></textarea>
+              </div>
+
+              <!-- Document Uploads -->
+              <div class="form-group" style="grid-column:1/-1">
+                <label class="form-label">Profile Image</label>
+                <input id="dfProfileImage" class="form-control" type="file" accept="image/*">
+                <small id="dfProfileImageHint" style="display:block;margin-top:6px;color:#6b7280;">
+                  Optional. Upload a profile photo.
+                </small>
+                <div id="dfProfileImagePreviewWrap" style="display:none;margin-top:10px;">
+                  <img id="dfProfileImagePreview" alt="Profile Preview"
+                    style="max-width:120px;max-height:120px;border-radius:50%;border:1px solid #e5e7eb;object-fit:cover;">
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">NIC Document</label>
+                <input id="dfNicImage" class="form-control" type="file" accept="image/*,.pdf">
+                <small id="dfNicImageHint" style="display:block;margin-top:6px;color:#6b7280;">
+                  Required when adding. Optional when editing.
+                </small>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Driver's License Document</label>
+                <input id="dfLicenseImage" class="form-control" type="file" accept="image/*,.pdf">
+                <small id="dfLicenseImageHint" style="display:block;margin-top:6px;color:#6b7280;">
+                  Required when adding. Optional when editing.
+                </small>
+              </div>
+
+              <!-- Password (only for new drivers) -->
+              <div class="form-group" id="dfPasswordWrap">
+                <label class="form-label">Password</label>
+                <input id="dfPassword" class="form-control" type="password" placeholder="Minimum 6 characters">
+              </div>
+
+              <div class="form-group" id="dfConfirmPasswordWrap">
+                <label class="form-label">Confirm Password</label>
+                <input id="dfConfirmPassword" class="form-control" type="password" placeholder="Re-enter password">
+              </div>
+
             </div>
           </div>
           <div class="modal-footer">
@@ -1452,20 +1594,239 @@
       };
     }
 
+    function resetDriverForm() {
+      $("#driverForm")?.reset();
+      $("#dfId").value = "";
+
+      const pwWrap = $("#dfPasswordWrap");
+      const cpwWrap = $("#dfConfirmPasswordWrap");
+      if (pwWrap) pwWrap.style.display = "";
+      if (cpwWrap) cpwWrap.style.display = "";
+
+      const imgWrap = $("#dfProfileImagePreviewWrap");
+      if (imgWrap) imgWrap.style.display = "none";
+
+      const nicHint = $("#dfNicImageHint");
+      const licHint = $("#dfLicenseImageHint");
+      const profHint = $("#dfProfileImageHint");
+      if (nicHint)
+        nicHint.textContent = "Required when adding. Optional when editing.";
+      if (licHint)
+        licHint.textContent = "Required when adding. Optional when editing.";
+      if (profHint) profHint.textContent = "Optional. Upload a profile photo.";
+    }
+
     window._openDriverModal = () => {
+      resetDriverForm();
       $("#driverModalTitle").textContent = "Add Driver";
-      $("#driverForm").reset();
+
+      const nicHint = $("#dfNicImageHint");
+      const licHint = $("#dfLicenseImageHint");
+      if (nicHint) nicHint.textContent = "Required when adding a driver.";
+      if (licHint) licHint.textContent = "Required when adding a driver.";
+
       openModal("driverModal");
+    };
+
+    window._editDriver = async (driverId) => {
+      try {
+        const res = await fetch(`${API_DRIVERS}/${driverId}`);
+        const data = await res.json();
+
+        if (!data.success || !data.driver) {
+          alert("Driver not found");
+          return;
+        }
+
+        const d = data.driver;
+        resetDriverForm();
+
+        $("#driverModalTitle").textContent = "Edit Driver";
+        $("#dfId").value = d.id || "";
+        $("#dfFirstName").value = d.firstName || "";
+        $("#dfLastName").value = d.lastName || "";
+        $("#dfUsername").value = d.username || "";
+        $("#dfEmail").value = d.email || "";
+        $("#dfPhone").value = d.phone || "";
+        $("#dfAge").value = d.age || "";
+        $("#dfHomeAddress").value = d.homeAddress || "";
+        $("#dfNic").value = d.nicNumber || "";
+        $("#dfLicense").value = d.licenseNumber || "";
+        $("#dfLicenseExpiry").value = d.licenseExpiry || "";
+        $("#dfLicenseCategories").value = d.licenseCategories || "";
+        $("#dfExperience").value = d.experience || 0;
+        $("#dfArea").value = d.area || "";
+        $("#dfAssignedArea").value = d.assignedArea || "";
+        $("#dfShiftTime").value = d.shiftTime || "";
+        $("#dfReportingManager").value = d.reportingManager || "";
+        $("#dfStatus").value = d.status || "Available";
+        $("#dfAvailability").value = d.availability || "available";
+        $("#dfDescription").value = d.description || "";
+
+        // Hide password fields for edit
+        const pwWrap = $("#dfPasswordWrap");
+        const cpwWrap = $("#dfConfirmPasswordWrap");
+        if (pwWrap) pwWrap.style.display = "none";
+        if (cpwWrap) cpwWrap.style.display = "none";
+
+        // Update hints for edit mode
+        const nicHint = $("#dfNicImageHint");
+        const licHint = $("#dfLicenseImageHint");
+        const profHint = $("#dfProfileImageHint");
+        if (nicHint)
+          nicHint.textContent =
+            "Optional when editing. Leave empty to keep current.";
+        if (licHint)
+          licHint.textContent =
+            "Optional when editing. Leave empty to keep current.";
+        if (profHint)
+          profHint.textContent = "Optional. Leave empty to keep current photo.";
+
+        // Show existing profile image preview
+        if (d.hasProfileImage) {
+          const imgWrap = $("#dfProfileImagePreviewWrap");
+          const img = $("#dfProfileImagePreview");
+          if (imgWrap && img) {
+            img.src = `${API_DRIVERS}/${d.id}/profile-image?t=${Date.now()}`;
+            imgWrap.style.display = "block";
+          }
+        }
+
+        // Disable NIC number in edit mode (it's a unique identifier)
+        $("#dfNic").readOnly = true;
+        $("#dfUsername").readOnly = true;
+        $("#dfEmail").readOnly = true;
+
+        openModal("driverModal");
+      } catch (err) {
+        console.error(err);
+        alert("Failed to load driver details");
+      }
     };
 
     const dForm = $("#driverForm");
     if (dForm) {
       dForm.onsubmit = async (e) => {
         e.preventDefault();
-        alert(
-          "Driver registration requires NIC and license document uploads. Please use the full driver registration flow.",
-        );
-        closeModal("driverModal");
+
+        const driverId = $("#dfId").value.trim();
+        const isEdit = !!driverId;
+
+        const firstName = $("#dfFirstName").value.trim();
+        const lastName = $("#dfLastName").value.trim();
+        const username = $("#dfUsername").value.trim();
+        const email = $("#dfEmail").value.trim();
+        const phone = $("#dfPhone").value.trim();
+        const age = $("#dfAge").value;
+        const homeAddress = $("#dfHomeAddress").value.trim();
+        const nicNumber = $("#dfNic").value.trim();
+        const licenseNumber = $("#dfLicense").value.trim();
+        const licenseExpiry = $("#dfLicenseExpiry").value;
+        const licenseCategories = $("#dfLicenseCategories").value.trim();
+        const experience = $("#dfExperience").value;
+        const area = $("#dfArea").value.trim();
+        const assignedArea = $("#dfAssignedArea").value.trim();
+        const shiftTime = $("#dfShiftTime").value.trim();
+        const reportingManager = $("#dfReportingManager").value.trim();
+        const status = $("#dfStatus").value;
+        const availability = $("#dfAvailability").value;
+        const description = $("#dfDescription").value.trim();
+        const password = $("#dfPassword").value;
+        const confirmPassword = $("#dfConfirmPassword").value;
+
+        const profileImageFile = $("#dfProfileImage")?.files?.[0] || null;
+        const nicImageFile = $("#dfNicImage")?.files?.[0] || null;
+        const licenseImageFile = $("#dfLicenseImage")?.files?.[0] || null;
+
+        if (!firstName || !lastName || !email) {
+          alert("First name, last name, and email are required.");
+          return;
+        }
+
+        if (!isEdit) {
+          if (!username) {
+            alert("Username is required.");
+            return;
+          }
+          if (!nicNumber) {
+            alert("NIC number is required.");
+            return;
+          }
+          if (!password) {
+            alert("Password is required for new drivers.");
+            return;
+          }
+          if (password.length < 6) {
+            alert("Password must be at least 6 characters.");
+            return;
+          }
+          if (password !== confirmPassword) {
+            alert("Passwords do not match.");
+            return;
+          }
+          if (!nicImageFile) {
+            alert("Please upload a NIC document.");
+            return;
+          }
+          if (!licenseImageFile) {
+            alert("Please upload a driver's license document.");
+            return;
+          }
+        }
+
+        const fd = new FormData();
+        fd.append("name", firstName + " " + lastName);
+        fd.append("firstName", firstName);
+        fd.append("lastName", lastName);
+        fd.append("username", username);
+        fd.append("email", email);
+        fd.append("phone", phone);
+        fd.append("age", age || "0");
+        fd.append("homeAddress", homeAddress);
+        fd.append("nicNumber", nicNumber);
+        fd.append("licenseNumber", licenseNumber);
+        fd.append("licenseExpiry", licenseExpiry);
+        fd.append("licenseCategories", licenseCategories);
+        fd.append("experience", experience || "0");
+        fd.append("area", area);
+        fd.append("assignedArea", assignedArea);
+        fd.append("shiftTime", shiftTime);
+        fd.append("reportingManager", reportingManager);
+        fd.append("status", status);
+        fd.append("availability", availability);
+        fd.append("description", description);
+        fd.append("companyId", String(company.id));
+
+        if (!isEdit) {
+          fd.append("password", password);
+        }
+
+        if (profileImageFile) fd.append("profileImage", profileImageFile);
+        if (nicImageFile) fd.append("nicImage", nicImageFile);
+        if (licenseImageFile) fd.append("licenseImage", licenseImageFile);
+
+        try {
+          const url = isEdit ? `${API_DRIVERS}/${driverId}` : API_DRIVERS;
+          const method = isEdit ? "PUT" : "POST";
+
+          const res = await fetch(url, { method, body: fd });
+          const data = await res.json();
+
+          if (data.success) {
+            closeModal("driverModal");
+            await loadCompanyData(company.id);
+
+            setTimeout(() => {
+              const dTab = document.querySelector('[data-tab="drivers"]');
+              if (dTab) dTab.click();
+            }, 100);
+          } else {
+            alert(data.message || "Save failed");
+          }
+        } catch (err) {
+          console.error(err);
+          alert("Failed to save driver");
+        }
       };
     }
 

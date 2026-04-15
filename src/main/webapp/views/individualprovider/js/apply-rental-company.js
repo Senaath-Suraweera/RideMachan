@@ -1,16 +1,20 @@
-// apply-rental-company.js (REAL API version)
+// apply-rental-company.js — Professional refactor with tabbed detail view + doc viewer
 
 const BASE_URL = "http://localhost:8080";
-// If you use context path, uncomment:
 // const BASE_URL = "http://localhost:8080/RideMachan";
 
-const VEHICLES_API = `${BASE_URL}/api/vehicles`; // has /me
+const VEHICLES_API = `${BASE_URL}/api/vehicles`;
 const PROVIDER_REQ_API = `${BASE_URL}/api/provider/rental-requests`;
 
 let providerId = null;
 let companies = [];
 let myRequests = [];
+let currentDetailCompany = null;
+let currentDetailTab = "overview";
 
+// ─────────────────────────────────────────
+// Init
+// ─────────────────────────────────────────
 document.addEventListener("DOMContentLoaded", async () => {
   providerId = await getProviderIdFromSession();
   if (!providerId) {
@@ -20,11 +24,14 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   await Promise.all([loadCompanies(), loadMyRequests()]);
   renderCompanies(companies);
-  bindForm();
+  bindEvents();
 });
 
+// ─────────────────────────────────────────
+// API helpers
+// ─────────────────────────────────────────
 async function apiFetch(url, options = {}) {
-  return fetch(url, { ...options, credentials: "include" }); // ✅ send JSESSIONID cookie
+  return fetch(url, { ...options, credentials: "include" });
 }
 
 async function getProviderIdFromSession() {
@@ -68,6 +75,9 @@ async function loadMyRequests() {
   myRequests = data.requests || [];
 }
 
+// ─────────────────────────────────────────
+// Render Company Cards
+// ─────────────────────────────────────────
 function hasAnyPendingForCompany(companyId) {
   return myRequests.some(
     (r) =>
@@ -76,12 +86,24 @@ function hasAnyPendingForCompany(companyId) {
   );
 }
 
+function getCompanyInitials(name) {
+  if (!name) return "RC";
+  const words = name.trim().split(/\s+/);
+  if (words.length === 1) return words[0].substring(0, 2).toUpperCase();
+  return (words[0][0] + words[1][0]).toUpperCase();
+}
+
 function renderCompanies(list) {
   const container = document.querySelector(".companies-container");
   if (!container) return;
 
   if (!list.length) {
-    container.innerHTML = `<p>No companies available.</p>`;
+    container.innerHTML = `
+      <div style="text-align:center;padding:60px 20px;color:var(--text-light);">
+        <i class="fas fa-building-circle-xmark" style="font-size:48px;margin-bottom:16px;display:block;color:#dde1e7;"></i>
+        <p style="font-size:16px;font-weight:600;">No companies available at the moment.</p>
+        <p style="font-size:14px;margin-top:6px;">Check back later or adjust your filters.</p>
+      </div>`;
     return;
   }
 
@@ -90,346 +112,550 @@ function renderCompanies(list) {
   list.forEach((c) => {
     const companyId = c.companyid;
     const pending = hasAnyPendingForCompany(companyId);
-
-    const rating = Number(c.rating || 4);
+    // rating can be null from backend when no reviews exist yet
+    const rating = c.rating != null ? Number(c.rating) : null;
     const reviews = Number(c.reviews || 0);
+    const drivers = Number(c.drivers || 0);
     const location = (c.location || "N/A").toString();
+    const initials = getCompanyInitials(c.companyname);
 
     const card = document.createElement("div");
     card.className = "company-card";
-    card.dataset.rating = String(rating);
+    card.dataset.rating = String(rating ?? 0);
     card.dataset.location = location.toLowerCase();
     card.dataset.companyId = String(companyId);
+    card.dataset.name = (c.companyname || "").toLowerCase();
+
+    const ratingHtml =
+      rating != null
+        ? `<div class="stars">${renderStars(rating)}</div>
+         <span class="rating-text">
+           <i class="fas fa-users" style="font-size:11px;color:var(--primary-light);"></i>
+           ${rating.toFixed(1)} &bull; ${reviews} review${reviews !== 1 ? "s" : ""}
+         </span>`
+        : `<span class="rating-text" style="color:#adb5bd;">
+           <i class="fas fa-star" style="font-size:11px;"></i> No ratings yet
+         </span>`;
 
     card.innerHTML = `
-      <div class="company-header">
-        <div class="company-logo">
-          <div class="logo-placeholder">Logo</div>
-        </div>
-        <div class="company-main-info">
-          <h3 class="company-name">${escapeHtml(c.companyname || "Rental Company")}</h3>
-          <div class="company-rating">
-            <div class="stars">${renderStars(rating)}</div>
-            <span class="rating-text">No of reviews: ${reviews}</span>
+      <div class="company-card-accent"></div>
+      <div class="company-card-inner">
+        <div class="company-header">
+          <div class="company-avatar">${escapeHtml(initials)}</div>
+          <div class="company-main-info">
+            <h3 class="company-name">${escapeHtml(c.companyname || "Rental Company")}</h3>
+            <div class="company-rating">${ratingHtml}</div>
+            <div class="company-location">
+              <i class="fas fa-location-dot"></i>
+              ${escapeHtml(location)}
+            </div>
           </div>
-          <div class="company-location">📍 ${escapeHtml(location)}</div>
+          <div class="company-actions">
+            <button class="btn btn-primary apply-btn" ${pending ? "disabled" : ""}>
+              ${
+                pending
+                  ? `<i class="fas fa-clock"></i> Application Sent`
+                  : `<i class="fas fa-paper-plane"></i> Apply Now`
+              }
+            </button>
+            ${pending ? `<span class="status-badge status-pending"><i class="fas fa-hourglass-half"></i> Pending</span>` : ""}
+          </div>
         </div>
-        <div class="company-actions">
-          <button class="btn btn-primary apply-btn" ${pending ? "disabled" : ""}>
-            ${pending ? "Application Sent" : "Apply Now"}
-          </button>
-          ${pending ? `<div class="status-badge status-pending" style="margin-top:8px;">Application Pending</div>` : ""}
-        </div>
-      </div>
 
-      <div class="company-description">
-        <p>${escapeHtml(c.description || "No description available.")}</p>
-      </div>
+        <p class="company-description">${escapeHtml(c.description || "No description available.")}</p>
 
-      <div class="company-details">
-        <div class="detail-item">
-          <strong>Drivers:</strong>
-          <span class="driver-count">${Number(c.drivers || 0)}</span>
-          <span class="driver-note">(Click card to view more details)</span>
+        <div class="company-footer">
+          <div class="company-meta">
+            <span class="meta-chip">
+              <i class="fas fa-user-tie"></i>
+              <strong>${drivers}</strong> Drivers
+            </span>
+            <span class="meta-chip">
+              <i class="fas fa-id-card"></i>
+              ${escapeHtml(c.businesslicensenumber || "N/A")}
+            </span>
+          </div>
+          <span class="view-details-link">
+            <i class="fas fa-circle-info"></i>
+            View Details
+            <i class="fas fa-arrow-right" style="font-size:11px;"></i>
+          </span>
         </div>
-        <div class="business-license">
-          <strong>Business License Number:</strong> ${escapeHtml(c.businesslicensenumber || "N/A")}
-        </div>
-      </div>
-    `;
+      </div>`;
 
-    const btn = card.querySelector(".apply-btn");
-    btn.addEventListener("click", (e) => {
-      e.stopPropagation(); // Prevent card click event
+    // Apply Now button
+    card.querySelector(".apply-btn").addEventListener("click", (e) => {
+      e.stopPropagation();
       openApplicationModal(companyId, c.companyname || "Company");
     });
 
-    // Add click event to card for detail view
+    // Card click → detail modal
     card.addEventListener("click", (e) => {
-      // Don't open details if clicking the apply button
       if (e.target.closest(".apply-btn")) return;
-      openCompanyDetailModal(companyId);
+      openCompanyDetailModal(companyId, c.companyname || "Company");
     });
 
     container.appendChild(card);
   });
 }
 
-// Filters/sorting (keep your UI)
-function applyFilters() {
-  const locationFilter =
-    document.getElementById("locationFilter")?.value?.toLowerCase() || "";
-  const minRating = parseInt(
-    document.getElementById("ratingFilter")?.value || "0",
-    10,
-  );
+// ─────────────────────────────────────────
+// Company Detail Modal
+// ─────────────────────────────────────────
+async function openCompanyDetailModal(companyId, companyName) {
+  const overlay = document.getElementById("companyDetailOverlay");
+  if (!overlay) return;
 
-  const cards = document.querySelectorAll(".company-card");
-  cards.forEach((card) => {
-    const cardLoc = (card.dataset.location || "").toLowerCase();
-    const cardRating = parseInt(card.dataset.rating || "0", 10);
+  // Reset to overview tab
+  currentDetailTab = "overview";
+  updateTabUI("overview");
 
-    const okLoc = !locationFilter || cardLoc.includes(locationFilter);
-    const okRating = cardRating >= minRating;
+  document.getElementById("detailCompanyName").textContent =
+    companyName || "Loading...";
+  document.getElementById("detailAvatar").textContent =
+    getCompanyInitials(companyName);
 
-    card.style.display = okLoc && okRating ? "" : "none";
-  });
+  const content = document.getElementById("detailTabContent");
+  content.innerHTML = `
+    <div style="text-align:center;padding:60px 0;">
+      <i class="fas fa-circle-notch fa-spin" style="font-size:32px;color:var(--primary-light);"></i>
+      <p style="margin-top:12px;color:var(--text-light);">Loading company details...</p>
+    </div>`;
 
-  updateResultsCount();
-}
-
-function applySorting() {
-  const sortValue = document.getElementById("sortSelect").value;
-  const container = document.querySelector(".companies-container");
-  const companyCards = Array.from(container.querySelectorAll(".company-card"));
-
-  companyCards.sort((a, b) => {
-    switch (sortValue) {
-      case "Sort by Name (A-Z)":
-        return a
-          .querySelector(".company-name")
-          .textContent.localeCompare(
-            b.querySelector(".company-name").textContent,
-          );
-      case "Sort by Name (Z-A)":
-        return b
-          .querySelector(".company-name")
-          .textContent.localeCompare(
-            a.querySelector(".company-name").textContent,
-          );
-      case "Sort by Location":
-        return a
-          .querySelector(".company-location")
-          .textContent.localeCompare(
-            b.querySelector(".company-location").textContent,
-          );
-      case "Sort by Reviews": {
-        const reviewsA = parseInt(
-          a.querySelector(".rating-text").textContent.match(/\d+/)?.[0] || "0",
-          10,
-        );
-        const reviewsB = parseInt(
-          b.querySelector(".rating-text").textContent.match(/\d+/)?.[0] || "0",
-          10,
-        );
-        return reviewsB - reviewsA;
-      }
-      case "Sort by Rating":
-      default: {
-        const ratingA = parseInt(a.dataset.rating || "0", 10);
-        const ratingB = parseInt(b.dataset.rating || "0", 10);
-        return ratingB - ratingA;
-      }
-    }
-  });
-
-  companyCards.forEach((card) => container.appendChild(card));
-}
-
-function searchCompanies() {
-  applyFilters();
-  const searchButton = event?.target;
-  if (!searchButton) return;
-
-  const originalText = searchButton.textContent;
-  searchButton.textContent = "🔄 Searching...";
-  searchButton.disabled = true;
-
-  setTimeout(() => {
-    searchButton.textContent = originalText;
-    searchButton.disabled = false;
-  }, 600);
-}
-
-function updateResultsCount() {
-  const visibleCards = document.querySelectorAll(
-    '.company-card:not([style*="display: none"])',
-  ).length;
-  const totalCards = document.querySelectorAll(".company-card").length;
-  console.log(`Showing ${visibleCards} of ${totalCards} companies`);
-}
-
-// ---------------- COMPANY DETAIL MODAL ----------------
-async function openCompanyDetailModal(companyId) {
-  const detailOverlay = document.getElementById("companyDetailOverlay");
-  if (!detailOverlay) return;
-
-  // Show loading state
-  const detailBody = detailOverlay.querySelector(".company-detail-body");
-  if (detailBody) {
-    detailBody.innerHTML = `
-      <div style="text-align: center; padding: 40px;">
-        <p>Loading company details...</p>
-      </div>
-    `;
-  }
-
-  detailOverlay.classList.add("active");
+  overlay.classList.add("active");
   document.body.style.overflow = "hidden";
 
-  // Load company details
   const company = await loadCompanyDetails(companyId);
+  currentDetailCompany = company;
+
   if (!company) {
-    if (detailBody) {
-      detailBody.innerHTML = `
-        <div style="text-align: center; padding: 40px;">
-          <p>Failed to load company details.</p>
-        </div>
-      `;
-    }
+    content.innerHTML = `
+      <div style="text-align:center;padding:60px 20px;color:var(--text-light);">
+        <i class="fas fa-triangle-exclamation" style="font-size:40px;color:#f6c90e;display:block;margin-bottom:14px;"></i>
+        <p>Failed to load company details. Please try again.</p>
+      </div>`;
     return;
   }
 
-  // Update modal content
-  const modalTitle = detailOverlay.querySelector(".company-detail-header h2");
-  if (modalTitle) {
-    modalTitle.textContent = company.companyname || "Company Details";
-  }
-
-  if (detailBody) {
-    const location = buildLocationString(company.street, company.city);
-    const rating = Number(company.rating || 4);
-    const reviews = Number(company.reviews || 0);
-    const drivers = Number(company.drivers || 0);
-    const vehicles = Number(company.vehicles || 0);
-
-    detailBody.innerHTML = `
-      <div class="company-detail-info">
-        <div class="detail-section">
-          <h3>About ${escapeHtml(company.companyname || "Company")}</h3>
-          <p>${escapeHtml(company.description || "No description available.")}</p>
-        </div>
-
-        <div class="detail-section">
-          <h3>Contact Information</h3>
-          <div class="detail-grid">
-            <div class="detail-row">
-              <strong>Email:</strong>
-              <span>${escapeHtml(company.companyemail || "N/A")}</span>
-            </div>
-            <div class="detail-row">
-              <strong>Phone:</strong>
-              <span>${escapeHtml(company.phone || "N/A")}</span>
-            </div>
-            <div class="detail-row">
-              <strong>Location:</strong>
-              <span>${escapeHtml(location || "N/A")}</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="detail-section">
-          <h3>Company Information</h3>
-          <div class="detail-grid">
-            <div class="detail-row">
-              <strong>Registration Number:</strong>
-              <span>${escapeHtml(company.registrationnumber || "N/A")}</span>
-            </div>
-            <div class="detail-row">
-              <strong>Tax ID:</strong>
-              <span>${escapeHtml(company.taxid || "N/A")}</span>
-            </div>
-            <div class="detail-row">
-              <strong>Business License:</strong>
-              <span>${escapeHtml(company.businesslicensenumber || "N/A")}</span>
-            </div>
-          </div>
-        </div>
-
-        ${
-          company.terms
-            ? `
-        <div class="detail-section">
-          <h3>Terms & Conditions</h3>
-          <div class="terms-content">
-            <p>${escapeHtml(company.terms)}</p>
-          </div>
-        </div>
-        `
-            : ""
-        }
-      </div>
-
-      <div class="company-detail-stats">
-        <h3>Company Statistics</h3>
-        <div class="stat-item">
-          <span>Rating</span>
-          <span>${rating.toFixed(1)} ⭐</span>
-        </div>
-        <div class="stat-item">
-          <span>Reviews</span>
-          <span>${reviews}</span>
-        </div>
-        <div class="stat-item">
-          <span>Active Drivers</span>
-          <span>${drivers}</span>
-        </div>
-        <div class="stat-item">
-          <span>Total Vehicles</span>
-          <span>${vehicles}</span>
-        </div>
-      </div>
-    `;
-  }
-
-  // Update footer button
-  const applyBtn = detailOverlay.querySelector(
-    ".company-detail-footer .btn-primary",
+  // Update header
+  document.getElementById("detailCompanyName").textContent =
+    company.companyname || companyName;
+  document.getElementById("detailAvatar").textContent = getCompanyInitials(
+    company.companyname || companyName,
   );
-  if (applyBtn) {
-    const pending = hasAnyPendingForCompany(companyId);
-    applyBtn.textContent = pending ? "Application Pending" : "Apply Now";
-    applyBtn.disabled = pending;
 
-    // Remove old event listeners by cloning
-    const newApplyBtn = applyBtn.cloneNode(true);
-    applyBtn.parentNode.replaceChild(newApplyBtn, applyBtn);
+  // Update apply button in footer
+  const applyBtn = document.getElementById("detailApplyBtn");
+  const pending = hasAnyPendingForCompany(companyId);
+  applyBtn.disabled = pending;
+  applyBtn.innerHTML = pending
+    ? `<i class="fas fa-clock"></i> Application Pending`
+    : `<i class="fas fa-paper-plane"></i> Apply Now`;
 
-    if (!pending) {
-      newApplyBtn.addEventListener("click", () => {
-        closeCompanyDetailModal();
-        setTimeout(() => {
-          openApplicationModal(companyId, company.companyname || "Company");
-        }, 300);
-      });
-    }
+  // Remove old listener, add fresh one
+  const newBtn = applyBtn.cloneNode(true);
+  applyBtn.parentNode.replaceChild(newBtn, applyBtn);
+  newBtn.disabled = pending;
+  if (!pending) {
+    newBtn.addEventListener("click", () => {
+      closeCompanyDetailModal();
+      setTimeout(
+        () => openApplicationModal(companyId, company.companyname || "Company"),
+        280,
+      );
+    });
   }
+
+  renderDetailTab(company, "overview");
 }
 
 function closeCompanyDetailModal() {
-  const detailOverlay = document.getElementById("companyDetailOverlay");
-  if (!detailOverlay) return;
-
-  detailOverlay.classList.remove("active");
+  const overlay = document.getElementById("companyDetailOverlay");
+  if (!overlay) return;
+  overlay.classList.remove("active");
   document.body.style.overflow = "";
+  currentDetailCompany = null;
 }
 
-function buildLocationString(street, city) {
-  const s = trimToNull(street);
-  const c = trimToNull(city);
-  if (!s && !c) return null;
-  if (!s) return c;
-  if (!c) return s;
-  return `${s}, ${c}`;
+function updateTabUI(tab) {
+  document.querySelectorAll(".detail-tab").forEach((btn) => {
+    btn.classList.toggle("active", btn.dataset.tab === tab);
+  });
+  currentDetailTab = tab;
 }
 
-function trimToNull(str) {
-  if (!str) return null;
-  const trimmed = String(str).trim();
-  return trimmed === "" ? null : trimmed;
+function renderDetailTab(company, tab) {
+  updateTabUI(tab);
+  const content = document.getElementById("detailTabContent");
+  content.innerHTML = "";
+
+  switch (tab) {
+    case "overview":
+      content.innerHTML = buildOverviewTab(company);
+      break;
+    case "contact":
+      content.innerHTML = buildContactTab(company);
+      break;
+    case "legal":
+      content.innerHTML = buildLegalTab(company);
+      break;
+    case "stats":
+      content.innerHTML = buildStatsTab(company);
+      break;
+  }
 }
 
-// ---------------- MODAL ----------------
+// ── Tab: Overview ──
+function buildOverviewTab(c) {
+  const rating = c.rating != null ? Number(c.rating) : null;
+  const reviews = Number(c.reviews || 0);
+
+  return `
+    <div class="detail-overview-grid">
+      <div>
+        <div class="detail-about-card">
+          <div class="detail-card-header">
+            <i class="fas fa-building"></i>
+            <h4>About ${escapeHtml(c.companyname || "Company")}</h4>
+          </div>
+          <div class="detail-card-body">
+            <p class="detail-about-text">${escapeHtml(c.description || "No description provided.")}</p>
+          </div>
+        </div>
+
+        <div class="detail-about-card" style="margin-top:14px;">
+          <div class="detail-card-header">
+            <i class="fas fa-star"></i>
+            <h4>Rating Overview</h4>
+          </div>
+          <div class="detail-card-body" style="display:flex;align-items:center;gap:20px;">
+            <div style="text-align:center;">
+              <div style="font-size:44px;font-weight:700;color:var(--primary);line-height:1;">${rating != null ? rating.toFixed(1) : "—"}</div>
+              <div style="margin:6px 0;">${rating != null ? renderStars(rating) : `<span style="font-size:13px;color:#adb5bd;">No ratings yet</span>`}</div>
+              <div style="font-size:12px;color:var(--text-light);">${reviews} review${reviews !== 1 ? "s" : ""}</div>
+            </div>
+            <div style="flex:1;padding-left:20px;border-left:1px solid var(--border);">
+              ${[5, 4, 3, 2, 1]
+                .map(
+                  (s) => `
+                <div style="display:flex;align-items:center;gap:10px;margin-bottom:7px;">
+                  <span style="font-size:12px;color:var(--text-light);width:40px;">${s} <i class="fas fa-star" style="color:#f6c90e;font-size:10px;"></i></span>
+                  <div style="flex:1;height:6px;background:#eee;border-radius:3px;">
+                    <div style="height:100%;width:${s === rating ? 70 : s === rating - 1 ? 20 : 5}%;background:linear-gradient(90deg,var(--primary),var(--primary-light));border-radius:3px;"></div>
+                  </div>
+                </div>`,
+                )
+                .join("")}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-stat-card">
+        <div class="detail-card-header">
+          <i class="fas fa-chart-pie"></i>
+          <h4>Quick Stats</h4>
+        </div>
+        <div class="stat-grid">
+          <div class="stat-row">
+            <span class="stat-label"><i class="fas fa-user-tie"></i> Drivers</span>
+            <span class="stat-value">${Number(c.drivers || 0)}</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-label"><i class="fas fa-car"></i> Vehicles</span>
+            <span class="stat-value">${Number(c.vehicles || 0)}</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-label"><i class="fas fa-star"></i> Rating</span>
+            <span class="stat-value">${rating}.0</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-label"><i class="fas fa-comments"></i> Reviews</span>
+            <span class="stat-value">${reviews}</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-label"><i class="fas fa-shield-halved"></i> Status</span>
+            <span class="stat-value" style="font-size:12px;">
+              <span class="status-badge status-approved"><i class="fas fa-check"></i> Active</span>
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>`;
+}
+
+// ── Tab: Contact ──
+function buildContactTab(c) {
+  const location = buildLocationString(c.street, c.city);
+
+  const fields = [
+    { icon: "fas fa-envelope", label: "Email", value: c.companyemail },
+    { icon: "fas fa-phone", label: "Phone", value: c.phone },
+    {
+      icon: "fas fa-hashtag",
+      label: "Registration Number",
+      value: c.registrationnumber,
+    },
+    { icon: "fas fa-file-invoice", label: "Tax ID", value: c.taxid },
+  ];
+
+  const fieldHtml = fields
+    .map(
+      (f) => `
+    <div class="contact-item">
+      <div class="contact-icon"><i class="${f.icon}"></i></div>
+      <div>
+        <div class="contact-label">${f.label}</div>
+        <div class="contact-value">${escapeHtml(f.value || "N/A")}</div>
+      </div>
+    </div>`,
+    )
+    .join("");
+
+  return `
+    <div>
+      <div class="contact-grid">${fieldHtml}</div>
+      ${
+        location
+          ? `
+      <div class="address-card">
+        <i class="fas fa-location-dot"></i>
+        <div>
+          <div class="contact-label">Address</div>
+          <div class="contact-value">${escapeHtml(location)}</div>
+        </div>
+      </div>`
+          : ""
+      }
+    </div>`;
+}
+
+// ── Tab: Legal & Docs ──
+function buildLegalTab(c) {
+  const legalFields = [
+    {
+      icon: "fas fa-id-badge",
+      label: "Business License Number",
+      value: c.businesslicensenumber,
+      badge: "verified",
+    },
+    {
+      icon: "fas fa-file-signature",
+      label: "Registration Number",
+      value: c.registrationnumber,
+      badge: "verified",
+    },
+    {
+      icon: "fas fa-receipt",
+      label: "Tax ID",
+      value: c.taxid,
+      badge: "verified",
+    },
+  ];
+
+  const fieldsHtml = legalFields
+    .map(
+      (f) => `
+    <div class="legal-field">
+      <div class="legal-field-left">
+        <i class="${f.icon}"></i>
+        <div>
+          <div class="legal-field-label">${f.label}</div>
+          <div class="legal-field-value">${escapeHtml(f.value || "Not provided")}</div>
+        </div>
+      </div>
+      ${f.value ? `<span class="legal-badge ${f.badge}"><i class="fas fa-circle-check"></i> Verified</span>` : ""}
+    </div>`,
+    )
+    .join("");
+
+  // Document tiles — using server paths if provided, else show placeholders
+  const docs = [
+    {
+      key: "certificatepath",
+      name: "Business Certificate",
+      icon: "fas fa-certificate",
+    },
+    {
+      key: "taxdocumentpath",
+      name: "Tax Document",
+      icon: "fas fa-file-invoice-dollar",
+    },
+  ];
+
+  const docTiles = docs
+    .map((d) => {
+      const path = c[d.key];
+      const hasDoc = !!path;
+      return `
+      <div class="doc-tile" onclick="${hasDoc ? `viewDocument('${escapeHtml(path)}', '${d.name}')` : "showNoDoc()"}">
+        <div class="doc-tile-preview">
+          ${
+            hasDoc
+              ? `<img src="${BASE_URL}/${escapeHtml(path)}" alt="${d.name}" onerror="this.style.display='none';this.parentElement.querySelector('.doc-placeholder').style.display='flex';" />
+               <div class="doc-placeholder" style="display:none;flex-direction:column;align-items:center;gap:6px;">
+                 <i class="${d.icon}" style="font-size:32px;color:var(--primary-light);opacity:0.7;"></i>
+                 <span style="font-size:12px;color:var(--text-light);font-weight:600;">${d.name}</span>
+               </div>`
+              : `<div class="doc-placeholder" style="display:flex;flex-direction:column;align-items:center;gap:6px;">
+                 <i class="${d.icon}" style="font-size:32px;color:var(--primary-light);opacity:0.7;"></i>
+                 <span style="font-size:12px;color:var(--text-light);font-weight:600;">Not uploaded</span>
+               </div>`
+          }
+          <div class="doc-view-overlay">
+            <i class="fas fa-${hasDoc ? "eye" : "ban"}"></i>
+          </div>
+        </div>
+        <div class="doc-tile-footer">
+          <span class="doc-tile-name">
+            <i class="${d.icon}" style="color:var(--primary-light);margin-right:6px;"></i>
+            ${d.name}
+          </span>
+          <span class="doc-tile-action">
+            ${hasDoc ? `<i class="fas fa-eye"></i> View` : `<i class="fas fa-ban"></i> Unavailable`}
+          </span>
+        </div>
+      </div>`;
+    })
+    .join("");
+
+  const termsHtml = c.terms
+    ? `
+    <div class="terms-card">
+      <div class="terms-card-header">
+        <i class="fas fa-file-lines"></i>
+        <span>Terms & Conditions</span>
+      </div>
+      <div class="terms-card-body">${escapeHtml(c.terms)}</div>
+    </div>`
+    : "";
+
+  return `
+    <div>
+      <div class="legal-info-grid">${fieldsHtml}</div>
+      <h4 style="font-size:14px;font-weight:700;color:var(--dark);margin:20px 0 12px;display:flex;align-items:center;gap:8px;">
+        <i class="fas fa-folder-open" style="color:var(--primary-light);"></i>
+        Legal Documents
+      </h4>
+      <div class="doc-tiles">${docTiles}</div>
+      ${termsHtml}
+    </div>`;
+}
+
+// ── Tab: Statistics ──
+function buildStatsTab(c) {
+  const stats = [
+    {
+      label: "Active Drivers",
+      value: Number(c.drivers || 0),
+      icon: "fas fa-user-tie",
+      color: "#4361ee",
+    },
+    {
+      label: "Total Vehicles",
+      value: Number(c.vehicles || 0),
+      icon: "fas fa-car",
+      color: "#3a0ca3",
+    },
+    {
+      label: "Average Rating",
+      value:
+        c.rating != null ? `${Number(c.rating).toFixed(1)} ⭐` : "No ratings",
+      icon: "fas fa-star",
+      color: "#f6c90e",
+    },
+    {
+      label: "Total Reviews",
+      value: Number(c.reviews || 0),
+      icon: "fas fa-comments",
+      color: "#7209b7",
+    },
+  ];
+
+  return `
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin-bottom:20px;">
+      ${stats
+        .map(
+          (s) => `
+        <div style="background:#fff;border:1.5px solid var(--border);border-radius:12px;padding:20px;text-align:center;">
+          <div style="width:50px;height:50px;background:${s.color}12;border-radius:12px;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;">
+            <i class="${s.icon}" style="font-size:20px;color:${s.color};"></i>
+          </div>
+          <div style="font-size:26px;font-weight:700;color:var(--dark);margin-bottom:4px;">${s.value}</div>
+          <div style="font-size:12px;font-weight:600;color:var(--text-light);text-transform:uppercase;letter-spacing:0.5px;">${s.label}</div>
+        </div>`,
+        )
+        .join("")}
+    </div>
+    <div style="background:#fff;border:1.5px solid var(--border);border-radius:12px;padding:20px;">
+      <div style="font-size:14px;font-weight:700;color:var(--dark);margin-bottom:14px;display:flex;align-items:center;gap:8px;">
+        <i class="fas fa-circle-info" style="color:var(--primary-light);"></i>
+        Company Profile
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px;font-size:14px;">
+        <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);">
+          <span style="color:var(--text-light);display:flex;align-items:center;gap:8px;"><i class="fas fa-building" style="color:var(--primary-light);width:16px;text-align:center;"></i> Company Name</span>
+          <span style="font-weight:600;color:var(--dark);">${escapeHtml(c.companyname || "N/A")}</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);">
+          <span style="color:var(--text-light);display:flex;align-items:center;gap:8px;"><i class="fas fa-location-dot" style="color:var(--primary-light);width:16px;text-align:center;"></i> Location</span>
+          <span style="font-weight:600;color:var(--dark);">${escapeHtml(buildLocationString(c.street, c.city) || "N/A")}</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding:10px 0;">
+          <span style="color:var(--text-light);display:flex;align-items:center;gap:8px;"><i class="fas fa-shield-halved" style="color:var(--primary-light);width:16px;text-align:center;"></i> Status</span>
+          <span class="status-badge status-approved"><i class="fas fa-check"></i> Active & Verified</span>
+        </div>
+      </div>
+    </div>`;
+}
+
+// ─────────────────────────────────────────
+// Document Viewer Modal
+// ─────────────────────────────────────────
+function viewDocument(path, name) {
+  const overlay = document.getElementById("docViewerOverlay");
+  const title = document.getElementById("docViewerTitle");
+  const body = document.getElementById("docViewerBody");
+  if (!overlay) return;
+
+  title.innerHTML = `<i class="fas fa-file-image"></i> ${escapeHtml(name)}`;
+
+  const fullUrl = path.startsWith("http") ? path : `${BASE_URL}/${path}`;
+  body.innerHTML = `
+    <img
+      src="${escapeHtml(fullUrl)}"
+      alt="${escapeHtml(name)}"
+      onerror="this.outerHTML='<div class=\\'doc-no-preview\\'><i class=\\'fas fa-file-circle-exclamation\\'></i><p>Unable to load document.<br/>The file may not be accessible.</p></div>'"
+    />`;
+
+  overlay.classList.add("active");
+}
+
+function showNoDoc() {
+  const overlay = document.getElementById("docViewerOverlay");
+  const title = document.getElementById("docViewerTitle");
+  const body = document.getElementById("docViewerBody");
+  if (!overlay) return;
+  title.innerHTML = `<i class="fas fa-ban"></i> Document Unavailable`;
+  body.innerHTML = `<div class="doc-no-preview"><i class="fas fa-file-circle-xmark"></i><p>This document has not been uploaded by the company.</p></div>`;
+  overlay.classList.add("active");
+}
+
+function closeDocViewer() {
+  const overlay = document.getElementById("docViewerOverlay");
+  if (overlay) overlay.classList.remove("active");
+}
+
+// ─────────────────────────────────────────
+// Application Modal
+// ─────────────────────────────────────────
 async function openApplicationModal(companyId, companyName) {
   const modal = document.getElementById("applicationModal");
   const form = document.getElementById("applicationForm");
 
   document.getElementById("modalCompanyName").textContent = companyName;
-
-  // ✅ reset FIRST (so it doesn't wipe company_id later)
   if (form) form.reset();
 
-  // hidden company id
   let hidden = document.getElementById("modalCompanyId");
   if (!hidden) {
     hidden = document.createElement("input");
@@ -440,10 +666,7 @@ async function openApplicationModal(companyId, companyName) {
   }
   hidden.value = String(companyId);
 
-  // ✅ Auto-fill provider fields
   await fillProviderDetailsIntoModal();
-
-  // ✅ Load vehicles (radio button list for single selection)
   await loadEligibleVehiclesIntoModal();
 
   modal.classList.add("active");
@@ -454,11 +677,8 @@ async function fillProviderDetailsIntoModal() {
   try {
     const res = await apiFetch(`${PROVIDER_REQ_API}/profile`);
     if (!res.ok) return;
-
     const data = await res.json();
     const p = data.provider || {};
-
-    // These IDs/names must exist in your HTML inputs
     setInputValue("providerName", p.fullName || p.username || "");
     setInputValue("providerEmail", p.email || "");
     setInputValue("providerPhone", p.phone || "");
@@ -475,180 +695,262 @@ function setInputValue(idOrName, value) {
   const el =
     document.getElementById(idOrName) ||
     document.querySelector(`[name="${idOrName}"]`);
-  if (!el) return;
-  el.value = value;
+  if (el) el.value = value;
 }
 
 function closeApplicationModal() {
   const modal = document.getElementById("applicationModal");
-  const modalContent = modal.querySelector(".modal");
-
-  modalContent.style.transform = "scale(0.7)";
-  modalContent.style.opacity = "0";
-
-  setTimeout(() => {
-    modal.classList.remove("active");
-    document.body.style.overflow = "";
-    modalContent.style.transform = "";
-    modalContent.style.opacity = "";
-    modalContent.style.transition = "";
-  }, 300);
+  if (!modal) return;
+  modal.classList.remove("active");
+  document.body.style.overflow = "";
 }
 
 async function loadEligibleVehiclesIntoModal() {
-  const listContainer =
-    document.querySelector(".vehicle-selection") ||
-    document.querySelector(".vehicle-options") ||
-    document.querySelector("#vehicleSelectionContainer");
+  const container = document.getElementById("vehicleSelectionContainer");
+  if (!container) return;
 
-  if (!listContainer) return;
-
-  listContainer.innerHTML = `<p>Loading eligible vehicles...</p>`;
+  container.innerHTML = `
+    <div style="text-align:center;padding:20px;color:var(--text-light);">
+      <i class="fas fa-circle-notch fa-spin" style="font-size:24px;color:var(--primary-light);"></i>
+      <p style="margin-top:8px;font-size:13px;">Loading your vehicles...</p>
+    </div>`;
 
   const res = await apiFetch(`${PROVIDER_REQ_API}/eligible-vehicles`);
   if (!res.ok) {
-    listContainer.innerHTML = `<p>Failed to load vehicles.</p>`;
+    container.innerHTML = `<p style="color:#e53e3e;font-size:13px;padding:10px;">
+      <i class="fas fa-circle-exclamation"></i> Failed to load vehicles.</p>`;
     return;
   }
+
   const data = await res.json();
   const vehicles = data.vehicles || [];
 
   if (!vehicles.length) {
-    listContainer.innerHTML = `<p>No eligible vehicles (all assigned or already pending).</p>`;
+    container.innerHTML = `
+      <div style="text-align:center;padding:20px;color:var(--text-light);">
+        <i class="fas fa-car-burst" style="font-size:28px;margin-bottom:10px;display:block;opacity:0.4;"></i>
+        <p style="font-size:13px;">No eligible vehicles. All your vehicles are already assigned or have pending requests.</p>
+      </div>`;
     return;
   }
 
-  // ✅ Changed from checkboxes to radio buttons for single selection
-  listContainer.innerHTML = vehicles
+  container.innerHTML = vehicles
     .map(
       (v) => `
-      <label class="vehicle-option" style="display:block;margin:8px 0;cursor:pointer;">
-        <input type="radio" name="vehicle" value="${Number(v.vehicleid)}" required />
-        ${escapeHtml(v.vehiclebrand || "")} ${escapeHtml(v.vehiclemodel || "")}
-        – ${escapeHtml(v.numberplatenumber || "")}
-        ${v.price_per_day ? ` – Rs ${escapeHtml(String(v.price_per_day))}/day` : ""}
-      </label>
-    `,
+    <label class="vehicle-option-label">
+      <input type="radio" name="vehicle" value="${Number(v.vehicleid)}" required />
+      <div class="vehicle-icon"><i class="fas fa-car"></i></div>
+      <div style="flex:1;min-width:0;">
+        <div class="vehicle-name-text">${escapeHtml(v.vehiclebrand || "")} ${escapeHtml(v.vehiclemodel || "")}</div>
+        <div class="vehicle-plate">
+          <i class="fas fa-hashtag" style="font-size:10px;"></i>
+          ${escapeHtml(v.numberplatenumber || "")}
+          ${v.location ? ` &bull; <i class="fas fa-location-dot" style="font-size:10px;"></i> ${escapeHtml(v.location)}` : ""}
+        </div>
+      </div>
+      ${v.price_per_day ? `<span class="vehicle-price">Rs ${escapeHtml(String(v.price_per_day))}/day</span>` : ""}
+    </label>`,
     )
     .join("");
 }
 
-function bindForm() {
+// ─────────────────────────────────────────
+// Filter / Sort
+// ─────────────────────────────────────────
+function applyFilters() {
+  const locationFilter =
+    document.getElementById("locationFilter")?.value?.toLowerCase() || "";
+  const nameFilter =
+    document.getElementById("companyNameFilter")?.value?.toLowerCase() || "";
+  const ratingRaw = document.getElementById("ratingFilter")?.value || "0";
+  const minRating = parseInt(ratingRaw.match(/\d+/)?.[0] || "0", 10);
+
+  document.querySelectorAll(".company-card").forEach((card) => {
+    const cardLoc = (card.dataset.location || "").toLowerCase();
+    const cardName = (card.dataset.name || "").toLowerCase();
+    const cardRating = parseInt(card.dataset.rating || "0", 10);
+
+    const okLoc = !locationFilter || cardLoc.includes(locationFilter);
+    const okName = !nameFilter || cardName.includes(nameFilter);
+    const okRating = cardRating >= minRating;
+
+    card.style.display = okLoc && okName && okRating ? "" : "none";
+  });
+}
+
+function applySorting() {
+  const sortValue = document.getElementById("sortSelect")?.value || "";
+  const container = document.querySelector(".companies-container");
+  if (!container) return;
+
+  const cards = Array.from(container.querySelectorAll(".company-card"));
+  cards.sort((a, b) => {
+    switch (sortValue) {
+      case "Sort by Name (A-Z)":
+        return (a.dataset.name || "").localeCompare(b.dataset.name || "");
+      case "Sort by Name (Z-A)":
+        return (b.dataset.name || "").localeCompare(a.dataset.name || "");
+      case "Sort by Location":
+        return (a.dataset.location || "").localeCompare(
+          b.dataset.location || "",
+        );
+      default:
+        return (
+          parseInt(b.dataset.rating || "0", 10) -
+          parseInt(a.dataset.rating || "0", 10)
+        );
+    }
+  });
+  cards.forEach((c) => container.appendChild(c));
+}
+
+function searchCompanies() {
+  applyFilters();
+}
+
+// ─────────────────────────────────────────
+// Bind Events
+// ─────────────────────────────────────────
+function bindEvents() {
+  // Form submission
   const form = document.getElementById("applicationForm");
-  if (!form) return;
+  if (form) {
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
 
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
+      const companyId = Number(
+        document.getElementById("modalCompanyId")?.value,
+      );
+      const selectedRadio = form.querySelector('input[name="vehicle"]:checked');
 
-    const companyId = Number(document.getElementById("modalCompanyId")?.value);
-
-    // ✅ Changed to get single radio button value
-    const selectedRadio = form.querySelector('input[name="vehicle"]:checked');
-
-    if (!companyId || !selectedRadio) {
-      alert("Please select a vehicle.");
-      return;
-    }
-
-    const vehicleId = Number(selectedRadio.value);
-
-    // ✅ Get message and experience values from form
-    const message = document.getElementById("message")?.value?.trim() || "";
-    const experience = document.getElementById("experience")?.value || "";
-
-    // Validate terms checkbox
-    const termsChecked = document.getElementById("terms")?.checked;
-    if (!termsChecked) {
-      alert("Please agree to the terms and conditions.");
-      return;
-    }
-
-    if (!experience) {
-      alert("Please select your years of experience.");
-      return;
-    }
-
-    // Find submit button - it's outside the form in modal-footer
-    const submitButton = document.querySelector(
-      '#applicationModal button[type="submit"]',
-    );
-    if (!submitButton) {
-      alert("Submit button not found");
-      return;
-    }
-    const originalText = submitButton.textContent;
-    submitButton.textContent = "Submitting...";
-    submitButton.disabled = true;
-
-    try {
-      // ✅ Include message and experience in the request
-      const res = await apiFetch(PROVIDER_REQ_API, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          company_id: companyId,
-          vehicle_id: vehicleId,
-          message: message,
-          experience: experience,
-        }),
-      });
-
-      if (!res.ok) {
-        const errorText = await res.text();
-        throw new Error(errorText);
+      if (!companyId || !selectedRadio) {
+        alert("Please select a vehicle before submitting.");
+        return;
       }
 
-      alert("Application submitted successfully!");
-      closeApplicationModal();
+      const vehicleId = Number(selectedRadio.value);
+      const message = document.getElementById("message")?.value?.trim() || "";
+      const experience = document.getElementById("experience")?.value || "";
+      const termsChecked = document.getElementById("terms")?.checked;
 
-      // refresh UI
-      await loadMyRequests();
-      renderCompanies(companies);
-    } catch (err) {
-      console.error(err);
-      alert("Failed to submit application.\n" + err.message);
-    } finally {
-      submitButton.textContent = originalText;
-      submitButton.disabled = false;
-    }
+      if (!termsChecked) {
+        alert("Please agree to the terms and conditions.");
+        return;
+      }
+      if (!experience) {
+        alert("Please select your years of experience.");
+        return;
+      }
+
+      const submitBtn = document.querySelector(
+        '#applicationModal button[type="submit"]',
+      );
+      if (!submitBtn) {
+        alert("Submit button not found.");
+        return;
+      }
+
+      const originalHtml = submitBtn.innerHTML;
+      submitBtn.innerHTML = `<i class="fas fa-circle-notch fa-spin"></i> Submitting...`;
+      submitBtn.disabled = true;
+
+      try {
+        const res = await apiFetch(PROVIDER_REQ_API, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            company_id: companyId,
+            vehicle_id: vehicleId,
+            message,
+            experience,
+          }),
+        });
+
+        if (!res.ok) throw new Error(await res.text());
+
+        alert("Application submitted successfully!");
+        closeApplicationModal();
+        await loadMyRequests();
+        renderCompanies(companies);
+      } catch (err) {
+        console.error(err);
+        alert("Failed to submit application.\n" + err.message);
+      } finally {
+        submitBtn.innerHTML = originalHtml;
+        submitBtn.disabled = false;
+      }
+    });
+  }
+
+  // Tab buttons in detail modal
+  document.querySelectorAll(".detail-tab").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      if (currentDetailCompany)
+        renderDetailTab(currentDetailCompany, btn.dataset.tab);
+    });
   });
 
-  // close on outside click
+  // Close on backdrop click
   document.addEventListener("click", (e) => {
-    const modal = document.getElementById("applicationModal");
-    if (e.target === modal) closeApplicationModal();
-
-    const detailOverlay = document.getElementById("companyDetailOverlay");
-    if (e.target === detailOverlay) closeCompanyDetailModal();
+    if (e.target === document.getElementById("applicationModal"))
+      closeApplicationModal();
+    if (e.target === document.getElementById("companyDetailOverlay"))
+      closeCompanyDetailModal();
+    if (e.target === document.getElementById("docViewerOverlay"))
+      closeDocViewer();
   });
 
-  // close on ESC
+  // Close on ESC
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape") {
+      closeDocViewer();
       closeApplicationModal();
       closeCompanyDetailModal();
     }
   });
 
-  // hook sort change
-  const sortSelect = document.getElementById("sortSelect");
-  if (sortSelect) sortSelect.addEventListener("change", applySorting);
+  // Sort select
+  document
+    .getElementById("sortSelect")
+    ?.addEventListener("change", applySorting);
 
-  // hook filters (if your ids exist)
-  const ratingFilter = document.getElementById("ratingFilter");
-  const locationFilter = document.getElementById("locationFilter");
-  if (ratingFilter) ratingFilter.addEventListener("change", applyFilters);
-  if (locationFilter) locationFilter.addEventListener("input", applyFilters);
+  // Filter inputs
+  document
+    .getElementById("ratingFilter")
+    ?.addEventListener("change", applyFilters);
+  document
+    .getElementById("locationFilter")
+    ?.addEventListener("input", applyFilters);
+  document
+    .getElementById("companyNameFilter")
+    ?.addEventListener("input", applyFilters);
 }
 
-// helpers
+// ─────────────────────────────────────────
+// Helpers
+// ─────────────────────────────────────────
+function buildLocationString(street, city) {
+  const s = trimToNull(street);
+  const c = trimToNull(city);
+  if (!s && !c) return null;
+  if (!s) return c;
+  if (!c) return s;
+  return `${s}, ${c}`;
+}
+
+function trimToNull(str) {
+  if (!str) return null;
+  const trimmed = String(str).trim();
+  return trimmed === "" ? null : trimmed;
+}
+
 function renderStars(rating) {
-  const r = Math.max(0, Math.min(5, rating));
-  let html = "";
-  for (let i = 1; i <= 5; i++) {
-    html += `<span class="star ${i <= r ? "filled" : "empty"}">★</span>`;
-  }
-  return html;
+  const r = Math.max(0, Math.min(5, Math.round(rating)));
+  return Array.from(
+    { length: 5 },
+    (_, i) =>
+      `<span class="star ${i < r ? "filled" : ""}"><i class="fas fa-star"></i></span>`,
+  ).join("");
 }
 
 function escapeHtml(str) {
@@ -660,7 +962,6 @@ function escapeHtml(str) {
     .replaceAll("'", "&#039;");
 }
 
-// keep your existing button (Load More) behavior
 function loadMoreCompanies() {
-  alert("No more companies available at the moment");
+  alert("No more companies available at the moment.");
 }

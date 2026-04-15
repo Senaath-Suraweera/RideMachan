@@ -1,14 +1,18 @@
-// past-bookings.js (API-connected)
+// past-bookings.js — Provider side
+// API: GET /api/provider/bookings?type=past&...
+// Detail: ../html/order-details.html?id={bookingId}
 
-document.addEventListener("DOMContentLoaded", () => {
-  // Past page uses same filter controls layout in your project
-  initializeFilters();
-  initializeDateInputs();
-  initializeSort();
-  loadBookings("past");
-});
+let ALL_BOOKINGS = [];
+let currentPage = 1;
+let totalBookings = 0;
+const PAGE_SIZE = 10;
 
 const API_BASE = window.API_BASE || "";
+
+document.addEventListener("DOMContentLoaded", () => {
+  wireUI();
+  loadBookings("past", 1);
+});
 
 async function fetchJson(url, options = {}) {
   const res = await fetch(url, {
@@ -34,155 +38,249 @@ function buildQuery(paramsObj) {
   return s ? `?${s}` : "";
 }
 
-async function loadBookings(type) {
+async function loadBookings(type, page) {
+  const container = document.querySelector(".bookings-container");
+  if (!container) return;
+
+  if (page === 1) {
+    container.innerHTML = `<div style="padding:16px;color:#6b7280;">Loading bookings…</div>`;
+    ALL_BOOKINGS = [];
+  }
+
   try {
-    const q = collectFilterParams(type);
+    const q = collectFilterParams(type, page);
     const data = await fetchJson(
       `${API_BASE}/api/provider/bookings${buildQuery(q)}`,
     );
-    renderBookings(data.items || []);
-    wireCardNavigation();
+    const incoming = data.items || [];
+    totalBookings = Number(data.total || incoming.length);
+    currentPage = page;
+
+    ALL_BOOKINGS = page === 1 ? incoming : ALL_BOOKINGS.concat(incoming);
+
+    renderBookings(ALL_BOOKINGS, page === 1);
+    updateLoadMoreButton();
   } catch (err) {
     console.error(err);
-    renderBookings([]);
-    alert(err.message);
+    container.innerHTML = `<div style="padding:16px;color:#b91c1c;">Failed to load bookings. ${escapeHtml(err.message)}</div>`;
   }
 }
 
-function collectFilterParams(type) {
+function collectFilterParams(type, page) {
   const vehicleType = document.getElementById("vehicleTypeFilter")?.value;
   const location = document.getElementById("locationFilter")?.value;
   const fromDate = document.getElementById("fromDate")?.value;
   const toDate = document.getElementById("toDate")?.value;
+  const withDriver = document.getElementById("withDriver")?.checked;
+  const completed = document.getElementById("completed")?.checked;
+  const cancelled = document.getElementById("cancelled")?.checked;
+  const paid = document.getElementById("paid")?.checked;
+
+  let status = "";
+  if (completed) status = "completed";
+  else if (cancelled) status = "cancelled";
 
   return {
     type,
+    page: page || 1,
+    pageSize: PAGE_SIZE,
     vehicleType:
       vehicleType && vehicleType !== "Select type" ? vehicleType : "",
     location: location || "",
     fromDate: fromDate || "",
     toDate: toDate || "",
+    withDriver: withDriver ? "true" : "",
+    status,
+    paymentStatus: paid ? "paid" : "",
   };
 }
 
-function initializeFilters() {
-  const ids = ["vehicleTypeFilter", "locationFilter", "fromDate", "toDate"];
-  ids.forEach((id) => {
-    const el = document.getElementById(id);
-    if (!el) return;
-    el.addEventListener("change", () => loadBookings("past"));
-    if (id === "locationFilter")
-      el.addEventListener("input", () => loadBookings("past"));
-  });
-}
-
-function initializeDateInputs() {
-  // optional: leave empty for past searches
-}
-
-function initializeSort() {
-  const sortSelect = document.getElementById("sortSelect");
-  if (!sortSelect) return;
-  sortSelect.addEventListener("change", () => applySorting());
-}
-
-function applySorting() {
-  const sortValue =
-    document.getElementById("sortSelect")?.value || "Descending";
+function renderBookings(items, clearFirst) {
   const container = document.querySelector(".bookings-container");
   if (!container) return;
 
-  const cards = Array.from(container.querySelectorAll(".booking-card"));
-  cards.sort((a, b) => {
-    const aId = parseInt(a.dataset.bookingId || "0", 10);
-    const bId = parseInt(b.dataset.bookingId || "0", 10);
-    if (sortValue.includes("Ascending")) return aId - bId;
-    return bId - aId;
-  });
-
-  cards.forEach((c) => container.appendChild(c));
-}
-
-function renderBookings(items) {
-  const container = document.querySelector(".bookings-container");
-  if (!container) return;
+  if (clearFirst) container.innerHTML = "";
 
   if (!items.length) {
-    container.innerHTML = `<div style="padding:16px;color:#5f6368;">No past bookings found.</div>`;
+    container.innerHTML = `<div style="padding:16px;color:#6b7280;">No past bookings found.</div>`;
     return;
   }
 
-  container.innerHTML = items
-    .map((b) => {
-      return `
-      <div class="booking-card" data-booking-id="${b.bookingId}" style="cursor:pointer;">
-        <div class="booking-header">
-          <div class="booking-id">
-            <h3>Booking ID: ${escapeHtml(b.displayId || "BK" + b.bookingId)}</h3>
-            <span class="customer-name"> ${escapeHtml(b.customerName || "Unknown")}</span>
-          </div>
-          <div class="booking-status">${escapeHtml((b.status || "completed").toUpperCase())}</div>
+  if (clearFirst) {
+    items.forEach((b) => container.appendChild(createBookingCard(b)));
+  } else {
+    const startIdx = (currentPage - 1) * PAGE_SIZE;
+    items
+      .slice(startIdx)
+      .forEach((b) => container.appendChild(createBookingCard(b)));
+  }
+}
+
+function createBookingCard(b) {
+  const bookingId = b.displayId || "BK" + b.bookingId;
+  const status = String(b.status || "").toLowerCase();
+  const pay = String(b.paymentStatus || "").toLowerCase();
+  const customerName = b.customerName || "Unknown";
+  const companyName = b.rentalCompany || "Rental Company";
+  const driverName = b.driverName || null;
+  const vehicleName = b.vehicleName || b.vehicle?.name || "Vehicle";
+  const vehicleType = b.vehicleType || b.vehicle?.type || "";
+  const location =
+    b.pickupLocation || b.dropLocation || b.vehicle?.location || "—";
+  const durationDays = b.durationDays != null ? `${b.durationDays} days` : "—";
+
+  const badge = statusBadgeText(status, pay);
+  const badgeClass = statusBadgeClass(status);
+
+  const dots = [];
+  if (status === "completed")
+    dots.push(`<span class="status-dot accepted">Completed</span>`);
+  if (status === "cancelled")
+    dots.push(`<span class="status-dot pickup">Cancelled</span>`);
+  if (pay === "paid") dots.push(`<span class="status-dot paid">Paid</span>`);
+
+  const card = document.createElement("div");
+  card.className = "booking-card";
+  card.dataset.bookingId = b.bookingId;
+  card.dataset.status = pay || status || "";
+  card.dataset.tripStart = b.tripStartDate || "";
+  card.dataset.tripEnd = b.tripEndDate || "";
+  card.dataset.vehicleType = vehicleType.toLowerCase();
+  card.dataset.location = location.toLowerCase();
+
+  card.innerHTML = `
+    <div class="booking-header">
+      <div class="booking-id">
+        <h3>Booking ID: ${escapeHtml(bookingId)}</h3>
+        <span class="customer-name">${escapeHtml(customerName)}</span>
+      </div>
+      <div class="booking-status ${badgeClass}">${escapeHtml(badge)}</div>
+    </div>
+
+    <div class="booking-content">
+      <div class="booking-left">
+        <div class="vehicle-image">
+          ${createVehicleImageMarkup(b.vehicle)}
         </div>
-
-        <div class="booking-content">
-          <div class="booking-left">
-            <div class="vehicle-image">
-              <div class="image-placeholder">Image of Vehicle</div>
-            </div>
-            <div class="rental-info">
-              <div class="rental-company">
-                <strong>Rental Company</strong>
-                <span>${escapeHtml(b.rentalCompany || "N/A")}</span>
-              </div>
-              <div class="location-info">
-                <strong>Location</strong>
-                <span>📍 ${escapeHtml(b.pickupLocation || "N/A")}</span>
-              </div>
-            </div>
+        <div class="rental-info">
+          <div class="rental-company">
+            <strong>Rental Company</strong>
+            <span>${escapeHtml(companyName)}</span>
           </div>
-
-          <div class="booking-right">
-            <div class="vehicle-details">
-              <strong>Vehicle</strong>
-              <span> ${escapeHtml(b.vehicleName || "N/A")}</span>
-            </div>
-            <div class="duration-info">
-              <strong>Duration</strong>
-              <span> ${escapeHtml(String(b.durationDays || ""))} days</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="booking-footer">
-          <div class="booking-actions">
-            <button class="btn btn-sm btn-primary" type="button" data-view-details="${b.bookingId}">View Details</button>
+          ${
+            driverName
+              ? `
+          <div class="driver-info">
+            <strong>Driver</strong>
+            <span>${escapeHtml(driverName)}</span>
+          </div>`
+              : ""
+          }
+          <div class="location-info">
+            <strong>Location</strong>
+            <span><i class="fas fa-location-dot"></i> ${escapeHtml(location)}</span>
           </div>
         </div>
       </div>
-      `;
-    })
-    .join("");
+
+      <div class="booking-right">
+        <div class="vehicle-details">
+          <strong>Vehicle</strong>
+          <span>${escapeHtml(vehicleName)}${vehicleType ? ` (${escapeHtml(vehicleType)})` : ""}</span>
+        </div>
+        <div class="duration-info">
+          <strong>Duration</strong>
+          <span>${escapeHtml(durationDays)}</span>
+        </div>
+        ${
+          b.tripStartDate
+            ? `
+        <div class="date-info">
+          <strong>From</strong>
+          <span>${formatDateShort(b.tripStartDate)}</span>
+        </div>`
+            : ""
+        }
+        ${
+          b.tripEndDate
+            ? `
+        <div class="date-info">
+          <strong>To</strong>
+          <span>${formatDateShort(b.tripEndDate)}</span>
+        </div>`
+            : ""
+        }
+      </div>
+    </div>
+
+    <div class="booking-footer">
+      <div class="status-indicators">
+        ${dots.join("")}
+      </div>
+      <div class="booking-actions">
+        <button class="btn btn-sm btn-primary view-details-btn" type="button" data-booking-id="${b.bookingId}">
+          View Details
+        </button>
+      </div>
+    </div>
+  `;
+
+  card.addEventListener("click", (e) => {
+    if (e.target.closest("button")) return;
+    navigateToOrderDetails(b.bookingId);
+  });
+
+  card.querySelector("[data-booking-id]").addEventListener("click", (e) => {
+    e.stopPropagation();
+    navigateToOrderDetails(b.bookingId);
+  });
+
+  return card;
 }
 
-function wireCardNavigation() {
-  const container = document.querySelector(".bookings-container");
-  if (!container) return;
+function navigateToOrderDetails(bookingId) {
+  sessionStorage.setItem("previousPage", "past-bookings");
+  sessionStorage.setItem("scrollPosition", window.scrollY);
+  window.location.href = `../html/order-details.html?id=${encodeURIComponent(bookingId)}`;
+}
 
-  container.querySelectorAll(".booking-card").forEach((card) => {
-    const bookingId = card.getAttribute("data-booking-id");
-    card.addEventListener("click", (e) => {
-      if (e.target.closest("button")) return;
-      window.location.href = `../html/order-details.html?id=${encodeURIComponent(bookingId)}`;
+function createVehicleImageMarkup(vehicle) {
+  if (vehicle?.imageUrl) {
+    return `<img
+      src="${escapeHtml(vehicle.imageUrl)}"
+      alt="${escapeHtml(vehicle.name || "Vehicle")}"
+      style="width:100%;height:100%;object-fit:cover;border-radius:inherit;display:block;"
+      onerror="this.onerror=null;this.parentElement.innerHTML='<span class=&quot;vehicle-icon&quot;><i class=&quot;fas fa-car-side&quot;></i></span><div class=&quot;image-placeholder&quot;>Vehicle</div>';"
+    />`;
+  }
+  return `<span class="vehicle-icon"><i class="fas fa-car-side"></i></span>
+          <div class="image-placeholder">Vehicle</div>`;
+}
+
+function statusBadgeText(status, pay) {
+  if (status === "completed") return "Completed";
+  if (status === "cancelled") return "Cancelled";
+  if (pay === "paid") return "Paid";
+  return "Past";
+}
+
+function statusBadgeClass(status) {
+  if (status === "completed") return "paid";
+  if (status === "cancelled") return "cancelled";
+  return "paid";
+}
+
+function formatDateShort(dateStr) {
+  if (!dateStr) return "—";
+  try {
+    return new Date(dateStr).toLocaleDateString("en-GB", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
     });
-
-    const btn = card.querySelector(`[data-view-details="${bookingId}"]`);
-    if (btn) {
-      btn.addEventListener("click", (e) => {
-        e.stopPropagation();
-        window.location.href = `../html/order-details.html?id=${encodeURIComponent(bookingId)}`;
-      });
-    }
-  });
+  } catch {
+    return dateStr;
+  }
 }
 
 function escapeHtml(str) {
@@ -193,3 +291,81 @@ function escapeHtml(str) {
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#039;");
 }
+
+function applySorting() {
+  const val = document.getElementById("sortSelect")?.value || "Descending";
+  const container = document.querySelector(".bookings-container");
+  if (!container) return;
+
+  const cards = Array.from(container.querySelectorAll(".booking-card"));
+  cards.sort((a, b) => {
+    if (val.includes("Date")) {
+      const aDate = new Date(a.dataset.tripStart || 0);
+      const bDate = new Date(b.dataset.tripStart || 0);
+      return val.includes("Newest") ? bDate - aDate : aDate - bDate;
+    }
+    const aId = parseInt(a.dataset.bookingId || "0", 10);
+    const bId = parseInt(b.dataset.bookingId || "0", 10);
+    return val.includes("Ascending") ? aId - bId : bId - aId;
+  });
+  cards.forEach((c) => container.appendChild(c));
+}
+
+function updateLoadMoreButton() {
+  const section = document.getElementById("loadMoreSection");
+  if (!section) return;
+  if (ALL_BOOKINGS.length < totalBookings) {
+    section.style.display = "block";
+    const btn = document.getElementById("loadMoreBtn");
+    if (btn)
+      btn.innerHTML = `<i class="fas fa-chevron-down"></i> Load More (${ALL_BOOKINGS.length} / ${totalBookings})`;
+  } else {
+    section.style.display = "none";
+  }
+}
+
+function loadMoreBookings() {
+  loadBookings("past", currentPage + 1);
+}
+
+function wireUI() {
+  const ids = [
+    "vehicleTypeFilter",
+    "locationFilter",
+    "fromDate",
+    "toDate",
+    "withDriver",
+    "completed",
+    "cancelled",
+    "paid",
+  ];
+  ids.forEach((id) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const evt = id === "locationFilter" ? "input" : "change";
+    el.addEventListener(evt, applyFilters);
+  });
+  document
+    .getElementById("sortSelect")
+    ?.addEventListener("change", applySorting);
+}
+
+function applyFilters() {
+  loadBookings("past", 1);
+}
+
+function toggleFilters(btn) {
+  const filterOptions = document.getElementById("filterOptions");
+  if (!filterOptions) return;
+  const hidden = filterOptions.style.display === "none";
+  filterOptions.style.display = hidden ? "flex" : "none";
+  if (btn) {
+    btn.innerHTML = hidden
+      ? `<i class="fas fa-sliders"></i> Hide Filters`
+      : `<i class="fas fa-sliders"></i> Show Filters`;
+  }
+}
+
+window.applyFilters = applyFilters;
+window.toggleFilters = toggleFilters;
+window.loadMoreBookings = loadMoreBookings;

@@ -20,57 +20,92 @@
     <div class="container">
       <div class="main-content">
         <div class="page-header">
-          <h1>Apply for Rental Company</h1>
+          <h1>
+            <i class="fas fa-building"></i>
+            Apply for Rental Company
+          </h1>
+          <p class="page-subtitle">
+            Browse and apply to partner with verified rental companies
+          </p>
         </div>
 
         <!-- Search and Filter Section -->
         <div class="search-filter-section">
           <div class="filter-row">
             <div class="form-group">
-              <label class="form-label">Company Name</label>
-              <input
-                type="text"
-                class="form-control"
-                placeholder="Enter company name"
-                id="companyNameFilter"
-              />
+              <label class="form-label">
+                <i
+                  class="fas fa-building"
+                  style="color: var(--primary-light)"
+                ></i>
+                Company Name
+              </label>
+              <div class="input-icon-wrap">
+                <i class="fas fa-search input-icon"></i>
+                <input
+                  type="text"
+                  class="form-control"
+                  placeholder="Search by company name..."
+                  id="companyNameFilter"
+                />
+              </div>
             </div>
             <div class="form-group">
-              <label class="form-label">Location</label>
-              <input
-                type="text"
-                class="form-control"
-                placeholder="Enter location"
-                id="locationFilter"
-              />
+              <label class="form-label">
+                <i
+                  class="fas fa-map-marker-alt"
+                  style="color: var(--primary-light)"
+                ></i>
+                Location
+              </label>
+              <div class="input-icon-wrap">
+                <i class="fas fa-location-dot input-icon"></i>
+                <input
+                  type="text"
+                  class="form-control"
+                  placeholder="Filter by city or area..."
+                  id="locationFilter"
+                />
+              </div>
             </div>
             <div class="form-group">
-              <label class="form-label">Rating Filter</label>
+              <label class="form-label">
+                <i class="fas fa-star" style="color: var(--primary-light)"></i>
+                Minimum Rating
+              </label>
               <select class="form-select" id="ratingFilter">
-                <option>All ratings</option>
-                <option>5 Stars</option>
-                <option>4+ Stars</option>
-                <option>3+ Stars</option>
-                <option>2+ Stars</option>
+                <option value="0">All ratings</option>
+                <option value="5">5 Stars only</option>
+                <option value="4">4+ Stars</option>
+                <option value="3">3+ Stars</option>
+                <option value="2">2+ Stars</option>
               </select>
             </div>
           </div>
           <div class="filter-options">
             <label class="checkbox-label">
-              <input type="checkbox" id="withDriverFilter" /> With driver
+              <input type="checkbox" id="withDriverFilter" />
+              <i class="fas fa-user-tie"></i> With driver
+            </label>
+            <label class="checkbox-label">
+              <input type="checkbox" id="availableFilter" />
+              <i class="fas fa-circle-check"></i> Accepting applications
             </label>
           </div>
           <div class="search-actions">
             <button class="btn btn-primary" onclick="searchCompanies()">
-              🔍 Search
+              <i class="fas fa-magnifying-glass"></i> Search
             </button>
-            <select class="form-select sort-select" id="sortSelect">
-              <option>Sort by Rating</option>
-              <option>Sort by Name (A-Z)</option>
-              <option>Sort by Name (Z-A)</option>
-              <option>Sort by Location</option>
-              <option>Sort by Reviews</option>
-            </select>
+            <div class="sort-wrap">
+              <i class="fas fa-sort sort-icon"></i>
+              <select class="form-select sort-select" id="sortSelect">
+                <option>Sort by Rating</option>
+                <option>Sort by Name (A-Z)</option>
+                <option>Sort by Name (Z-A)</option>
+                <option>Sort by Location</option>
+                <option>Sort by Reviews</option>
+              </select>
+            </div>
           </div>
         </div>
 
@@ -80,140 +115,281 @@
         <!-- Load More Button -->
         <div class="load-more-section">
           <button class="btn btn-secondary" onclick="loadMoreCompanies()">
-            Load More Companies
+            <i class="fas fa-rotate"></i> Load More Companies
           </button>
         </div>
       </div>
     </div>
 
-    <!-- Company Detail Modal -->
+    <!-- ==================== COMPANY DETAIL MODAL ==================== -->
     <div class="company-detail-overlay" id="companyDetailOverlay">
       <div class="company-detail-card">
         <div class="company-detail-header">
-          <h2>Company Details</h2>
+          <div class="detail-header-info">
+            <div class="detail-company-avatar" id="detailAvatar">RC</div>
+            <div>
+              <h2 id="detailCompanyName">Company Details</h2>
+              <span class="detail-verified-badge">
+                <i class="fas fa-shield-halved"></i> Verified Partner
+              </span>
+            </div>
+          </div>
           <button
             class="company-detail-close"
             onclick="closeCompanyDetailModal()"
+            aria-label="Close"
           >
-            ×
+            <i class="fas fa-xmark"></i>
           </button>
         </div>
-        <div class="company-detail-body">
-          <!-- Content loaded dynamically -->
+
+        <!-- Tab Navigation -->
+        <div class="detail-tabs">
+          <button class="detail-tab active" data-tab="overview">
+            <i class="fas fa-circle-info"></i> Overview
+          </button>
+          <button class="detail-tab" data-tab="contact">
+            <i class="fas fa-address-card"></i> Contact
+          </button>
+          <button class="detail-tab" data-tab="legal">
+            <i class="fas fa-file-contract"></i> Legal & Docs
+          </button>
+          <button class="detail-tab" data-tab="stats">
+            <i class="fas fa-chart-bar"></i> Statistics
+          </button>
         </div>
+
+        <div class="company-detail-body">
+          <!-- Content loaded dynamically per tab -->
+          <div id="detailTabContent" class="detail-tab-content">
+            <div style="text-align: center; padding: 60px 0">
+              <i
+                class="fas fa-circle-notch fa-spin"
+                style="font-size: 32px; color: var(--primary-light)"
+              ></i>
+              <p style="margin-top: 12px; color: var(--text-light)">
+                Loading company details...
+              </p>
+            </div>
+          </div>
+        </div>
+
         <div class="company-detail-footer">
           <button class="btn btn-secondary" onclick="closeCompanyDetailModal()">
-            Close
+            <i class="fas fa-arrow-left"></i> Back to List
           </button>
-          <button class="btn btn-primary">Apply Now</button>
+          <button class="btn btn-primary" id="detailApplyBtn">
+            <i class="fas fa-paper-plane"></i> Apply Now
+          </button>
         </div>
       </div>
     </div>
 
-    <!-- Application Modal -->
+    <!-- ==================== DOCUMENT VIEWER MODAL ==================== -->
+    <div class="doc-viewer-overlay" id="docViewerOverlay">
+      <div class="doc-viewer-card">
+        <div class="doc-viewer-header">
+          <h3 id="docViewerTitle">
+            <i class="fas fa-file-image"></i> Document Viewer
+          </h3>
+          <button class="modal-close-btn" onclick="closeDocViewer()">
+            <i class="fas fa-xmark"></i>
+          </button>
+        </div>
+        <div class="doc-viewer-body" id="docViewerBody">
+          <!-- Image rendered here -->
+        </div>
+        <div class="doc-viewer-footer">
+          <span class="doc-viewer-note">
+            <i class="fas fa-lock"></i> Confidential — for review purposes only
+          </span>
+          <button class="btn btn-secondary" onclick="closeDocViewer()">
+            <i class="fas fa-xmark"></i> Close
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== APPLICATION MODAL ==================== -->
     <div class="modal-overlay" id="applicationModal">
       <div class="modal">
         <div class="modal-header">
-          <h2>Apply to <span id="modalCompanyName">Company</span></h2>
-          <button class="modal-close" onclick="closeApplicationModal()">
-            ×
+          <div class="modal-header-info">
+            <div class="modal-company-icon">
+              <i class="fas fa-building"></i>
+            </div>
+            <div>
+              <h2>Apply to <span id="modalCompanyName">Company</span></h2>
+              <p class="modal-subtitle">Complete the application form below</p>
+            </div>
+          </div>
+          <button
+            class="modal-close-btn"
+            onclick="closeApplicationModal()"
+            aria-label="Close"
+          >
+            <i class="fas fa-xmark"></i>
           </button>
         </div>
+
+        <div class="modal-progress">
+          <div class="progress-step active" data-step="1">
+            <span class="step-num">1</span>
+            <span class="step-label">Your Info</span>
+          </div>
+          <div class="progress-line"></div>
+          <div class="progress-step" data-step="2">
+            <span class="step-num">2</span>
+            <span class="step-label">Vehicle</span>
+          </div>
+          <div class="progress-line"></div>
+          <div class="progress-step" data-step="3">
+            <span class="step-num">3</span>
+            <span class="step-label">Details</span>
+          </div>
+        </div>
+
         <div class="modal-body">
           <form id="applicationForm">
-            <div class="form-section">
-              <h3>Personal Information</h3>
-              <div class="form-row">
-                <div class="form-group">
-                  <label>Provider Name</label>
-                  <input
-                    id="providerName"
-                    name="providerName"
-                    type="text"
-                    readonly
-                  />
+            <!-- STEP 1: Personal Info -->
+            <div class="form-section" id="step1">
+              <div class="form-section-header">
+                <div class="section-icon">
+                  <i class="fas fa-user-circle"></i>
                 </div>
-
-                <div class="form-group">
-                  <label>Provider Email</label>
-                  <input
-                    id="providerEmail"
-                    name="providerEmail"
-                    type="email"
-                    readonly
-                  />
+                <div>
+                  <h3>Personal Information</h3>
+                  <p>Your profile details (auto-filled from your account)</p>
                 </div>
-
+              </div>
+              <div class="form-row readonly-row">
                 <div class="form-group">
-                  <label>Provider Phone</label>
-                  <input
-                    id="providerPhone"
-                    name="providerPhone"
-                    type="text"
-                    readonly
-                  />
+                  <label><i class="fas fa-user"></i> Provider Name</label>
+                  <div class="readonly-field">
+                    <input
+                      id="providerName"
+                      name="providerName"
+                      type="text"
+                      readonly
+                    />
+                    <i class="fas fa-lock readonly-lock"></i>
+                  </div>
                 </div>
-
+                <div class="form-group">
+                  <label><i class="fas fa-envelope"></i> Email Address</label>
+                  <div class="readonly-field">
+                    <input
+                      id="providerEmail"
+                      name="providerEmail"
+                      type="email"
+                      readonly
+                    />
+                    <i class="fas fa-lock readonly-lock"></i>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label><i class="fas fa-phone"></i> Phone Number</label>
+                  <div class="readonly-field">
+                    <input
+                      id="providerPhone"
+                      name="providerPhone"
+                      type="text"
+                      readonly
+                    />
+                    <i class="fas fa-lock readonly-lock"></i>
+                  </div>
+                </div>
                 <input id="providerIdDisplay" type="hidden" />
               </div>
             </div>
 
-            <div class="form-section">
-              <h3>Vehicle Information</h3>
+            <!-- STEP 2: Vehicle -->
+            <div class="form-section" id="step2">
+              <div class="form-section-header">
+                <div class="section-icon"><i class="fas fa-car"></i></div>
+                <div>
+                  <h3>Vehicle Selection</h3>
+                  <p>Choose one vehicle to register with this company</p>
+                </div>
+              </div>
               <div class="form-group">
-                <label class="form-label"
-                  >Select Vehicle to Register (Choose One)
-                  <span style="color: red">*</span></label
-                >
-                <div class="vehicle-selection"></div>
+                <div
+                  class="vehicle-selection"
+                  id="vehicleSelectionContainer"
+                ></div>
               </div>
             </div>
 
-            <div class="form-section">
-              <h3>Additional Information</h3>
+            <!-- STEP 3: Additional -->
+            <div class="form-section" id="step3">
+              <div class="form-section-header">
+                <div class="section-icon">
+                  <i class="fas fa-clipboard-list"></i>
+                </div>
+                <div>
+                  <h3>Additional Information</h3>
+                  <p>Help the company learn more about you</p>
+                </div>
+              </div>
               <div class="form-group">
-                <label class="form-label">Years of Experience</label>
+                <label class="form-label">
+                  <i class="fas fa-briefcase"></i> Years of Experience
+                  <span class="required-mark">*</span>
+                </label>
                 <select
                   class="form-select"
                   name="experience"
                   id="experience"
                   required
                 >
-                  <option value="">Select experience</option>
-                  <option value="1-2">1-2 years</option>
-                  <option value="3-5">3-5 years</option>
+                  <option value="">Select your experience level</option>
+                  <option value="1-2">1–2 years</option>
+                  <option value="3-5">3–5 years</option>
                   <option value="5+">5+ years</option>
                 </select>
               </div>
               <div class="form-group">
-                <label class="form-label">Message (Optional)</label>
+                <label class="form-label">
+                  <i class="fas fa-comment-dots"></i> Message to Company
+                  <span class="optional-tag">Optional</span>
+                </label>
                 <textarea
                   class="form-control"
                   name="message"
                   id="message"
                   rows="4"
-                  placeholder="Tell us why you want to join this company..."
+                  placeholder="Tell the company why you'd like to partner with them, your strengths, and what you bring to the table..."
                 ></textarea>
               </div>
-              <div class="form-group">
-                <label class="checkbox-label">
+              <div class="form-group terms-group">
+                <label class="checkbox-label terms-label">
                   <input type="checkbox" name="terms" id="terms" required />
-                  I agree to the terms and conditions
+                  <span class="checkbox-custom"></span>
+                  <span
+                    >I agree to the
+                    <a href="#" class="terms-link">terms and conditions</a> and
+                    confirm all information provided is accurate</span
+                  >
                 </label>
               </div>
             </div>
           </form>
         </div>
+
         <div class="modal-footer">
           <button
             type="button"
             class="btn btn-secondary"
             onclick="closeApplicationModal()"
           >
-            Cancel
+            <i class="fas fa-times"></i> Cancel
           </button>
-          <button type="submit" form="applicationForm" class="btn btn-primary">
-            Submit Application
+          <button
+            type="submit"
+            form="applicationForm"
+            class="btn btn-primary submit-btn"
+          >
+            <i class="fas fa-paper-plane"></i> Submit Application
           </button>
         </div>
       </div>

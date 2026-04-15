@@ -37,7 +37,7 @@ public class ProviderRentalRequestsServlet extends HttpServlet {
     private Integer getProviderIdFromSession(HttpServletRequest req) {
         try {
             Object actorType = req.getSession(false) != null ? req.getSession(false).getAttribute("actorType") : null;
-            Object actorId = req.getSession(false) != null ? req.getSession(false).getAttribute("actorId") : null;
+            Object actorId   = req.getSession(false) != null ? req.getSession(false).getAttribute("actorId")   : null;
             if (actorType != null && "PROVIDER".equalsIgnoreCase(String.valueOf(actorType)) && actorId != null) {
                 return Integer.parseInt(String.valueOf(actorId));
             }
@@ -76,20 +76,24 @@ public class ProviderRentalRequestsServlet extends HttpServlet {
     }
 
     private Set<String> getColumns(Connection con, String table) throws SQLException {
-        Set<String> cols = new HashSet<>();
+        Set<String> normalized = new HashSet<>();
         DatabaseMetaData md = con.getMetaData();
         try (ResultSet rs = md.getColumns(con.getCatalog(), null, table, null)) {
-            while (rs.next()) cols.add(rs.getString("COLUMN_NAME").toLowerCase());
+            while (rs.next()) normalized.add(rs.getString("COLUMN_NAME").toLowerCase());
         }
-        // some MySQL configs require uppercase match; keep both safe:
-        Set<String> normalized = new HashSet<>();
-        for (String c : cols) normalized.add(c.toLowerCase());
         return normalized;
     }
 
+    /** Returns true if the table exists in the current schema */
+    private boolean tableExists(Connection con, String table) {
+        try (ResultSet rs = con.getMetaData().getTables(con.getCatalog(), null, table, null)) {
+            return rs.next();
+        } catch (SQLException e) {
+            return false;
+        }
+    }
+
     private String getProviderProfile(Connection con, int providerId) throws SQLException {
-        // Your provider table name might be VehicleProvider / VehicleProviders / vehicleprovider.
-        // We'll try common ones in order.
         String[] tables = {"VehicleProvider", "VehicleProviders", "vehicleprovider", "vehicleproviders", "Vehicle_Provider"};
 
         String foundTable = null;
@@ -101,51 +105,43 @@ public class ProviderRentalRequestsServlet extends HttpServlet {
             } catch (SQLException ignored) {}
         }
 
-        if (foundTable == null) {
-            return "{\"provider\":{}}";
-        }
+        if (foundTable == null) return "{\"provider\":{}}";
 
         Set<String> cols = getColumns(con, foundTable);
 
-        // Detect likely column names
-        String idCol = cols.contains("providerid") ? "providerid"
-                : (cols.contains("provider_id") ? "provider_id"
-                : (cols.contains("id") ? "id" : "providerid"));
-
-        String usernameCol = cols.contains("username") ? "username" : null;
-        String firstNameCol = cols.contains("firstname") ? "firstname" : (cols.contains("first_name") ? "first_name" : null);
-        String lastNameCol  = cols.contains("lastname")  ? "lastname"  : (cols.contains("last_name")  ? "last_name"  : null);
-        String emailCol     = cols.contains("email")     ? "email"     : null;
-        String phoneCol     = cols.contains("phonenumber") ? "phonenumber"
-                : (cols.contains("mobile") ? "mobile"
-                : (cols.contains("mobilenumber") ? "mobilenumber" : null));
+        String idCol        = cols.contains("providerid")    ? "providerid"    : (cols.contains("provider_id") ? "provider_id" : "providerid");
+        String usernameCol  = cols.contains("username")      ? "username"      : null;
+        String firstNameCol = cols.contains("firstname")     ? "firstname"     : (cols.contains("first_name")  ? "first_name"  : null);
+        String lastNameCol  = cols.contains("lastname")      ? "lastname"      : (cols.contains("last_name")   ? "last_name"   : null);
+        String emailCol     = cols.contains("email")         ? "email"         : null;
+        String phoneCol     = cols.contains("phonenumber")   ? "phonenumber"   : (cols.contains("mobile") ? "mobile" : (cols.contains("mobilenumber") ? "mobilenumber" : null));
 
         List<String> select = new ArrayList<>();
         select.add(idCol + " AS provider_id");
-        if (usernameCol != null) select.add(usernameCol);
+        if (usernameCol  != null) select.add(usernameCol);
         if (firstNameCol != null) select.add(firstNameCol + " AS firstname");
-        if (lastNameCol != null) select.add(lastNameCol + " AS lastname");
-        if (emailCol != null) select.add(emailCol);
-        if (phoneCol != null) select.add(phoneCol + " AS phone");
+        if (lastNameCol  != null) select.add(lastNameCol  + " AS lastname");
+        if (emailCol     != null) select.add(emailCol);
+        if (phoneCol     != null) select.add(phoneCol + " AS phone");
 
         String sql = "SELECT " + String.join(", ", select) + " FROM " + foundTable + " WHERE " + idCol + " = ? LIMIT 1";
 
         JsonObject out = new JsonObject();
-        JsonObject p = new JsonObject();
+        JsonObject p   = new JsonObject();
 
         try (PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setInt(1, providerId);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     p.addProperty("providerId", rs.getInt("provider_id"));
-                    p.addProperty("username", safeGet(rs, "username"));
-                    p.addProperty("firstname", safeGet(rs, "firstname"));
-                    p.addProperty("lastname", safeGet(rs, "lastname"));
-                    p.addProperty("email", safeGet(rs, "email"));
-                    p.addProperty("phone", safeGet(rs, "phone"));
+                    p.addProperty("username",   safeGet(rs, "username"));
+                    p.addProperty("firstname",  safeGet(rs, "firstname"));
+                    p.addProperty("lastname",   safeGet(rs, "lastname"));
+                    p.addProperty("email",      safeGet(rs, "email"));
+                    p.addProperty("phone",      safeGet(rs, "phone"));
 
                     String fullName = (safeGet(rs, "firstname") == null ? "" : safeGet(rs, "firstname")) +
-                            (safeGet(rs, "lastname") == null ? "" : (" " + safeGet(rs, "lastname")));
+                            (safeGet(rs, "lastname")  == null ? "" : (" " + safeGet(rs, "lastname")));
                     p.addProperty("fullName", fullName.trim());
                 }
             }
@@ -154,7 +150,6 @@ public class ProviderRentalRequestsServlet extends HttpServlet {
         out.add("provider", p);
         return gson.toJson(out);
     }
-
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
@@ -184,7 +179,7 @@ public class ProviderRentalRequestsServlet extends HttpServlet {
                 return;
             }
 
-            if (path != null && path.startsWith("/companies/")) {
+            if (path.startsWith("/companies/")) {
                 String companyIdStr = path.substring("/companies/".length());
                 Integer companyId = parseIntOrNull(companyIdStr);
                 if (companyId == null) {
@@ -211,7 +206,6 @@ public class ProviderRentalRequestsServlet extends HttpServlet {
                 return;
             }
 
-
             resp.setStatus(404);
             resp.getWriter().write("{\"error\":\"Not found\"}");
 
@@ -222,49 +216,80 @@ public class ProviderRentalRequestsServlet extends HttpServlet {
         }
     }
 
+    // ─────────────────────────────────────────────────────────────────────────
+    // LIST COMPANIES — fetches real driver count, vehicle count, and avg rating
+    // ─────────────────────────────────────────────────────────────────────────
     private String listCompanies(Connection con) throws SQLException {
-        // We don’t know your exact RentalCompany columns, so we detect what exists.
         Set<String> cols = getColumns(con, "RentalCompany");
+        boolean hasRatings = tableExists(con, "ratings");
 
-        // Choose best-guess fields if present
         String idCol = cols.contains("companyid") ? "companyid" : (cols.contains("company_id") ? "company_id" : "companyid");
 
-        List<String> select = new ArrayList<>();
-        select.add(idCol + " AS companyid");
+        // Build the SELECT list for RentalCompany columns
+        List<String> rcSelect = new ArrayList<>();
+        rcSelect.add("rc." + idCol + " AS companyid");
 
-        if (cols.contains("companyname")) select.add("companyname");
-        else if (cols.contains("name")) select.add("name AS companyname");
+        if (cols.contains("companyname"))          rcSelect.add("rc.companyname");
+        else if (cols.contains("name"))            rcSelect.add("rc.name AS companyname");
 
-        if (cols.contains("location")) select.add("location");
-        else if (cols.contains("city")) select.add("city AS location");
+        // Use city as location since there's no standalone location column in your schema
+        if (cols.contains("location"))             rcSelect.add("rc.location");
+        else if (cols.contains("city"))            rcSelect.add("rc.city AS location");
 
-        if (cols.contains("description")) select.add("description");
+        if (cols.contains("description"))          rcSelect.add("rc.description");
 
-        if (cols.contains("businesslicensenumber")) select.add("businesslicensenumber");
-        else if (cols.contains("business_license_number")) select.add("business_license_number AS businesslicensenumber");
+        if (cols.contains("businesslicensenumber"))          rcSelect.add("rc.businesslicensenumber");
+        else if (cols.contains("business_license_number"))   rcSelect.add("rc.business_license_number AS businesslicensenumber");
 
-        // Optional “status” filter if you have it
-        StringBuilder sql = new StringBuilder("SELECT " + String.join(", ", select) + " FROM RentalCompany");
-        if (cols.contains("status")) {
-            sql.append(" WHERE status IN ('active','approved','Active','Approved') ");
+        // Real counts via subqueries (always safe — tables exist in your schema)
+        rcSelect.add("(SELECT COUNT(*) FROM Driver d WHERE d.company_id = rc." + idCol + ") AS driver_count");
+        rcSelect.add("(SELECT COUNT(*) FROM Vehicle v WHERE v.company_id = rc." + idCol + ") AS vehicle_count");
+
+        // Real average rating — only if ratings table exists and has a companyid column
+        if (hasRatings) {
+            Set<String> ratingCols = getColumns(con, "ratings");
+            if (ratingCols.contains("companyid") && ratingCols.contains("rating_value")) {
+                rcSelect.add(
+                        "(SELECT ROUND(AVG(r.rating_value),1) FROM ratings r WHERE r.companyid = rc." + idCol + ") AS avg_rating"
+                );
+                rcSelect.add(
+                        "(SELECT COUNT(*) FROM ratings r WHERE r.companyid = rc." + idCol + ") AS review_count"
+                );
+            } else {
+                rcSelect.add("NULL AS avg_rating");
+                rcSelect.add("0 AS review_count");
+            }
+        } else {
+            rcSelect.add("NULL AS avg_rating");
+            rcSelect.add("0 AS review_count");
         }
 
-        sql.append(" ORDER BY ").append(idCol).append(" DESC");
+        StringBuilder sql = new StringBuilder("SELECT " + String.join(", ", rcSelect) + " FROM RentalCompany rc");
+        if (cols.contains("status")) {
+            sql.append(" WHERE rc.status IN ('active','approved','Active','Approved')");
+        }
+        sql.append(" ORDER BY rc.").append(idCol).append(" DESC");
 
         List<Map<String, Object>> rows = new ArrayList<>();
         try (PreparedStatement ps = con.prepareStatement(sql.toString());
              ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
                 Map<String, Object> m = new LinkedHashMap<>();
-                m.put("companyid", rs.getInt("companyid"));
-                m.put("companyname", safeGet(rs, "companyname"));
-                m.put("location", safeGet(rs, "location"));
-                m.put("description", safeGet(rs, "description"));
-                m.put("businesslicensenumber", safeGet(rs, "businesslicensenumber"));
-                // frontend expects these for sorting — provide safe defaults
-                m.put("rating", 4);          // placeholder (unless you have ratings per company)
-                m.put("reviews", 0);         // placeholder
-                m.put("drivers", 0);         // placeholder
+                m.put("companyid",            rs.getInt("companyid"));
+                m.put("companyname",          safeGet(rs, "companyname"));
+                m.put("location",             safeGet(rs, "location"));
+                m.put("description",          safeGet(rs, "description"));
+                m.put("businesslicensenumber",safeGet(rs, "businesslicensenumber"));
+
+                // Real values from DB
+                m.put("drivers",  rs.getInt("driver_count"));
+                m.put("vehicles", rs.getInt("vehicle_count"));
+
+                // Rating: use real avg if available, otherwise null (frontend shows "No ratings yet")
+                double avg = rs.getDouble("avg_rating");
+                m.put("rating",  rs.wasNull() ? null : avg);
+                m.put("reviews", rs.getInt("review_count"));
+
                 rows.add(m);
             }
         }
@@ -279,26 +304,33 @@ public class ProviderRentalRequestsServlet extends HttpServlet {
         try { return rs.getString(col); } catch (Exception e) { return null; }
     }
 
+    // ─────────────────────────────────────────────────────────────────────────
+    // GET COMPANY DETAILS — also uses real counts and ratings
+    // ─────────────────────────────────────────────────────────────────────────
     private String getCompanyDetails(Connection con, int companyId) throws SQLException {
-        Set<String> cols = getColumns(con, "RentalCompany");
+        Set<String> cols       = getColumns(con, "RentalCompany");
+        boolean     hasRatings = tableExists(con, "ratings");
 
         String idCol = cols.contains("companyid") ? "companyid" : (cols.contains("company_id") ? "company_id" : "companyid");
 
         List<String> select = new ArrayList<>();
         select.add(idCol + " AS companyid");
 
-        if (cols.contains("companyname")) select.add("companyname");
-        else if (cols.contains("name")) select.add("name AS companyname");
+        if (cols.contains("companyname"))          select.add("companyname");
+        else if (cols.contains("name"))            select.add("name AS companyname");
 
-        if (cols.contains("companyemail")) select.add("companyemail");
-        if (cols.contains("phone")) select.add("phone");
-        if (cols.contains("registrationnumber")) select.add("registrationnumber");
-        if (cols.contains("taxid")) select.add("taxid");
-        if (cols.contains("street")) select.add("street");
-        if (cols.contains("city")) select.add("city");
-        if (cols.contains("description")) select.add("description");
-        if (cols.contains("terms")) select.add("terms");
-        if (cols.contains("businesslicensenumber")) select.add("businesslicensenumber");
+        if (cols.contains("companyemail"))         select.add("companyemail");
+        if (cols.contains("phone"))                select.add("phone");
+        if (cols.contains("registrationnumber"))   select.add("registrationnumber");
+        if (cols.contains("taxid"))                select.add("taxid");
+        if (cols.contains("street"))               select.add("street");
+        if (cols.contains("city"))                 select.add("city");
+        if (cols.contains("description"))          select.add("description");
+        if (cols.contains("terms"))                select.add("terms");
+        if (cols.contains("certificatepath"))      select.add("certificatepath");
+        if (cols.contains("taxdocumentpath"))      select.add("taxdocumentpath");
+
+        if (cols.contains("businesslicensenumber"))        select.add("businesslicensenumber");
         else if (cols.contains("business_license_number")) select.add("business_license_number AS businesslicensenumber");
 
         String sql = "SELECT " + String.join(", ", select) + " FROM RentalCompany WHERE " + idCol + " = ? LIMIT 1";
@@ -308,36 +340,60 @@ public class ProviderRentalRequestsServlet extends HttpServlet {
             ps.setInt(1, companyId);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    company.put("companyid", rs.getInt("companyid"));
-                    company.put("companyname", safeGet(rs, "companyname"));
-                    company.put("companyemail", safeGet(rs, "companyemail"));
-                    company.put("phone", safeGet(rs, "phone"));
-                    company.put("registrationnumber", safeGet(rs, "registrationnumber"));
-                    company.put("taxid", safeGet(rs, "taxid"));
-                    company.put("street", safeGet(rs, "street"));
-                    company.put("city", safeGet(rs, "city"));
-                    company.put("description", safeGet(rs, "description"));
-                    company.put("terms", safeGet(rs, "terms"));
+                    company.put("companyid",             rs.getInt("companyid"));
+                    company.put("companyname",           safeGet(rs, "companyname"));
+                    company.put("companyemail",          safeGet(rs, "companyemail"));
+                    company.put("phone",                 safeGet(rs, "phone"));
+                    company.put("registrationnumber",    safeGet(rs, "registrationnumber"));
+                    company.put("taxid",                 safeGet(rs, "taxid"));
+                    company.put("street",                safeGet(rs, "street"));
+                    company.put("city",                  safeGet(rs, "city"));
+                    company.put("description",           safeGet(rs, "description"));
+                    company.put("terms",                 safeGet(rs, "terms"));
+                    company.put("certificatepath",       safeGet(rs, "certificatepath"));
+                    company.put("taxdocumentpath",       safeGet(rs, "taxdocumentpath"));
                     company.put("businesslicensenumber", safeGet(rs, "businesslicensenumber"));
 
-                    // Count drivers and vehicles
-                    try (PreparedStatement psDrivers = con.prepareStatement("SELECT COUNT(*) FROM Driver WHERE company_id = ?")) {
-                        psDrivers.setInt(1, companyId);
-                        try (ResultSet rsDrivers = psDrivers.executeQuery()) {
-                            if (rsDrivers.next()) company.put("drivers", rsDrivers.getInt(1));
+                    // Real driver count
+                    try (PreparedStatement ps2 = con.prepareStatement("SELECT COUNT(*) FROM Driver WHERE company_id = ?")) {
+                        ps2.setInt(1, companyId);
+                        try (ResultSet rs2 = ps2.executeQuery()) {
+                            company.put("drivers", rs2.next() ? rs2.getInt(1) : 0);
                         }
                     }
 
-                    try (PreparedStatement psVehicles = con.prepareStatement("SELECT COUNT(*) FROM Vehicle WHERE company_id = ?")) {
-                        psVehicles.setInt(1, companyId);
-                        try (ResultSet rsVehicles = psVehicles.executeQuery()) {
-                            if (rsVehicles.next()) company.put("vehicles", rsVehicles.getInt(1));
+                    // Real vehicle count
+                    try (PreparedStatement ps2 = con.prepareStatement("SELECT COUNT(*) FROM Vehicle WHERE company_id = ?")) {
+                        ps2.setInt(1, companyId);
+                        try (ResultSet rs2 = ps2.executeQuery()) {
+                            company.put("vehicles", rs2.next() ? rs2.getInt(1) : 0);
                         }
                     }
 
-                    // Placeholder ratings
-                    company.put("rating", 4);
-                    company.put("reviews", 120);
+                    // Real rating and review count
+                    if (hasRatings) {
+                        Set<String> ratingCols = getColumns(con, "ratings");
+                        if (ratingCols.contains("companyid") && ratingCols.contains("rating_value")) {
+                            String rSql = "SELECT ROUND(AVG(rating_value),1) AS avg_r, COUNT(*) AS cnt FROM ratings WHERE companyid = ?";
+                            try (PreparedStatement ps2 = con.prepareStatement(rSql)) {
+                                ps2.setInt(1, companyId);
+                                try (ResultSet rs2 = ps2.executeQuery()) {
+                                    if (rs2.next()) {
+                                        double avg = rs2.getDouble("avg_r");
+                                        company.put("rating",  rs2.wasNull() ? null : avg);
+                                        company.put("reviews", rs2.getInt("cnt"));
+                                    }
+                                }
+                            }
+                        } else {
+                            company.put("rating",  null);
+                            company.put("reviews", 0);
+                        }
+                    } else {
+                        company.put("rating",  null);
+                        company.put("reviews", 0);
+                    }
+
                 } else {
                     JsonObject error = new JsonObject();
                     error.addProperty("error", "Company not found");
@@ -352,8 +408,6 @@ public class ProviderRentalRequestsServlet extends HttpServlet {
     }
 
     private String listEligibleVehicles(Connection con, int providerId) throws SQLException {
-        // Vehicles owned by provider, not assigned to any company
-        // AND not already in pending request
         String sql =
                 "SELECT v.vehicleid, v.vehiclebrand, v.vehiclemodel, v.numberplatenumber, v.location, v.price_per_day " +
                         "FROM Vehicle v " +
@@ -371,12 +425,12 @@ public class ProviderRentalRequestsServlet extends HttpServlet {
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     Map<String, Object> v = new LinkedHashMap<>();
-                    v.put("vehicleid", rs.getInt("vehicleid"));
-                    v.put("vehiclebrand", rs.getString("vehiclebrand"));
-                    v.put("vehiclemodel", rs.getString("vehiclemodel"));
-                    v.put("numberplatenumber", rs.getString("numberplatenumber"));
-                    v.put("location", rs.getString("location"));
-                    v.put("price_per_day", rs.getBigDecimal("price_per_day"));
+                    v.put("vehicleid",         rs.getInt("vehicleid"));
+                    v.put("vehiclebrand",       rs.getString("vehiclebrand"));
+                    v.put("vehiclemodel",       rs.getString("vehiclemodel"));
+                    v.put("numberplatenumber",  rs.getString("numberplatenumber"));
+                    v.put("location",           rs.getString("location"));
+                    v.put("price_per_day",      rs.getBigDecimal("price_per_day"));
                     vehicles.add(v);
                 }
             }
@@ -389,19 +443,13 @@ public class ProviderRentalRequestsServlet extends HttpServlet {
     }
 
     private String listMyRequests(Connection con, int providerId) throws SQLException {
-        // detect available columns in RentalCompany
         Set<String> cols = getColumns(con, "RentalCompany");
 
-        String companyIdCol = cols.contains("companyid") ? "companyid"
-                : (cols.contains("company_id") ? "company_id" : "companyid");
+        String companyIdCol   = cols.contains("companyid")   ? "companyid"   : (cols.contains("company_id") ? "company_id" : "companyid");
+        String companyNameCol = cols.contains("companyname") ? "companyname" : (cols.contains("name") ? "name" : null);
+        String streetCol      = cols.contains("street")      ? "street"      : null;
+        String cityCol        = cols.contains("city")        ? "city"        : null;
 
-        String companyNameCol = cols.contains("companyname") ? "companyname"
-                : (cols.contains("name") ? "name" : null);
-
-        String streetCol = cols.contains("street") ? "street" : null;
-        String cityCol   = cols.contains("city") ? "city" : null;
-
-        // build SELECT dynamically so we never reference missing columns
         List<String> select = new ArrayList<>();
         select.add("pr.request_id");
         select.add("pr.company_id");
@@ -412,8 +460,8 @@ public class ProviderRentalRequestsServlet extends HttpServlet {
         select.add("pr.responded_at");
 
         if (companyNameCol != null) select.add("rc." + companyNameCol + " AS companyname");
-        if (streetCol != null) select.add("rc." + streetCol + " AS street");
-        if (cityCol != null) select.add("rc." + cityCol + " AS city");
+        if (streetCol      != null) select.add("rc." + streetCol      + " AS street");
+        if (cityCol        != null) select.add("rc." + cityCol        + " AS city");
 
         String sql =
                 "SELECT " + String.join(", ", select) + " " +
@@ -428,24 +476,15 @@ public class ProviderRentalRequestsServlet extends HttpServlet {
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     Map<String, Object> m = new LinkedHashMap<>();
-                    m.put("request_id", rs.getInt("request_id"));
-                    m.put("company_id", rs.getInt("company_id"));
-                    m.put("vehicle_id", rs.getInt("vehicle_id"));
-                    m.put("status", rs.getString("status"));
-                    m.put("message", rs.getString("message"));
+                    m.put("request_id",   rs.getInt("request_id"));
+                    m.put("company_id",   rs.getInt("company_id"));
+                    m.put("vehicle_id",   rs.getInt("vehicle_id"));
+                    m.put("status",       rs.getString("status"));
+                    m.put("message",      rs.getString("message"));
                     m.put("requested_at", rs.getString("requested_at"));
                     m.put("responded_at", rs.getString("responded_at"));
-
-                    String companyName = safeGet(rs, "companyname");
-                    String street = safeGet(rs, "street");
-                    String city = safeGet(rs, "city");
-
-                    m.put("companyname", companyName);
-
-                    // ✅ location = "street, city" (or whichever exists)
-                    String location = buildLocation(street, city);
-                    m.put("location", location);
-
+                    m.put("companyname",  safeGet(rs, "companyname"));
+                    m.put("location",     buildLocation(safeGet(rs, "street"), safeGet(rs, "city")));
                     rows.add(m);
                 }
             }
@@ -459,14 +498,12 @@ public class ProviderRentalRequestsServlet extends HttpServlet {
 
     private String buildLocation(String street, String city) {
         street = trimToNull(street);
-        city = trimToNull(city);
-
+        city   = trimToNull(city);
         if (street == null && city == null) return null;
         if (street == null) return city;
-        if (city == null) return street;
+        if (city   == null) return street;
         return street + ", " + city;
     }
-
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
@@ -492,7 +529,7 @@ public class ProviderRentalRequestsServlet extends HttpServlet {
 
             Integer companyId = body.has("company_id") ? body.get("company_id").getAsInt() : null;
             Integer vehicleId = body.has("vehicle_id") ? body.get("vehicle_id").getAsInt() : null;
-            String message = body.has("message") ? trimToNull(body.get("message").getAsString()) : null;
+            String  message   = body.has("message")    ? trimToNull(body.get("message").getAsString()) : null;
 
             if (companyId == null || vehicleId == null) {
                 resp.setStatus(400);
@@ -500,7 +537,7 @@ public class ProviderRentalRequestsServlet extends HttpServlet {
                 return;
             }
 
-            // Ensure vehicle belongs to provider and not assigned
+            // Ensure vehicle belongs to provider and is not yet assigned
             String checkVehicle =
                     "SELECT vehicleid FROM Vehicle WHERE vehicleid=? AND provider_id=? AND (company_id IS NULL OR company_id=0)";
             try (PreparedStatement ps = con.prepareStatement(checkVehicle)) {

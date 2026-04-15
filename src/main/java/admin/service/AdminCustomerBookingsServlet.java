@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 
 @WebServlet("/api/admin/customer-bookings/*")
@@ -77,14 +78,14 @@ public class AdminCustomerBookingsServlet extends HttpServlet {
             return;
         }
 
-        String path = req.getPathInfo(); // "/{customerId}/ongoing" | "/{customerId}/past" | "/{customerId}/{bookingId}"
+        String path = req.getPathInfo();
         if (path == null || "/".equals(path)) {
             resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             resp.getWriter().write("{\"error\":\"Missing path. Use /{customerId}/ongoing|past|{bookingId}\"}");
             return;
         }
 
-        String[] parts = path.split("/"); // ["", customerId, actionOrBookingId]
+        String[] parts = path.split("/");
         if (parts.length < 3) {
             resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             resp.getWriter().write("{\"error\":\"Invalid path. Use /{customerId}/ongoing|past|{bookingId}\"}");
@@ -157,7 +158,6 @@ public class AdminCustomerBookingsServlet extends HttpServlet {
         }
         where.append(" ) ");
 
-        // count
         String countSql =
                 "SELECT COUNT(*) " +
                         "FROM companybookings cb " +
@@ -179,7 +179,7 @@ public class AdminCustomerBookingsServlet extends HttpServlet {
                         " cb.trip_start_date, cb.trip_end_date, cb.start_time, cb.end_time, " +
                         " cb.pickup_location, cb.drop_location, cb.booked_date, " +
                         " rc.companyid, rc.companyname, rc.city AS company_city, " +
-                        " v.vehicleid, v.vehiclebrand, v.vehiclemodel, v.numberplatenumber, v.color, v.vehicle_type, v.location, " +
+                        " v.vehicleid, v.vehiclebrand, v.vehiclemodel, v.numberplatenumber, v.color, v.vehicle_type, v.location, v.vehicleimages, " +
                         " cb.driverid, d.firstname AS driver_firstname, d.lastname AS driver_lastname " +
                         "FROM companybookings cb " +
                         "LEFT JOIN rentalcompany rc ON cb.companyid = rc.companyid " +
@@ -209,6 +209,9 @@ public class AdminCustomerBookingsServlet extends HttpServlet {
                     b.addProperty("paymentStatus", rs.getString("payment_status"));
                     b.addProperty("totalAmount", rs.getBigDecimal("total_amount") == null ? null : rs.getBigDecimal("total_amount").doubleValue());
 
+                    Date booked = rs.getDate("booked_date");
+                    b.addProperty("bookedDate", booked == null ? null : booked.toString());
+
                     Date s = rs.getDate("trip_start_date");
                     Date e = rs.getDate("trip_end_date");
                     b.addProperty("tripStartDate", s == null ? null : s.toString());
@@ -234,11 +237,12 @@ public class AdminCustomerBookingsServlet extends HttpServlet {
                     int vehicleId = rs.getInt("vehicleid");
                     if (!rs.wasNull()) {
                         vehicle.addProperty("vehicleId", vehicleId);
-                        vehicle.addProperty("name", rs.getString("vehiclebrand") + " " + rs.getString("vehiclemodel"));
+                        vehicle.addProperty("name", safeJoin(rs.getString("vehiclebrand"), rs.getString("vehiclemodel")));
                         vehicle.addProperty("plate", rs.getString("numberplatenumber"));
                         vehicle.addProperty("type", rs.getString("vehicle_type"));
                         vehicle.addProperty("color", rs.getString("color"));
                         vehicle.addProperty("location", rs.getString("location"));
+                        vehicle.addProperty("imageUrl", blobToDataUrl(rs.getBytes("vehicleimages")));
                     }
                     b.add("vehicle", vehicle);
 
@@ -248,7 +252,7 @@ public class AdminCustomerBookingsServlet extends HttpServlet {
                         driver.addProperty("driverId", driverId);
                         String df = rs.getString("driver_firstname");
                         String dl = rs.getString("driver_lastname");
-                        driver.addProperty("name", ((df == null ? "" : df) + " " + (dl == null ? "" : dl)).trim());
+                        driver.addProperty("name", safeJoin(df, dl));
                         b.add("driver", driver);
                     } else {
                         b.add("driver", null);
@@ -279,7 +283,7 @@ public class AdminCustomerBookingsServlet extends HttpServlet {
                         " rc.companyid, rc.companyname, rc.companyemail, rc.phone AS company_phone, rc.city AS company_city, " +
                         " c.customerid, c.firstname AS c_first, c.lastname AS c_last, c.email AS c_email, c.mobilenumber AS c_phone, " +
                         " c.nic_number, c.passport_number, c.drivers_license_number, c.international_drivers_license_number, " +
-                        " v.vehicleid, v.vehiclebrand, v.vehiclemodel, v.numberplatenumber, v.color, v.vehicle_type, v.fuel_type, v.milage, v.numberofpassengers, v.location, v.price_per_day, " +
+                        " v.vehicleid, v.vehiclebrand, v.vehiclemodel, v.numberplatenumber, v.color, v.vehicle_type, v.fuel_type, v.milage, v.numberofpassengers, v.location, v.price_per_day, v.enginecapacity, v.transmission, v.features, v.description, v.vehicleimages, " +
                         " d.driverid, d.firstname AS d_first, d.lastname AS d_last, d.mobilenumber AS d_phone, d.licensenumber " +
                         "FROM companybookings cb " +
                         "JOIN customer c ON cb.customerid = c.customerid " +
@@ -302,6 +306,9 @@ public class AdminCustomerBookingsServlet extends HttpServlet {
                 root.addProperty("status", rs.getString("status"));
                 root.addProperty("paymentStatus", rs.getString("payment_status"));
                 root.addProperty("totalAmount", rs.getBigDecimal("total_amount") == null ? null : rs.getBigDecimal("total_amount").doubleValue());
+
+                Date booked = rs.getDate("booked_date");
+                root.addProperty("bookedDate", booked == null ? null : booked.toString());
 
                 Date s = rs.getDate("trip_start_date");
                 Date e = rs.getDate("trip_end_date");
@@ -328,16 +335,14 @@ public class AdminCustomerBookingsServlet extends HttpServlet {
 
                 JsonObject customer = new JsonObject();
                 customer.addProperty("customerId", rs.getInt("customerid"));
-                customer.addProperty("name", (rs.getString("c_first") + " " + rs.getString("c_last")).trim());
+                customer.addProperty("name", safeJoin(rs.getString("c_first"), rs.getString("c_last")));
                 customer.addProperty("email", rs.getString("c_email"));
                 customer.addProperty("phone", rs.getString("c_phone"));
 
-                // license: local vs foreign
                 String lic = rs.getString("drivers_license_number");
                 if (lic == null || lic.isEmpty()) lic = rs.getString("international_drivers_license_number");
                 customer.addProperty("license", lic);
 
-                // doc: nic vs passport (optional to expose)
                 String doc = rs.getString("nic_number");
                 if (doc == null || doc.isEmpty()) doc = rs.getString("passport_number");
                 customer.addProperty("docNumber", doc);
@@ -348,7 +353,9 @@ public class AdminCustomerBookingsServlet extends HttpServlet {
                 int vehicleId = rs.getInt("vehicleid");
                 if (!rs.wasNull()) {
                     vehicle.addProperty("vehicleId", vehicleId);
-                    vehicle.addProperty("name", rs.getString("vehiclebrand") + " " + rs.getString("vehiclemodel"));
+                    vehicle.addProperty("name", safeJoin(rs.getString("vehiclebrand"), rs.getString("vehiclemodel")));
+                    vehicle.addProperty("brand", rs.getString("vehiclebrand"));
+                    vehicle.addProperty("model", rs.getString("vehiclemodel"));
                     vehicle.addProperty("plate", rs.getString("numberplatenumber"));
                     vehicle.addProperty("type", rs.getString("vehicle_type"));
                     vehicle.addProperty("fuelType", rs.getString("fuel_type"));
@@ -357,6 +364,11 @@ public class AdminCustomerBookingsServlet extends HttpServlet {
                     vehicle.addProperty("passengers", rs.getInt("numberofpassengers"));
                     vehicle.addProperty("location", rs.getString("location"));
                     vehicle.addProperty("pricePerDay", rs.getBigDecimal("price_per_day") == null ? null : rs.getBigDecimal("price_per_day").doubleValue());
+                    vehicle.addProperty("engineCapacity", rs.getInt("enginecapacity"));
+                    vehicle.addProperty("transmission", rs.getString("transmission"));
+                    vehicle.addProperty("features", rs.getString("features"));
+                    vehicle.addProperty("description", rs.getString("description"));
+                    vehicle.addProperty("imageUrl", blobToDataUrl(rs.getBytes("vehicleimages")));
                 }
                 root.add("vehicle", vehicle);
 
@@ -364,7 +376,7 @@ public class AdminCustomerBookingsServlet extends HttpServlet {
                 if (!rs.wasNull()) {
                     JsonObject driver = new JsonObject();
                     driver.addProperty("driverId", driverId);
-                    driver.addProperty("name", (rs.getString("d_first") + " " + rs.getString("d_last")).trim());
+                    driver.addProperty("name", safeJoin(rs.getString("d_first"), rs.getString("d_last")));
                     driver.addProperty("phone", rs.getString("d_phone"));
                     driver.addProperty("license", rs.getString("licensenumber"));
                     root.add("driver", driver);
@@ -386,5 +398,42 @@ public class AdminCustomerBookingsServlet extends HttpServlet {
             else if (p instanceof Date) ps.setDate(i++, (Date) p);
             else ps.setString(i++, String.valueOf(p));
         }
+    }
+
+    private String safeJoin(String a, String b) {
+        String left = a == null ? "" : a.trim();
+        String right = b == null ? "" : b.trim();
+        return (left + " " + right).trim();
+    }
+
+    private String blobToDataUrl(byte[] bytes) {
+        if (bytes == null || bytes.length == 0) return null;
+        String mime = detectMimeType(bytes);
+        return "data:" + mime + ";base64," + Base64.getEncoder().encodeToString(bytes);
+    }
+
+    private String detectMimeType(byte[] bytes) {
+        if (bytes == null || bytes.length < 4) return "image/jpeg";
+
+        if ((bytes[0] & 0xFF) == 0x89 && bytes[1] == 0x50 && bytes[2] == 0x4E && bytes[3] == 0x47) {
+            return "image/png";
+        }
+        if ((bytes[0] & 0xFF) == 0xFF && (bytes[1] & 0xFF) == 0xD8) {
+            return "image/jpeg";
+        }
+        if (bytes.length >= 6) {
+            String header6 = new String(bytes, 0, 6);
+            if ("GIF87a".equals(header6) || "GIF89a".equals(header6)) {
+                return "image/gif";
+            }
+        }
+        if (bytes.length >= 12) {
+            String riff = new String(bytes, 0, 4);
+            String webp = new String(bytes, 8, 4);
+            if ("RIFF".equals(riff) && "WEBP".equals(webp)) {
+                return "image/webp";
+            }
+        }
+        return "image/jpeg";
     }
 }
