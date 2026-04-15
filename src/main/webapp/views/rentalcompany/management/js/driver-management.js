@@ -1,744 +1,589 @@
-// Driver Management JavaScript
-class DriverManager {
-  constructor() {
-    this.drivers = [
-      {
-        id: "DL2345678",
-        name: "Nimesh Perera",
-        initials: "NP",
-        phone: "+94-555-0101",
-        license: "ABC123456",
-        area: "Downtown",
-        expiry: "2025-06-15",
-        status: "available",
-        rating: 4.8,
-        trips: 156,
-        currentBooking: {
-          id: "BK001",
-          time: "09:00 - 17:00",
-          customer: "Alice Johnson",
-          vehicle: "Toyota Prius 2020",
-        },
-      },
-      {
-        id: "DL8765432",
-        name: "Sarah Wilson",
-        initials: "SW",
-        phone: "+94-555-0102",
-        license: "XYZ789012",
-        area: "Airport",
-        expiry: "2024-12-20",
-        status: "on-trip",
-        rating: 4.9,
-        trips: 203,
-        currentBooking: {
-          id: "BK002",
-          time: "14:00 - 18:00",
-          customer: "Bob Miller",
-          vehicle: "Honda Civic 2021",
-        },
-      },
-      {
-        id: "DL5432167",
-        name: "Mike Davis",
-        initials: "MD",
-        phone: "+1-555-0103",
-        license: "DEF456789",
-        area: "Uptown",
-        expiry: "2025-03-10",
-        status: "offline",
-        rating: 4.6,
-        trips: 89,
-        currentBooking: null,
-      },
-    ];
+async function checkLogin() {
 
-    this.filteredDrivers = [...this.drivers];
-    this.init();
-  }
+    try {
 
-  init() {
-    this.renderDrivers();
-    this.setupEventListeners();
-  }
+        const response = await fetch("/checklogin");
+        const data = await response.json();
 
-  setupEventListeners() {
-    // Search functionality
-    const searchInput = document.querySelector(".search-input");
-    const filterSelect = document.querySelector(".filter-select");
-    const addDriverBtn = document.querySelector(".add-driver-btn");
-    const addDriverForm = document.getElementById("addDriverForm"); // ✅ FIXED
+        if (!data.loggedIn) {
 
-    if (searchInput) {
-      searchInput.addEventListener("input", (e) => {
-        this.filterDrivers(e.target.value, filterSelect.value);
-      });
-    }
+            const modal = document.getElementById("loginModal");
+            modal.style.display = "flex";
 
-    if (filterSelect) {
-      filterSelect.addEventListener("change", (e) => {
-        this.filterDrivers(searchInput.value, e.target.value);
-      });
-    }
 
-    if (addDriverBtn) {
-      addDriverBtn.addEventListener("click", () => this.openAddDriverModal());
-    }
+            document.getElementById("loginOkBtn").onclick = () => {
 
-    if (addDriverForm) {
-      addDriverForm.addEventListener("submit", (e) => {
-        e.preventDefault();
-        const formData = new FormData(addDriverForm);
+                window.location.href = "/companylogin";
 
-        // ✅ Always append companyid before sending
-        formData.append("companyid", "1");
+            };
 
-        if (formData.get("password") !== formData.get("confirmPassword")) {
-          this.showNotification("Passwords do not match!", "info");
-          return;
+            return false;
+
         }
 
-        this.addNewDriver(formData);
-      });
-    }
-  }
+        console.log("User is logged in.");
+        return true;
 
-  filterDrivers(searchTerm, statusFilter) {
-    this.filteredDrivers = this.drivers.filter((driver) => {
-      const matchesSearch =
-        !searchTerm ||
-        driver.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        driver.id.toLowerCase().includes(searchTerm.toLowerCase());
+    } catch (err) {
 
-      const matchesStatus =
-        statusFilter === "all" || driver.status === statusFilter;
+        console.error("Error checking login:", err);
+        return false;
 
-      return matchesSearch && matchesStatus;
-    });
-
-    this.renderDrivers();
-  }
-
-  renderDrivers() {
-    const driversGrid = document.getElementById("driversGrid");
-
-    if (this.filteredDrivers.length === 0) {
-      driversGrid.innerHTML = `
-                <div class="no-drivers">
-                    <i class="fas fa-users" style="font-size: 3rem; color: #ccc; margin-bottom: 1rem;"></i>
-                    <h3>No drivers found</h3>
-                    <p>Try adjusting your search or filter criteria</p>
-                </div>
-            `;
-      return;
     }
 
-    driversGrid.innerHTML = this.filteredDrivers
-      .map(
-        (driver) => `
-            <div class="driver-card">
-                <div class="driver-status status-${driver.status}">
-                    ${this.getStatusText(driver.status)}
-                </div>
-                
-                <div class="driver-header">
-                    <div class="driver-avatar">${driver.initials}</div>
-                    <div class="driver-info">
-                        <h3>${driver.name}</h3>
-                        <p class="driver-id">Driver ID: ${driver.id}</p>
-                    </div>
-                </div>
+}
 
-                <div class="driver-rating">
-                    <i class="fas fa-star rating-star"></i>
-                    <span><strong>${driver.rating}</strong></span>
-                    <span class="rating-text">(${driver.trips} trips)</span>
-                </div>
 
-                <div class="driver-details">
-                    <div class="detail-item">
-                        <i class="fas fa-map-marker-alt detail-icon"></i>
-                        <span>Area: ${driver.area}</span>
-                    </div>
-                    <div class="detail-item">
-                        <i class="fas fa-phone detail-icon"></i>
-                        <span>${driver.phone}</span>
-                    </div>
-                    <div class="detail-item">
-                        <i class="fas fa-id-card detail-icon"></i>
-                        <span>License: ${driver.license}</span>
-                    </div>
-                    <div class="detail-item">
-                        <i class="fas fa-calendar detail-icon"></i>
-                        <span>Expires: ${driver.expiry}</span>
-                    </div>
-                </div>
+let AllDrivers;
 
-                ${
-                  driver.currentBooking
-                    ? `
-                    <div class="current-booking">
-                        <div class="booking-header">
-                            <span class="booking-title">Current Booking</span>
-                            <span class="booking-id">${driver.currentBooking.id}</span>
-                        </div>
-                        <div class="booking-details">
-                            <span><i class="fas fa-clock"></i> ${driver.currentBooking.time}</span>
-                            <span><i class="fas fa-car"></i> ${driver.currentBooking.vehicle}</span>
-                        </div>
-                        <div class="booking-details">
-                            <span><i class="fas fa-user"></i> Customer: ${driver.currentBooking.customer}</span>
-                        </div>
-                    </div>
-                `
-                    : ""
-                }
+async function LoadAllDrivers() {
 
-                <div class="driver-actions">
-                    <button class="action-btn" onclick="window.driverManager.messageDriver('${
-                      driver.id
-                    }')">
-                        <i class="fas fa-comment"></i>
-                        Message
-                    </button>
-                    
-                    <button class="action-btn primary" data-driver-id="${
-                      driver.id
-                    }">
-                        Assign Booking
-                    </button>
-                </div>
-            </div>
-        `
-      )
-      .join("");
-  }
+    try {
 
-  getStatusText(status) {
-    const statusMap = {
-      available: "Available",
-      "on-trip": "On Trip",
-      offline: "Offline",
-    };
-    return statusMap[status] || status;
-  }
+        let response = await fetch(`/displaydrivers`);
 
-  // Open Add Driver Modal
-  openAddDriverModal() {
-    const modal = document.getElementById("addDriverModal");
-    modal.classList.add("active");
-    document.body.style.overflow = "hidden";
 
-    // Close modal if clicked outside
-    modal.addEventListener("click", (e) => {
-      if (e.target === modal) {
-        this.closeAddDriverModal();
-      }
-    });
-  }
-
-  // Close Add Driver Modal
-  closeAddDriverModal() {
-    const modal = document.getElementById("addDriverModal");
-    modal.classList.remove("active");
-    document.body.style.overflow = "auto";
-    document.getElementById("addDriverForm").reset();
-  }
-
-  addNewDriver(formData) {
-    const url = "http://localhost:8080/driver/signup";
-
-    // Always set companyid = 1
-    formData.append("companyid", "1");
-
-    fetch(url, {
-      method: "POST",
-      body: formData, // FormData automatically sends as multipart/form-data
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.status === "success") {
-          this.showNotification("Driver added successfully!", "success");
-          this.closeAddDriverModal();
-        } else {
-          this.showNotification("Failed: " + data.message, "info");
+        if(!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
         }
-      })
-      .catch((err) => {
-        console.error("[ERROR] Add driver failed:", err);
-        this.showNotification("Error connecting to server", "info");
-      });
-  }
 
-  getInitials(name) {
-    return name
-      .split(" ")
-      .map((n) => n[0])
-      .join("")
-      .toUpperCase();
-  }
 
-  messageDriver(driverId) {
-    const driver = this.drivers.find((d) => d.id === driverId);
-    if (!driver) return;
+        let data = await response.json();
 
-    // Open your message modal
-    document.getElementById(
-      "messageStaffName"
-    ).textContent = `To: ${driver.name}`;
-    document.getElementById("messageContent").value = "";
-    messageModal.style.display = "flex";
-    document.body.style.overflow = "hidden";
-  }
+        console.log(data);
 
-  callDriver(driverId) {
-    const driver = this.drivers.find((d) => d.id === driverId);
-    this.showNotification(
-      `Calling ${driver.name} at ${driver.phone}...`,
-      "info"
-    );
-    // Implement calling functionality
-  }
+        return data;
 
-  viewDriverDetails(driverId) {
-    const driver = this.drivers.find((d) => d.id === driverId);
-    this.showNotification(`Opening details for ${driver.name}...`, "info");
-    // Implement driver details view
-  }
+    }catch (err) {
 
-  showNotification(message, type = "info") {
-    // Create notification element
+        console.log(err);
+
+    }
+
+}
+
+async function AssignBooking(driverId) {
+
+    try {
+
+        const bookingId = document.getElementById("bookingIdInput").value.trim();
+
+
+        if (!bookingId) {
+            showNotification("Please fill all fields!", "error");
+            return;
+        }
+
+
+
+
+
+        let response = await fetch("/assignbookingdriver", {
+
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded"
+            },
+            body: `driverId=${driverId}&bookingId=${bookingId}`
+
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        console.log("Booking assigned:", data);
+
+        showNotification("Booking assigned successfully!", "success");
+
+
+        document.getElementById("assignBookingModal").remove();
+
+
+        AllDrivers = await LoadAllDrivers();
+        renderdrivers(AllDrivers);
+
+        return data;
+
+    } catch (err) {
+
+        console.error("Error assigning booking:", err);
+        showNotification("Failed to assign booking. See console for details!", "error");
+
+    }
+
+}
+
+function showNotification(message, type = "info") {
+
     const notification = document.createElement("div");
-    notification.className = `notification notification-${type}`;
-    notification.innerHTML = `
-            <i class="fas fa-${
-              type === "success" ? "check-circle" : "info-circle"
-            }"></i>
-            <span>${message}</span>
-        `;
 
-    // Add to page
+    notification.textContent = message;
+
+    // basic styling
+    notification.style.position = "fixed";
+    notification.style.top = "20px";
+    notification.style.right = "20px";
+    notification.style.padding = "12px 18px";
+    notification.style.borderRadius = "8px";
+    notification.style.color = "#fff";
+    notification.style.fontSize = "14px";
+    notification.style.zIndex = "9999";
+    notification.style.boxShadow = "0 4px 12px rgba(0,0,0,0.2)";
+    notification.style.transition = "0.3s ease";
+
+    // color based on type
+    if (type === "success") {
+        notification.style.background = "#28a745";
+    } else if (type === "error") {
+        notification.style.background = "#dc3545";
+    } else if (type === "info") {
+        notification.style.background = "#17a2b8";
+    } else {
+        notification.style.background = "#333";
+    }
+
     document.body.appendChild(notification);
 
-    // Remove after 3 seconds
+    // auto remove after 3 seconds
     setTimeout(() => {
-      notification.remove();
+
+        notification.style.opacity = "0";
+        setTimeout(() => notification.remove(), 300);
+
     }, 3000);
-  }
+
 }
 
-// Initialize when DOM is loaded
-document.addEventListener("DOMContentLoaded", () => {
-  window.driverManager = new DriverManager();
-});
 
-// Add notification styles
-const notificationStyles = `
-    .notification {
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        background: white;
-        padding: 1rem 1.5rem;
-        border-radius: 8px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        z-index: 1001;
-        animation: slideIn 0.3s ease;
-    }
-    
-    .notification-success {
-        border-left: 4px solid #28a745;
-        color: #155724;
-    }
-    
-    .notification-info {
-        border-left: 4px solid #17a2b8;
-        color: #0c5460;
-    }
-    
-    @keyframes slideIn {
-        from {
-            transform: translateX(100%);
-            opacity: 0;
+function renderdrivers(drivers) {
+
+    let driversGrid = document.getElementById("driversGrid");
+    driversGrid.innerHTML = "";
+
+    let status;
+
+    drivers.forEach(driver => {
+
+        const rating = driver.rating || 0;
+        const trips = driver.trips || 0;
+
+        status = (driver.status || "").toLowerCase();
+
+        let bookingsHtml = "";
+        if (driver.bookings && driver.bookings.length > 0) {
+            for (let i = 0; i < driver.bookings.length; i++) {
+                const booking = driver.bookings[i];
+                bookingsHtml += `
+                    <div class="booking-card">
+                        <div class="booking-header">
+                            <span class="booking-id">Booking: ${booking.bookingId}</span>
+                        </div>
+                        <div class="booking-body">
+                            <p><i class="fas fa-car"></i> Ride: ${booking.rideId}</p>
+                            <p><i class="fas fa-money-bill"></i> Amount: Rs${booking.totalAmount} </p>
+                            ${booking.customerName ? `<p><i class="fas fa-user"></i> Customer: ${booking.customerName}</p>` : ""}
+                            <p>Trip Start Date: ${booking.tripStartDate}</p>
+                            <p>Trip End Date: ${booking.tripEndDate}</p>
+                        </div>
+                    </div>
+                `;
+            }
         }
-        to {
-            transform: translateX(0);
-            opacity: 1;
+
+        const driverCard = document.createElement("div");
+        driverCard.className = "driver-card";
+
+
+
+        driverCard.innerHTML = `                                    
+                                    <div class="driver-status status-${status}">
+                                        ${driver.status}
+                                    </div>
+    
+                                    <div class="driver-header">   
+                                        <div class="driver-avatar" style="border: 1px solid red">${driver.initials}</div>                                                 
+                                        <div class="driver-info">
+                                            <h3>${driver.firstName} ${driver.lastName}</h3>
+                                            <p class="driver-id">Driver ID: ${driver.driverId}</p>
+                                        </div>
+                                    </div>
+    
+                                    <div class="driver-rating">
+                                        <i class="fas fa-star rating-star"></i>
+                                        <span><strong>${rating}</strong></span>
+                                        <span class="rating-text">(${trips} trips)</span>
+                                    </div>
+    
+                                    <div class="driver-details">
+                                        <div class="detail-item">
+                                            <i class="fas fa-map-marker-alt detail-icon"></i>
+                                            <span>Area: ${driver.area}</span>
+                                        </div>
+                                        <div class="detail-item">
+                                            <i class="fas fa-phone detail-icon"></i>
+                                            <span>${driver.mobileNumber}</span>
+                                        </div>
+                                        <div class="detail-item">
+                                            <i class="fas fa-id-card detail-icon"></i>
+                                            <span>License: ${driver.driverLicenceNumber}</span>
+                                        </div>
+                                        <div class="detail-item">
+                                            <i class="fas fa-calendar detail-icon"></i>
+                                            <span>Expires: ${driver.licenceExpiration}</span>
+                                        </div>
+                                    </div>
+    
+                                    ${bookingsHtml}
+        
+    
+                                   <div class="driver-actions">
+                                       <button class="action-btn" onclick="window.driverManager.messageDriver('${driver.driverId}')">
+                                           <i class="fas fa-comment"></i>
+                                           Message
+                                       </button>    
+                                       <button class="action-btn primary" data-driver-id="${driver.driverId}" onclick="openAssignBookingModel('${driver.driverId}')">
+                                           Assign Booking
+                                       </button>
+                                   </div>
+                                `;
+
+        driversGrid.appendChild(driverCard);
+
+
+    })
+
+}
+
+
+function openAssignBookingModel(driverId) {
+
+
+    const existingModal = document.getElementById("assignBookingModal");
+    if(existingModal) existingModal.remove();
+
+    let assignBookingModel = document.createElement("div");
+    assignBookingModel.id = "assignBookingModal";
+    assignBookingModel.style.position = "fixed";
+    assignBookingModel.style.top = "0";
+    assignBookingModel.style.left = "0";
+    assignBookingModel.style.width = "100%";
+    assignBookingModel.style.height = "100%";
+    assignBookingModel.style.background = "rgba(0,0,0,0.5)";
+    assignBookingModel.style.display = "flex";
+    assignBookingModel.style.justifyContent = "center";
+    assignBookingModel.style.alignItems = "center";
+    assignBookingModel.style.zIndex = "1000";
+
+    assignBookingModel.innerHTML = `
+        <div style="
+            background:white; 
+            padding:30px 40px; 
+            border-radius:12px; 
+            width:400px; 
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3); 
+            display:flex; 
+            flex-direction:column;
+            align-items:center;
+        ">
+            <h3 style="margin-bottom:20px;">Assign Booking</h3>
+
+            <div class="form-row" style="width:100%; display:flex; flex-direction:column; gap:15px;">                                   
+                <div class="form-group" style="display:flex; flex-direction:column; width:100%;">
+                    <label>Booking Id</label>
+                    <input id="bookingIdInput" type="number" name="bookingid" required style="padding:8px; border-radius:5px; border:1px solid #ccc;"/>
+                </div>
+                <div class="form-group" style="display:flex; flex-direction:column; width:100%;">
+                    <label>Pickup Location</label>
+                    <input type="text" name="pickuplocation" required style="padding:8px; border-radius:5px; border:1px solid #ccc;"/>
+                </div>
+                <div class="form-group" style="display:flex; flex-direction:column; width:100%;">
+                    <label>Drop Off Location</label>
+                    <input id="dropoffLocationInput" type="text" name="dropofflocation" required style="padding:8px; border-radius:5px; border:1px solid #ccc;"/>
+                </div>
+            </div>
+
+            <div style="margin-top:25px; display:flex; gap:10px; width:100%; justify-content:flex-end;">
+                <button onclick="document.getElementById('assignBookingModal').remove()" 
+                    style="padding:8px 15px; border:none; border-radius:6px; cursor:pointer; background:#ccc; color:#000;">
+                    Cancel
+                </button>
+                <button onclick="AssignBooking('${driverId}')" style="padding:8px 15px; border:none; border-radius:6px; cursor:pointer; background:linear-gradient(135deg, #3a0ca3, #4361ee); color:white;">
+                    Assign
+                </button>
+            </div>
+        </div>
+    `;
+
+    document.body.appendChild(assignBookingModel);
+
+}
+
+
+
+function OpenAddDriverModel() {
+
+    const AddDriverModel = document.getElementById("Add-Driver-Modal");
+    AddDriverModel.classList.add("active");
+
+}
+
+function CLoseAddDriverModel() {
+
+    let AddDriverModel = document.getElementById("Add-Driver-Modal");
+    AddDriverModel.classList.remove("active");
+    const form = document.getElementById("addDriverform");
+    form.reset();
+
+}
+
+async function addDriver() {
+
+    const addDriverForm = document.getElementById("addDriverform");
+
+    const formData = new FormData(addDriverForm);
+
+    const response = await fetch("/driver/signup", {
+
+        method:"POST",
+        body:formData
+
+    });
+
+
+
+    if(response.ok) {
+
+        showNotification("Driver added successfully!", "success");
+        CLoseAddDriverModel();
+
+        AllDrivers = await LoadAllDrivers();
+        renderdrivers(AllDrivers);
+    }
+
+
+}
+
+
+
+
+
+
+document.addEventListener("DOMContentLoaded", async function() {
+
+    try {
+
+        const loggedIn = await checkLogin();
+
+        if (!loggedIn) {
+            return;    // stop here if not logged in
         }
+
+        AllDrivers = await LoadAllDrivers();
+        renderdrivers(AllDrivers);
+
+
+    } catch (err) {
+
+        console.error("Error during initialization:", err);
+
     }
-    
-    .no-drivers {
-        grid-column: 1 / -1;
-        text-align: center;
-        padding: 3rem;
-        color: #666;
+
+});
+
+document.addEventListener("input", async function() {
+
+    let driverInput = document.getElementsByClassName("search-input")[0];
+    let inputValue = driverInput.value.trim();
+
+
+    console.log("Input value:", inputValue, "isNaN:", isNaN(inputValue));
+
+    if(inputValue === "") {
+        AllDrivers = await LoadAllDrivers();
+        renderdrivers(AllDrivers);
+        return;
     }
-    
-    .no-drivers h3 {
-        margin: 0 0 0.5rem 0;
-        color: #1a1a1a;
+
+    if(!isNaN(inputValue)) {
+        filterDriversByDriverId(inputValue);
+    }else {
+        filterDriversByText(inputValue);
     }
-`;
 
-// Inject notification styles
-const styleSheet = document.createElement("style");
-styleSheet.textContent = notificationStyles;
-document.head.appendChild(styleSheet);
-
-// Wait until DOM is loaded
-document.addEventListener("DOMContentLoaded", function () {
-  const driversGrid = document.getElementById("driversGrid");
-
-  // Event delegation for Assign Booking button
-  driversGrid.addEventListener("click", function (e) {
-    const btn = e.target.closest(".action-btn.primary");
-    if (!btn) return;
-    const driverId = btn.dataset.driverId;
-    if (!driverId) return;
-
-    const driver = window.driverManager.drivers.find((d) => d.id === driverId);
-    if (!driver) return;
-
-    // Create overlay
-    const overlay = document.createElement("div");
-    overlay.style.cssText = `
-      position: fixed; top:0; left:0; width:100%; height:100%;
-      background: rgba(0,0,0,0.6); display:flex; justify-content:center;
-      align-items:center; z-index:10000;
-    `;
-
-    // Create modal
-    const modal = document.createElement("div");
-    modal.style.cssText = `
-      background: #fff; padding: 25px; border-radius: 12px;
-      width: 500px; max-height: 90%; overflow-y: auto;
-      box-shadow: 0 6px 20px rgba(0,0,0,0.3); position: relative;
-      font-family: 'Poppins', sans-serif; color: #333;
-    `;
-
-    modal.innerHTML = `
-      <h2>Assign Booking to ${driver.name}</h2>
-      <form id="assignBookingForm">
-        <div style="margin-bottom:10px;">
-          <label>Booking ID</label>
-          <input type="text" name="bookingId" required style="width:100%; padding:8px;">
-        </div>
-        <div style="margin-bottom:10px;">
-          <label>Pickup Location</label>
-          <input type="text" name="pickup" required style="width:100%; padding:8px;">
-        </div>
-        <div style="margin-bottom:10px;">
-          <label>Dropoff Location</label>
-          <input type="text" name="dropoff" required style="width:100%; padding:8px;">
-        </div>
-        <div style="margin-bottom:10px;">
-          <label>Date</label>
-          <input type="date" name="date" required style="width:100%; padding:8px;">
-        </div>
-        <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:15px;">
-          <button type="submit" style="padding:8px 14px; background:#1dd1a1; color:#fff; border:none; border-radius:6px; cursor:pointer;">Assign</button>
-          <button type="button" id="closeAssignModal" style="padding:8px 14px; background:#ff6b6b; color:#fff; border:none; border-radius:6px; cursor:pointer;">Cancel</button>
-        </div>
-      </form>
-    `;
-
-    overlay.appendChild(modal);
-    document.body.appendChild(overlay);
-    document.body.style.overflow = "hidden";
-
-    // Close modal
-    modal.querySelector("#closeAssignModal").addEventListener("click", () => {
-      overlay.remove();
-      document.body.style.overflow = "auto";
-    });
-
-    // Handle form submission
-    modal
-      .querySelector("#assignBookingForm")
-      .addEventListener("submit", (e) => {
-        e.preventDefault();
-        const formData = new FormData(e.target);
-        const booking = {
-          id: formData.get("bookingId"),
-          pickup: formData.get("pickup"),
-          dropoff: formData.get("dropoff"),
-          date: formData.get("date"),
-        };
-
-        // Assign booking to driver
-        driver.currentBooking = booking;
-
-        // Update driverManager UI
-        window.driverManager.filteredDrivers = [
-          ...window.driverManager.drivers,
-        ];
-        window.driverManager.renderDrivers();
-        window.driverManager.showNotification(
-          `Booking ${booking.id} assigned to ${driver.name}`,
-          "success"
-        );
-
-        overlay.remove();
-        document.body.style.overflow = "auto";
-      });
-  });
 });
 
-// Event delegation for Call button
-document.getElementById("driversGrid").addEventListener("click", function (e) {
-  const btn = e.target.closest(".action-btn");
-  if (!btn) return;
+document.getElementById("Add-Driver-Button").addEventListener("click",function() {
 
-  const driverId = btn.dataset.driverId || null;
-  if (!driverId) return;
+    OpenAddDriverModel();
 
-  const driver = window.driverManager.drivers.find((d) => d.id === driverId);
-  if (!driver) return;
+})
 
-  // Check if button is "Call"
-  if (btn.innerText.includes("Call")) {
-    // Create overlay
-    const overlay = document.createElement("div");
-    overlay.style.cssText = `
-      position: fixed; top:0; left:0; width:100%; height:100%;
-      background: rgba(0,0,0,0.6); display:flex; justify-content:center;
-      align-items:center; z-index:10000;
-    `;
+document.getElementById("addDriverform").addEventListener("submit",async function(e) {
 
-    // Create modal
-    const modal = document.createElement("div");
-    modal.style.cssText = `
-      background: #fff; padding: 20px; border-radius: 12px;
-      width: 400px; max-width:90%; text-align:center;
-      box-shadow: 0 6px 20px rgba(0,0,0,0.3); position: relative;
-      font-family: 'Poppins', sans-serif; color: #333;
-    `;
-
-    modal.innerHTML = `
-      <h2>Call Driver</h2>
-      <p>Driver: <strong>${driver.name}</strong></p>
-      <p>Phone: <strong>${driver.phone}</strong></p>
-      <button id="copyPhoneBtn" style="
-        margin:10px; padding:8px 14px; background:#48dbfb; color:#fff;
-        border:none; border-radius:6px; cursor:pointer;
-      ">Copy Number</button>
-      <button id="closeCallModal" style="
-        margin:10px; padding:8px 14px; background:#ff6b6b; color:#fff;
-        border:none; border-radius:6px; cursor:pointer;
-      ">Close</button>
-    `;
-
-    overlay.appendChild(modal);
-    document.body.appendChild(overlay);
-    document.body.style.overflow = "hidden";
-
-    // Copy phone number
-    modal.querySelector("#copyPhoneBtn").addEventListener("click", () => {
-      navigator.clipboard.writeText(driver.phone).then(() => {
-        window.driverManager.showNotification(
-          "Phone number copied!",
-          "success"
-        );
-      });
-    });
-
-    // Close modal
-    modal.querySelector("#closeCallModal").addEventListener("click", () => {
-      overlay.remove();
-      document.body.style.overflow = "auto";
-    });
-  }
-});
-
-// ====== Message Staff Popup JS ======
-
-// Create the modal dynamically
-const messageModal = document.createElement("div");
-messageModal.id = "messageStaffModal";
-messageModal.style.display = "none";
-messageModal.style.position = "fixed";
-messageModal.style.top = "0";
-messageModal.style.left = "0";
-messageModal.style.width = "100%";
-messageModal.style.height = "100%";
-messageModal.style.backgroundColor = "rgba(0,0,0,0.5)";
-messageModal.style.zIndex = "1000";
-messageModal.style.justifyContent = "center";
-messageModal.style.alignItems = "center";
-
-messageModal.innerHTML = `
-  <div style="background:#fff; padding:20px; border-radius:8px; width:400px; max-width:90%; position:relative;">
-    <span id="closeMessageModal" style="position:absolute; top:10px; right:15px; font-size:20px; cursor:pointer;">&times;</span>
-    <h2>Message Driver</h2>
-    <p id="messageStaffName" style="font-weight:600;"></p>
-    <textarea id="messageContent" placeholder="Type your message..." style="width:100%; height:120px; margin-top:10px; padding:8px; border:1px solid #ccc; border-radius:4px;"></textarea>
-    <button id="sendMessageBtn" style="margin-top:10px; padding:10px 20px; background:#4CAF50; color:#fff; border:none; border-radius:4px; cursor:pointer;">Send</button>
-  </div>
-`;
-
-document.body.appendChild(messageModal);
-
-// Open Message Modal
-function messageStaff(staffId) {
-  const staff = staffData.find((s) => s.id === staffId);
-  if (!staff) return;
-
-  document.getElementById("messageStaffName").textContent = `To: ${staff.name}`;
-  document.getElementById("messageContent").value = "";
-  messageModal.style.display = "flex";
-  document.body.style.overflow = "hidden";
-}
-
-// Close Message Modal
-function closeMessageModal() {
-  messageModal.style.display = "none";
-  document.body.style.overflow = "auto";
-}
-
-// Send Message
-document.getElementById("sendMessageBtn").addEventListener("click", () => {
-  const message = document.getElementById("messageContent").value.trim();
-  if (!message) {
-    alert("Please enter a message.");
-    return;
-  }
-
-  console.log("[v0] Message sent:", message);
-  alert("Message sent successfully!");
-  closeMessageModal();
-});
-
-// Close modal via close button
-document
-  .getElementById("closeMessageModal")
-  .addEventListener("click", closeMessageModal);
-
-// Close modal when clicking outside
-window.addEventListener("click", (event) => {
-  if (event.target === messageModal) {
-    closeMessageModal();
-  }
-});
-
-// Close modal with Escape key
-document.addEventListener("keydown", (event) => {
-  if (event.key === "Escape") {
-    closeMessageModal();
-  }
-});
-
-document.querySelectorAll(".btn-assign-booking").forEach((btn) => {
-  btn.addEventListener("click", () => {
-    const driverId = btn.dataset.driverId;
-    const driverWindow = window.open("driver-management.html", "_blank");
-
-    // Poll until driverManager exists
-    const interval = setInterval(() => {
-      if (driverWindow.driverManager) {
-        clearInterval(interval);
-
-        // Open dynamic modal
-        createAssignBookingModal(driverWindow, driverId);
-      }
-    }, 100);
-  });
-});
-
-function createAssignBookingModal(driverWindow, driverId) {
-  // Create modal overlay
-  const overlay = driverWindow.document.createElement("div");
-  overlay.style.cssText = `
-    position: fixed; top:0; left:0; width:100%; height:100%;
-    background: rgba(0,0,0,0.5); display:flex; justify-content:center;
-    align-items:center; z-index:10000;
-  `;
-
-  // Modal content
-  const modal = driverWindow.document.createElement("div");
-  modal.style.cssText = `
-    background: #fff; padding:20px; border-radius:10px; width:400px;
-    max-width:90%; font-family:sans-serif;
-  `;
-
-  modal.innerHTML = `
-    <h2>Assign Booking</h2>
-    <form id="assignBookingForm">
-      <div>
-        <label>Booking ID</label>
-        <input type="text" name="bookingId" required>
-      </div>
-      <div>
-        <label>Pickup Location</label>
-        <input type="text" name="pickup" required>
-      </div>
-      <div>
-        <label>Dropoff Location</label>
-        <input type="text" name="dropoff" required>
-      </div>
-      <div>
-        <label>Date</label>
-        <input type="date" name="date" required>
-      </div>
-      <div style="margin-top:15px; text-align:right;">
-        <button type="submit">Assign</button>
-        <button type="button" id="closeAssignModal">Cancel</button>
-      </div>
-    </form>
-  `;
-
-  overlay.appendChild(modal);
-  driverWindow.document.body.appendChild(overlay);
-  driverWindow.document.body.style.overflow = "hidden";
-
-  // Close modal
-  modal.querySelector("#closeAssignModal").addEventListener("click", () => {
-    overlay.remove();
-    driverWindow.document.body.style.overflow = "auto";
-  });
-
-  // Form submit
-  modal.querySelector("#assignBookingForm").addEventListener("submit", (e) => {
     e.preventDefault();
-    const formData = new FormData(e.target);
-    const booking = {
-      id: formData.get("bookingId"),
-      time: formData.get("date"),
-      pickup: formData.get("pickup"),
-      dropoff: formData.get("dropoff"),
-      customer: "N/A", // optional
-      vehicle: "N/A", // optional
-    };
 
-    // Assign to driver in driverManager
-    const driver = driverWindow.driverManager.drivers.find(
-      (d) => d.id === driverId
-    );
-    if (driver) {
-      driver.currentBooking = booking;
-      driverWindow.driverManager.filteredDrivers = [
-        ...driverWindow.driverManager.drivers,
-      ];
-      driverWindow.driverManager.renderDrivers();
+    await addDriver();
+
+})
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//for search by staff id
+function filterDriversByDriverId(driverId) {
+
+    const driverGrid = document.getElementsByClassName("drivers-grid")[0];
+    driverGrid.innerHTML = "";
+
+    let filteredDrivers = [];
+
+
+    for(let i=0; i<AllDrivers.length; i++) {
+
+        if(AllDrivers[i].driverId == driverId) {
+            filteredDrivers.push(AllDrivers[i]);
+        }
+
     }
 
-    overlay.remove();
-    driverWindow.document.body.style.overflow = "auto";
-    driverWindow.driverManager.showNotification("Booking assigned!", "success");
-  });
+    renderdrivers(filteredDrivers);
+
 }
 
-// Wait until DOM is loaded
-document.addEventListener("DOMContentLoaded", () => {
-  // Select the button
-  const assignDriverBtn = document.querySelector(".assignDriverBtn");
-  if (assignDriverBtn) {
-    assignDriverBtn.addEventListener("click", (e) => {
-      e.preventDefault(); // Prevent default <a> behavior
-      // Redirect to driver-management.html
-      window.location.href = "driver-management.html";
-    });
-  }
-});
+// Search driver by name
+function filterDriversByText(searchText) {
+
+    const driverGrid = document.getElementsByClassName("drivers-grid")[0];
+    driverGrid.innerHTML = "";
+
+    let inputLower = searchText.toLowerCase().trim();
+    let filteredDrivers = [];
+
+    for(let i=0; i<AllDrivers.length; i++) {
+
+        let driver = AllDrivers[i];
+        let driverName =
+            (driver.firstName + " " + driver.lastName)
+                .toLowerCase()
+                .trim();
+
+        if (driverName.includes(inputLower)) {
+            filteredDrivers.push(driver);
+        }
+
+    }
+
+    console.log("Filtered driver count:", filteredDrivers.length);
+    renderdrivers(filteredDrivers);
+
+}
+
+//search available,on-trip,offline drivers
+function filterDriversByDriverStatus(status) {
+
+    const driverGrid = document.getElementsByClassName("drivers-grid")[0];
+    driverGrid.innerHTML = "";
+
+    let filteredDrivers = [];
+
+    let selectedStatus = status.toLowerCase().trim();
+
+
+    for(let i=0; i<AllDrivers.length; i++) {
+
+        let driverStatus =
+            (AllDrivers[i].status || "").toLowerCase().trim();
+
+        //DEBUG 1
+        console.log("driver status:- ", AllDrivers[i].status)
+        console.log("selected driver status:- ", selectedStatus)
+
+
+
+        //DEBUG 2
+        console.log("Comparing:- ", AllDrivers[i].status , "with ", selectedStatus)
+        console.log("Match?:- ", AllDrivers[i].status == selectedStatus)
+
+        if(driverStatus === selectedStatus) {
+            filteredDrivers.push(AllDrivers[i]);
+        }
+
+    }
+
+    console.log("Filtered drivers count:", filteredDrivers.length);
+    console.log("About to render...");
+    renderdrivers(filteredDrivers);
+    console.log("Render complete!");
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// ===============================
+// GENERIC VALIDATION FUNCTION
+// ===============================
+function validate(value, rules, fieldName = "Field") {
+
+    value = (value ?? "").toString().trim();
+
+    // REQUIRED CHECK
+    if (rules.required && value === "") {
+        showNotification(`${fieldName} is required`, "error");
+        return false;
+    }
+
+    // MIN LENGTH
+    if (rules.minLength && value.length < rules.minLength) {
+        showNotification(`${fieldName} must be at least ${rules.minLength} characters`, "error");
+        return false;
+    }
+
+    // MAX LENGTH
+    if (rules.maxLength && value.length > rules.maxLength) {
+        showNotification(`${fieldName} must be less than ${rules.maxLength} characters`, "error");
+        return false;
+    }
+
+    // PATTERN CHECK
+    if (rules.pattern && !rules.pattern.test(value)) {
+        showNotification(rules.message || `Invalid ${fieldName}`, "error");
+        return false;
+    }
+
+    return true;
+}

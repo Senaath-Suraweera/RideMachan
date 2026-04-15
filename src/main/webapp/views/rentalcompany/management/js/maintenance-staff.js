@@ -1,520 +1,465 @@
-// Maintenance Staff Management JavaScript
+let companyId = null;
+let AllMaintenaceStaff;
 
-// Sample staff data
-const staffData = [
-  {
-    id: "MAINT001",
-    name: "Robert Wilson",
-    specialization: "Engine & Transmission",
-    status: "available",
-    rating: 4.9,
-    jobs: 89,
-    experience: 6,
-    phone: "+1-555-0201",
-    vehicles: ["2020 Toyota Prius - ABC-123", "2019 Honda Civic - XYZ-456"],
-    badges: ["ASE Certified", "Hybrid Specialist"],
-  },
-  {
-    id: "MAINT002",
-    name: "Maria Garcia",
-    specialization: "Electrical & Electronics",
-    status: "on-job",
-    rating: 4.8,
-    jobs: 76,
-    experience: 6,
-    phone: "+1-555-0202",
-    vehicles: ["2020 Nissan Altima - GHI-012", "2021 BMW 320i - JKL-345"],
-    badges: ["Electronics Specialist", "Diagnostic Expert"],
-    currentAssignment: {
-      id: "M-001",
-      vehicle: "Toyota Prius 2020",
-      task: "Brake Inspection",
-      completion: "2:00 PM",
-    },
-  },
-  {
-    id: "MAINT003",
-    name: "James Thompson",
-    specialization: "Body & Paint",
-    status: "offline",
-    rating: 4.7,
-    jobs: 54,
-    experience: 12,
-    phone: "+1-555-0203",
-    vehicles: ["2021 Mercedes C200 - MNO-678"],
-    badges: ["Paint Specialist", "Body Repair"],
-  },
-];
+async function checkLogin() {
 
-// Initialize page
-document.addEventListener("DOMContentLoaded", () => {
-  initializeSearch();
-  initializeFilter();
-  updateStats();
-});
+    try {
 
-// Search functionality
-function initializeSearch() {
-  const searchInput = document.getElementById("staffSearch");
-  if (searchInput) {
-    searchInput.addEventListener("input", function () {
-      const searchTerm = this.value.toLowerCase();
-      filterStaff(searchTerm);
-    });
-  }
-}
+        const response = await fetch("/checklogin");
+        const data = await response.json();
 
-// Filter functionality
-function initializeFilter() {
-  const filterSelect = document.getElementById("staffFilter");
-  if (filterSelect) {
-    filterSelect.addEventListener("change", function () {
-      const filterValue = this.value;
-      filterStaffByStatus(filterValue);
-    });
-  }
-}
+        if (!data.loggedIn) {
 
-// Filter staff by search term
-function filterStaff(searchTerm) {
-  const staffCards = document.querySelectorAll(".staff-card");
+            const modal = document.getElementById("loginModal");
+            modal.style.display = "flex";
 
-  staffCards.forEach((card) => {
-    const staffName = card
-      .querySelector(".staff-name")
-      .textContent.toLowerCase();
-    const staffId = card.querySelector(".staff-id").textContent.toLowerCase();
-    const specialization = card
-      .querySelector(".staff-specialization")
-      .textContent.toLowerCase();
 
-    if (
-      staffName.includes(searchTerm) ||
-      staffId.includes(searchTerm) ||
-      specialization.includes(searchTerm)
-    ) {
-      card.style.display = "block";
-    } else {
-      card.style.display = "none";
+            document.getElementById("loginOkBtn").onclick = () => {
+
+                window.location.href = "/companylogin";
+
+            };
+
+            return false;
+
+        }
+
+        companyId = data.companyId;
+
+        console.log("User is logged in.");
+        return true;
+
+    } catch (err) {
+
+        console.error("Error checking login:", err);
+        return false;
+
     }
-  });
+
 }
 
-// Filter staff by status
-function filterStaffByStatus(status) {
-  const staffCards = document.querySelectorAll(".staff-card");
+async function loadStaffStatistics() {
 
-  staffCards.forEach((card) => {
-    if (status === "all") {
-      card.style.display = "block";
-    } else {
-      const cardStatus = card.getAttribute("data-status");
-      if (cardStatus === status) {
-        card.style.display = "block";
-      } else {
-        card.style.display = "none";
-      }
+    try {
+
+        const response = await fetch("/displaystaffstatistics", {method: "POST"});
+        console.log(response);
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+
+        const data = await response.json();
+
+        console.log(data);
+
+
+        return data;
+
+    }catch (err) {
+
+        console.log(err);
+
     }
-  });
+
 }
 
-// Update statistics
-function updateStats() {
-  const totalStaff = staffData.length;
-  const availableStaff = staffData.filter(
-    (staff) => staff.status === "available"
-  ).length;
-  const onJobStaff = staffData.filter(
-    (staff) => staff.status === "on-job"
-  ).length;
-  const offlineStaff = staffData.filter(
-    (staff) => staff.status === "offline"
-  ).length;
-  const totalVehicles = staffData.reduce(
-    (total, staff) => total + staff.vehicles.length,
-    0
-  );
+function showNotification(message, type = "info") {
 
-  // Update stat cards if they exist
-  const statCards = document.querySelectorAll(".stat-card .stat-number");
-  if (statCards.length >= 5) {
-    statCards[0].textContent = totalStaff;
-    statCards[1].textContent = availableStaff;
-    statCards[2].textContent = onJobStaff;
-    statCards[3].textContent = offlineStaff;
-    statCards[4].textContent = totalVehicles;
-  }
+    const notification = document.createElement("div");
+
+    notification.textContent = message;
+
+    // basic styling
+    notification.style.position = "fixed";
+    notification.style.top = "20px";
+    notification.style.right = "20px";
+    notification.style.padding = "12px 18px";
+    notification.style.borderRadius = "8px";
+    notification.style.color = "#fff";
+    notification.style.fontSize = "14px";
+    notification.style.zIndex = "9999";
+    notification.style.boxShadow = "0 4px 12px rgba(0,0,0,0.2)";
+    notification.style.transition = "0.3s ease";
+
+    // color based on type
+    if (type === "success") {
+        notification.style.background = "#28a745";
+    } else if (type === "error") {
+        notification.style.background = "#dc3545";
+    } else if (type === "info") {
+        notification.style.background = "#17a2b8";
+    } else {
+        notification.style.background = "#333";
+    }
+
+    document.body.appendChild(notification);
+
+    // auto remove after 3 seconds
+    setTimeout(() => {
+
+        notification.style.opacity = "0";
+        setTimeout(() => notification.remove(), 300);
+
+    }, 3000);
+
 }
 
-// Modal functions
+
+function renderStaffStatistics(stats) {
+
+    const statsGrid = document.getElementsByClassName("stats-grid")[0];
+    statsGrid.innerHTML = "";
+
+    function createStatsCard(statusClass, label, value) {
+        return `
+            <div class="stat-card ${statusClass}">
+                <div class="stat-number">${value}</div>
+                <div class="stat-label">${label}</div>
+            </div>
+        `;
+    }
+
+    statsGrid.innerHTML += createStatsCard("", "Total Staff", stats.totalStaff || 0);
+    statsGrid.innerHTML += createStatsCard("available", "Available", stats.availableStaff || 0);
+    statsGrid.innerHTML += createStatsCard("on-job", "On Job", stats.onJobStaff || 0);
+    statsGrid.innerHTML += createStatsCard("offline", "Offline", stats.offlineStaff || 0);
+    statsGrid.innerHTML += createStatsCard("vehicles", "Total Vehicles", stats.totalVehicles || 0);
+
+}
+
+
+async function loadAllMaintenanceStaff() {
+
+    try {
+
+        const response = await fetch("/display/maintenancestaff", {
+            method: "POST"
+        });
+
+        if(!response.ok){
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        let data = await response.json();
+
+        console.log(data);
+
+
+        return data;
+
+    }catch(err) {
+
+        console.log(err);
+
+    }
+
+}
+
+function renderMaintenanceStaff(maintenanceStaffs) {
+
+    const staffGrid = document.getElementsByClassName("staff-grid")[0];
+    staffGrid.innerHTML = "";
+
+    let status;
+
+    maintenanceStaffs.forEach(maintenanceStaff => {
+
+        maintenanceStaff.initials = maintenanceStaff.initials || maintenanceStaff.firstname?.[0] || "";
+
+        status = maintenanceStaff.status ? maintenanceStaff.status.charAt(0).toUpperCase() + maintenanceStaff.status.slice(1).toLowerCase(): "";
+
+        maintenanceStaff.specialization = maintenanceStaff.specialization || "";
+        maintenanceStaff.completedJobs = maintenanceStaff.completedJobs || 0;
+        maintenanceStaff.assignedVehicles = maintenanceStaff.assignedVehicles || [];
+        maintenanceStaff.moreVehiclesCount = maintenanceStaff.moreVehiclesCount || 0;
+        maintenanceStaff.certifications = maintenanceStaff.certifications || [];
+        maintenanceStaff.yearsOfExperience = maintenanceStaff.yearsOfExperience || 0;
+
+        const staffCard = document.createElement("div");
+        staffCard.className = "staff-card";
+        staffCard.dataset.status = maintenanceStaff.status;
+
+        staffCard.innerHTML = `                  
+                          <div class="staff-header">
+                              <div class="staff-avatar">${maintenanceStaff.initials}</div>
+                              <div class="staff-info">
+                                  <h3 class="staff-name">${maintenanceStaff.firstname + " " + maintenanceStaff.lastname}</h3>
+                                  <p class="staff-id">Staff ID: ${maintenanceStaff.staffId}</p>
+                                  <div class="staff-jobs">
+                                      <i class="fas fa-star rating-star"></i>  
+                                      <span class="job-count">(${maintenanceStaff.completedJobs} jobs)</span>
+                                  </div>
+                              </div>
+                              <div class="staff-status status-badge ${maintenanceStaff.status}">${status}</div>
+                          </div>
+                          <div class="staff-details">
+                              <div class="detail-item"><i class="fas fa-phone detail-icon"></i><span>+ ${maintenanceStaff.contactNumber}</span></div>
+                              <div class="detail-item"><i class="fas fa-calendar detail-icon"></i><span>Years of Experience: ${maintenanceStaff.yearsOfExperience}</span></div>
+                              <div class="detail-item"><i class="fas fa-car detail-icon"></i><span>Assigned Vehicles: ${maintenanceStaff.assignedVehicles.length}</span></div>
+                              <div class="detail-item"><i class="fas fa-wrench detail-icon"></i><span>${maintenanceStaff.specialization}</span></div>  
+                          </div>
+                          <div class="staff-badges">
+                              ${maintenanceStaff.certifications.map(cert => `<span class="badge">${cert}</span>`).join('')}
+                          </div>
+                          <div class="staff-actions">
+                              <button class="action-btn" onclick="messageStaff('${maintenanceStaff.staffId}')">
+                                      <i class="fas fa-comment"></i>
+                                      Message
+                              </button>
+                              <a href="maintenance-vehicle-assignment.html">
+                                  <button class="action-btn primary" data-staff-id="${maintenanceStaff.staffId}">
+                                          View Assign Vehicles
+                                  </button> 
+                              </a>
+                              
+                              <!--<button class="action-btn primary" data-staff-id="${maintenanceStaff.staffId}" onclick="viewAssignedVehicles('${maintenanceStaff.staffId}')">
+                                      View Assign Vehicles
+                              </button> -->                                                          
+                          </div>                         
+                       `;
+
+        staffGrid.appendChild(staffCard);
+
+    })
+
+}
+
+//for search by staff id
+function filterStaffByStaffId(staffId) {
+
+    const staffGrid = document.getElementsByClassName("staff-grid")[0];
+    staffGrid.innerHTML = "";
+
+    let filteredStaff = [];
+
+
+    for(let i=0; i<AllMaintenaceStaff.length; i++) {
+
+        if(AllMaintenaceStaff[i].staffId == staffId) {
+            filteredStaff.push(AllMaintenaceStaff[i]);
+        }
+
+    }
+
+    renderMaintenanceStaff(filteredStaff);
+
+}
+
+// Search staff by name or specialization
+function filterStaffByText(searchText) {
+
+    const staffGrid = document.getElementsByClassName("staff-grid")[0];
+    staffGrid.innerHTML = "";
+
+    let inputLower = searchText.toLowerCase().trim();
+    let filteredStaff = [];
+
+    for(let i=0; i<AllMaintenaceStaff.length; i++) {
+
+        let staff = AllMaintenaceStaff[i];
+
+
+        let staffName = (staff.firstname + " " + staff.lastname).toLowerCase().trim();
+        let specialization = (staff.specialization || "").toLowerCase().trim();
+
+
+        if (staffName.includes(inputLower) || specialization.includes(inputLower)) {
+            filteredStaff.push(staff);
+        }
+
+    }
+
+    console.log("Filtered staff count:", filteredStaff.length);
+    renderMaintenanceStaff(filteredStaff);
+
+}
+
+//search Available,On Job,available staff
+function filterStaffByStaffStatus(status) {
+
+    const staffGrid = document.getElementsByClassName("staff-grid")[0];
+    staffGrid.innerHTML = "";
+
+    let filteredStaff = [];
+
+    let selectedStatus = status.toLowerCase().trim();
+    AllMaintenaceStaff[i].status = AllMaintenaceStaff[i].status.toLowerCase().trim();
+
+    for(let i=0; i<AllMaintenaceStaff.length; i++) {
+
+        //DEBUG 1
+        console.log("staff status:- ", AllMaintenaceStaff[i].status)
+        console.log("selected staff status:- ", status)
+
+        let staffStatus =  AllMaintenaceStaff[i].status || "";
+
+        //DEBUG 2
+        console.log("Comparing:- ", staffStatus , "with ", status)
+        console.log("Match?:- ", staffStatus == selectedStatus)
+
+        if(staffStatus == status) {
+            filteredStaff.push(AllMaintenaceStaff[i]);
+        }
+
+    }
+
+    console.log("Filtered staff count:", filteredStaff.length);
+    console.log("About to render...");
+    renderMaintenanceStaff(filteredStaff);
+    console.log("Render complete!");
+
+}
+
+
+
 function openAddStaffModal() {
-  const modal = document.getElementById("addStaffModal");
-  if (modal) {
+
+    const modal = document.getElementById("addStaffModal");
     modal.style.display = "block";
+    modal.style.overflow = "hidden";
     document.body.style.overflow = "hidden";
-  }
+
 }
 
 function closeAddStaffModal() {
-  const modal = document.getElementById("addStaffModal");
-  if (modal) {
-    modal.style.display = "none";
+
+    let addStaffModal = document.getElementById("addStaffModal");
+    addStaffModal.style.display = "none";
     document.body.style.overflow = "auto";
 
-    // Reset form
     const form = document.getElementById("addStaffForm");
-    if (form) {
-      form.reset();
-    }
-  }
+    form.reset();
+
 }
 
-// Staff action functions
-function viewStaffDetails(staffId) {
-  console.log("[v0] Viewing details for staff:", staffId);
-  // Implement staff details view
-  alert(`Viewing details for staff: ${staffId}`);
-}
+async function addMaintenanceStaff() {
 
-function messageStaff(staffId) {
-  console.log("[v0] Opening message for staff:", staffId);
-  // Implement messaging functionality
-  alert(`Opening message for staff: ${staffId}`);
-}
+    const addStaffForm = document.getElementById("addStaffForm");
 
-function manageStaff(staffId) {
-  console.log("[v0] Managing staff:", staffId);
-  // Implement staff management
-  alert(`Managing staff: ${staffId}`);
-}
 
-// Add staff form submission
-// Add staff form submission to backend
-document.addEventListener("DOMContentLoaded", () => {
-  const addStaffForm = document.getElementById("addStaffForm");
+    const data = {
+        username: addStaffForm.username.value,
+        firstname: addStaffForm.firstname.value,
+        lastname: addStaffForm.lastname.value,
+        contactNumber: addStaffForm.contactNumber.value,
+        email: addStaffForm.email.value,
+        password: addStaffForm.password.value,
+        companyId: companyId,
+        specialization: addStaffForm.specialization.value,
+        yearsOfExperience: parseFloat(addStaffForm.yearsOfExperience.value)
+    };
 
-  if (addStaffForm) {
-    addStaffForm.addEventListener("submit", async function (e) {
-      e.preventDefault();
+    const response = await fetch("/maintenancestaff/signup", {
 
-      const password = document.getElementById("password").value;
-      const confirmPassword = document.getElementById("confirmPassword").value;
-
-      if (password !== confirmPassword) {
-        alert("Passwords do not match!");
-        return;
-      }
-
-      const staffData = {
-        username: document.getElementById("username").value,
-        firstname: document.getElementById("firstname").value,
-        lastname: document.getElementById("lastname").value,
-        contactNumber: document.getElementById("contactNumber").value,
-        email: document.getElementById("email").value,
-        password: password,
-        companyId: 1, // temporary — replace later with logged-in company ID
-      };
-
-      console.log("[DEBUG] Sending staff signup data:", staffData);
-
-      try {
-        const response = await fetch(
-          "http://localhost:8080/maintenancestaff/signup",
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(staffData),
-          }
-        );
-
-        const result = await response.json();
-        console.log("[DEBUG] Server response:", result);
-
-        if (response.ok && result.status === "success") {
-          alert("Staff member registered successfully!");
-          closeAddStaffModal();
-          addStaffForm.reset();
-        } else {
-          alert("Error: " + (result.message || "Failed to register staff."));
-        }
-      } catch (error) {
-        console.error("[ERROR] Failed to send signup request:", error);
-        alert("Network or server error while registering staff.");
-      }
+        method:"POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
     });
-  }
-});
 
-// Close modal when clicking outside
-window.addEventListener("click", (event) => {
-  const modal = document.getElementById("addStaffModal");
-  if (event.target === modal) {
-    closeAddStaffModal();
-  }
-});
+    const result = await response.json();
 
-// Keyboard navigation
-document.addEventListener("keydown", (event) => {
-  if (event.key === "Escape") {
-    closeAddStaffModal();
-  }
-});
+    if(result.status === "success") {
+        showNotification("Staff added successfully!", "success");
+        closeAddStaffModal();
 
-// ====== Message Staff Popup JS ======
+        AllMaintenaceStaff = await loadAllMaintenanceStaff();
+        renderMaintenanceStaff(AllMaintenaceStaff);
 
-// Create the modal dynamically
-const messageModal = document.createElement("div");
-messageModal.id = "messageStaffModal";
-messageModal.style.display = "none";
-messageModal.style.position = "fixed";
-messageModal.style.top = "0";
-messageModal.style.left = "0";
-messageModal.style.width = "100%";
-messageModal.style.height = "100%";
-messageModal.style.backgroundColor = "rgba(0,0,0,0.5)";
-messageModal.style.zIndex = "1000";
-messageModal.style.justifyContent = "center";
-messageModal.style.alignItems = "center";
+        const stats = await loadStaffStatistics();
 
-messageModal.innerHTML = ` 
-  <div style="background:#fff; padding:20px; border-radius:8px; width:400px; max-width:90%; position:relative;">
-    <span id="closeMessageModal" style="position:absolute; top:10px; right:15px; font-size:20px; cursor:pointer;">&times;</span>
-    <h2>Message Staff</h2>
-    <p id="messageStaffName" style="font-weight:600;"></p>
-    <textarea id="messageContent" placeholder="Type your message..." style="width:100%; height:120px; margin-top:10px; padding:8px; border:1px solid #ccc; border-radius:4px;"></textarea>
-    <button id="sendMessageBtn" style="margin-top:10px; padding:10px 20px; background:#4CAF50; color:#fff; border:none; border-radius:4px; cursor:pointer;">Send</button>
-  </div>
-`;
+        if (stats) {
+            renderStaffStatistics(stats);
+        }
 
-document.body.appendChild(messageModal);
+    }else{
+        showNotification("Staff adding is Failrd", "error");
+    }
 
-// Open Message Modal
-function messageStaff(staffId) {
-  const staff = staffData.find((s) => s.id === staffId);
-  if (!staff) return;
-
-  document.getElementById("messageStaffName").textContent = `To: ${staff.name}`;
-  document.getElementById("messageContent").value = "";
-  messageModal.style.display = "flex";
-  document.body.style.overflow = "hidden";
 }
 
-// Close Message Modal
-function closeMessageModal() {
-  messageModal.style.display = "none";
-  document.body.style.overflow = "auto";
-}
 
-// Send Message
-document.getElementById("sendMessageBtn").addEventListener("click", () => {
-  const message = document.getElementById("messageContent").value.trim();
-  if (!message) {
-    alert("Please enter a message.");
-    return;
-  }
+document.addEventListener("DOMContentLoaded", async function() {
 
-  console.log("[v0] Message sent:", message);
-  alert("Message sent successfully!");
-  closeMessageModal();
+    try {
+
+        const loggedIn = await checkLogin();
+
+        if (!loggedIn) {
+            return;    // stop here if not logged in
+        }
+
+        AllMaintenaceStaff = await loadAllMaintenanceStaff();
+        renderMaintenanceStaff(AllMaintenaceStaff);
+
+        const stats = await loadStaffStatistics();
+
+        if (stats) {
+            renderStaffStatistics(stats);
+        }
+
+
+    } catch (err) {
+
+        console.error("Error during initialization:", err);
+
+    }
+
 });
 
-// Close modal via close button
-document
-  .getElementById("closeMessageModal")
-  .addEventListener("click", closeMessageModal);
+document.getElementById("addStaffModal").addEventListener("click", function (event){
 
-// Close modal when clicking outside
-window.addEventListener("click", (event) => {
-  if (event.target === messageModal) {
-    closeMessageModal();
-  }
+    if (event.target === this) {
+        closeAddStaffModal();
+    }
+
 });
 
-// Close modal with Escape key
-document.addEventListener("keydown", (event) => {
-  if (event.key === "Escape") {
-    closeMessageModal();
-  }
+document.getElementById("addStaffForm").addEventListener("submit",async function (e){
+
+    e.preventDefault();
+
+    await addMaintenanceStaff();
+
 });
 
-// ====== Manage Staff Modal ======
 
-// Create the modal dynamically
-const manageModal = document.createElement("div");
-manageModal.id = "manageStaffModal";
-manageModal.style.display = "none";
-manageModal.style.position = "fixed";
-manageModal.style.top = "0";
-manageModal.style.left = "0";
-manageModal.style.width = "100%";
-manageModal.style.height = "100%";
-manageModal.style.backgroundColor = "rgba(0,0,0,0.5)";
-manageModal.style.zIndex = "1000";
-manageModal.style.justifyContent = "center";
-manageModal.style.alignItems = "center";
+document.addEventListener("input", async function() {
 
-manageModal.innerHTML = `
-  <div style="background:#fff; padding:25px; border-radius:12px; width:500px; max-width:90%; position:relative; max-height:90vh; overflow-y:auto; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
-    <span id="closeManageModal" style="position:absolute; top:10px; right:15px; font-size:22px; cursor:pointer;">&times;</span>
-    <h2 style="margin-bottom:15px; color:#333;">Manage Staff</h2>
-    <p id="manageStaffName" style="font-weight:600; margin-bottom:15px;"></p>
+    let staffInput = document.getElementById("staffSearch");
+    let inputValue = staffInput.value;
 
-    <div style="margin-bottom:20px;">
-      <h3 style="margin-bottom:5px;">1. Assign / Update Jobs</h3>
-      <textarea id="assignJobs" placeholder="Assign tasks or update current jobs..." style="width:100%; height:80px; padding:8px; border:1px solid #ccc; border-radius:6px;"></textarea>
-    </div>
+    inputValue = inputValue.trim();
 
-    <div style="margin-bottom:20px;">
-      <h3 style="margin-bottom:5px;">2. Update Staff Details</h3>
-      <input id="updatePhone" type="text" placeholder="Phone" style="width:48%; margin-right:4%; padding:6px; border-radius:6px; border:1px solid #ccc;">
-      <input id="updateEmail" type="email" placeholder="Email" style="width:48%; padding:6px; border-radius:6px; border:1px solid #ccc;">
-      <input id="updateDepartment" type="text" placeholder="Department" style="width:48%; margin-right:4%; margin-top:8px; padding:6px; border-radius:6px; border:1px solid #ccc;">
-      <input id="updateShift" type="text" placeholder="Shift" style="width:48%; margin-top:8px; padding:6px; border-radius:6px; border:1px solid #ccc;">
-    </div>
+    console.log("Input value:", inputValue, "isNaN:", isNaN(inputValue));
 
-    <div style="margin-bottom:20px;">
-      <h3 style="margin-bottom:5px;">3. Manage Availability</h3>
-      <select id="updateStatus" style="width:100%; padding:6px; border-radius:6px; border:1px solid #ccc;">
-        <option value="available">Available</option>
-        <option value="on-job">On Job</option>
-        <option value="offline">Offline</option>
-      </select>
-    </div>
+    if(inputValue === "") {
+        AllMaintenaceStaff = await loadAllMaintenanceStaff();
+        renderMaintenanceStaff(AllMaintenaceStaff);
+        return;
+    }
 
-    <div style="margin-bottom:20px;">
-      <h3 style="margin-bottom:5px;">4. Equipment / Vehicles</h3>
-      <textarea id="updateVehicles" placeholder="Assign/remove vehicles or equipment..." style="width:100%; height:60px; padding:8px; border:1px solid #ccc; border-radius:6px;"></textarea>
-    </div>
+    if(!isNaN(inputValue)) {
+        filterStaffByStaffId(inputValue);
+    }else {
+        filterStaffByText(inputValue);
+    }
 
-    <div style="margin-bottom:20px;">
-      <h3 style="margin-bottom:5px;">5. Administrative Actions</h3>
-      <button id="suspendStaffBtn" style="background:#f44336; color:#fff; border:none; border-radius:6px; padding:8px 12px; cursor:pointer;">Suspend / Deactivate</button>
-    </div>
+});
 
-    <button id="saveManageBtn" style="background:#4CAF50; color:#fff; border:none; border-radius:6px; padding:10px 15px; cursor:pointer; width:100%;">Save Changes</button>
-  </div>
-`;
+document.addEventListener("change", async function() {
 
-document.body.appendChild(manageModal);
+    let statusFilter = document.getElementById("staffFilter");
 
-// // ========================
-// // ADD STAFF MODAL - JS ONLY
-// // ========================
+    let selectedStatus = statusFilter.value;
 
-// function openAddStaffModal() {
-//   // Create overlay
-//   const overlay = document.createElement("div");
-//   overlay.id = "addStaffOverlay";
-//   overlay.style.position = "fixed";
-//   overlay.style.top = 0;
-//   overlay.style.left = 0;
-//   overlay.style.width = "100%";
-//   overlay.style.height = "100%";
-//   overlay.style.backgroundColor = "rgba(0,0,0,0.5)";
-//   overlay.style.display = "flex";
-//   overlay.style.justifyContent = "center";
-//   overlay.style.alignItems = "center";
-//   overlay.style.zIndex = 1000;
+    if(selectedStatus == "all") {
+        AllMaintenaceStaff = await loadAllMaintenanceStaff();
+        renderMaintenanceStaff(AllMaintenaceStaff);
+        return;
+    }
 
-//   // Create modal container
-//   const modal = document.createElement("div");
-//   modal.id = "addStaffModal";
-//   modal.style.backgroundColor = "#fff";
-//   modal.style.padding = "20px";
-//   modal.style.borderRadius = "10px";
-//   modal.style.width = "400px";
-//   modal.style.boxShadow = "0 5px 15px rgba(0,0,0,0.3)";
-//   modal.style.position = "relative";
-//   modal.style.width = "400px";
-//   modal.style.maxHeight = "80vh"; // <-- Maximum 80% of viewport height
-//   modal.style.overflowY = "auto"; // <-- Enable vertical scrolling
-//   modal.style.padding = "20px";
-//   modal.style.borderRadius = "10px";
-//   modal.style.boxShadow = "0 5px 15px rgba(0,0,0,0.3)";
-//   modal.style.position = "relative";
+    filterStaffByStaffStatus(selectedStatus);
 
-//   // Modal header
-//   const header = document.createElement("div");
-//   header.style.display = "flex";
-//   header.style.justifyContent = "space-between";
-//   header.style.alignItems = "center";
-//   const title = document.createElement("h2");
-//   title.textContent = "Add New Staff Member";
-//   const closeBtn = document.createElement("span");
-//   closeBtn.innerHTML = "&times;";
-//   closeBtn.style.cursor = "pointer";
-//   closeBtn.style.fontSize = "24px";
-//   closeBtn.onclick = () => document.body.removeChild(overlay);
-//   header.appendChild(title);
-//   header.appendChild(closeBtn);
-
-//   // Modal form
-//   const form = document.createElement("form");
-//   form.id = "addStaffForm";
-
-//   form.style.marginTop = "30px";
-
-//   const fields = [
-//     { label: "Name", type: "text", name: "name" },
-//     { label: "Age", type: "number", name: "age" },
-//     { label: "Gender", type: "text", name: "gender" },
-//     { label: "Phone", type: "text", name: "phone" },
-//     { label: "Supervisor", type: "text", name: "supervisor" },
-//     { label: "Address", type: "text", name: "address" },
-//     { label: "Description", type: "text", name: "role" },
-//     { label: "Email", type: "email", name: "email" },
-//   ];
-
-//   fields.forEach((f) => {
-//     const wrapper = document.createElement("div");
-//     wrapper.style.marginBottom = "10px";
-//     const lbl = document.createElement("label");
-//     lbl.textContent = f.label;
-//     lbl.style.display = "block";
-//     lbl.style.marginBottom = "5px";
-//     const input = document.createElement("input");
-//     input.type = f.type;
-//     input.name = f.name;
-//     input.required = true;
-//     input.style.width = "100%";
-//     input.style.padding = "8px";
-//     input.style.borderRadius = "5px";
-//     input.style.border = "1px solid #ccc";
-//     input.style.display = "flex";
-//     wrapper.appendChild(lbl);
-//     wrapper.appendChild(input);
-//     form.appendChild(wrapper);
-//   });
-
-//   // Submit button
-//   const submitBtn = document.createElement("button");
-//   submitBtn.type = "submit";
-//   submitBtn.textContent = "Add Staff";
-//   submitBtn.style.padding = "10px 35px";
-//   submitBtn.style.border = "none";
-//   submitBtn.style.borderRadius = "5px";
-//   submitBtn.style.backgroundColor = "#4CAF50";
-//   submitBtn.style.color = "#fff";
-//   submitBtn.style.cursor = "pointer";
-
-//   form.appendChild(submitBtn);
-
-//   form.onsubmit = (e) => {
-//     e.preventDefault();
-//     const formData = new FormData(form);
-//     console.log("New Staff:", Object.fromEntries(formData.entries()));
-//     // Close modal after submit
-//     document.body.removeChild(overlay);
-//   };
-
-//   // Append everything
-//   modal.appendChild(header);
-//   modal.appendChild(form);
-//   overlay.appendChild(modal);
-//   document.body.appendChild(overlay);
-// }
-
-// // Example: attach to button
-// document
-//   .getElementById("addStaffBtn")
-//   .addEventListener("click", openAddStaffModal);
+});

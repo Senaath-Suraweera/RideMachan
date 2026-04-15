@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Driver Profile - Ride Machan</title>
+    <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+    />
+    <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
+    />
+    <link
+            href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+            rel="stylesheet"
+    />
+    <!-- External CSS File -->
+    <link rel="stylesheet" href="../css/profile.css" />
+</head>
+<body>
+<div class="container">
+    <!-- Mobile Toggle Button -->
+    <button class="mobile-toggle" onclick="toggleSidebar()">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <!-- Sidebar Navigation -->
+    <div class="sidebar" id="sidebar">
+        <div class="logo">
+            <img src="../logo.png" alt="Logo" class="logo">
+        </div>
+        <div class="nav-menu">
+            <div class="nav-item">
+                <i class="fas fa-house"></i>
+                <a href="dashboard.html"><span> Home</span></a>
+            </div>
+            <div class="nav-item">
+                <i class="fas fa-calendar-alt"></i>
+                <a href="drivercalview.html"><span>Calendar</span></a>
+            </div>
+            <div class="nav-item" data-page="ongoing">
+                <i class="fas fa-clock"></i>
+                <a href="ongoing.html"><span>Ongoing Bookings</span></a>
+            </div>
+            <div class="nav-item" data-page="bookings">
+                <i class="fas fa-history"></i>
+                <a href="pastbooking.html"><span>Past Bookings</span></a>
+            </div>
+            <div class="logout">
+                <i class="fas fa-sign-out"></i>
+                <span>Logout</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Header Section -->
+    <div class="header">
+        <div class="hi">
+            <h1>Driver Profile</h1>
+        </div>
+        <div class="header-actions">
+            <!-- Notifications -->
+            <a href="notification.html">
+                <div class="notification" id="bellNotification" title="Notifications">
+                    <i class="fas fa-bell"></i>
+                    <div class="badge" id="bellBadge">3</div>
+                </div>
+            </a>
+            <a href="messages.html">
+                <div class="notification" id="messageNotification" title="Messages">
+                    <i class="fas fa-envelope"></i>
+                    <div class="badge" id="messageBadge">5</div>
+                </div>
+            </a>
+            <!-- User Profile -->
+            <div class="user-profile" id="userProfile">
+                <a href="profile.html">
+                    <div class="profile-img" id="headerInitial">K</div>
+                </a>
+                <div class="user-info">
+                    <div class="user-name" id="headerName">Loading...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Loading Indicator -->
+        <div id="loadingIndicator" style="display: none; text-align: center; padding: 40px;">
+            <i class="fas fa-spinner fa-spin" style="font-size: 48px; color: var(--primary);"></i>
+            <p style="margin-top: 20px; color: var(--text-light);">Loading profile...</p>
+        </div>
+
+        <!-- Error Message -->
+        <div id="errorMessage" style="display: none; background: #fee; border: 1px solid #fcc; padding: 15px; border-radius: 8px; margin-bottom: 20px; color: #c00;">
+            <i class="fas fa-exclamation-circle"></i>
+            <span id="errorText"></span>
+        </div>
+
+        <!-- Success Message -->
+        <div id="successMessage" style="display: none; background: #efe; border: 1px solid #cfc; padding: 15px; border-radius: 8px; margin-bottom: 20px; color: #080;">
+            <i class="fas fa-check-circle"></i>
+            <span id="successText"></span>
+        </div>
+
+        <!-- Driver Profile Header -->
+        <div class="profile-header" id="profileHeader">
+            <div class="profile-title">Driver Profile</div>
+            <div class="profile-info">
+                <div class="profile-avatar-wrapper">
+                    <div class="profile-avatar" id="profileAvatar">S</div>
+                    <img id="profileImage" class="profile-avatar-image" style="display: none;" />
+                    <input type="file" id="profilePictureInput" accept="image/*" style="display: none;" />
+                    <button class="edit-avatar-btn" id="editAvatarBtn" onclick="triggerFileUpload()" style="display: none;">
+                        <i class="fas fa-camera"></i>
+                    </button>
+                </div>
+                <div class="profile-details">
+                    <h3 id="profileFullName">Loading...</h3>
+                </div>
+            </div>
+        </div>
+
+        <!-- Personal Information -->
+        <div class="personal-info" id="personalInfo">
+            <div class="section-title">Personal Information</div>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label class="form-label">First Name</label>
+                    <input type="text" class="form-input" id="firstname" data-field="firstname" readonly>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Last Name</label>
+                    <input type="text" class="form-input" id="lastname" data-field="lastname" readonly>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <input type="email" class="form-input" id="email" data-field="email" readonly>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Phone Number</label>
+                    <input type="text" class="form-input" id="mobilenumber" data-field="mobilenumber" readonly>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Home Address</label>
+                    <input type="text" class="form-input" id="homeaddress" data-field="homeaddress" readonly>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">License Number</label>
+                    <input type="text" class="form-input" id="licensenumber" data-field="licensenumber" readonly>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Driver ID</label>
+                    <input type="text" class="form-input" id="driverid" data-field="driverid" readonly>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">NIC Number</label>
+                    <input type="text" class="form-input" id="nicnumber" data-field="nicnumber" readonly>
+                </div>
+            </div>
+        </div>
+
+        <!-- Company/Employment Information -->
+        <div class="company-info" id="companyInfo">
+            <div class="section-title">Company/Employment Information</div>
+            <div class="company-grid">
+                <div class="info-card">
+                    <div class="info-label">Rental Company</div>
+                    <div class="company-badge" id="companyName">Loading...</div>
+                </div>
+                <div class="info-card">
+                    <div class="info-card-header">
+                        <i class="fas fa-calendar-alt info-icon"></i>
+                        <span class="info-label">Joined On</span>
+                    </div>
+                    <div class="info-value" id="joinedDate">-</div>
+                    <div class="info-extra" id="experience">-</div>
+                </div>
+                <div class="info-card">
+                    <div class="info-card-header">
+                        <i class="fas fa-map-marker-alt info-icon"></i>
+                        <span class="info-label">Assigned Area</span>
+                    </div>
+                    <div class="area-badge" id="assignedArea">-</div>
+                </div>
+                <div class="info-card">
+                    <div class="info-card-header">
+                        <i class="fas fa-clock info-icon"></i>
+                        <span class="info-label">Shift Time</span>
+                    </div>
+                    <div class="info-value" id="shiftTime">-</div>
+                </div>
+                <div class="info-card">
+                    <div class="info-card-header">
+                        <i class="fas fa-user-tie info-icon"></i>
+                        <span class="info-label">Reporting Manager</span>
+                    </div>
+                    <div class="info-value" id="reportingManager">-</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="quick-actions">
+            <div class="section-title">Quick Actions</div>
+            <div class="actions-grid">
+                <a href="drivercalview.html" class="action-button">
+                    <i class="fas fa-calendar info-icon"></i>
+                    <span>My Calendar</span>
+                </a>
+                <a href="issuereporting.html" class="action-button">
+                    <i class="fas fa-exclamation-triangle info-icon"></i>
+                    <span>Issue Reports</span>
+                </a>
+                <a href="#" class="action-button" onclick="toggleEditMode(event)">
+                    <i class="fas fa-edit info-icon" id="editIcon"></i>
+                    <span id="edit-button-text">Edit Profile</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- External JavaScript File -->
+<script src="../js/profile.js"></script>
+</body>
+</html>

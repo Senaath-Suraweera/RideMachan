@@ -1096,6 +1096,7 @@ body {
 
 
 .vehicle-info {
+  display: none;
   background: white;
   border-radius: 12px;
   padding: 24px;
@@ -1103,6 +1104,11 @@ body {
   height: fit-content;
   margin-left: -15px;
   width: 350px;
+}
+
+.vehicle-info.show {
+  display: block;
+  opacity: 1;
 }
 
 .vehicle-card {

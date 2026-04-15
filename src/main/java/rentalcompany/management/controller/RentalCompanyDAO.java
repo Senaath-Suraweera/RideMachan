@@ -2,6 +2,8 @@ package rentalcompany.management.controller;
 
 import common.util.DBConnection;
 import rentalcompany.management.model.RentalCompany;
+import rentalcompany.companyvehicle.model.Vehicle;
+import rentalcompany.maintenance.model.MaintenanceStaff;
 
 import java.sql.*;
 
@@ -65,4 +67,154 @@ public class RentalCompanyDAO {
         }
         return null;
     }
+
+    public static RentalCompany getCompanyById(int companyId) {
+
+        String sql = "SELECT * FROM rentalcompany WHERE companyid = ?";
+
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setInt(1, companyId);
+
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+
+                RentalCompany company = new RentalCompany();
+
+                company.setCompanyId(rs.getInt("companyid"));
+                company.setCompanyName(rs.getString("companyname"));
+                company.setEmail(rs.getString("companyemail"));
+                company.setPhone(rs.getString("phone"));
+                company.setRegistrationNumber(rs.getString("registrationnumber"));
+                company.setTaxId(rs.getString("taxid"));
+                company.setStreet(rs.getString("street"));
+                company.setCity(rs.getString("city"));
+                company.setCertificatePath(rs.getString("certificatepath"));
+                company.setTaxDocumentPath(rs.getString("taxdocumentpath"));
+                company.setDescription(rs.getString("description"));
+                company.setTerms(rs.getString("terms"));
+
+                return company;
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    public static boolean updateCompanyProfile(int companyId,String companyName,String phone,String email,String street, String city) {
+
+        boolean status = false;
+
+        String sql = "UPDATE rentalcompany SET companyname=?, phone=?, companyemail=?, street=?, city=? WHERE companyid=?";
+
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+
+            ps.setString(1, companyName);
+            ps.setString(2, phone);
+            ps.setString(3, email);
+            ps.setString(4, street);
+            ps.setString(5, city);
+            ps.setInt(6, companyId);
+
+            status = ps.executeUpdate() > 0;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return status;
+    }
+
+    public static Vehicle getVehicleDetails(int companyId, String numberplate, String date) {
+
+        Vehicle vehicle = null;
+
+        String sql = "SELECT * FROM vehicle WHERE company_id=? AND numberplatenumber=?";
+
+
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setInt(1, companyId);
+            ps.setString(2, numberplate);
+
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+
+                vehicle = new Vehicle();
+
+                vehicle.setVehicleId(rs.getInt("vehicleid"));
+                vehicle.setVehicleBrand(rs.getString("vehiclebrand"));
+                vehicle.setVehicleModel(rs.getString("vehiclemodel"));
+                vehicle.setNumberPlateNumber(rs.getString("numberplatenumber"));
+                vehicle.setYear(rs.getInt("manufacture_year"));
+                vehicle.setStatus(rs.getString("availability_status"));
+
+            }
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return vehicle;
+    }
+
+    public static boolean assignStaffToVehicle(int staffId, int vehicleId, int companyId) {
+
+        boolean status = false;
+
+        String sql = "INSERT INTO maintenance_vehicle_assignment (maintenanceid, vehicleid, assigned_date, status) VALUES (?, ?, NOW(), 'assigned')";
+
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setInt(1, staffId);
+            ps.setInt(2, vehicleId);
+
+            status = ps.executeUpdate() > 0;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return status;
+    }
+
+
+
+
+
+    public static boolean checkVehicleAssignment(int vehicleId) {
+
+        String sql = "SELECT 1 " +
+                    "FROM maintenance_vehicle_assignment " +
+                    "WHERE vehicleid = ? " +
+                    "LIMIT 1";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, vehicleId);
+
+            ResultSet rs = ps.executeQuery();
+
+            return rs.next();
+
+        } catch (Exception e) {
+
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+
 }
