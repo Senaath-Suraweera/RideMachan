@@ -381,8 +381,6 @@ document.addEventListener("DOMContentLoaded", async function() {
 
     try {
 
-
-
           const loggedIn = await checkLogin();
 
           if (!loggedIn) {

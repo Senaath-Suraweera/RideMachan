@@ -15,6 +15,10 @@ public class MaintenanceStaff {
     String status;
     private String[] assignedVehicles;
     private float yearsOfExperience;
+    private String companyName;
+    private String companyEmail;
+    private String companyPhone;
+    private String companyCity;
 
     //constructor for getmaintenancestaff
     public MaintenanceStaff() {}
@@ -80,4 +84,17 @@ public class MaintenanceStaff {
 
     public float getYearsOfExperience() { return yearsOfExperience; }
     public void setYearsOfExperience(float yearsOfExperience) { this.yearsOfExperience = yearsOfExperience; }
+
+    public String getCompanyName() { return companyName; }
+    public void setCompanyName(String companyName) { this.companyName = companyName; }
+
+    public String getCompanyEmail() { return companyEmail; }
+    public void setCompanyEmail(String companyEmail) { this.companyEmail = companyEmail; }
+
+    public String getCompanyPhone() { return companyPhone; }
+    public void setCompanyPhone(String companyPhone) { this.companyPhone = companyPhone; }
+
+    public String getCompanyCity() { return companyCity; }
+    public void setCompanyCity(String companyCity) { this.companyCity = companyCity; }
+
 }

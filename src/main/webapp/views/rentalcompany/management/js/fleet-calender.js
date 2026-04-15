@@ -6,6 +6,8 @@ let vehicle;
 let AllMaintenanceStaff;
 let AllVehicles;
 let selectedDate;
+let isAssignedToThisVehicle = false;
+
 
 async function checkLogin() {
 
@@ -69,6 +71,29 @@ async function LoadVehicles() {
 
 }
 
+async function checkAssignment(vehicleId) {
+
+    try {
+
+        const response = await fetch(`/checkassignment?vehicleId=${vehicleId}`);
+
+        if (!response.ok) throw new Error("Failed to check assignment");
+
+        const data = await response.json();
+
+        console.log("Assignment check:", data);
+
+        return data.isAssigned;
+
+    } catch (err) {
+
+        console.log(err);
+        return false;
+
+    }
+
+}
+
 async function assignStaff(staffId) {
 
     try {
@@ -91,10 +116,13 @@ async function assignStaff(staffId) {
 
         console.log(data);
 
-        showNotification("Assigned successfully", "success");
+        showNotification("Staff is Assigned successfully", "success");
 
         AllMaintenanceStaff = await loadAllMaintenanceStaff();
         renderAllMaintenanceStaffWithAssociatedVehicleNumberPlate(AllMaintenanceStaff);
+
+        await refreshAssignmentState(vehicleId);
+        closeStaffModal();
 
     } catch (err) {
 
@@ -163,39 +191,7 @@ async function LoadAllSchedule(date, vehicleId) {
 
 }
 
-async function LoadStatistics(date) {
 
-    try {
-
-        const response = await fetch("/displaydaystatistics", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({ date })
-        });
-
-
-
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-
-
-        const data = await response.json();
-
-        console.log("Statistics for", date, ":", data);
-
-
-        return data;
-
-    }catch (err) {
-
-        console.log(err);
-
-    }
-
-}
 
 function showNotification(message, type = "info") {
 
@@ -299,9 +295,32 @@ function handleDateSection() {
 
 }
 
+async function refreshAssignmentState(vehicleId) {
+
+    isAssignedToThisVehicle = await checkAssignment(vehicleId);
+    updateAssignButtonUI();
+
+}
+
+function updateAssignButtonUI() {
+
+    let btn = document.getElementById("Vehicleassign");
+
+    if (!btn) {
+        return;
+    }
+
+    if (isAssignedToThisVehicle) {
+        btn.style.display = "none";
+    } else {
+        btn.style.display = "inline-block";
+    }
+
+}
+
 function openStaffModal() {
 
-    const modal = document.getElementById("staffModal");
+    let modal = document.getElementById("staffModal");
     modal.style.display = "flex";
 
     renderAllMaintenanceStaffWithAssociatedVehicleNumberPlate(AllMaintenanceStaff);
@@ -316,7 +335,7 @@ function closeStaffModal() {
 
 function renderAllMaintenanceStaffWithAssociatedVehicleNumberPlate(allMaintenanceStaff) {
 
-    const container = document.getElementById("staffContainer");
+    let container = document.getElementById("staffContainer");
 
     if (!container) {
         console.log("staffContainer not found");
@@ -359,6 +378,7 @@ function renderAllMaintenanceStaffWithAssociatedVehicleNumberPlate(allMaintenanc
             </button>
         `;
         container.appendChild(card);
+
     });
 
 }
@@ -634,16 +654,30 @@ document.addEventListener("DOMContentLoaded", async function () {
 
             scheduleData = await LoadAllSchedule(date, vehicleId);
             renderScheduleSection(scheduleData.schedule);
+
         });
 
-        let stats = dummyData.stats;
-        //let stats = LoadStatistics(selectedDate);
-
-        if (stats) {
-            renderStatistics(stats)
-        }
 
         AllMaintenanceStaff = await loadAllMaintenanceStaff();
+
+        await refreshAssignmentState(vehicleId);
+
+        document.getElementById("Vehicleassign").addEventListener("click", openStaffModal);
+
+
+        document.addEventListener("click", async function (e) {
+
+            if (e.target.classList.contains("assign-staff-btn")) {
+
+                const staffId = e.target.getAttribute("data-id");
+
+                console.log("Assign clicked for staff:", staffId);
+
+                await assignStaff(staffId);
+
+            }
+
+        });
 
     } catch (err) {
 
@@ -656,21 +690,10 @@ document.addEventListener("DOMContentLoaded", async function () {
 
 
 
-document.getElementById("Vehicleassgin").addEventListener("click", openStaffModal);
 
 
-document.addEventListener("click", async function (e) {
 
-    if (e.target.classList.contains("assign-staff-btn")) {
 
-        const staffId = e.target.getAttribute("data-id");
-
-        console.log("Assign clicked for staff:", staffId);
-
-        await assignStaff(staffId);
-    }
-
-});
 
 
 

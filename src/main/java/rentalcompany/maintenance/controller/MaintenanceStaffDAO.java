@@ -100,6 +100,71 @@ public class MaintenanceStaffDAO {
         return null;
     }
 
+    public static MaintenanceStaff getStaffProfile(int staffId) {
+
+        String sql = """
+                        SELECT 
+                            ms.maintenanceid,
+                            ms.username,
+                            ms.firstname,
+                            ms.lastname,
+                            ms.mobilenumber,
+                            ms.email,
+                            ms.specialization,
+                            ms.status,
+                            ms.yearsOfExperience,
+                
+                            rc.companyid,
+                            rc.companyname,
+                            rc.companyemail,
+                            rc.phone,
+                            rc.registrationnumber,
+                            rc.city
+                
+                        FROM maintenancestaff ms
+                        INNER JOIN rentalcompany rc
+                        ON ms.company_id = rc.companyid
+                        WHERE ms.maintenanceid = ?
+                    """;
+
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setInt(1, staffId);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+
+                MaintenanceStaff s = new MaintenanceStaff();
+
+                // staff fields
+                s.setStaffId(rs.getInt("maintenanceid"));
+                s.setUsername(rs.getString("username"));
+                s.setFirstname(rs.getString("firstname"));
+                s.setLastname(rs.getString("lastname"));
+                s.setContactNumber(rs.getString("mobilenumber"));
+                s.setEmail(rs.getString("email"));
+                s.setSpecialization(rs.getString("specialization"));
+                s.setStatus(rs.getString("status"));
+                s.setYearsOfExperience(rs.getFloat("yearsOfExperience"));
+
+
+                s.setCompanyId(rs.getInt("companyid"));
+                s.setCompanyName(rs.getString("companyname"));
+                s.setCompanyEmail(rs.getString("companyemail"));
+                s.setCompanyPhone(rs.getString("phone"));
+                s.setCompanyCity(rs.getString("city"));
+
+                return s;
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
     public static int getTotalStaffCount(int companyId) {
 
         String sql = "SELECT COUNT(*) FROM maintenanceStaff WHERE company_id = ?";
@@ -118,6 +183,37 @@ public class MaintenanceStaffDAO {
             e.printStackTrace();
         }
         return 0;
+
+    }
+
+    public static boolean updateMaintenanceProfile(int staffId, String firstname,String lastname,String mobileNumber,String email) {
+
+        String sql = "UPDATE maintenancestaff SET " +
+                "firstname = ?, " +
+                "lastname = ?, " +
+                "mobilenumber = ?, " +
+                "email = ? " +
+                "WHERE maintenanceid = ?";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, firstname);
+            ps.setString(2, lastname);
+            ps.setString(3, mobileNumber);
+            ps.setString(4, email);
+            ps.setInt(5, staffId);
+
+            int rows = ps.executeUpdate();
+
+            return rows > 0;
+
+        } catch (Exception e) {
+
+            e.printStackTrace();
+            return false;
+
+        }
 
     }
 

@@ -540,3 +540,50 @@ function filterDriversByDriverStatus(status) {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// ===============================
+// GENERIC VALIDATION FUNCTION
+// ===============================
+function validate(value, rules, fieldName = "Field") {
+
+    value = (value ?? "").toString().trim();
+
+    // REQUIRED CHECK
+    if (rules.required && value === "") {
+        showNotification(`${fieldName} is required`, "error");
+        return false;
+    }
+
+    // MIN LENGTH
+    if (rules.minLength && value.length < rules.minLength) {
+        showNotification(`${fieldName} must be at least ${rules.minLength} characters`, "error");
+        return false;
+    }
+
+    // MAX LENGTH
+    if (rules.maxLength && value.length > rules.maxLength) {
+        showNotification(`${fieldName} must be less than ${rules.maxLength} characters`, "error");
+        return false;
+    }
+
+    // PATTERN CHECK
+    if (rules.pattern && !rules.pattern.test(value)) {
+        showNotification(rules.message || `Invalid ${fieldName}`, "error");
+        return false;
+    }
+
+    return true;
+}

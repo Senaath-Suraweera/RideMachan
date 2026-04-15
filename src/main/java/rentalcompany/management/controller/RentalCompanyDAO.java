@@ -189,4 +189,32 @@ public class RentalCompanyDAO {
         return status;
     }
 
+
+
+
+
+    public static boolean checkVehicleAssignment(int vehicleId) {
+
+        String sql = "SELECT 1 " +
+                    "FROM maintenance_vehicle_assignment " +
+                    "WHERE vehicleid = ? " +
+                    "LIMIT 1";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, vehicleId);
+
+            ResultSet rs = ps.executeQuery();
+
+            return rs.next();
+
+        } catch (Exception e) {
+
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+
 }
