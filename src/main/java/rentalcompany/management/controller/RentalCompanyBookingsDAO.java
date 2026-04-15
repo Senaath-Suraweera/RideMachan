@@ -214,7 +214,8 @@ public class RentalCompanyBookingsDAO {
 
         String sql =
                 "SELECT booking_id, customer_name, driverid, vehicleid, " +
-                        "start_time, end_time, status " +
+                        "start_time, end_time, status, " +
+                        "trip_start_date, trip_end_date " +
                         "FROM companybookings " +
                         "WHERE companyid = ? " +
                         "AND vehicleid = ? " +
@@ -243,10 +244,17 @@ public class RentalCompanyBookingsDAO {
                 Time st = rs.getTime("start_time");
                 Time et = rs.getTime("end_time");
 
-                b.setStartTimeStr(st != null ? st.toString().substring(0,5) : null);
-                b.setEndTimeStr(et != null ? et.toString().substring(0,5) : null);
+                b.setStartTimeStr(st != null ? st.toString().substring(0, 5) : null);
+                b.setEndTimeStr(et != null ? et.toString().substring(0, 5) : null);
 
                 b.setStatus(rs.getString("status"));
+
+
+                Date startDate = rs.getDate("trip_start_date");
+                Date endDate = rs.getDate("trip_end_date");
+
+                b.setTripStartDate(startDate);
+                b.setTripEndDate(endDate);
 
                 list.add(b);
             }

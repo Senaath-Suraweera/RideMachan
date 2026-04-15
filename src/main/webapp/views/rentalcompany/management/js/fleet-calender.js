@@ -5,6 +5,7 @@ let companyId = null;
 let vehicle;
 let AllMaintenanceStaff;
 let AllVehicles;
+let selectedDate;
 
 async function checkLogin() {
 
@@ -604,21 +605,36 @@ document.addEventListener("DOMContentLoaded", async function () {
             return;    // stop here if not logged in
         }
 
+        const dummyData = createDummyDataInput();
+
         handleDateSection();
 
-        const selectedDate = document.getElementById("calendarDate").value;
-        const vehicleId = getVehicleIdFromURL();
+        selectedDate = document.getElementById("calendarDate").value;
 
-        const dummyData = createDummyDataInput();
+        let vehicleId = getVehicleIdFromURL();
+
 
         AllVehicles = await LoadVehicles();
         vehicle = getVehicle(vehicleId);
 
         renderVehicleCard(vehicle);
 
-        //let schedule = createDummyDataInput().schedule;
-        const scheduleData = await LoadAllSchedule(selectedDate, vehicleId);
-        renderScheduleSection(schedule.schedule);
+
+        let scheduleData = await LoadAllSchedule(selectedDate, vehicleId);
+        renderScheduleSection(scheduleData.schedule);
+
+        document.getElementById("calendarDate").addEventListener("change", async function () {
+
+            const date = this.value;
+            const vehicleId = getVehicleIdFromURL();
+
+            scheduleData = await LoadAllSchedule(date, vehicleId);
+
+            console.log("Updated schedule:", scheduleData);
+
+            scheduleData = await LoadAllSchedule(date, vehicleId);
+            renderScheduleSection(scheduleData.schedule);
+        });
 
         let stats = dummyData.stats;
         //let stats = LoadStatistics(selectedDate);
@@ -636,6 +652,8 @@ document.addEventListener("DOMContentLoaded", async function () {
     }
 
 });
+
+
 
 
 document.getElementById("Vehicleassgin").addEventListener("click", openStaffModal);

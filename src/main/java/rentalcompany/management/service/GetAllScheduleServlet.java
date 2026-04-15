@@ -16,8 +16,8 @@ import common.util.DBConnection;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.Connection;
+import java.sql.Date;
 import java.util.List;
-
 
 @WebServlet("/getallschedule")
 public class GetAllScheduleServlet extends HttpServlet {
@@ -55,48 +55,86 @@ public class GetAllScheduleServlet extends HttpServlet {
             List<RentalCompanyBookings> Bookings = RentalCompanyBookingsDAO.loadBookingsByVehicleAndDate(companyId, vehicleId, dateStr);
             List<CalendarEvent> maintenanceWork = CalendarEventDAO.getEventsByVehicleAndDate(vehicleId, dateStr);
 
-            if(Bookings == null || Bookings.isEmpty()) {}
 
-            String json = """
-            {
-                "schedule": {
-                    "bookings": [
-                        {
-                            "id": "BK001",
-                            "customer": "John Smith",
-                            "driver": "Mike Johnson",
-                            "startTime": "08:00",
-                            "endTime": "10:00",
-                            "status": "Ongoing"
-                        },
-                        {
-                            "id": "BK002",
-                            "customer": "Sarah Wilson",
-                            "driver": "David Perera",
-                            "startTime": "14:00",
-                            "endTime": "16:00",
-                            "status": "Confirmed"
-                        }
-                    ],
-                    "maintenance": [
-                        {
-                            "id": "MT001",
-                            "type": "Engine Check",
-                            "startTime": "11:30",
-                            "endTime": "13:00",
-                            "status": "Scheduled"
-                        },
-                        {
-                            "id": "MT002",
-                            "type": "Oil Change",
-                            "startTime": "16:00",
-                            "endTime": "17:00",
-                            "status": "In Progress"
-                        }
-                    ]
+
+            Date selectedDate = Date.valueOf(dateStr);
+
+            String bookingsJson = "[";
+
+            for (int i = 0; i < Bookings.size(); i++) {
+
+                RentalCompanyBookings b = Bookings.get(i);
+
+                Date dateOfTripStart = (Date) b.getTripStartDate();
+                Date dateOfTripEnd = (Date) b.getTripEndDate();
+
+                String startTime = b.getStartTimeStr();
+                String endTime = b.getEndTimeStr();
+
+                String finalStartTime = startTime;
+
+                if (dateOfTripStart == null || dateOfTripStart.before(selectedDate)) {
+                    finalStartTime = "08:00";
+                } else if (startTime != null && startTime.compareTo("08:00") < 0) {
+                    finalStartTime = "08:00";
                 }
+
+
+
+                String finalEndTime = endTime;
+
+                if (dateOfTripEnd == null || dateOfTripEnd.after(selectedDate)) {
+                    finalEndTime = "18:00";
+                } else if (endTime != null && endTime.compareTo("18:00") > 0) {
+                    finalEndTime = "18:00";
+                }
+
+                bookingsJson += "{"
+                        + "\"id\":\"BK" + String.format("%03d", b.getBookingId()) + "\","
+                        + "\"customer\":\"" + b.getCustomerName() + "\","
+                        + "\"driver\":\"" + b.getDriverName() + "\","
+                        + "\"startTime\":\"" + finalStartTime + "\","
+                        + "\"endTime\":\"" + finalEndTime + "\","
+                        + "\"status\":\"" + b.getStatus() + "\""
+                        + "}";
+
+
+                if (i < Bookings.size() - 1) {
+                    bookingsJson += ",";
+                }
+
             }
-            """;
+
+            bookingsJson += "]";
+
+
+            String maintenanceJson = "[";
+
+            for (int i = 0; i < maintenanceWork.size(); i++) {
+
+                CalendarEvent e = maintenanceWork.get(i);
+
+                maintenanceJson += "{"
+                        + "\"id\":\"MT" + String.format("%03d", e.getEventId()) + "\","
+                        + "\"type\":\"" + e.getServiceType() + "\","
+                        + "\"startTime\":\"" + e.getScheduledTime() + "\","
+                        + "\"endTime\":\"" + e.getScheduledTime() + "\","
+                        + "\"status\":\"" + e.getStatus() + "\""
+                        + "}";
+
+                if (i < maintenanceWork.size() - 1) maintenanceJson += ",";
+            }
+
+            maintenanceJson += "]";
+
+
+            String json =
+                    "{"
+                            + "\"schedule\":{"
+                            + "\"bookings\":" + bookingsJson + ","
+                            + "\"maintenance\":" + maintenanceJson
+                            + "}"
+                            + "}";
 
             resp.getWriter().write(json);
 
