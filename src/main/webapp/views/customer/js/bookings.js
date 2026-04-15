@@ -5,33 +5,27 @@
 
 let allBookings = [];
 let currentBookingId = null;
-let ratings = { overall: 0, service: 0, vehicle: 0 };
+let ratings = { service: 0, vehicle: 0 };
 
 // ---------- Component loading (navbar + header) ----------
 function loadComponent(elementId, filePath, callback) {
     fetch(filePath)
         .then(r => r.text())
         .then(html => {
-            if (elementId === 'header-container') {
-                html = html.replace('{{PAGE_TITLE}}', 'MY BOOKINGS');
-            }
             document.getElementById(elementId).innerHTML = html;
-            executeComponentScripts(elementId);
             if (callback) callback();
         })
         .catch(err => console.error('Error loading component:', err));
 }
 
-function executeComponentScripts(containerId) {
-    const container = document.getElementById(containerId);
-    if (!container) return;
-    container.querySelectorAll('script').forEach(oldScript => {
-        const newScript = document.createElement('script');
-        if (oldScript.src) newScript.src = oldScript.src;
-        else newScript.textContent = oldScript.textContent;
-        document.body.appendChild(newScript);
-        oldScript.parentNode && oldScript.parentNode.removeChild(oldScript);
-    });
+// Load header.js manually — <script> tags inside innerHTML do NOT execute
+function loadHeaderScript(cb) {
+    if (window.initializeHeader) { cb(); return; }
+    const s = document.createElement('script');
+    s.src = '../components/header.js';
+    s.onload = cb;
+    s.onerror = () => { console.error('Failed to load header.js'); cb(); };
+    document.head.appendChild(s);
 }
 
 // ---------- Boot ----------
@@ -44,13 +38,15 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     loadComponent('header-container', '../components/header.html', () => {
-        if (typeof initializeHeader === 'function') initializeHeader();
-        const pageTitle = document.querySelector('.hi h1');
-        if (pageTitle) {
-            pageTitle.textContent = 'MY BOOKINGS';
-            const subtitle = document.querySelector('.subtitle');
-            if (subtitle) subtitle.textContent = 'Manage your vehicle reservations';
-        }
+        loadHeaderScript(() => {
+            if (typeof initializeHeader === 'function') initializeHeader();
+            if (typeof setPageTitle === 'function') {
+                setPageTitle('MY BOOKINGS');
+            } else {
+                const pageTitle = document.getElementById('pageTitle');
+                if (pageTitle) pageTitle.textContent = 'MY BOOKINGS';
+            }
+        });
     });
 
     initializeFilterTabs();
@@ -121,7 +117,6 @@ function renderSection(sectionSelector, bookings, category) {
     const section = document.querySelector(sectionSelector);
     if (!section) return;
 
-    // Keep the section title, remove old cards
     section.querySelectorAll('.booking-card').forEach(c => c.remove());
     const emptyMsg = section.querySelector('.empty-state');
     if (emptyMsg) emptyMsg.remove();
@@ -136,6 +131,44 @@ function renderSection(sectionSelector, bookings, category) {
     }
 
     bookings.forEach(b => section.appendChild(buildBookingCard(b, category)));
+}
+
+// ---------- 24h cancel rule ----------
+function getPickupDateTime(b) {
+    if (!b || !b.tripStartDate) return null;
+    const dateStr = String(b.tripStartDate).trim();           // YYYY-MM-DD
+    const timeStr = String(b.startTime || '00:00').trim();    // HH:mm or HH:mm:ss
+
+    const dParts = dateStr.split('-').map(Number);
+    if (dParts.length !== 3 || dParts.some(isNaN)) return null;
+    const [y, mo, d] = dParts;
+    const [hh, mm] = timeStr.split(':').map(Number);
+    const dt = new Date(y, mo - 1, d, hh || 0, mm || 0, 0);
+    return isNaN(dt.getTime()) ? null : dt;
+}
+
+function isCancellable(b) {
+    if (!b) return { ok: false, reason: 'Booking not found' };
+
+    // Only upcoming category should ever offer cancel — server enforces too
+    const status = (b.status || '').toLowerCase();
+    if (['cancelled', 'completed'].includes(status)) {
+        return { ok: false, reason: 'This booking cannot be cancelled' };
+    }
+
+    const pickup = getPickupDateTime(b);
+    if (!pickup) return { ok: false, reason: 'Pickup time unavailable' };
+
+    const hoursUntil = (pickup.getTime() - Date.now()) / 3600000;
+    if (hoursUntil < 24) {
+        return {
+            ok: false,
+            reason: hoursUntil < 0
+                ? 'Pickup time has already passed'
+                : 'Bookings can only be cancelled at least 24 hours before pickup'
+        };
+    }
+    return { ok: true };
 }
 
 // ---------- Card builder ----------
@@ -154,7 +187,6 @@ function buildBookingCard(b, category) {
         ? '<span class="payment-badge paid">Paid</span>'
         : '<span class="payment-badge unpaid">Unpaid</span>';
 
-    // Driver / self-drive block
     let partyBlock;
     if (isSelfDrive) {
         partyBlock = `
@@ -179,7 +211,6 @@ function buildBookingCard(b, category) {
             </div>`;
     }
 
-    // Actions based on category
     let actionsBlock = '';
     const id = b.rideId;
     const msgLabel = isSelfDrive ? 'Message Company' : 'Message Driver';
@@ -187,17 +218,25 @@ function buildBookingCard(b, category) {
         actionsBlock = `
             <button class="btn btn-outline btn-sm" onclick="navigateToDetails(this.closest('.booking-card'))"><i class="fas fa-eye"></i> View Details</button>
             <button class="btn btn-primary btn-sm" onclick="openMessageModal('${id}')"><i class="fas fa-message"></i> ${msgLabel}</button>
-            <button class="btn btn-success btn-sm" onclick="openCallModal('${id}')"><i class="fas fa-phone"></i> ${isSelfDrive ? 'Call Company' : 'Call Driver'}</button>`;
+            <button class="btn btn-success btn-sm" onclick="openCallModal('${id}')"><i class="fas fa-phone"></i> ${isSelfDrive ? 'Call Company' : 'Call Driver'}</button>
+            <button class="btn btn-report btn-sm" onclick="openReportModal('${id}')"><i class="fas fa-flag"></i> Report</button>`;
     } else if (category === 'upcoming') {
+        // Cancel button — disabled with tooltip if outside 24h rule
+        const check = isCancellable(b);
+        const cancelAttrs = check.ok
+            ? `onclick="openCancelModal('${id}')"`
+            : `disabled style="opacity:0.5;cursor:not-allowed;" title="${escapeHtml(check.reason)}"`;
         actionsBlock = `
             <button class="btn btn-outline btn-sm" onclick="navigateToDetails(this.closest('.booking-card'))"><i class="fas fa-eye"></i> View Details</button>
             <button class="btn btn-warning btn-sm" onclick="openMessageModal('${id}')"><i class="fas fa-message"></i> ${msgLabel}</button>
-            <button class="btn btn-danger btn-sm" onclick="openCancelModal('${id}')"><i class="fas fa-times"></i> Cancel</button>`;
+            <button class="btn btn-danger btn-sm" ${cancelAttrs}><i class="fas fa-times"></i> Cancel</button>
+            <button class="btn btn-report btn-sm" onclick="openReportModal('${id}')"><i class="fas fa-flag"></i> Report</button>`;
     } else {
         actionsBlock = `
             <button class="btn btn-outline btn-sm" onclick="navigateToDetails(this.closest('.booking-card'))"><i class="fas fa-eye"></i> View Details</button>
             <button class="btn btn-primary btn-sm" onclick="openRatingModal('${id}')"><i class="fas fa-star"></i> Rate Experience</button>
-            <button class="btn btn-success btn-sm" onclick="openRebookModal('${id}')"><i class="fas fa-redo"></i> Book Again</button>`;
+            <button class="btn btn-success btn-sm" onclick="rebookVehicle('${id}')"><i class="fas fa-redo"></i> Book Again</button>
+            <button class="btn btn-report btn-sm" onclick="openReportModal('${id}')"><i class="fas fa-flag"></i> Report</button>`;
     }
 
     card.innerHTML = `
@@ -237,7 +276,6 @@ function buildBookingCard(b, category) {
 function getStatusBadge(category, dbStatus) {
     if (category === 'active')   return '<span class="status-badge active-progress">Active</span>';
     if (category === 'past')     return '<span class="status-badge completed">Completed</span>';
-    // upcoming
     const s = (dbStatus || 'pending').toLowerCase();
     if (s === 'cancelled') return '<span class="status-badge cancelled">Cancelled</span>';
     return '<span class="status-badge paid">Confirmed</span>';
@@ -246,14 +284,14 @@ function getStatusBadge(category, dbStatus) {
 // ---------- Helpers ----------
 function formatDate(iso) {
     if (!iso) return '-';
-    const parts = iso.split('-'); // yyyy-mm-dd
+    const parts = iso.split('-');
     if (parts.length !== 3) return iso;
     return `${parseInt(parts[1])}/${parseInt(parts[2])}/${parts[0]}`;
 }
 
 function formatTime(t) {
     if (!t) return '';
-    return t.substring(0, 5); // HH:mm
+    return t.substring(0, 5);
 }
 
 function getInitials(name) {
@@ -378,6 +416,14 @@ function openCancelModal(rideId) {
     currentBookingId = rideId;
     const b = findBooking(rideId);
     if (!b) return;
+
+    // Re-check 24h rule
+    const check = isCancellable(b);
+    if (!check.ok) {
+        showNotification(check.reason, 'warning');
+        return;
+    }
+
     document.getElementById('cancelSubtitle').textContent = 'Are you sure you want to cancel this booking?';
     document.getElementById('cancelDetails').innerHTML = `
         <div class="detail-item"><strong>Vehicle:</strong> ${escapeHtml(b.vehicleModel)}</div>
@@ -395,6 +441,16 @@ function closeCancelModal() {
 
 function confirmCancellation() {
     const rideId = currentBookingId;
+    const b = findBooking(rideId);
+
+    // Final guard
+    const check = isCancellable(b);
+    if (!check.ok) {
+        closeCancelModal();
+        showNotification(check.reason, 'warning');
+        return;
+    }
+
     const card = document.querySelector(`[data-booking-id="${rideId}"]`);
     if (card) {
         card.style.opacity = '0.5';
@@ -411,12 +467,10 @@ function confirmCancellation() {
         .then(res => res.json())
         .then(data => {
             if (data.success) {
-                // Remove from local state and UI
-                allBookings = allBookings.filter(b => b.rideId !== rideId);
+                allBookings = allBookings.filter(x => x.rideId !== rideId);
                 if (card) {
                     setTimeout(() => {
                         card.remove();
-                        // If the upcoming section is now empty, show empty state
                         const upcomingSection = document.querySelector('.vehicle-upcoming');
                         if (upcomingSection && upcomingSection.querySelectorAll('.booking-card').length === 0) {
                             const empty = document.createElement('div');
@@ -449,6 +503,14 @@ function confirmCancellation() {
 // ---------- Rating ----------
 function openRatingModal(rideId) {
     currentBookingId = rideId;
+    const b = findBooking(rideId);
+    if (!b) return;
+
+    const driverSection = document.getElementById('driverRatingSection');
+    if (driverSection) {
+        driverSection.style.display = (b.rentalType === 'self-drive') ? 'none' : 'block';
+    }
+
     document.getElementById('ratingModal').style.display = 'flex';
     document.body.style.overflow = 'hidden';
 }
@@ -479,14 +541,14 @@ function initializeRatingModal() {
         });
         ratingDiv.addEventListener('mouseleave', function () {
             const type = ratingDiv.id.replace('Rating', '');
-            const current = ratings[type];
+            const current = ratings[type] || 0;
             stars.forEach((s, idx) => { s.style.color = idx < current ? '#f8961e' : ''; });
         });
     });
 }
 
 function resetRatings() {
-    ratings = { overall: 0, service: 0, vehicle: 0 };
+    ratings = { service: 0, vehicle: 0 };
     document.querySelectorAll('.star-rating i').forEach(s => {
         s.classList.remove('fas'); s.classList.add('far'); s.style.color = '';
     });
@@ -495,48 +557,104 @@ function resetRatings() {
 }
 
 function submitRating() {
-    if (ratings.overall === 0 || ratings.service === 0 || ratings.vehicle === 0) {
-        showNotification('Please provide all ratings', 'warning');
+    const b = findBooking(currentBookingId);
+    if (!b) {
+        showNotification('Booking not found', 'warning');
         return;
     }
-    showNotification('Submitting your rating...', 'info');
-    setTimeout(() => {
-        showNotification('Thank you for your feedback!', 'success');
-        closeRatingModal();
-        const card = document.querySelector(`[data-booking-id="${currentBookingId}"]`);
-        if (card) {
-            const rateBtn = card.querySelector('.btn-primary');
-            if (rateBtn) {
-                rateBtn.innerHTML = '<i class="fas fa-check"></i> Rated';
-                rateBtn.disabled = true;
-                rateBtn.style.opacity = '0.6';
+
+    const isSelfDrive = b.rentalType === 'self-drive';
+
+    if (ratings.vehicle === 0) {
+        showNotification('Please rate the vehicle condition', 'warning');
+        return;
+    }
+    if (!isSelfDrive && ratings.service === 0) {
+        showNotification('Please rate the driver/service quality', 'warning');
+        return;
+    }
+
+    const review = (document.getElementById('ratingComments').value || '').trim();
+
+    const payload = {
+        rideId:        b.rideId,
+        vehicleId:     b.vehicleId,
+        driverId:      b.driverId || 0,
+        companyId:     b.companyId,
+        driverRating:  isSelfDrive ? 0 : ratings.service,
+        vehicleRating: ratings.vehicle,
+        review:        review || null
+    };
+
+    const btn = document.getElementById('submitRatingBtn');
+    if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
+    }
+
+    fetch('../../../customer/rating/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'same-origin',
+        body: JSON.stringify(payload)
+    })
+        .then(res => {
+            if (res.status === 401) {
+                showNotification('Please login to submit a rating', 'warning');
+                throw new Error('Unauthorized');
             }
-        }
-    }, 1000);
+            return res.json();
+        })
+        .then(data => {
+            if (btn) {
+                btn.disabled = false;
+                btn.innerHTML = 'Submit Rating';
+            }
+
+            if (data.success) {
+                showNotification('Thank you for your feedback!', 'success');
+                closeRatingModal();
+
+                const card = document.querySelector(`[data-booking-id="${currentBookingId}"]`);
+                if (card) {
+                    const rateBtn = card.querySelector('.btn-primary');
+                    if (rateBtn) {
+                        rateBtn.innerHTML = '<i class="fas fa-check"></i> Rated';
+                        rateBtn.disabled = true;
+                        rateBtn.style.opacity = '0.6';
+                        rateBtn.onclick = null;
+                    }
+                }
+            } else {
+                showNotification(data.message || 'Failed to submit rating', 'warning');
+            }
+        })
+        .catch(err => {
+            console.error('Rating submit error:', err);
+            if (btn) {
+                btn.disabled = false;
+                btn.innerHTML = 'Submit Rating';
+            }
+            if (err.message !== 'Unauthorized') {
+                showNotification('Could not connect to server', 'warning');
+            }
+        });
 }
 
-// ---------- Rebook ----------
-function openRebookModal(rideId) {
-    currentBookingId = rideId;
+// ---------- Rebook → goes straight to vehicle profile ----------
+function rebookVehicle(rideId) {
     const b = findBooking(rideId);
-    if (!b) return;
-    document.getElementById('rebookSubtitle').textContent = `Book ${b.vehicleModel} again for your next trip`;
-    document.getElementById('rebookDetails').innerHTML = `
-        <div class="detail-item"><strong>Previous Vehicle:</strong> ${escapeHtml(b.vehicleModel)}</div>
-        <div class="detail-item"><strong>Rental Type:</strong> ${b.rentalType === 'self-drive' ? 'Self-Drive' : 'With Driver'}</div>
-        <div class="detail-item"><strong>Company:</strong> ${escapeHtml(b.companyName || '-')}</div>`;
-    document.getElementById('rebookModal').style.display = 'flex';
-    document.body.style.overflow = 'hidden';
-}
-
-function closeRebookModal() {
-    document.getElementById('rebookModal').style.display = 'none';
-    document.body.style.overflow = 'auto';
-}
-
-function confirmRebook() {
-    sessionStorage.setItem('rebookingId', currentBookingId);
-    window.location.href = 'search.html';
+    if (!b) {
+        showNotification('Booking not found', 'warning');
+        return;
+    }
+    if (!b.vehicleId) {
+        showNotification('Vehicle information unavailable for rebooking', 'warning');
+        return;
+    }
+    sessionStorage.setItem('selectedVehicleId', b.vehicleId);
+    sessionStorage.setItem('rebookingFromRideId', b.rideId);
+    window.location.href = `vehicle-profile.html?vehicleId=${encodeURIComponent(b.vehicleId)}`;
 }
 
 // ---------- Notification ----------
@@ -550,7 +668,6 @@ function showNotification(message, type = 'info') {
     setTimeout(() => { n.classList.remove('show'); setTimeout(() => n.remove(), 300); }, 3000);
 }
 
-// ---------- Close modals on outside click ----------
 window.onclick = function (event) {
     if (event.target.classList.contains('action-modal')) {
         event.target.style.display = 'none';
@@ -559,23 +676,19 @@ window.onclick = function (event) {
 };
 
 // =========================================================================
-// ADDITIONS to bookings.js for the Report feature
-// Append this block at the END of bookings.js (before the closing of file).
-// Also: add the Report button to buildBookingCard (see section B below).
+// Report feature
 // =========================================================================
 
-// ---------- State for report modal ----------
 let reportState = {
     rideId: null,
     driverId: null,
     driverName: null,
     companyId: null,
     companyName: null,
-    target: 'DRIVER',      // DRIVER or COMPANY
-    selectedImages: []     // File[]
+    target: 'DRIVER',
+    selectedImages: []
 };
 
-// ---------- Open ----------
 function openReportModal(rideId) {
     const b = findBooking(rideId);
     if (!b) return;
@@ -592,11 +705,9 @@ function openReportModal(rideId) {
         selectedImages: []
     };
 
-    // Subtitle
     document.getElementById('reportSubtitle').textContent =
         `Report an issue with your booking: ${b.vehicleModel || 'Vehicle'} (${rideId})`;
 
-    // Populate target names
     const driverBtn = document.querySelector('.report-target-btn[data-target="DRIVER"]');
     const companyBtn = document.querySelector('.report-target-btn[data-target="COMPANY"]');
 
@@ -605,7 +716,6 @@ function openReportModal(rideId) {
     document.getElementById('reportCompanyName').textContent =
         reportState.companyName || 'Unknown';
 
-    // For self-drive there's no driver to report -> disable driver button
     if (isSelfDrive || !reportState.driverId) {
         driverBtn.classList.add('disabled');
         driverBtn.classList.remove('active');
@@ -616,7 +726,6 @@ function openReportModal(rideId) {
         companyBtn.classList.remove('active');
     }
 
-    // Reset form
     document.getElementById('reportCategory').value = '';
     document.getElementById('reportSubject').value = '';
     document.getElementById('reportDescription').value = '';
@@ -633,9 +742,7 @@ function closeReportModal() {
     reportState.selectedImages = [];
 }
 
-// ---------- Target toggle ----------
 function selectReportTarget(target) {
-    // Don't allow clicks on disabled
     const btn = document.querySelector(`.report-target-btn[data-target="${target}"]`);
     if (!btn || btn.classList.contains('disabled')) return;
 
@@ -644,11 +751,10 @@ function selectReportTarget(target) {
     btn.classList.add('active');
 }
 
-// ---------- Image handling ----------
 function handleReportImageSelect(event) {
     const files = Array.from(event.target.files || []);
     const maxFiles = 5;
-    const maxSize = 10 * 1024 * 1024; // 10MB
+    const maxSize = 10 * 1024 * 1024;
 
     files.forEach(file => {
         if (reportState.selectedImages.length >= maxFiles) {
@@ -663,7 +769,7 @@ function handleReportImageSelect(event) {
     });
 
     renderReportImagePreviews();
-    event.target.value = ''; // allow re-selecting same file
+    event.target.value = '';
 }
 
 function renderReportImagePreviews() {
@@ -690,27 +796,15 @@ function removeReportImage(idx) {
     renderReportImagePreviews();
 }
 
-// ---------- Submit ----------
 function submitReport() {
     const category = document.getElementById('reportCategory').value;
     const subject = document.getElementById('reportSubject').value.trim();
     const description = document.getElementById('reportDescription').value.trim();
 
-    // Validation
-    if (!category) {
-        showNotification('Please select a category', 'warning');
-        return;
-    }
-    if (!subject) {
-        showNotification('Please enter a subject', 'warning');
-        return;
-    }
-    if (!description) {
-        showNotification('Please describe the issue', 'warning');
-        return;
-    }
+    if (!category) { showNotification('Please select a category', 'warning'); return; }
+    if (!subject) { showNotification('Please enter a subject', 'warning'); return; }
+    if (!description) { showNotification('Please describe the issue', 'warning'); return; }
 
-    // Resolve reportedId based on target
     const reportedRole = reportState.target;
     const reportedId = reportedRole === 'DRIVER' ? reportState.driverId : reportState.companyId;
 
@@ -719,7 +813,6 @@ function submitReport() {
         return;
     }
 
-    // Disable submit button
     const btn = document.getElementById('reportSubmitBtn');
     btn.disabled = true;
     btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
@@ -746,18 +839,14 @@ function submitReport() {
             return res.json();
         })
         .then(data => {
-            if (!data.success) {
-                throw new Error(data.message || 'Failed to submit report');
-            }
+            if (!data.success) throw new Error(data.message || 'Failed to submit report');
             const reportId = data.reportId;
 
-            // If no images, we're done
             if (reportState.selectedImages.length === 0) {
                 finishReportSubmission();
                 return;
             }
 
-            // Upload images
             const formData = new FormData();
             formData.append('reportId', reportId);
             reportState.selectedImages.forEach(f => formData.append('images', f));

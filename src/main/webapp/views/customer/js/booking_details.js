@@ -5,7 +5,7 @@
 let currentBooking = null;
 
 // ─────────────────────────────────────────────
-// Component loader (unchanged)
+// Component loader
 // ─────────────────────────────────────────────
 function loadComponent(elementId, filePath, callback) {
     fetch(filePath)
@@ -29,13 +29,25 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     loadComponent('header-container', '../components/header.html', () => {
-        const pageTitle = document.querySelector('.hi h1');
-        if (pageTitle) {
-            pageTitle.textContent = 'Booking Details';
-            const subtitle = document.querySelector('.subtitle');
-            if (subtitle) subtitle.textContent = 'Complete information about your reservation';
-        }
+        loadHeaderScript(() => {
+            if (typeof initializeHeader === 'function') initializeHeader();
+            if (typeof setPageTitle === 'function') {
+                setPageTitle('Booking Details');
+            } else {
+                const pageTitle = document.getElementById('pageTitle');
+                if (pageTitle) pageTitle.textContent = 'Booking Details';
+            }
+        });
     });
+
+    function loadHeaderScript(cb) {
+        if (window.initializeHeader) { cb(); return; }
+        const s = document.createElement('script');
+        s.src = '../components/header.js';
+        s.onload = cb;
+        s.onerror = () => { console.error('Failed to load header.js'); cb(); };
+        document.head.appendChild(s);
+    }
 
     setTimeout(() => {
         loadBookingDetails();
@@ -55,7 +67,6 @@ function loadBookingDetails() {
         return;
     }
 
-    // Context path aware: works whether app is deployed at / or /RideMachan
     const ctx = window.location.pathname.split('/views/')[0];
     const url = `${ctx}/customer/booking-details?id=${encodeURIComponent(bookingId)}`;
 
@@ -114,14 +125,23 @@ function renderBooking(booking) {
 
     // Vehicle
     document.getElementById('vehicleName').textContent = booking.vehicle || '-';
-    document.getElementById('companyName').textContent =
-        (booking.company && booking.company.name) || '-';
+    const companyEl = document.getElementById('companyName');
+    if (booking.company && booking.company.name && booking.company.id) {
+        companyEl.textContent = booking.company.name;
+        companyEl.style.cursor = 'pointer';
+        companyEl.style.color = 'var(--primary)';
+        companyEl.style.textDecoration = 'underline';
+        companyEl.title = 'View company profile';
+        companyEl.onclick = navigateToCompany;
+    } else {
+        companyEl.textContent = (booking.company && booking.company.name) || '-';
+        companyEl.onclick = null;
+    }
     document.getElementById('vehicleTypeText').textContent = booking.vehicleType || '-';
     document.getElementById('vehiclePlateText').textContent = booking.vehiclePlate || '-';
     document.getElementById('rentalTypeText').textContent =
         booking.rentalType === 'with-driver' ? 'With Driver' : 'Self-Drive';
 
-    // Vehicle features — overwrite the static placeholder if we got real data
     if (booking.vehicleFeatures) {
         const grid = document.getElementById('vehicleFeatures');
         if (grid) {
@@ -149,11 +169,10 @@ function renderBooking(booking) {
     document.getElementById('dropoffTime').innerHTML =
         `<i class="fas fa-clock"></i> ${booking.dropoffTime || '-'}`;
 
-    // Duration — simple hour diff from HH:mm strings
     const duration = computeDuration(booking.pickupTime, booking.dropoffTime);
     document.getElementById('durationText').textContent = duration;
 
-    // Cost breakdown
+    // Cost
     document.getElementById('baseFare').textContent =
         `LKR ${Math.round(booking.baseFare || 0).toLocaleString()}`;
     document.getElementById('driverCharges').textContent =
@@ -191,7 +210,6 @@ function renderBooking(booking) {
 
             window.currentDriverId = d.id;
         } else {
-            // with-driver but none assigned yet
             document.getElementById('driverPlaceholder').textContent = '?';
             document.getElementById('driverName').textContent = 'Driver not assigned yet';
             document.getElementById('driverBio').textContent =
@@ -200,6 +218,7 @@ function renderBooking(booking) {
     }
 
     updateSupportModal(booking);
+    updateCancelButtonVisibility(booking);
 }
 
 function computeDuration(startHHmm, endHHmm) {
@@ -220,34 +239,166 @@ function escapeHtml(str) {
 }
 
 // ─────────────────────────────────────────────
-// Support modal (unchanged behavior)
+// 24-hour cancel rule helpers
+// ─────────────────────────────────────────────
+const CANCELLABLE_STATUSES = ['active', 'confirmed', 'pending', 'upcoming'];
+
+/**
+ * Returns the pickup datetime as a Date, or null if unavailable.
+ * Accepts pickupDate as 'YYYY-MM-DD' or 'M/D/YYYY' and pickupTime as 'HH:mm' or 'HH:mm:ss'.
+ */
+function getPickupDateTime(booking) {
+    if (!booking || !booking.pickupDate) return null;
+    const dateStr = String(booking.pickupDate).trim();
+    const timeStr = String(booking.pickupTime || '00:00').trim();
+
+    let y, mo, d;
+    if (dateStr.includes('-')) {
+        const parts = dateStr.split('-').map(Number);
+        if (parts.length !== 3 || parts.some(isNaN)) return null;
+        [y, mo, d] = parts;
+    } else if (dateStr.includes('/')) {
+        const parts = dateStr.split('/').map(Number);
+        if (parts.length !== 3 || parts.some(isNaN)) return null;
+        // assume M/D/YYYY
+        [mo, d, y] = parts;
+    } else {
+        return null;
+    }
+
+    const [hh, mm] = timeStr.split(':').map(Number);
+    const dt = new Date(y, (mo || 1) - 1, d || 1, hh || 0, mm || 0, 0);
+    return isNaN(dt.getTime()) ? null : dt;
+}
+
+function isCancellable(booking) {
+    if (!booking) return { ok: false, reason: 'No booking loaded' };
+
+    const status = (booking.status || '').toLowerCase();
+    if (!CANCELLABLE_STATUSES.includes(status)) {
+        return { ok: false, reason: 'Only upcoming bookings can be cancelled' };
+    }
+
+    const pickup = getPickupDateTime(booking);
+    if (!pickup) {
+        return { ok: false, reason: 'Pickup time unavailable' };
+    }
+
+    const now = new Date();
+    const hoursUntilPickup = (pickup.getTime() - now.getTime()) / (1000 * 60 * 60);
+
+    if (hoursUntilPickup < 24) {
+        return {
+            ok: false,
+            reason: hoursUntilPickup < 0
+                ? 'Pickup time has already passed'
+                : 'Bookings can only be cancelled at least 24 hours before pickup'
+        };
+    }
+
+    return { ok: true };
+}
+
+function updateCancelButtonVisibility(booking) {
+    // The cancel button is the one with class .btn-danger inside .detail-actions
+    const cancelBtn = document.querySelector('.detail-actions .btn-danger');
+    if (!cancelBtn) return;
+
+    const check = isCancellable(booking);
+    if (check.ok) {
+        cancelBtn.style.display = '';
+        cancelBtn.disabled = false;
+        cancelBtn.title = '';
+    } else {
+        // Keep visible but disabled with tooltip — clearer than hiding
+        cancelBtn.style.display = '';
+        cancelBtn.disabled = true;
+        cancelBtn.style.opacity = '0.5';
+        cancelBtn.style.cursor = 'not-allowed';
+        cancelBtn.title = check.reason;
+    }
+}
+
+// ─────────────────────────────────────────────
+// Support modal — show numbers inline (no tel:)
 // ─────────────────────────────────────────────
 function updateSupportModal(booking) {
-    if (booking.driver) {
+    // Driver section
+    if (booking.driver && booking.driver.phone) {
         document.getElementById('driverSupportOption').style.display = 'block';
         document.getElementById('driverContactInfo').innerHTML = `
-            <strong>Name:</strong> ${booking.driver.name || '-'}<br>
-            <strong>Phone:</strong> ${booking.driver.phone || '-'}
+            <div class="contact-row"><strong>Name:</strong> <span>${escapeHtml(booking.driver.name || '-')}</span></div>
+            <div class="contact-row">
+                <strong>Phone:</strong>
+                <span class="phone-display" id="driverPhoneDisplay">${escapeHtml(booking.driver.phone)}</span>
+                <button class="copy-btn" type="button" onclick="copyToClipboard('${escapeHtml(booking.driver.phone)}', this)">
+                    <i class="fas fa-copy"></i> Copy
+                </button>
+            </div>
         `;
     } else {
         document.getElementById('driverSupportOption').style.display = 'none';
     }
 
+    // Company section
     const c = booking.company || {};
     document.getElementById('companyContactInfo').innerHTML = `
-        <strong>Company:</strong> ${c.name || '-'}<br>
-        <strong>Phone:</strong> ${c.phone || '-'}<br>
-        <strong>Email:</strong> ${c.email || '-'}
+        <div class="contact-row"><strong>Company:</strong> <span>${escapeHtml(c.name || '-')}</span></div>
+        <div class="contact-row">
+            <strong>Phone:</strong>
+            <span class="phone-display">${escapeHtml(c.phone || '-')}</span>
+            ${c.phone ? `<button class="copy-btn" type="button" onclick="copyToClipboard('${escapeHtml(c.phone)}', this)">
+                <i class="fas fa-copy"></i> Copy
+            </button>` : ''}
+        </div>
+        <div class="contact-row"><strong>Email:</strong> <span>${escapeHtml(c.email || '-')}</span></div>
     `;
 }
 
+function copyToClipboard(text, btn) {
+    if (!text || text === '-') return;
+
+    const done = () => {
+        if (btn) {
+            const original = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-check"></i> Copied';
+            btn.classList.add('copied');
+            setTimeout(() => {
+                btn.innerHTML = original;
+                btn.classList.remove('copied');
+            }, 1500);
+        }
+        showNotification('Phone number copied', 'success');
+    };
+
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(done).catch(() => fallbackCopy(text, done));
+    } else {
+        fallbackCopy(text, done);
+    }
+}
+
+function fallbackCopy(text, done) {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); done(); }
+    catch (e) { showNotification('Could not copy', 'warning'); }
+    document.body.removeChild(ta);
+}
+
 // ─────────────────────────────────────────────
-// Navigation / action handlers (unchanged)
+// Navigation / action handlers
 // ─────────────────────────────────────────────
 function navigateToCompany() {
-    if (currentBooking && currentBooking.company) {
+    if (currentBooking && currentBooking.company && currentBooking.company.id) {
         sessionStorage.setItem('selectedCompanyId', currentBooking.company.id);
-        window.location.href = `company-profile.html?company=${currentBooking.company.id}`;
+        window.location.href = `company-profile.html?companyId=${encodeURIComponent(currentBooking.company.id)}`;
+    } else {
+        showNotification('Company information not available', 'warning');
     }
 }
 
@@ -266,21 +417,19 @@ function viewInvoice() {
     }
 }
 
+// Driver call/message buttons inside Driver card — also no tel:
 function callDriver() {
-    if (currentBooking && currentBooking.driver) {
-        showNotification(`Calling ${currentBooking.driver.name}...`, 'info');
-        setTimeout(() => {
-            window.location.href = `tel:${currentBooking.driver.phone}`;
-        }, 1000);
+    if (currentBooking && currentBooking.driver && currentBooking.driver.phone) {
+        // Just open the support modal so the user can see/copy the number
+        contactSupport();
+    } else {
+        showNotification('Driver phone not available', 'warning');
     }
 }
 
 function messageDriver() {
     if (currentBooking && currentBooking.driver) {
-        showNotification(`Opening message to ${currentBooking.driver.name}...`, 'info');
-        setTimeout(() => {
-            alert(`Message feature coming soon. You can call ${currentBooking.driver.name} at ${currentBooking.driver.phone}`);
-        }, 1000);
+        showNotification('Messaging feature coming soon', 'info');
     }
 }
 
@@ -290,39 +439,72 @@ function contactSupport() {
 function closeSupportModal() {
     document.getElementById('supportModal').classList.remove('show');
 }
+
+// Kept for compatibility — now just copy the number instead of dialing
 function contactDriverPhone() {
-    if (currentBooking && currentBooking.driver) {
-        window.location.href = `tel:${currentBooking.driver.phone}`;
+    if (currentBooking && currentBooking.driver && currentBooking.driver.phone) {
+        copyToClipboard(currentBooking.driver.phone, null);
     }
 }
 function contactCompanyPhone() {
-    if (currentBooking && currentBooking.company) {
-        window.location.href = `tel:${currentBooking.company.phone}`;
+    if (currentBooking && currentBooking.company && currentBooking.company.phone) {
+        copyToClipboard(currentBooking.company.phone, null);
     }
 }
 function contactAdmin() {
-    window.location.href = 'tel:+94112345678';
+    copyToClipboard('+94112345678', null);
 }
 
+// ─────────────────────────────────────────────
+// Cancel booking — 24h rule (frontend) + server enforces too
+// ─────────────────────────────────────────────
 function cancelBooking() {
-    if (currentBooking &&
-        ['Active', 'Confirmed', 'Pending'].includes(currentBooking.status)) {
-        document.getElementById('cancelModal').classList.add('show');
-    } else {
-        showNotification('This booking cannot be cancelled', 'warning');
+    const check = isCancellable(currentBooking);
+    if (!check.ok) {
+        showNotification(check.reason, 'warning');
+        return;
     }
+    document.getElementById('cancelModal').classList.add('show');
 }
+
 function closeCancelModal() {
     document.getElementById('cancelModal').classList.remove('show');
 }
+
 function confirmCancel() {
+    if (!currentBooking) return;
+
+    // Re-check at submit time
+    const check = isCancellable(currentBooking);
+    if (!check.ok) {
+        closeCancelModal();
+        showNotification(check.reason, 'warning');
+        return;
+    }
+
     closeCancelModal();
     showNotification('Processing cancellation...', 'info');
-    // TODO: hook this to your CustomerCancelBookingServlet
-    setTimeout(() => {
-        showNotification('Booking cancelled successfully', 'success');
-        setTimeout(() => (window.location.href = 'bookings.html'), 2000);
-    }, 1500);
+
+    const ctx = window.location.pathname.split('/views/')[0];
+    fetch(`${ctx}/customer/cancel-booking`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'same-origin',
+        body: JSON.stringify({ rideId: currentBooking.id })
+    })
+        .then(res => res.json().then(data => ({ status: res.status, data })))
+        .then(({ status, data }) => {
+            if (data.success) {
+                showNotification('Booking cancelled successfully', 'success');
+                setTimeout(() => (window.location.href = 'bookings.html'), 1500);
+            } else {
+                showNotification(data.message || 'Failed to cancel booking', 'warning');
+            }
+        })
+        .catch(err => {
+            console.error('Cancel error:', err);
+            showNotification('Could not connect to server', 'error');
+        });
 }
 
 function showNotification(message, type = 'info') {

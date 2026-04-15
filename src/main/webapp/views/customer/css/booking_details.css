@@ -1007,3 +1007,84 @@
     font-size: 20px;
   }
 }
+
+/* =========================
+  Contact Phone Display (Support Modal)
+  Append these to booking_details.css
+  ========================= */
+
+.contact-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 14px;
+  color: var(--text);
+  padding: 6px 0;
+}
+
+.contact-row strong {
+  color: var(--text);
+  font-weight: 600;
+  min-width: 70px;
+}
+
+.phone-display {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 12px;
+  background: linear-gradient(135deg, rgba(58, 12, 163, 0.08), rgba(67, 97, 238, 0.08));
+  border: 1px dashed rgba(58, 12, 163, 0.3);
+  border-radius: var(--radius-sm);
+  font-family: 'Courier New', monospace;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--primary);
+  letter-spacing: 0.5px;
+  user-select: all;
+}
+
+.copy-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.copy-btn:hover {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(58, 12, 163, 0.2);
+}
+
+.copy-btn.copied {
+  background: #10b981;
+  color: white;
+  border-color: #10b981;
+}
+
+.copy-btn i {
+  font-size: 12px;
+}
+
+/* Disabled cancel button styling (24h rule) */
+.detail-actions .btn-danger:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+  pointer-events: auto; /* still allow tooltip to show */
+}
+
+.detail-actions .btn-danger:disabled:hover {
+  transform: none;
+  box-shadow: none;
+}

@@ -9,6 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="../css/main.css" />
     <link rel="stylesheet" href="../css/bookings.css" />
+    <link rel="stylesheet" href="../css/report.css" />
 </head>
 <body>
 <div class="container">
@@ -140,17 +141,8 @@
             <button class="modal-close" onclick="closeRatingModal()">&times;</button>
         </div>
         <div class="action-modal-body">
-            <div class="rating-section">
-                <label>Overall Experience</label>
-                <div class="star-rating" id="overallRating">
-                    <i class="far fa-star" data-rating="1"></i>
-                    <i class="far fa-star" data-rating="2"></i>
-                    <i class="far fa-star" data-rating="3"></i>
-                    <i class="far fa-star" data-rating="4"></i>
-                    <i class="far fa-star" data-rating="5"></i>
-                </div>
-            </div>
-            <div class="rating-section">
+            <!-- Driver/Service rating (hidden for self-drive) -->
+            <div class="rating-section" id="driverRatingSection">
                 <label>Driver/Service Quality</label>
                 <div class="star-rating" id="serviceRating">
                     <i class="far fa-star" data-rating="1"></i>
@@ -177,7 +169,7 @@
         </div>
         <div class="action-modal-footer">
             <button class="btn btn-outline" onclick="closeRatingModal()">Cancel</button>
-            <button class="btn btn-primary" onclick="submitRating()">Submit Rating</button>
+            <button class="btn btn-primary" id="submitRatingBtn" onclick="submitRating()">Submit Rating</button>
         </div>
     </div>
 </div>
@@ -201,6 +193,82 @@
             <button class="btn btn-outline" onclick="closeRebookModal()">Cancel</button>
             <button class="btn btn-success" onclick="confirmRebook()">
                 <i class="fas fa-search"></i> Search Similar Vehicles
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- =========================================================================
+     REPORT MODAL
+     ========================================================================= -->
+
+<div id="reportModal" class="action-modal">
+    <div class="action-modal-content report-modal-content">
+        <div class="action-modal-header">
+            <h3><i class="fas fa-flag text-danger"></i> File a Report</h3>
+            <button class="modal-close" onclick="closeReportModal()">&times;</button>
+        </div>
+        <div class="action-modal-body">
+            <p class="modal-subtitle" id="reportSubtitle"></p>
+
+            <!-- Who are you reporting? -->
+            <div class="rating-section">
+                <label>Who are you reporting?</label>
+                <div class="report-target-toggle">
+                    <button type="button" class="report-target-btn active" data-target="DRIVER" onclick="selectReportTarget('DRIVER')">
+                        <i class="fas fa-user"></i>
+                        <span class="target-label">Driver</span>
+                        <span class="target-name" id="reportDriverName">-</span>
+                    </button>
+                    <button type="button" class="report-target-btn" data-target="COMPANY" onclick="selectReportTarget('COMPANY')">
+                        <i class="fas fa-building"></i>
+                        <span class="target-label">Company</span>
+                        <span class="target-name" id="reportCompanyName">-</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Category -->
+            <div class="rating-section">
+                <label>Category <span class="required">*</span></label>
+                <select id="reportCategory" class="report-select">
+                    <option value="">-- Select a category --</option>
+                    <option value="vehicle">Vehicle (condition, cleanliness, mechanical)</option>
+                    <option value="behavior">Behavior (rudeness, unprofessionalism)</option>
+                    <option value="payment">Payment (billing, refund, overcharge)</option>
+                    <option value="safety">Safety (reckless driving, harassment)</option>
+                    <option value="app">App Issue (bugs, technical)</option>
+                </select>
+            </div>
+
+            <!-- Subject -->
+            <div class="rating-section">
+                <label>Subject <span class="required">*</span></label>
+                <input type="text" id="reportSubject" class="report-input" maxlength="255" placeholder="Brief summary of the issue" />
+            </div>
+
+            <!-- Description -->
+            <div class="rating-section">
+                <label>Description <span class="required">*</span></label>
+                <textarea id="reportDescription" rows="5" placeholder="Please describe what happened in detail..."></textarea>
+            </div>
+
+            <!-- Image upload -->
+            <div class="rating-section">
+                <label>Attach Images (Optional)</label>
+                <div class="report-upload-area" onclick="document.getElementById('reportImageInput').click()">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <p>Click to upload images</p>
+                    <span class="upload-hint">Up to 5 images, max 10MB each</span>
+                </div>
+                <input type="file" id="reportImageInput" accept="image/*" multiple style="display:none" onchange="handleReportImageSelect(event)" />
+                <div id="reportImagePreview" class="report-image-preview"></div>
+            </div>
+        </div>
+        <div class="action-modal-footer">
+            <button class="btn btn-outline" onclick="closeReportModal()">Cancel</button>
+            <button class="btn btn-danger" id="reportSubmitBtn" onclick="submitReport()">
+                <i class="fas fa-flag"></i> Submit Report
             </button>
         </div>
     </div>

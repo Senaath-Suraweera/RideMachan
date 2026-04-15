@@ -1,0 +1,173 @@
+/* =========================================================================
+   report.css - styles for the Report button and Report modal
+   Save as: webapp/css/report.css
+   Include in bookings.html <head>:
+   <link rel="stylesheet" href="../css/report.css" />
+   ========================================================================= */
+
+/* Report button on booking cards */
+.btn-report {
+    background: #fff;
+    color: #dc3545;
+    border: 1.5px solid #dc3545;
+    transition: all 0.2s ease;
+}
+.btn-report:hover {
+    background: #dc3545;
+    color: #fff;
+}
+
+/* Report modal width */
+.report-modal-content {
+    max-width: 560px;
+    width: 95%;
+}
+
+/* Required asterisk */
+.report-modal-content .required {
+    color: #dc3545;
+    font-weight: 600;
+}
+
+/* Inputs / select */
+.report-input,
+.report-select {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1.5px solid #e0e0e0;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 14px;
+    background: #fff;
+    transition: border-color 0.2s;
+}
+.report-input:focus,
+.report-select:focus {
+    outline: none;
+    border-color: #4361ee;
+}
+
+/* Target toggle (Driver vs Company) */
+.report-target-toggle {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+.report-target-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 14px 10px;
+    border: 1.5px solid #e0e0e0;
+    border-radius: 10px;
+    background: #fff;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: inherit;
+}
+.report-target-btn i {
+    font-size: 20px;
+    color: #888;
+}
+.report-target-btn .target-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #555;
+}
+.report-target-btn .target-name {
+    font-size: 11px;
+    color: #999;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.report-target-btn:hover {
+    border-color: #4361ee;
+}
+.report-target-btn.active {
+    border-color: #dc3545;
+    background: #fff5f5;
+}
+.report-target-btn.active i,
+.report-target-btn.active .target-label {
+    color: #dc3545;
+}
+.report-target-btn.disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+/* Upload area */
+.report-upload-area {
+    border: 2px dashed #d0d0d0;
+    border-radius: 10px;
+    padding: 22px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: #fafafa;
+}
+.report-upload-area:hover {
+    border-color: #4361ee;
+    background: #f0f4ff;
+}
+.report-upload-area i {
+    font-size: 32px;
+    color: #888;
+    margin-bottom: 6px;
+}
+.report-upload-area p {
+    margin: 4px 0 2px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #555;
+}
+.report-upload-area .upload-hint {
+    font-size: 11px;
+    color: #999;
+}
+
+/* Image previews */
+.report-image-preview {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 10px;
+}
+.report-image-preview .preview-item {
+    position: relative;
+    width: 72px;
+    height: 72px;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1.5px solid #e0e0e0;
+}
+.report-image-preview .preview-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.report-image-preview .preview-remove {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.65);
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    font-size: 11px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.report-image-preview .preview-remove:hover {
+    background: #dc3545;
+}
+
+.text-danger { color: #dc3545; }

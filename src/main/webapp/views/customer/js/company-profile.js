@@ -63,29 +63,42 @@ function loadComponent(elementId, filePath) {
     return fetch(filePath)
         .then(response => response.text())
         .then(data => {
-            let modifiedData = data;
-            if (elementId === 'header-container') {
-                modifiedData = data.replace('{{PAGE_TITLE}}', 'Company Profile');
-                setTimeout(() => {
-                    const headerLeft = document.querySelector('.header .hi');
-                    if (headerLeft && !headerLeft.querySelector('.back-btn')) {
-                        const backBtn = document.createElement('button');
-                        backBtn.className = 'back-btn';
-                        backBtn.onclick = goBack;
-                        backBtn.innerHTML = '<i class="fas fa-arrow-left"></i> Back';
-                        headerLeft.style.display = 'flex';
-                        headerLeft.style.alignItems = 'center';
-                        headerLeft.style.gap = '20px';
-                        headerLeft.insertBefore(backBtn, headerLeft.firstChild);
-                    }
-                }, 100);
-            }
             const container = document.getElementById(elementId);
-            if (container) {
-                container.innerHTML = modifiedData;
+            if (container) container.innerHTML = data;
+
+            if (elementId === 'header-container') {
+                return new Promise(resolve => {
+                    loadHeaderScript(() => {
+                        if (typeof initializeHeader === 'function') initializeHeader();
+                        if (typeof setPageTitle === 'function') setPageTitle('Company Profile');
+
+                        // Add back button (your existing logic)
+                        const headerLeft = document.querySelector('.header .hi');
+                        if (headerLeft && !headerLeft.querySelector('.back-btn')) {
+                            const backBtn = document.createElement('button');
+                            backBtn.className = 'back-btn';
+                            backBtn.onclick = goBack;
+                            backBtn.innerHTML = '<i class="fas fa-arrow-left"></i> Back';
+                            headerLeft.style.display = 'flex';
+                            headerLeft.style.alignItems = 'center';
+                            headerLeft.style.gap = '20px';
+                            headerLeft.insertBefore(backBtn, headerLeft.firstChild);
+                        }
+                        resolve();
+                    });
+                });
             }
         })
         .catch(error => console.error('Error loading component:', error));
+}
+
+function loadHeaderScript(cb) {
+    if (window.initializeHeader) { cb(); return; }
+    const s = document.createElement('script');
+    s.src = '../components/header.js';
+    s.onload = cb;
+    s.onerror = () => { console.error('Failed to load header.js'); cb(); };
+    document.head.appendChild(s);
 }
 
 function updateStars(containerId, rating) {
@@ -227,6 +240,7 @@ async function loadCompanyProfile() {
 
         const aboutNameEl = document.getElementById('aboutCompanyName');
         if (aboutNameEl) aboutNameEl.textContent = companyName;
+        if (typeof setPageTitle === 'function') setPageTitle(companyName);
 
         // Location
         const location = safeText(companyPayload.city, 'Sri Lanka');
