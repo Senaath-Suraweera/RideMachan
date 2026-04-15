@@ -928,3 +928,24 @@ textarea.form-control {
         font-size: 18px;
     }
 }
+
+/* =========================
+   Driver / Call avatar — image fit
+   Append to existing driver-profile.css
+   ========================= */
+
+.driver-avatar-img.has-image,
+.call-avatar.has-image {
+    background: #fff;
+    padding: 0;
+    overflow: hidden;
+}
+
+.driver-avatar-img.has-image img,
+.call-avatar.has-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+    display: block;
+}
