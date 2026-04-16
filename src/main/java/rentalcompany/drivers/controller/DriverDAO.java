@@ -226,11 +226,122 @@ public class DriverDAO {
         return bookings;
     }
 
+    public static List<Driver> loadTripAvailableDrivers(int companyId, int bookingId) {
+
+        List<Driver> drivers = new ArrayList<>();
+
+        String sql =
+                "SELECT trip_start_date, trip_end_date, start_time, end_time " +
+                        "FROM companybookings " +
+                        "WHERE booking_id = ? AND companyid = ?";
+
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setInt(1, bookingId);
+            ps.setInt(2, companyId);
+
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+
+                Date startDate = rs.getDate("trip_start_date");
+                Date endDate = rs.getDate("trip_end_date");
+                Time startTime = rs.getTime("start_time");
+                Time endTime = rs.getTime("end_time");
+
+                drivers = getAvailableDrivers(companyId, startDate, endDate, startTime, endTime);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return drivers;
+    }
 
 
+    public static List<Driver> getAvailableDrivers(int companyId,Date startDate,Date endDate,Time startTime,Time endTime) {
+
+        List<Driver> drivers = new ArrayList<>();
+
+        String sql = "SELECT * FROM driver WHERE company_id = ?";
+
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setInt(1, companyId);
+
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+
+                int driverId = rs.getInt("driverid");
+
+                boolean conflict = isDriverConflict(driverId, startDate, endDate, startTime, endTime);
+
+                if (!conflict) {
+
+                    Driver d = new Driver();
+                    d.setDriverId(driverId);
+                    d.setFirstName(rs.getString("firstname"));
+                    d.setLastName(rs.getString("lastname"));
+                    d.setEmail(rs.getString("email"));
+
+                    drivers.add(d);
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return drivers;
+
+    }
 
 
+    public static boolean isDriverConflict(int driverId,Date startDate,Date endDate,Time startTime,Time endTime) {
 
+        String sql =
+                "SELECT cb.trip_start_date, cb.trip_end_date, cb.start_time, cb.end_time " +
+                "FROM companybookings cb " +
+                "JOIN driver_booking_status dbs ON cb.booking_id = dbs.booking_id " +
+                "WHERE dbs.driverid = ?";
+
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setInt(1, driverId);
+
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+
+                Date exStartDate = rs.getDate("trip_start_date");
+                Date exEndDate = rs.getDate("trip_end_date");
+                Time exStartTime = rs.getTime("start_time");
+                Time exEndTime = rs.getTime("end_time");
+
+                boolean dateOverlap =
+                        (exStartDate.compareTo(endDate) <= 0) &&
+                                (exEndDate.compareTo(startDate) >= 0);
+
+                boolean timeOverlap =
+                        (exStartTime.compareTo(endTime) <= 0) &&
+                                (exEndTime.compareTo(startTime) >= 0);
+
+                if (dateOverlap && timeOverlap) {
+                    return true;
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
 
 
 

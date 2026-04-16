@@ -54,6 +54,7 @@ public class RentalCompanyBookingsDAO {
                 booking.setCustomerName(rs.getString("customerName"));
                 booking.setCustomerPhoneNumber(rs.getString("mobilenumber"));
                 booking.setCustomerEmail(rs.getString("email"));
+                booking.setSpecialInstructions(rs.getString("special_instructions"));
 
                 booking.setVehicleId(rs.getInt("vehicleid"));
                 booking.setVehicleBrand(rs.getString("vehiclebrand"));

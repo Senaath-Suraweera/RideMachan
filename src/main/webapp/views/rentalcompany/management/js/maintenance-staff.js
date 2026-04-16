@@ -204,19 +204,12 @@ function renderMaintenanceStaff(maintenanceStaffs) {
                               ${maintenanceStaff.certifications.map(cert => `<span class="badge">${cert}</span>`).join('')}
                           </div>
                           <div class="staff-actions">
-                              <button class="action-btn" onclick="messageStaff('${maintenanceStaff.staffId}')">
-                                      <i class="fas fa-comment"></i>
-                                      Message
-                              </button>
-                              <a href="maintenance-vehicle-assignment.html">
+                              <a href="maintenance-vehicle-assignment.html" style="text-decoration: none">
                                   <button class="action-btn primary" data-staff-id="${maintenanceStaff.staffId}">
                                           View Assign Vehicles
                                   </button> 
                               </a>
-                              
-                              <!--<button class="action-btn primary" data-staff-id="${maintenanceStaff.staffId}" onclick="viewAssignedVehicles('${maintenanceStaff.staffId}')">
-                                      View Assign Vehicles
-                              </button> -->                                                          
+                                                        
                           </div>                         
                        `;
 
