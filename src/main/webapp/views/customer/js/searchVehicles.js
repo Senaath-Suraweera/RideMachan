@@ -6,6 +6,10 @@ let filteredVehicles = [];
 let companiesMap = {};      // id  → name  (populated from /customer/getCompanies)
 let companyNameToId = {};   // name → id   (reverse map, built at the same time)
 
+// ── Pagination ──
+const PAGE_SIZE   = 20;
+let   currentPage = 1;
+
 // ========================================
 // 1. Boot sequence — load companies first,
 //    then load vehicles (vehicles need the map)
@@ -143,9 +147,11 @@ async function loadVehicles() {
 }
 
 // ========================================
-// 6. Display Vehicles in Search Results
+// 6. Display Vehicles in Search Results (paginated)
 // ========================================
-function displayVehicles(vehicles) {
+function displayVehicles(vehicles, resetPage = true) {
+    if (resetPage) currentPage = 1;
+
     const container = document.getElementById('searchResults');
     if (!container) return;
 
@@ -156,10 +162,15 @@ function displayVehicles(vehicles) {
             <p style="text-align:center;color:var(--text-light);padding:40px;">
                 No vehicles found matching your criteria.
             </p>`;
+        renderPagination(vehicles);
         return;
     }
 
-    vehicles.forEach(vehicle => {
+    // Slice to current page
+    const start    = (currentPage - 1) * PAGE_SIZE;
+    const pageSlice = vehicles.slice(start, start + PAGE_SIZE);
+
+    pageSlice.forEach(vehicle => {
         const card = document.createElement('div');
         card.className = 'vehicle-card';
         card.onclick = () => viewVehicle(vehicle.vehicleId);
@@ -227,6 +238,124 @@ function displayVehicles(vehicles) {
         // Load rating asynchronously so cards appear instantly
         loadVehicleRating(vehicle.vehicleId);
     });
+
+    renderPagination(vehicles);
+
+    // Scroll to top of results smoothly on page change
+    container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// ========================================
+// 6b. Render Pagination Controls
+// ========================================
+function renderPagination(vehicles) {
+    // Remove any existing pagination bar
+    const existing = document.getElementById('paginationBar');
+    if (existing) existing.remove();
+
+    const totalPages = Math.ceil(vehicles.length / PAGE_SIZE);
+    if (totalPages <= 1) return; // No bar needed for single page
+
+    const bar = document.createElement('div');
+    bar.id = 'paginationBar';
+    bar.style.cssText = `
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        padding: 28px 0 12px;
+        flex-wrap: wrap;
+    `;
+
+    // Results summary
+    const start  = (currentPage - 1) * PAGE_SIZE + 1;
+    const end    = Math.min(currentPage * PAGE_SIZE, vehicles.length);
+    const summary = document.createElement('div');
+    summary.style.cssText = `
+        width: 100%;
+        text-align: center;
+        font-size: 13px;
+        color: var(--text-light, #888);
+        margin-bottom: 10px;
+    `;
+    summary.textContent = `Showing ${start}–${end} of ${vehicles.length} vehicles`;
+    bar.appendChild(summary);
+
+    // Helper to create a button
+    function makeBtn(label, page, isActive, isDisabled) {
+        const btn = document.createElement('button');
+        btn.innerHTML = label;
+        btn.disabled  = isDisabled;
+        btn.style.cssText = `
+            min-width: 38px;
+            height: 38px;
+            padding: 0 10px;
+            border-radius: 8px;
+            border: 1.5px solid ${isActive ? 'var(--primary, #4361ee)' : 'var(--border, #e0e0e0)'};
+            background: ${isActive ? 'var(--primary, #4361ee)' : 'white'};
+            color: ${isActive ? 'white' : isDisabled ? '#ccc' : 'var(--text, #333)'};
+            font-size: 14px;
+            font-weight: ${isActive ? '600' : '400'};
+            cursor: ${isDisabled ? 'default' : 'pointer'};
+            transition: background 0.15s, border-color 0.15s, color 0.15s;
+            font-family: inherit;
+            box-shadow: ${isActive ? '0 2px 8px rgba(67,97,238,0.25)' : 'none'};
+        `;
+        if (!isDisabled && !isActive) {
+            btn.onmouseenter = () => { btn.style.borderColor = 'var(--primary, #4361ee)'; btn.style.color = 'var(--primary, #4361ee)'; };
+            btn.onmouseleave = () => { btn.style.borderColor = 'var(--border, #e0e0e0)'; btn.style.color = 'var(--text, #333)'; };
+        }
+        if (!isDisabled) {
+            btn.onclick = () => goToPage(page, vehicles);
+        }
+        return btn;
+    }
+
+    // ← Prev
+    bar.appendChild(makeBtn('<i class="fas fa-chevron-left"></i>', currentPage - 1, false, currentPage === 1));
+
+    // Page number buttons with ellipsis
+    const pageButtons = buildPageRange(currentPage, totalPages);
+    pageButtons.forEach(item => {
+        if (item === '...') {
+            const ellipsis = document.createElement('span');
+            ellipsis.textContent = '…';
+            ellipsis.style.cssText = 'padding: 0 4px; color: var(--text-light, #888); font-size:14px; line-height:38px;';
+            bar.appendChild(ellipsis);
+        } else {
+            bar.appendChild(makeBtn(item, item, item === currentPage, false));
+        }
+    });
+
+    // Next →
+    bar.appendChild(makeBtn('<i class="fas fa-chevron-right"></i>', currentPage + 1, false, currentPage === totalPages));
+
+    // Insert after searchResults
+    const resultsContainer = document.getElementById('searchResults');
+    resultsContainer.insertAdjacentElement('afterend', bar);
+}
+
+// Build a smart page range with ellipsis: [1, ..., 4, 5, 6, ..., 12]
+function buildPageRange(current, total) {
+    if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
+
+    const pages = [];
+    pages.push(1);
+
+    if (current > 3)          pages.push('...');
+    for (let p = Math.max(2, current - 1); p <= Math.min(total - 1, current + 1); p++) {
+        pages.push(p);
+    }
+    if (current < total - 2)  pages.push('...');
+
+    pages.push(total);
+    return pages;
+}
+
+// Navigate to a specific page
+function goToPage(page, vehicles) {
+    currentPage = page;
+    displayVehicles(vehicles, false);  // false = don't reset currentPage again
 }
 
 // ========================================
