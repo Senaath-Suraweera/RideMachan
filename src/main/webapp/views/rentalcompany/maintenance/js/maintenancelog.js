@@ -35,6 +35,7 @@ async function checkLogin() {
 
 let assignedVehicles;
 let maintenanceLogs;
+let vehicle;
 
 
 
@@ -43,6 +44,31 @@ async function LoadAssignedVehicles() {
     try {
 
         let response = await fetch(`/assignedvehicles`);
+
+        if(!response.ok){
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        let data = await response.json();
+
+        console.log(data);
+
+
+        return data;
+
+    }catch (err) {
+
+        console.log(err);
+
+    }
+
+}
+
+async function LoadMaintenanceLogs(vehicleId) {
+
+    try {
+
+        let response = await fetch(`/maintenanceLogs?vehicleId=${vehicleId}`);
 
         if(!response.ok){
             throw new Error(`HTTP error! Status: ${response.status}`);
@@ -82,9 +108,9 @@ function renderVehicleDropdown() {
 }
 
 
-function filterVehicleByNumberPlate(numberplate) {
+async function filterVehicleByNumberPlate(numberplate) {
 
-    const vehicleInformation = document.getElementsByClassName("vehicle-info")[0];
+    let vehicleInformation = document.getElementsByClassName("vehicle-info")[0];
     vehicleInformation.innerHTML = "";
 
     let selectedVehicle = null;
@@ -112,11 +138,12 @@ function filterVehicleByNumberPlate(numberplate) {
     console.log("Render complete!");
 
 
-    let vehicleLogs = maintenanceLogs.filter(log => log.numberplate === numberplate);
+    if (!selectedVehicle) return;
 
-    console.log("Filtered vehicle logs:", vehicleLogs);
 
-    renderMaintenanceLogs(vehicleLogs);
+    let logs = selectedVehicle.maintenanceLogs;
+
+    renderMaintenanceLogs(logs);
 
 }
 
@@ -229,17 +256,13 @@ function renderMaintenanceLogs(maintenanceLogs) {
         }
 
         table.innerHTML += `
-
-                    <tr>
-                        <td>${log.date}</td>
-                        <td>${log.serviceType}</td>
-                        <td><span class="priority-badge ${priority}">${log.priority}</span></td>
-                        <td><span class="status-badge ${status}">${log.status}</span></td>
-                        <td>${log.nextService}</td>
-                    </tr>
-
-          `
-        ;
+            <tr>
+                <td>${log.scheduledDate || "-"}</td>
+                <td>${log.type || "-"}</td>
+                <td>${log.status || "-"}</td>
+                <td>${log.completedDate || "-"}</td>
+            </tr>
+        `;
 
     });
 
@@ -267,8 +290,9 @@ document.addEventListener("DOMContentLoaded", async function () {
 
         const dummyData = createDummyDataInput();
 
-        assignedVehicles = await LoadAssignedVehicles();
-        maintenanceLogs = dummyData.maintenancelogs;
+        let response = await LoadAssignedVehicles();
+        assignedVehicles = response.assignedvehicles;
+
 
         renderVehicleDropdown();
 
@@ -303,6 +327,42 @@ document.addEventListener("DOMContentLoaded", async function () {
     }
 
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

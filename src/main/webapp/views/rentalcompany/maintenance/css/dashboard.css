@@ -371,6 +371,23 @@ body {
   color: var(--dark);
 }
 
+.upcoming-activity{
+  position: relative;
+  top: -345px;
+  left: 480px;
+  background-color: white;
+  border-radius: var(--radius);
+  padding: 25px;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid rgba(0, 0, 0, 0.03);
+}
+
+.upcoming-activity h3 {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 25px;
+  color: var(--dark);
+}
 .activity-list {
   display: flex;
   flex-direction: column;
@@ -693,6 +710,10 @@ body {
   border-radius: 1rem;
   border: 1px solid rgba(58, 12, 163, 0.1);
 }
+.fleet-health-card{
+  position: relative;
+  top: -100px;
+}
 
 .content-card:hover {
   box-shadow: 0 20px 40px rgba(58, 12, 163, 0.15);
@@ -731,7 +752,7 @@ body {
   align-items: center;
   justify-content: space-between;
   margin-bottom: 1.5rem;
-  
+
 }
 
 .health-item:last-child {

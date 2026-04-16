@@ -4,6 +4,7 @@ package rentalcompany.maintenance.service;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
+import rentalcompany.companyvehicle.model.MaintenanceRecord;
 import rentalcompany.maintenance.controller.MaintenanceStaffDAO;
 import rentalcompany.companyvehicle.model.Vehicle;
 
@@ -30,11 +31,13 @@ public class LoadAssignedVehicleswServlet extends HttpServlet {
 
 
             List<Vehicle> vehicles = MaintenanceStaffDAO.getAssignedVehicles(staffId);
+            List<MaintenanceRecord> logs = MaintenanceStaffDAO.getMaintenanceLogsByStaffId(staffId);
 
             resp.setContentType("application/json");
             resp.setCharacterEncoding("UTF-8");
 
-            String json = "[";
+            String json = "{";
+            json += "\"assignedvehicles\":[";
 
             for (int i = 0; i < vehicles.size(); i++) {
 
@@ -53,25 +56,47 @@ public class LoadAssignedVehicleswServlet extends HttpServlet {
                 if (lastServiceDate == null) lastServiceDate = "";
                 if (nextServiceDate == null) nextServiceDate = "";
 
-                json += "{"
-                        + "\"vehicleId\":" + v.getVehicleId() + ","
-                        + "\"numberplate\":\"" + numberplate + "\","
-                        + "\"type\":\"" + type + "\","
-                        + "\"brand\":\"" + brand + "\","
-                        + "\"model\":\"" + model + "\","
-                        + "\"year\":" + year + ","
-                        + "\"status\":\"" + status + "\","
-                        + "\"lastServiceDate\":\"" + lastServiceDate + "\","
-                        + "\"nextServiceDate\":\"" + nextServiceDate + "\""
-                        + "}";
+                json += "{";
+                json += "\"vehicleId\":" + v.getVehicleId() + ",";
+                json += "\"numberplate\":\"" + v.getNumberPlateNumber() + "\",";
+                json += "\"type\":\"" + v.getType() + "\",";
+                json += "\"brand\":\"" + v.getVehicleBrand() + "\",";
+                json += "\"model\":\"" + v.getVehicleModel() + "\",";
+                json += "\"year\":" + v.getYear() + ",";
+                json += "\"status\":\"" + v.getStatus() + "\"";
+
+                json += ",\"maintenanceLogs\":[";
+
+                boolean firstLog = true;
+
+                for (MaintenanceRecord r : logs) {
+
+                    if (r.getVehicleId() == v.getVehicleId()) {
+
+                        if (!firstLog) json += ",";
+
+                        json += "{";
+                        json += "\"jobId\":" + r.getRecordId() + ",";
+                        json += "\"type\":\"" + r.getServiceType() + "\",";
+                        json += "\"status\":\"" + r.getStatus() + "\",";
+                        json += "\"completedDate\":\"" + r.getCompletedDate() + "\"";
+                        json += "}";
+
+                        firstLog = false;
+                    }
+                }
+
+                json += "]";
+
+                json += "}";
 
                 if (i < vehicles.size() - 1) {
                     json += ",";
                 }
-
             }
 
             json += "]";
+            json += "}";
 
             resp.getWriter().write(json);
 
