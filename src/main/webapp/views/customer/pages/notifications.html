@@ -1,189 +1,327 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-    <head>
-        <!-- ===================
+  <head>
+    <!-- ===================
                  Meta & Stylesheets
         =================== -->
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Notifications - Ride Machan</title>
-        <link
-            rel="stylesheet"
-            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
-        />
-        <link
-            rel="stylesheet"
-            href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
-        />
-        <link
-            href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
-            rel="stylesheet"
-        />
-        <link rel="stylesheet" href="../css/main.css" />
-        <link rel="stylesheet" href="../css/notifications.css" />
-    </head>
-    <body>
-        <div class="container">
-            <!-- Include Navbar -->
-            <div id="navbar-container"></div>
-            
-            <!-- Include Header -->
-            <div id="header-container"></div>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Notifications - Ride Machan</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../css/main.css" />
+    <link rel="stylesheet" href="../css/notifications.css" />
+  </head>
+  <body>
+    <div class="container">
+      <!-- Include Navbar -->
+      <div id="navbar-container"></div>
 
-            <!-- ===================
+      <!-- Include Header -->
+      <div id="header-container"></div>
+
+      <!-- ===================
                      Main Content - Notifications
             =================== -->
-            <div class="main-content">
-                <!-- Notification Stats -->
-                <div class="page-title-row">
-                    <button class="icon-btn back-btn" onclick="history.back()" aria-label="Go back" title="Back">
-                        <i class="fas fa-arrow-left"></i>
-                    </button>
-                </div>
-
-                <!-- Notifications List -->
-                <div class="notifications-container" id="notificationList">
-                    <div class="notification-item confirmed">
-                        <div class="notification-icon">
-                            <i class="fas fa-circle-check"></i>
-                        </div>
-                        <div class="notification-content">
-                            <h4>Booking Confirmed - Mercedes C-Class</h4>
-                            <p>Your luxury car is now booked for tomorrow Pickup: Jan 15, 2024 at 9:00 AM from Colombo Fort. Driver: Chaminda Perera | 4.8 ★ Rating</p>
-                        </div>
-                        <div class="notification-meta">
-                            <span class="time">25 minutes ago</span>
-                            <button class="action-btn"><i class="fas fa-ellipsis-vertical"></i></button>
-                        </div>
-                    </div>
-                    
-                    <div class="notification-item pending">
-                        <div class="notification-icon">
-                            <i class="fas fa-clock"></i>
-                        </div>
-                        <div class="notification-content">
-                            <h4>Payment Pending - BMW X5</h4>
-                            <p>Your booking payment is pending. Please complete payment within 2 hours to confirm your reservation.</p>
-                        </div>
-                        <div class="notification-meta">
-                            <span class="time">1 hour ago</span>
-                            <button class="action-btn"><i class="fas fa-ellipsis-vertical"></i></button>
-                        </div>
-                    </div>
-
-                    <div class="notification-item warning">
-                        <div class="notification-icon">
-                            <i class="fas fa-exclamation-triangle"></i>
-                        </div>
-                        <div class="notification-content">
-                            <h4>Trip Reminder</h4>
-                            <p>Your trip starts in 2 hours. Make sure to be ready at the pickup location 15 minutes early.</p>
-                        </div>
-                        <div class="notification-meta">
-                            <span class="time">2 hours ago</span>
-                            <button class="action-btn"><i class="fas fa-ellipsis-vertical"></i></button>
-                        </div>
-                    </div>
-
-                    <div class="notification-item info">
-                        <div class="notification-icon">
-                            <i class="fas fa-info-circle"></i>
-                        </div>
-                        <div class="notification-content">
-                            <h4>New Driver Assigned</h4>
-                            <p>Sunil Fernando has been assigned as your driver for tomorrow's trip. Contact: +94 77 123 4567</p>
-                        </div>
-                        <div class="notification-meta">
-                            <span class="time">3 hours ago</span>
-                            <button class="action-btn"><i class="fas fa-ellipsis-vertical"></i></button>
-                        </div>
-                    </div>
-
-                    <div class="notification-item confirmed">
-                        <div class="notification-icon">
-                            <i class="fas fa-star"></i>
-                        </div>
-                        <div class="notification-content">
-                            <h4>Rate Your Recent Trip</h4>
-                            <p>How was your trip with Audi A4? Your feedback helps us improve our service quality.</p>
-                        </div>
-                        <div class="notification-meta">
-                            <span class="time">1 day ago</span>
-                            <button class="action-btn"><i class="fas fa-ellipsis-vertical"></i></button>
-                        </div>
-                    </div>
-                </div>
-            </div>
+      <div class="main-content">
+        <!-- Notification Stats -->
+        <div class="page-title-row">
+          <button
+            class="icon-btn back-btn"
+            onclick="history.back()"
+            aria-label="Go back"
+            title="Back"
+          >
+            <i class="fas fa-arrow-left"></i>
+          </button>
         </div>
 
-        <!-- ===================
+        <!-- Notifications List -->
+        <div class="notifications-container" id="notificationList"></div>
+      </div>
+    </div>
+
+    <!-- ===================
                      JavaScript
         =================== -->
-        <script>
-            // Load header and navbar
-            async function loadComponents() {
-                try {
-                    const navbarResponse = await fetch('../components/navbar.html');
-                    document.getElementById('navbar-container').innerHTML = await navbarResponse.text();
+    <script>
+      const API_BASE = "/api/notifications";
 
-                    const headerResponse = await fetch('../components/header.html');
-                    document.getElementById('header-container').innerHTML = await headerResponse.text();
+      async function loadComponents() {
+        try {
+          const navbarResponse = await fetch("../components/navbar.html");
+          document.getElementById("navbar-container").innerHTML =
+            await navbarResponse.text();
 
-                    // Re-execute the header script (innerHTML doesn't run scripts)
-                    const headerScript = document.createElement('script');
-                    headerScript.src = '../components/header.js';
-                    headerScript.onload = () => {
-                        initializeHeader();
-                        // setPageTitle() is now handled automatically by header.js
-                    };
-                    document.body.appendChild(headerScript);
+          const headerResponse = await fetch("../components/header.html");
+          document.getElementById("header-container").innerHTML =
+            await headerResponse.text();
 
-                    initializeComponents();
-                } catch (error) {
-                    console.error('Error loading components:', error);
-                }
+          const headerScript = document.createElement("script");
+          headerScript.src = "../components/header.js";
+          headerScript.onload = async () => {
+            if (typeof initializeHeader === "function") {
+              initializeHeader();
             }
 
-            function initializeComponents() {
-                // Set active nav item
-                const notificationNavItem = document.querySelector('[data-page="notifications"]');
-                if (notificationNavItem) {
-                    notificationNavItem.classList.add('active');
-                }
+            await loadNotificationCount();
+            await loadNotifications();
+            initializeComponents();
+          };
+          document.body.appendChild(headerScript);
+        } catch (error) {
+          console.error("Error loading components:", error);
+        }
+      }
 
-                // Initialize action buttons
-                document.querySelectorAll(".action-btn").forEach(btn => {
-                    btn.addEventListener("click", (e) => {
-                        e.preventDefault();
-                        alert("More actions coming soon!");
-                    });
-                });
+      function initializeComponents() {
+        const notificationNavItem = document.querySelector(
+          '[data-page="notifications"]',
+        );
+        if (notificationNavItem) {
+          notificationNavItem.classList.add("active");
+        }
+      }
 
-                // Simulate notification updates
-                updateNotificationBadges();
-            }
+      async function loadNotificationCount() {
+        try {
+          const response = await fetch(`${API_BASE}/count`, {
+            method: "GET",
+            credentials: "include",
+            headers: { Accept: "application/json" },
+          });
 
-            function updateNotificationBadges() {
-                const bellBadge = document.getElementById("notificationCount");
-                const msgBadge = document.getElementById("messageCount");
+          if (response.status === 401) {
+            console.error("User not logged in");
+            return;
+          }
 
-                // Simulate notifications decrease after reading
-                setTimeout(() => {
-                    if (bellBadge) bellBadge.textContent = 1;
-                    if (msgBadge) msgBadge.textContent = 3;
-                }, 5000);
-            }
+          if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+          }
 
-            // Mobile sidebar toggle
-            function toggleSidebar() {
-                const sidebar = document.querySelector(".sidebar");
-                if (sidebar) {
-                    sidebar.classList.toggle("active");
-                }
-            }
+          const data = await response.json();
+          const badge = document.getElementById("notificationCount");
 
-            // Load components when DOM is ready
-            document.addEventListener('DOMContentLoaded', loadComponents);
-        </script>
-    </body>
+          if (badge && data.ok) {
+            badge.textContent = data.count || 0;
+            badge.style.display = data.count > 0 ? "flex" : "none";
+          }
+        } catch (error) {
+          console.error("Failed to load notification count:", error);
+        }
+      }
+
+      async function loadNotifications() {
+        const list = document.getElementById("notificationList");
+
+        try {
+          const response = await fetch(`${API_BASE}?limit=20&offset=0`, {
+            method: "GET",
+            credentials: "include",
+            headers: { Accept: "application/json" },
+          });
+
+          if (response.status === 401) {
+            list.innerHTML = `<div class="notification-item info">
+                    <div class="notification-content">
+                        <h4>Not logged in</h4>
+                        <p>Please sign in to view notifications.</p>
+                    </div>
+                </div>`;
+            return;
+          }
+
+          if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+          }
+
+          const data = await response.json();
+
+          if (
+            !data.ok ||
+            !Array.isArray(data.notifications) ||
+            data.notifications.length === 0
+          ) {
+            list.innerHTML = `<div class="notification-item info">
+                    <div class="notification-content">
+                        <h4>No notifications yet</h4>
+                        <p>You do not have any notifications right now.</p>
+                    </div>
+                </div>`;
+            return;
+          }
+
+          list.innerHTML = data.notifications.map(renderNotification).join("");
+
+          bindNotificationActions();
+        } catch (error) {
+          console.error("Failed to load notifications:", error);
+          list.innerHTML = `<div class="notification-item warning">
+                <div class="notification-content">
+                    <h4>Failed to load notifications</h4>
+                    <p>Please try again later.</p>
+                </div>
+            </div>`;
+        }
+      }
+
+      function renderNotification(notification) {
+        const typeClass = mapNotificationType(notification.type);
+        const iconClass = mapNotificationIcon(notification.type);
+        const timeText = formatTimeAgo(notification.createdAt);
+
+        return `
+            <div class="notification-item ${typeClass} ${notification.isRead ? "" : "new"}" data-id="${notification.notificationId}">
+                <div class="notification-icon">
+                    <i class="fas ${iconClass}"></i>
+                </div>
+                <div class="notification-content">
+                    <h4>${escapeHtml(notification.title)}</h4>
+                    <p>${escapeHtml(notification.body)}</p>
+                </div>
+                <div class="notification-meta">
+                    <span class="time">${timeText}</span>
+                    <button class="action-btn mark-read-btn" data-id="${notification.notificationId}" title="Mark as read">
+                        <i class="fas fa-check"></i>
+                    </button>
+                </div>
+            </div>
+        `;
+      }
+
+      function bindNotificationActions() {
+        document.querySelectorAll(".mark-read-btn").forEach((btn) => {
+          btn.addEventListener("click", async (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+
+            const id = btn.dataset.id;
+            await markNotificationAsRead(id);
+          });
+        });
+      }
+
+      async function markNotificationAsRead(id) {
+        try {
+          const response = await fetch(
+            `${API_BASE}/read?id=${encodeURIComponent(id)}`,
+            {
+              method: "POST",
+              credentials: "include",
+            },
+          );
+
+          if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+          }
+
+          const data = await response.json();
+
+          if (data.ok) {
+            await loadNotificationCount();
+            await loadNotifications();
+          }
+        } catch (error) {
+          console.error("Failed to mark notification as read:", error);
+        }
+      }
+
+      async function markAllNotificationsAsRead() {
+        try {
+          const response = await fetch(`${API_BASE}/readAll`, {
+            method: "POST",
+            credentials: "include",
+          });
+
+          if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+          }
+
+          const data = await response.json();
+
+          if (data.ok) {
+            await loadNotificationCount();
+            await loadNotifications();
+          }
+        } catch (error) {
+          console.error("Failed to mark all as read:", error);
+        }
+      }
+
+      function mapNotificationType(type) {
+        switch ((type || "").toUpperCase()) {
+          case "BOOKING":
+            return "confirmed";
+          case "TICKET":
+            return "pending";
+          case "REPORT":
+            return "warning";
+          case "MAINTENANCE":
+            return "info";
+          case "SYSTEM":
+            return "info";
+          case "GENERAL":
+            return "info";
+          default:
+            return "info";
+        }
+      }
+
+      function mapNotificationIcon(type) {
+        switch ((type || "").toUpperCase()) {
+          case "BOOKING":
+            return "fa-circle-check";
+          case "TICKET":
+            return "fa-clock";
+          case "REPORT":
+            return "fa-triangle-exclamation";
+          case "MAINTENANCE":
+            return "fa-screwdriver-wrench";
+          case "SYSTEM":
+            return "fa-bell";
+          case "GENERAL":
+            return "fa-info-circle";
+          default:
+            return "fa-info-circle";
+        }
+      }
+
+      function formatTimeAgo(dateString) {
+        if (!dateString) return "Just now";
+
+        const date = new Date(dateString);
+        const now = new Date();
+        const diffMs = now - date;
+        const diffMins = Math.floor(diffMs / 60000);
+        const diffHours = Math.floor(diffMs / 3600000);
+        const diffDays = Math.floor(diffMs / 86400000);
+
+        if (diffMins < 1) return "Just now";
+        if (diffMins < 60)
+          return `${diffMins} minute${diffMins !== 1 ? "s" : ""} ago`;
+        if (diffHours < 24)
+          return `${diffHours} hour${diffHours !== 1 ? "s" : ""} ago`;
+        return `${diffDays} day${diffDays !== 1 ? "s" : ""} ago`;
+      }
+
+      function escapeHtml(text) {
+        const div = document.createElement("div");
+        div.textContent = text || "";
+        return div.innerHTML;
+      }
+
+      document.addEventListener("DOMContentLoaded", loadComponents);
+    </script>
+  </body>
 </html>

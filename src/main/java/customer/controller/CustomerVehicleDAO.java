@@ -17,7 +17,7 @@ public class CustomerVehicleDAO {
     public List<Vehicle> getAllVehicles() throws SQLException {
 
         List<Vehicle> vehicles = new ArrayList<>();
-        String sql = "SELECT * FROM vehicle";
+        String sql = "SELECT * FROM vehicle WHERE company_id IS NOT NULL AND availability_status = 'available'";
 
         try (Statement st = connection.createStatement();
              ResultSet rs = st.executeQuery(sql)) {

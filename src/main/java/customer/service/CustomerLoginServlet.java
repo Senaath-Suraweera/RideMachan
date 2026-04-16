@@ -45,6 +45,8 @@ public class CustomerLoginServlet extends HttpServlet {
                 session.setAttribute("firstname", customer.getFirstname());
                 session.setAttribute("email", customer.getEmail());
                 session.setAttribute("customerType", customer.getCustomerType());
+                session.setAttribute("actorType" , "CUSTOMER");
+                session.setAttribute("actorId", customer.getCustomerId());
 
 
                 resp.setStatus(HttpServletResponse.SC_OK);
