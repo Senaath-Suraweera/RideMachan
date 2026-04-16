@@ -39,6 +39,10 @@ public class MaintenanceStaffLoginServlet extends HttpServlet {
                 HttpSession session = request.getSession();
                 session.setAttribute("staff", staff);
                 session.setAttribute("staff_id", staff.getStaffId());
+                session.setAttribute("actorType", "MAINTENANCE");
+                session.setAttribute("actorId", staff.getStaffId());
+                session.setAttribute("staffFName" , staff.getFirstname());
+                session.setAttribute("staffLName" , staff.getLastname());
                 response.getWriter().write("{\"status\":\"success\",\"message\":\"Login successful\"}");
             } else {
                 response.setStatus(401);

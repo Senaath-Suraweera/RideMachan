@@ -5,6 +5,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 import rentalcompany.maintenance.controller.CalendarEventDAO;
 import rentalcompany.maintenance.model.CalendarEvent;
+import rentalcompany.companyvehicle.dao.VehicleDAO;
 import common.util.DBConnection;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -15,7 +16,12 @@ import java.sql.Connection;
 
 /**
  * UpdateCalendarEventServlet
- * Handles updating existing calendar events and status changes
+ * Handles updating existing calendar events and status changes.
+ *
+ * NOTE: For full-event updates the "vehicle_id" field in the JSON body is
+ * expected to be a VEHICLE NUMBER PLATE (string), mirroring the contract
+ * used by AddCalendarEventServlet. The servlet resolves it to the internal
+ * integer vehicle id via VehicleDAO.getIdOfVehicle().
  */
 @WebServlet("/maintenance/updateEvent")
 public class UpdateCalendarEventServlet extends HttpServlet {
@@ -70,7 +76,16 @@ public class UpdateCalendarEventServlet extends HttpServlet {
 
                     // Set all fields from JSON
                     event.setEventId(jsonObject.get("eventid").getAsInt());
-                    event.setVehicleId(jsonObject.get("vehicle_id").getAsInt());
+
+                    // vehicle_id is a NUMBER PLATE string — resolve to internal id
+                    String vehicleNumberPlate = jsonObject.get("vehicle_id").getAsString();
+                    int vehicleId = VehicleDAO.getIdOfVehicle(vehicleNumberPlate);
+                    if (vehicleId == -1) {
+                        resp.getWriter().write("{\"status\":\"error\",\"message\":\"Invalid vehicle number plate\"}");
+                        return;
+                    }
+                    event.setVehicleId(vehicleId);
+
                     event.setServiceType(jsonObject.get("service_type").getAsString());
                     event.setStatus(jsonObject.get("status").getAsString());
                     event.setDescription(jsonObject.get("description").getAsString());
@@ -84,7 +99,28 @@ public class UpdateCalendarEventServlet extends HttpServlet {
                 } else {
                     // Handle form-encoded request
                     event.setEventId(Integer.parseInt(req.getParameter("eventid")));
-                    event.setVehicleId(Integer.parseInt(req.getParameter("vehicle_id")));
+
+                    // For form-encoded, support both: numeric id OR number plate.
+                    String vehicleParam = req.getParameter("vehicle_id");
+                    if (vehicleParam == null || vehicleParam.isEmpty()) {
+                        resp.getWriter().write("{\"status\":\"error\",\"message\":\"vehicle_id is required\"}");
+                        return;
+                    }
+
+                    int vehicleId;
+                    try {
+                        // If it parses cleanly as an int, treat as internal id
+                        vehicleId = Integer.parseInt(vehicleParam);
+                    } catch (NumberFormatException nfe) {
+                        // Otherwise treat as a number plate and resolve it
+                        vehicleId = VehicleDAO.getIdOfVehicle(vehicleParam);
+                        if (vehicleId == -1) {
+                            resp.getWriter().write("{\"status\":\"error\",\"message\":\"Invalid vehicle number plate\"}");
+                            return;
+                        }
+                    }
+                    event.setVehicleId(vehicleId);
+
                     event.setServiceType(req.getParameter("service_type"));
                     event.setStatus(req.getParameter("status"));
                     event.setDescription(req.getParameter("description"));
