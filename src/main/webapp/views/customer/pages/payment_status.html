@@ -88,14 +88,6 @@
                     </div>
                 </div>
 
-                <!-- Download Invoice -->
-                <div class="invoice-section">
-                    <button class="download-btn" onclick="downloadInvoice()">
-                        <i class="fas fa-download"></i>
-                        Download Invoice
-                    </button>
-                </div>
-
                 <!-- Vehicle Photo -->
                 <div class="vehicle-photo">
                     <div class="vehicle-image-placeholder" onclick="viewVehiclePhoto()">
@@ -190,12 +182,9 @@
     }
 
     function initializeNavbar() {
-        const currentPage = 'bookings';
         const navItems = document.querySelectorAll('.nav-item');
         navItems.forEach(item => {
-            if (item.getAttribute('data-page') === currentPage) {
-                item.classList.add('active');
-            }
+            if (item.getAttribute('data-page') === 'bookings') item.classList.add('active');
         });
     }
 
@@ -203,76 +192,57 @@
     // Populate dynamic payment data
     // ==============================
     function populatePaymentStatus() {
-        // 1. Try sessionStorage first (survives page navigation)
         let data = null;
         try {
             const stored = sessionStorage.getItem('paymentConfirmation');
-            if (stored) {
-                data = JSON.parse(stored);
-            }
+            if (stored) data = JSON.parse(stored);
         } catch (e) {
             console.error('Failed to parse paymentConfirmation from sessionStorage', e);
         }
 
-        // 2. Fallback to in-memory global
-        if (!data && window.paymentConfirmation) {
-            data = window.paymentConfirmation;
-        }
+        if (!data && window.paymentConfirmation) data = window.paymentConfirmation;
 
         if (!data) {
-            // No data - user navigated directly. Redirect back.
             showPopup('No Payment Data', 'No payment information found. Redirecting to bookings.', 'info');
             setTimeout(() => { window.location.href = 'bookings.html'; }, 1500);
             return;
         }
 
-        // Keep in memory too
         window.paymentConfirmation = data;
 
-        // Booking ID - prefer server rideId (varchar), fall back to confirmation number
         const bookingId = data.rideId ? String(data.rideId) : (data.confirmationNumber || '-');
         document.getElementById('ps-booking-id').textContent = bookingId;
 
-        // Booking date (today, formatted)
         const bookingDate = data.paymentDate ? new Date(data.paymentDate) : new Date();
         document.getElementById('ps-booking-date').textContent = bookingDate.toLocaleDateString('en-US', {
             year: 'numeric', month: 'short', day: 'numeric'
         });
 
-        // Email & payment method
         document.getElementById('ps-payment-email').textContent = data.email || '-';
-        document.getElementById('ps-payment-mode').textContent = data.paymentMethodDisplay || 'Card Payment';
+        document.getElementById('ps-payment-mode').textContent  = data.paymentMethodDisplay || 'Card Payment';
 
-        // Schedule details
-        document.getElementById('ps-pickup').textContent = data.pickupDateTime || '-';
-        document.getElementById('ps-return').textContent = data.returnDateTime || '-';
-        document.getElementById('ps-duration').textContent = data.hours ? `${data.hours} hour${data.hours > 1 ? 's' : ''}` : '-';
+        document.getElementById('ps-pickup').textContent   = data.pickupDateTime || '-';
+        document.getElementById('ps-return').textContent   = data.returnDateTime || '-';
         document.getElementById('ps-location').textContent = data.pickupLocation || '-';
 
-        // Vehicle / summary
-        document.getElementById('ps-vehicle-name').textContent = data.vehicleName || '-';
+        const hours = Number(data.hours) || 0;
+        document.getElementById('ps-duration').textContent = hours > 0
+            ? `${hours} hour${hours !== 1 ? 's' : ''}`
+            : '—';
+
+        document.getElementById('ps-vehicle-name').textContent     = data.vehicleName || '-';
         document.getElementById('ps-vehicle-name-big').textContent = data.vehicleName || '-';
-        document.getElementById('ps-mode').textContent = data.modeDisplay || '-';
-        document.getElementById('ps-company').textContent = data.company || '-';
-        document.getElementById('ps-total').textContent = data.totalCost
+        document.getElementById('ps-mode').textContent    = data.modeDisplay || '-';
+        document.getElementById('ps-company').textContent = data.company     || '-';
+        document.getElementById('ps-total').textContent   = data.totalCost
             ? `LKR ${Number(data.totalCost).toLocaleString()}.00`
             : '-';
     }
 
     function goBack() { window.history.back(); }
 
-    function downloadInvoice() {
-        showPopup('Download Started', 'Your invoice is being prepared and will be downloaded shortly.', 'success');
-        setTimeout(() => {
-            const link = document.createElement('a');
-            link.href = '#';
-            link.download = 'Invoice_' + (document.getElementById('ps-booking-id').textContent || 'booking') + '.pdf';
-            link.click();
-        }, 1000);
-    }
-
     function viewVehiclePhoto() { showPopup('Vehicle Photo', 'Vehicle photo gallery coming soon!', 'info'); }
-    function contactSupport() { showPopup('Contact Support', 'Support chat will open soon. For immediate assistance, call 1177.', 'info'); }
+    function contactSupport()   { showPopup('Contact Support', 'Support chat will open soon. For immediate assistance, call 1177.', 'info'); }
     function callHelpline() {
         if (confirm('Do you want to call our 24/7 helpline at 1177?')) {
             window.location.href = 'tel:1177';
@@ -287,15 +257,14 @@
         const color = type === 'success' ? 'var(--success)' :
             type === 'error' ? 'var(--danger)' : 'var(--info)';
         popup.innerHTML = `
-                <div class="popup-content" style="animation: fadeInUp 0.3s ease;">
-                    <div class="popup-icon" style="color: ${color};">
-                        <i class="fas ${iconClass}"></i>
-                    </div>
-                    <h3>${title}</h3>
-                    <p>${message}</p>
-                    <button onclick="closePopup(this)" class="btn btn-primary">OK</button>
+            <div class="popup-content" style="animation: fadeInUp 0.3s ease;">
+                <div class="popup-icon" style="color: ${color};">
+                    <i class="fas ${iconClass}"></i>
                 </div>
-            `;
+                <h3>${title}</h3>
+                <p>${message}</p>
+                <button onclick="closePopup(this)" class="btn btn-primary">OK</button>
+            </div>`;
         document.body.appendChild(popup);
     }
 

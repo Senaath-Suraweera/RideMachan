@@ -9,77 +9,95 @@ function loadBookingData() {
     let bookingData = null;
     try {
         const stored = sessionStorage.getItem('bookingDetails');
-        if (stored) {
-            bookingData = JSON.parse(stored);
-        }
+        if (stored) bookingData = JSON.parse(stored);
     } catch (e) {
         console.error('Failed to parse bookingDetails from sessionStorage', e);
     }
 
     // 2. Fallback to in-memory global
-    if (!bookingData && window.bookingDetails) {
-        bookingData = window.bookingDetails;
-    }
+    if (!bookingData && window.bookingDetails) bookingData = window.bookingDetails;
 
-    // 3. No data at all → show warning but stay on page so user can use Back to Booking
+    // 3. No data → warn but stay on page
     if (!bookingData) {
         showNotification('No booking data found. Please start a new booking from the vehicle page.', 'warning');
         return;
     }
 
-    // Keep it in memory too
     window.bookingDetails = bookingData;
 
-    // Populate booking summary
-    document.getElementById('summaryVehicleName').textContent = bookingData.vehicleName;
-    document.getElementById('summaryMode').textContent = bookingData.modeDisplay;
-    document.getElementById('summaryCompany').textContent = `Company: ${bookingData.company}`;
+    // ── Booking summary ──────────────────────────────────────
+    document.getElementById('summaryVehicleName').textContent = bookingData.vehicleName || '-';
+    document.getElementById('summaryMode').textContent        = bookingData.modeDisplay || '-';
+    document.getElementById('summaryCompany').textContent     = `Company: ${bookingData.company || '-'}`;
 
-    document.getElementById('summaryPickup').textContent = bookingData.pickupDateTime;
-    document.getElementById('summaryReturn').textContent = bookingData.returnDateTime;
-    document.getElementById('summaryDuration').textContent = `${bookingData.hours} hour${bookingData.hours > 1 ? 's' : ''}`;
-    document.getElementById('summaryLocation').textContent = bookingData.pickupLocation;
+    document.getElementById('summaryPickup').textContent   = bookingData.pickupDateTime || '-';
+    document.getElementById('summaryReturn').textContent   = bookingData.returnDateTime || '-';
+    document.getElementById('summaryLocation').textContent = bookingData.pickupLocation || '-';
 
-    document.getElementById('summaryRate').textContent = `LKR ${Number(bookingData.hourlyRate).toLocaleString()}/hour`;
-    document.getElementById('summaryHours').textContent = `${bookingData.hours} hour${bookingData.hours > 1 ? 's' : ''}`;
-    document.getElementById('summarySubtotal').textContent = `LKR ${Number(bookingData.subtotal).toLocaleString()}`;
-    document.getElementById('summaryServiceFee').textContent = `LKR ${Number(bookingData.serviceFee).toLocaleString()}`;
-    document.getElementById('summaryTotal').textContent = `LKR ${Number(bookingData.totalCost).toLocaleString()}`;
+    // ── Duration row ─────────────────────────────────────────
+    // For re-payments hours may be 0/null if the original booking didn't store it.
+    const hours = Number(bookingData.hours) || 0;
+    const durationText = hours > 0
+        ? `${hours} hour${hours !== 1 ? 's' : ''}`
+        : '—';
+    document.getElementById('summaryDuration').textContent = durationText;
+    document.getElementById('summaryHours').textContent    = durationText;
 
-    // Update pay button
-    document.getElementById('payButtonText').textContent = `Pay LKR ${Number(bookingData.totalCost).toLocaleString()}`;
+    // ── Pricing rows ─────────────────────────────────────────
+    const totalCost  = Number(bookingData.totalCost  || 0);
+    const serviceFee = Number(bookingData.serviceFee || 0);
+    const subtotal   = Number(bookingData.subtotal   || 0);
+    const hourlyRate = Number(bookingData.hourlyRate  || 0);
 
-    // Remove HTML 'required' attributes so only format validation is enforced
-    ['card-number', 'expiry-date', 'cvv', 'cardholder-name', 'email', 'phone'].forEach(id => {
+    // If this is a re-payment (Pay Now from bookings page), show a cleaner summary
+    if (bookingData.isRepayment) {
+        // Hide the rate row — we don't have an accurate hourly breakdown
+        const rateRow = document.getElementById('summaryRate')?.closest('.price-row');
+        if (rateRow) rateRow.style.display = hourlyRate > 0 ? '' : 'none';
+
+        document.getElementById('summaryRate').textContent =
+            hourlyRate > 0 ? `LKR ${hourlyRate.toLocaleString()}/hour` : '—';
+    } else {
+        document.getElementById('summaryRate').textContent =
+            `LKR ${hourlyRate.toLocaleString()}/hour`;
+    }
+
+    document.getElementById('summarySubtotal').textContent   = `LKR ${subtotal.toLocaleString()}`;
+    document.getElementById('summaryServiceFee').textContent = `LKR ${serviceFee.toLocaleString()}`;
+    document.getElementById('summaryTotal').textContent      = `LKR ${totalCost.toLocaleString()}`;
+
+    // ── Pay button label ─────────────────────────────────────
+    document.getElementById('payButtonText').textContent =
+        `Pay LKR ${totalCost.toLocaleString()}`;
+
+    // Remove HTML 'required' so only format validation fires
+    ['card-number','expiry-date','cvv','cardholder-name','email','phone'].forEach(id => {
         const el = document.getElementById(id);
         if (el) el.removeAttribute('required');
     });
 }
 
 function setupCardFormatting() {
-    // Format card number with spaces
+    // Card number with spaces
     const cardNumberInput = document.getElementById('card-number');
     if (cardNumberInput) {
         cardNumberInput.addEventListener('input', function (e) {
             let value = e.target.value.replace(/\s/g, '').replace(/[^0-9]/gi, '');
-            let formattedValue = value.match(/.{1,4}/g)?.join(' ') || value;
-            e.target.value = formattedValue;
+            e.target.value = value.match(/.{1,4}/g)?.join(' ') || value;
         });
     }
 
-    // Format expiry date as MM/YY
+    // Expiry MM/YY
     const expiryInput = document.getElementById('expiry-date');
     if (expiryInput) {
         expiryInput.addEventListener('input', function (e) {
             let value = e.target.value.replace(/\D/g, '');
-            if (value.length >= 2) {
-                value = value.substring(0, 2) + '/' + value.substring(2, 4);
-            }
+            if (value.length >= 2) value = value.substring(0, 2) + '/' + value.substring(2, 4);
             e.target.value = value;
         });
     }
 
-    // Format CVV (numbers only, max 3 digits)
+    // CVV — numbers only, max 3
     const cvvInput = document.getElementById('cvv');
     if (cvvInput) {
         cvvInput.addEventListener('input', function (e) {
@@ -87,7 +105,7 @@ function setupCardFormatting() {
         });
     }
 
-    // Format cardholder name (letters and spaces only)
+    // Cardholder name — letters + spaces only
     const nameInput = document.getElementById('cardholder-name');
     if (nameInput) {
         nameInput.addEventListener('input', function (e) {
@@ -95,78 +113,57 @@ function setupCardFormatting() {
         });
     }
 
-    // Format phone number
+    // Phone — digits, +, spaces, dashes
     const phoneInput = document.getElementById('phone');
     if (phoneInput) {
         phoneInput.addEventListener('input', function (e) {
-            let value = e.target.value.replace(/[^\d+\s-]/g, '');
-            e.target.value = value;
+            e.target.value = e.target.value.replace(/[^\d+\s-]/g, '');
         });
     }
 }
 
 /**
- * FORMAT-ONLY validation.
- * - Empty fields are allowed (no "required" errors).
- * - If a field IS filled, it must match its format.
+ * Format-only validation — empty fields are allowed, filled fields must be valid.
  */
 function validateFormatOnly() {
-    const cardNumber = document.getElementById('card-number').value.replace(/\s/g, '');
-    const expiryDate = document.getElementById('expiry-date').value.trim();
-    const cvv = document.getElementById('cvv').value.trim();
+    const cardNumber    = document.getElementById('card-number').value.replace(/\s/g, '');
+    const expiryDate    = document.getElementById('expiry-date').value.trim();
+    const cvv           = document.getElementById('cvv').value.trim();
     const cardholderName = document.getElementById('cardholder-name').value.trim();
-    const email = document.getElementById('email').value.trim();
-    const phone = document.getElementById('phone').value.trim();
+    const email         = document.getElementById('email').value.trim();
+    const phone         = document.getElementById('phone').value.trim();
 
     if (cardNumber.length > 0 && cardNumber.length !== 16) {
-        showNotification('Card number must be 16 digits', 'warning');
-        return false;
+        showNotification('Card number must be 16 digits', 'warning'); return false;
     }
-
     if (expiryDate.length > 0) {
         if (!expiryDate.match(/^\d{2}\/\d{2}$/)) {
-            showNotification('Expiry date must be in MM/YY format', 'warning');
-            return false;
+            showNotification('Expiry date must be in MM/YY format', 'warning'); return false;
         }
         const [month] = expiryDate.split('/').map(Number);
         if (month < 1 || month > 12) {
-            showNotification('Expiry month must be between 01 and 12', 'warning');
-            return false;
+            showNotification('Expiry month must be between 01 and 12', 'warning'); return false;
         }
     }
-
     if (cvv.length > 0 && cvv.length !== 3) {
-        showNotification('CVV must be 3 digits', 'warning');
-        return false;
+        showNotification('CVV must be 3 digits', 'warning'); return false;
     }
-
     if (cardholderName.length > 0 && !/^[a-zA-Z\s]+$/.test(cardholderName)) {
-        showNotification('Cardholder name can only contain letters', 'warning');
-        return false;
+        showNotification('Cardholder name can only contain letters', 'warning'); return false;
     }
-
     if (email.length > 0 && !email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
-        showNotification('Please enter a valid email address', 'warning');
-        return false;
+        showNotification('Please enter a valid email address', 'warning'); return false;
     }
-
-    if (phone.length > 0) {
-        const digitsOnly = phone.replace(/\D/g, '');
-        if (digitsOnly.length < 7) {
-            showNotification('Phone number is too short', 'warning');
-            return false;
-        }
+    if (phone.length > 0 && phone.replace(/\D/g, '').length < 7) {
+        showNotification('Phone number is too short', 'warning'); return false;
     }
-
     return true;
 }
 
 async function processPayment(event) {
     event.preventDefault();
 
-    if (!validateFormatOnly()) {
-        return;
-    }
+    if (!validateFormatOnly()) return;
 
     const bookingData = window.bookingDetails;
     if (!bookingData) {
@@ -174,46 +171,39 @@ async function processPayment(event) {
         return;
     }
 
-    const payButton = document.getElementById('payButton');
+    const payButton   = document.getElementById('payButton');
     const originalHTML = payButton.innerHTML;
     payButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing Payment...';
-    payButton.disabled = true;
+    payButton.disabled  = true;
 
-    // Build the payment confirmation object that payment-status will read
     const paymentConfirmation = {
         ...bookingData,
-        paymentMethod: document.getElementById('payment-method').value,
+        paymentMethod:        document.getElementById('payment-method').value,
         paymentMethodDisplay: getPaymentMethodDisplay(document.getElementById('payment-method').value),
-        email: document.getElementById('email').value,
-        phone: document.getElementById('phone').value,
-        cardholderName: document.getElementById('cardholder-name').value,
-        confirmationNumber: generateConfirmationNumber(),
-        paymentDate: new Date().toISOString(),
-        status: 'Confirmed'
+        email:                document.getElementById('email').value,
+        phone:                document.getElementById('phone').value,
+        cardholderName:       document.getElementById('cardholder-name').value,
+        confirmationNumber:   generateConfirmationNumber(),
+        paymentDate:          new Date().toISOString(),
+        status:               'Confirmed'
     };
 
-    // Call backend to mark booking status = 'confirmed' in company_booking table
     try {
         const response = await fetch('/customer/confirm-payment', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                rideId: bookingData.rideId,
-                vehicleId: bookingData.vehicleId,
+                rideId:        bookingData.rideId,
+                vehicleId:     bookingData.vehicleId,
                 paymentMethod: paymentConfirmation.paymentMethod,
-                totalCost: bookingData.totalCost
+                totalCost:     bookingData.totalCost
             })
         });
 
         let result = null;
-        try {
-            result = await response.json();
-        } catch (_) {
-            // Non-JSON response; treat as failure unless status OK
-        }
+        try { result = await response.json(); } catch (_) {}
 
         if (response.ok && (!result || result.success !== false)) {
-            // Store for payment-status page in BOTH memory and sessionStorage
             window.paymentConfirmation = paymentConfirmation;
             try {
                 sessionStorage.setItem('paymentConfirmation', JSON.stringify(paymentConfirmation));
@@ -221,62 +211,59 @@ async function processPayment(event) {
                 console.error('Failed to save paymentConfirmation to sessionStorage', e);
             }
 
-            // Clear the pending booking details now that it's confirmed
+            // Clear pending booking details now that it's confirmed
             sessionStorage.removeItem('bookingDetails');
 
-            // Fire booking confirmation email (non-blocking fire-and-forget)
+            // Fire confirmation email (non-blocking)
             sendBookingConfirmationEmail(paymentConfirmation, bookingData);
 
-            showNotification('Payment successful! Confirmation email sent. Redirecting...', 'success');
-            setTimeout(() => {
-                window.location.href = 'payment_status.html';
-            }, 1500);
+            showNotification('Payment successful! Redirecting...', 'success');
+            setTimeout(() => { window.location.href = 'payment_status.html'; }, 1500);
+
         } else {
             payButton.innerHTML = originalHTML;
-            payButton.disabled = false;
+            payButton.disabled  = false;
             const msg = (result && result.message) ? result.message : 'Payment could not be confirmed. Please try again.';
             showNotification(msg, 'error');
         }
+
     } catch (error) {
         console.error('Confirm payment error:', error);
         payButton.innerHTML = originalHTML;
-        payButton.disabled = false;
+        payButton.disabled  = false;
         showNotification('Network error. Please try again.', 'error');
     }
 }
 
-/**
- * Sends a booking confirmation email to the address entered in the
- * Contact Information section. Fire-and-forget — we don't block the
- * redirect on SMTP latency.
- */
 function sendBookingConfirmationEmail(paymentConfirmation, bookingData) {
-    if (!paymentConfirmation.email) {
-        console.warn('No email address provided; skipping confirmation email.');
-        return;
-    }
+    if (!paymentConfirmation.email) return;
+
+    const hours = Number(bookingData.hours) || 0;
+    const durationText = hours > 0 ? `${hours} hour${hours !== 1 ? 's' : ''}` : '—';
 
     try {
         fetch('/customer/send-booking-email', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                email: paymentConfirmation.email,
-                bookingId: paymentConfirmation.confirmationNumber,
-                customerName: paymentConfirmation.cardholderName,
-                vehicleName: bookingData.vehicleName,
-                company: bookingData.company,
-                mode: bookingData.modeDisplay,
-                pickupDateTime: bookingData.pickupDateTime,
-                returnDateTime: bookingData.returnDateTime,
-                duration: `${bookingData.hours} hour${bookingData.hours > 1 ? 's' : ''}`,
-                pickupLocation: bookingData.pickupLocation,
-                hourlyRate: `LKR ${Number(bookingData.hourlyRate).toLocaleString()}/hour`,
-                subtotal: `LKR ${Number(bookingData.subtotal).toLocaleString()}`,
-                serviceFee: `LKR ${Number(bookingData.serviceFee).toLocaleString()}`,
-                totalCost: `LKR ${Number(bookingData.totalCost).toLocaleString()}`,
-                paymentMethod: paymentConfirmation.paymentMethodDisplay,
-                phone: paymentConfirmation.phone
+                email:           paymentConfirmation.email,
+                bookingId:       paymentConfirmation.confirmationNumber,
+                customerName:    paymentConfirmation.cardholderName,
+                vehicleName:     bookingData.vehicleName,
+                company:         bookingData.company,
+                mode:            bookingData.modeDisplay,
+                pickupDateTime:  bookingData.pickupDateTime,
+                returnDateTime:  bookingData.returnDateTime,
+                duration:        durationText,
+                pickupLocation:  bookingData.pickupLocation,
+                hourlyRate:      bookingData.hourlyRate > 0
+                    ? `LKR ${Number(bookingData.hourlyRate).toLocaleString()}/hour`
+                    : '—',
+                subtotal:        `LKR ${Number(bookingData.subtotal   || 0).toLocaleString()}`,
+                serviceFee:      `LKR ${Number(bookingData.serviceFee || 0).toLocaleString()}`,
+                totalCost:       `LKR ${Number(bookingData.totalCost  || 0).toLocaleString()}`,
+                paymentMethod:   paymentConfirmation.paymentMethodDisplay,
+                phone:           paymentConfirmation.phone
             })
         }).catch(err => console.error('Email send failed:', err));
     } catch (e) {
@@ -286,17 +273,17 @@ function sendBookingConfirmationEmail(paymentConfirmation, bookingData) {
 
 function getPaymentMethodDisplay(value) {
     switch (value) {
-        case 'credit-debit': return 'Credit/Debit Card';
-        case 'paypal': return 'PayPal';
+        case 'credit-debit':  return 'Credit/Debit Card';
+        case 'paypal':        return 'PayPal';
         case 'bank-transfer': return 'Bank Transfer';
-        default: return 'Card Payment';
+        default:              return 'Card Payment';
     }
 }
 
 function generateConfirmationNumber() {
-    const prefix = 'RMB';
+    const prefix    = 'RMB';
     const timestamp = Date.now().toString().slice(-8);
-    const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
+    const random    = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
     return `${prefix}${timestamp}${random}`;
 }
 
@@ -307,7 +294,7 @@ function goBackToBooking() {
 }
 
 function showNotifications() { window.location.href = 'notifications.html'; }
-function showMessages() { showNotification('Messages feature coming soon!', 'info'); }
+function showMessages()      { showNotification('Messages feature coming soon!', 'info'); }
 function toggleProfileDropdown() { showNotification('Profile dropdown coming soon!', 'info'); }
 
 function handleLogout() {
@@ -325,10 +312,10 @@ function showNotification(message, type = 'info') {
     const notification = document.createElement('div');
     const bgColor = type === 'success' ? 'var(--success)' :
         type === 'warning' ? 'var(--warning)' :
-            type === 'error' ? 'var(--danger)' : 'var(--info)';
+            type === 'error'   ? 'var(--danger)'  : 'var(--info)';
     const icon = type === 'success' ? 'fa-check-circle' :
         type === 'warning' ? 'fa-exclamation-triangle' :
-            type === 'error' ? 'fa-times-circle' : 'fa-info-circle';
+            type === 'error'   ? 'fa-times-circle' : 'fa-info-circle';
 
     notification.style.cssText = `
         position: fixed; top: 20px; right: 20px; padding: 15px 20px;
