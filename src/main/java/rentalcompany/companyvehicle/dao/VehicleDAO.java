@@ -13,7 +13,9 @@ public class VehicleDAO {
     public static boolean addVehicle(Vehicle v) {
         String sql = "INSERT INTO Vehicle (vehiclebrand, vehiclemodel, numberplatenumber, tareweight, color, " +
                 "numberofpassengers, enginecapacity, enginenumber, chasisnumber, registrationdocumentation, " +
-                "vehicleimages, description, milage, company_id, provider_id,price_per_day,location) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+                "vehicleimages, description, milage, company_id, provider_id,price_per_day,location,features, " +
+                "vehicle_type, fuel_type, availability_status, manufacture_year, transmission, created_at, updated_at)" +
+                " VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
         try (Connection con = DBConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
 
@@ -42,6 +44,17 @@ public class VehicleDAO {
 
             ps.setInt(16, v.getPricePerDay());
             ps.setString(17, v.getLocation());
+
+            ps.setString(18, v.getFeatures());
+            ps.setString(19, v.getVehicleType());
+            ps.setString(20, v.getFuelType());
+            ps.setString(21, v.getAvailabilityStatus());
+            ps.setInt(22, v.getManufactureYear());
+            ps.setString(23, v.getTransmission());
+            ps.setTimestamp(24, v.getCreatedAt());
+            ps.setTimestamp(25, v.getUpdatedAt());
+
+
 
             return ps.executeUpdate() > 0;
         } catch (Exception e) {

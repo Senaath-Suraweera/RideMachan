@@ -35,7 +35,18 @@ public class AddVehicleServlet extends HttpServlet {
             String engineNumber = request.getParameter("enginenumber");
             String chasisNumber = request.getParameter("chasisnumber");
             String description = request.getParameter("description");
-            String milage = request.getParameter("milage");
+            String milage = calculateMileage(engineCapacity);
+            String feature = request.getParameter("feature");
+
+            String vehicleType = calculateVehicleType(passengers);
+            String fuelType = calculateFuelType(engineCapacity);
+            String transmission = calculateTransmission(engineCapacity);
+            String availabilityStatus = calculateAvailability();
+            int manufactureYear = calculateManufactureYear();
+
+            java.sql.Timestamp createdAt = getCurrentTimestamp();
+            java.sql.Timestamp updatedAt = createdAt;
+
 
             Part docPart = request.getPart("registrationdocumentation");
             Part imagePart = request.getPart("vehicleimages");
@@ -54,8 +65,19 @@ public class AddVehicleServlet extends HttpServlet {
                     ? Integer.parseInt(providerIdStr)
                     : null;
 
+
+
             Vehicle v = new Vehicle(brand, model, numberPlate, tareWeight, color, passengers, engineCapacity,
                     engineNumber, chasisNumber, docStream, imgStream, description, milage, companyId, providerId,pricePerDay, location);
+
+            v.setVehicleType(vehicleType);
+            v.setFuelType(fuelType);
+            v.setTransmission(transmission);
+            v.setAvailabilityStatus(availabilityStatus);
+            v.setManufactureYear(manufactureYear);
+            v.setCreatedAt(createdAt);
+            v.setUpdatedAt(updatedAt);
+            v.setFeatures(feature);
 
             boolean success = VehicleDAO.addVehicle(v);
 
@@ -64,5 +86,55 @@ public class AddVehicleServlet extends HttpServlet {
             e.printStackTrace();
             response.getWriter().write("{\"status\":\"error\",\"message\":\"" + e.getMessage() + "\"}");
         }
+    }
+
+
+
+    private String calculateVehicleType(int passengers) {
+        if (passengers <= 4) return "Car";
+        if (passengers <= 7) return "SUV";
+        return "Van";
+    }
+    private String calculateFuelType(int engineCapacity) {
+        if (engineCapacity < 1500) return "Petrol";
+        return "Diesel";
+    }
+
+    private String calculateTransmission(int engineCapacity) {
+        if (engineCapacity < 1500) return "Manual";
+        return "Automatic";
+    }
+
+    private String calculateAvailability() {
+        return "available";
+    }
+
+    private int calculateManufactureYear() {
+        return java.time.Year.now().getValue();
+    }
+
+    private java.sql.Timestamp getCurrentTimestamp() {
+        return new java.sql.Timestamp(System.currentTimeMillis());
+    }
+    private String calculateMileage(int engineCapacity) {
+
+        int min, max;
+
+        if (engineCapacity < 1000) {
+            min = 18;
+            max = 25;
+        } else if (engineCapacity < 2000) {
+            min = 12;
+            max = 18;
+        } else {
+            min = 8;
+            max = 14;
+        }
+
+        int value = java.util.concurrent.ThreadLocalRandom
+                .current()
+                .nextInt(min, max + 1);
+
+        return value + " km/l";
     }
 }

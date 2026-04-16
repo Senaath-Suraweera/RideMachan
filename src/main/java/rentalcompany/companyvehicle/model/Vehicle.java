@@ -27,6 +27,14 @@ public class Vehicle {
     private String location;
     private String lastServiceDate;
     private String nextServiceDate;
+    private String features;
+    private String vehicleType;
+    private String fuelType;
+    private String availabilityStatus;
+    private int manufactureYear;
+    private String transmission;
+    private java.sql.Timestamp createdAt;
+    private java.sql.Timestamp updatedAt;
 
     // Constructors
     public Vehicle() {}
@@ -127,4 +135,27 @@ public class Vehicle {
     public String getNextServiceDate() { return nextServiceDate; }
     public void setNextServiceDate(String nextServiceDate) { this.nextServiceDate = nextServiceDate; }
 
+    public String getFeatures() { return features; }
+    public void setFeatures(String features) { this.features = features; }
+
+    public String getVehicleType() { return vehicleType; }
+    public void setVehicleType(String vehicleType) { this.vehicleType = vehicleType; }
+
+    public String getFuelType() { return fuelType; }
+    public void setFuelType(String fuelType) { this.fuelType = fuelType; }
+
+    public String getAvailabilityStatus() { return availabilityStatus; }
+    public void setAvailabilityStatus(String availabilityStatus) { this.availabilityStatus = availabilityStatus; }
+
+    public int getManufactureYear() { return manufactureYear; }
+    public void setManufactureYear(int manufactureYear) { this.manufactureYear = manufactureYear; }
+
+    public String getTransmission() { return transmission; }
+    public void setTransmission(String transmission) { this.transmission = transmission; }
+
+    public java.sql.Timestamp getCreatedAt() { return createdAt; }
+    public void setCreatedAt(java.sql.Timestamp createdAt) { this.createdAt = createdAt; }
+
+    public java.sql.Timestamp getUpdatedAt() { return updatedAt; }
+    public void setUpdatedAt(java.sql.Timestamp updatedAt) { this.updatedAt = updatedAt; }
 }
