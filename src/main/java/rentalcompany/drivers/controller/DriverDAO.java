@@ -16,7 +16,7 @@ public class DriverDAO {
 
     public static boolean insertDriver(Driver driver) {
         String sql = "INSERT INTO Driver (username, firstname, lastname, email, mobilenumber, description, " +
-                "hashedpassword, salt, nicnumber, nic, driverslicence, company_id, Area, licenceexpirydate, licensenumber) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                "hashedpassword, salt, nicnumber, nic, driverslicense, company_id, Area, licenseexpirydate, licensenumber) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection con = DBConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
@@ -67,7 +67,7 @@ public class DriverDAO {
                 "    driver.Area, \n" +
                 "    driver.licensenumber, \n" +
                 "    driver.mobilenumber, \n" +
-                "    driver.licenceexpirydate, \n" +
+                "    driver.licenseexpirydate, \n" +
                 "    ROUND(AVG(ratings.rating_value)) AS rating_value \n" +
                 "FROM driver \n" +
                 "LEFT JOIN ratings \n" +
@@ -82,7 +82,7 @@ public class DriverDAO {
                 "driver.Area, " +
                 "driver.licensenumber, " +
                 "driver.mobilenumber, " +
-                "driver.licenceexpirydate";
+                "driver.licenseexpirydate";
 
 
         try(Connection con = DBConnection.getConnection();
@@ -104,7 +104,7 @@ public class DriverDAO {
                         rs.getString("Area"),
                         rs.getString("licensenumber"),
                         rs.getString("mobilenumber"),
-                        rs.getDate("licenceexpirydate")
+                        rs.getDate("licenseexpirydate")
 
                 );
 
@@ -305,9 +305,9 @@ public class DriverDAO {
 
         String sql =
                 "SELECT cb.trip_start_date, cb.trip_end_date, cb.start_time, cb.end_time " +
-                "FROM companybookings cb " +
-                "JOIN driver_booking_status dbs ON cb.booking_id = dbs.booking_id " +
-                "WHERE dbs.driverid = ?";
+                        "FROM companybookings cb " +
+                        "JOIN driver_booking_status dbs ON cb.booking_id = dbs.booking_id " +
+                        "WHERE dbs.driverid = ?";
 
         try (Connection con = DBConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
