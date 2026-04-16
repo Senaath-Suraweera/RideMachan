@@ -61,17 +61,17 @@
                 <span class="card-change positive">Scheduled Bookings</span>
             </div>
 
-            <div class="stat-card" onclick="navigateToBookings('completed')">
+            <div class="stat-card" onclick="navigateToBookings('unpaid')">
                 <div class="card-header">
                     <div>
-                        <span class="card-label">Completed</span>
-                        <span class="card-value" id="completedCount">0</span>
+                        <span class="card-label">Unpaid</span>
+                        <span class="card-value" id="unpaidCount">0</span>
                     </div>
-                    <div class="card-icon green">
-                        <i class="fas fa-check"></i>
+                    <div class="card-icon red">
+                        <i class="fas fa-exclamation-circle"></i>
                     </div>
                 </div>
-                <span class="card-change">Total Rides</span>
+                <span class="card-change negative">Pending Payment</span>
             </div>
 
             <div class="stat-card" onclick="showSpendingDetails()">
@@ -195,7 +195,7 @@
 
             document.getElementById("activeCount").textContent = data.active;
             document.getElementById("upcomingCount").textContent = data.upcoming;
-            document.getElementById("completedCount").textContent = data.completed;
+            document.getElementById("unpaidCount").textContent = data.unpaid?? 0;
             document.getElementById("monthlySpend").textContent =
                 "LKR " + data.monthlySpending.toLocaleString();
         } catch (error) {
@@ -252,6 +252,10 @@
             opacity: 1;
             transform: translateY(0);
         }
+    }
+    .card-icon.red {
+        background-color: #fee2e2;
+        color: #ef4444;
     }
 </style>
 

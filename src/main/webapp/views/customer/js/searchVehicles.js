@@ -3,288 +3,411 @@
 // ========================================
 let allVehicles = [];
 let filteredVehicles = [];
+let companiesMap = {};      // id  → name  (populated from /customer/getCompanies)
+let companyNameToId = {};   // name → id   (reverse map, built at the same time)
+
+// ── Pagination ──
+const PAGE_SIZE   = 20;
+let   currentPage = 1;
 
 // ========================================
-// Populate Filter Dropdowns from Vehicle Data
+// 1. Boot sequence — load companies first,
+//    then load vehicles (vehicles need the map)
 // ========================================
-function populateFilterOptions() {
-    if (!allVehicles || allVehicles.length === 0) {
-        console.log('⚠️ populateFilterOptions: No vehicles available');
-        return;
-    }
+document.addEventListener('DOMContentLoaded', function () {
+    loadCompaniesAndVehicles();
+    initializePriceSlider();
+});
 
-    console.log('🔍 populateFilterOptions: Processing', allVehicles.length, 'vehicles');
-    console.log('🔍 First vehicle sample:', allVehicles[0]);
-    console.log('🔍 Vehicle types:', allVehicles.map(v => v.vehicleType));
-
-    // Extract unique vehicle types (Car, SUV, Van, etc.)
-    const vehicleTypes = [...new Set(allVehicles
-        .map(v => v.vehicleType)
-        .filter(Boolean)
-        .map(type => type.trim())
-    )].sort();
-
-    console.log('✅ Unique vehicle types found:', vehicleTypes);
-
-    // Extract unique locations
-    const locations = [...new Set(allVehicles
-        .map(v => v.location)
-        .filter(Boolean)
-        .map(loc => loc.trim())
-    )].sort();
-
-    // Extract unique fuel types
-    const fuelTypes = [...new Set(allVehicles
-        .map(v => v.fuelType)
-        .filter(Boolean)
-        .map(fuel => fuel.trim())
-    )].sort();
-
-    // Extract unique seat counts
-    const seatCounts = [...new Set(allVehicles
-        .map(v => v.numberOfPassengers)
-        .filter(seats => seats && seats > 0)
-    )].sort((a, b) => a - b);
-
-    // Extract unique companies
-    // First get unique company IDs, then map to company objects
-    const uniqueCompanyIds = [...new Set(allVehicles
-        .map(v => v.companyId)
-        .filter(id => id != null)
-    )];
-
-    const companies = uniqueCompanyIds
-        .map(id => ({
-            id: id,
-            name: getCompanyName(id)
-        }))
-        .filter(company => company.name)
-        .sort((a, b) => a.name.localeCompare(b.name));
-
-    // Populate Vehicle Type dropdown
-    const vehicleTypeSelect = document.getElementById('vehicleType');
-    if (vehicleTypeSelect) {
-        // Keep the "All Types" option
-        vehicleTypeSelect.innerHTML = '<option value="">All Types</option>';
-        vehicleTypes.forEach(type => {
-            const option = document.createElement('option');
-            option.value = type.toLowerCase();
-            option.textContent = type;
-            vehicleTypeSelect.appendChild(option);
-        });
-    }
-
-    // Populate Pickup Location dropdown
-    const pickupLocationSelect = document.getElementById('pickupLocation');
-    if (pickupLocationSelect) {
-        pickupLocationSelect.innerHTML = '<option value="">All Locations</option>';
-        locations.forEach(location => {
-            const option = document.createElement('option');
-            option.value = location.toLowerCase();
-            option.textContent = location;
-            pickupLocationSelect.appendChild(option);
-        });
-    }
-
-    // Populate Fuel Type dropdown
-    const fuelTypeSelect = document.getElementById('fuelType');
-    if (fuelTypeSelect) {
-        fuelTypeSelect.innerHTML = '<option value="">All Fuel Types</option>';
-        fuelTypes.forEach(fuel => {
-            const option = document.createElement('option');
-            option.value = fuel.toLowerCase();
-            option.textContent = fuel;
-            fuelTypeSelect.appendChild(option);
-        });
-    }
-
-    // Populate Seats dropdown
-    const seatsSelect = document.getElementById('seats');
-    if (seatsSelect) {
-        seatsSelect.innerHTML = '<option value="">Any</option>';
-        seatCounts.forEach(seats => {
-            const option = document.createElement('option');
-            option.value = seats;
-            option.textContent = seats;
-            seatsSelect.appendChild(option);
-        });
-        // Add "7+" option if there are vehicles with 7+ seats
-        const maxSeats = Math.max(...seatCounts);
-        if (maxSeats >= 7) {
-            const option = document.createElement('option');
-            option.value = '7+';
-            option.textContent = '7+';
-            seatsSelect.appendChild(option);
-        }
-    }
-
-    // Populate Company dropdown
-    const companySelect = document.getElementById('companyFilter');
-    if (companySelect) {
-        companySelect.innerHTML = '<option value="">All Companies</option>';
-        companies.forEach(company => {
-            const option = document.createElement('option');
-            option.value = company.name;
-            option.textContent = company.name;
-            companySelect.appendChild(option);
-        });
-        console.log('✅ Companies populated:', companies.map(c => c.name));
-    }
+async function loadCompaniesAndVehicles() {
+    await loadCompanies();   // must finish before vehicles so the map is ready
+    await loadVehicles();
 }
 
 // ========================================
-// Fetch Vehicles from Backend on Load
+// 2. Fetch Companies from Backend
+//    GET /customer/getCompanies
+//    Returns: [{ "id": 1, "name": "Premium Rentals" }, ...]
+// ========================================
+async function loadCompanies() {
+    const contextPath = window.location.pathname.substring(0, window.location.pathname.indexOf('/', 1));
+    const endpoints = [
+        `${window.location.origin}${contextPath}/customer/getCompanies`,
+        '/customer/getCompanies',
+        `${window.location.origin}/customer/getCompanies`
+    ];
+
+    for (const endpoint of endpoints) {
+        try {
+            const response = await fetch(endpoint, { credentials: 'include' });
+            if (response.ok) {
+                const companies = await response.json();
+                companies.forEach(c => {
+                    companiesMap[c.id]      = c.name;
+                    companyNameToId[c.name] = c.id;
+                });
+                console.log('✅ Companies loaded:', companiesMap);
+                return;
+            }
+        } catch (e) {
+            console.warn(`Company endpoint ${endpoint} failed:`, e.message);
+        }
+    }
+    console.error('❌ All company endpoints failed — company names will fall back to IDs');
+}
+
+// ========================================
+// 3. Get Company Name by ID
+//    Uses the live map; falls back gracefully
+// ========================================
+function getCompanyName(companyId) {
+    return companiesMap[companyId] || `Company #${companyId}`;
+}
+
+// ========================================
+// 4. Populate Filter Dropdowns from Vehicle Data
+// ========================================
+function populateFilterOptions() {
+    if (!allVehicles || allVehicles.length === 0) return;
+
+    const vehicleTypes = [...new Set(allVehicles.map(v => v.vehicleType).filter(Boolean).map(t => t.trim()))].sort();
+    const locations    = [...new Set(allVehicles.map(v => v.location).filter(Boolean).map(l => l.trim()))].sort();
+    const fuelTypes    = [...new Set(allVehicles.map(v => v.fuelType).filter(Boolean).map(f => f.trim()))].sort();
+    const seatCounts   = [...new Set(allVehicles.map(v => v.numberOfPassengers).filter(s => s && s > 0))].sort((a, b) => a - b);
+
+    // Companies — built from the live companiesMap
+    const companies = Object.entries(companiesMap)
+        .map(([id, name]) => ({ id: parseInt(id), name }))
+        .sort((a, b) => a.name.localeCompare(b.name));
+
+    _populateSelect('vehicleType',    vehicleTypes, t => ({ value: t.toLowerCase(), text: t }), 'All Types');
+    _populateSelect('pickupLocation', locations,    l => ({ value: l.toLowerCase(), text: l }), 'All Locations');
+    _populateSelect('fuelType',       fuelTypes,    f => ({ value: f.toLowerCase(), text: f }), 'All Fuel Types');
+    _populateSelect('companyFilter',  companies,    c => ({ value: c.name,          text: c.name }), 'All Companies');
+
+    const seatsSelect = document.getElementById('seats');
+    if (seatsSelect) {
+        seatsSelect.innerHTML = '<option value="">Any</option>';
+        seatCounts.forEach(s => {
+            const opt = document.createElement('option');
+            opt.value = s; opt.textContent = s;
+            seatsSelect.appendChild(opt);
+        });
+        const maxSeats = Math.max(...seatCounts);
+        if (maxSeats >= 7) {
+            const opt = document.createElement('option');
+            opt.value = '7+'; opt.textContent = '7+';
+            seatsSelect.appendChild(opt);
+        }
+    }
+}
+
+function _populateSelect(id, items, mapper, defaultLabel) {
+    const sel = document.getElementById(id);
+    if (!sel) return;
+    sel.innerHTML = `<option value="">${defaultLabel}</option>`;
+    items.forEach(item => {
+        const { value, text } = mapper(item);
+        const opt = document.createElement('option');
+        opt.value = value; opt.textContent = text;
+        sel.appendChild(opt);
+    });
+}
+
+// ========================================
+// 5. Fetch Vehicles from Backend
+//    GET /customer/search/vehicle
 // ========================================
 async function loadVehicles() {
-    console.log('=== loadVehicles() called ===');
-
-    // Determine the base URL dynamically
     const contextPath = window.location.pathname.substring(0, window.location.pathname.indexOf('/', 1));
     const baseUrl = `${window.location.origin}${contextPath}`;
     const endpoints = [
         `${baseUrl}/customer/search/vehicle`,
         '/customer/search/vehicle',
-        `${window.location.origin}/customer/search/vehicle`,
-        '../../../customer/search/vehicle',
-        '/RideMachan-1.0-SNAPSHOT/customer/search/vehicle'
+        `${window.location.origin}/customer/search/vehicle`
     ];
-
-    console.log('Context path:', contextPath);
-    console.log('Base URL:', baseUrl);
-    console.log('Current location:', window.location.href);
-    console.log('Will try endpoints:', endpoints);
-
-    let lastError = null;
 
     for (const endpoint of endpoints) {
         try {
-            console.log(`Trying endpoint: ${endpoint}`);
-            const response = await fetch(endpoint);
-            console.log(`Response status for ${endpoint}:`, response.status);
-
+            const response = await fetch(endpoint, { credentials: 'include' });
             if (response.ok) {
                 const data = await response.json();
-                console.log('✅ SUCCESS! Data received from:', endpoint);
-                console.log('Raw data received:', data);
-                console.log('Data type:', typeof data);
-                console.log('Is array:', Array.isArray(data));
-                console.log('Data length:', data ? data.length : 'null/undefined');
-
-                allVehicles = data;
+                allVehicles      = data;
                 filteredVehicles = [...allVehicles];
-
-                console.log('allVehicles set to:', allVehicles);
-                console.log('filteredVehicles set to:', filteredVehicles);
-
-                // Populate filter dropdowns with unique values from backend
                 populateFilterOptions();
-
                 displayVehicles(filteredVehicles);
-                return; // Success, exit function
-            } else {
-                console.log(`❌ Failed with status ${response.status} for: ${endpoint}`);
-                lastError = new Error(`HTTP ${response.status}`);
+                return;
             }
-        } catch (error) {
-            console.log(`❌ Error with endpoint ${endpoint}:`, error.message);
-            lastError = error;
+        } catch (e) {
+            console.warn(`Vehicle endpoint ${endpoint} failed:`, e.message);
         }
     }
 
-    // If we get here, all endpoints failed
-    console.error("=== ALL ENDPOINTS FAILED ===");
-    console.error("Last error:", lastError);
-    showError("Failed to load vehicles. Please check if the server is running and the endpoint is correct.");
+    showError('Failed to load vehicles. Please check if the server is running.');
 }
 
 // ========================================
-// Display Vehicles in Search Results
+// 6. Display Vehicles in Search Results (paginated)
 // ========================================
-function displayVehicles(vehicles) {
-    const container = document.getElementById("searchResults");
+function displayVehicles(vehicles, resetPage = true) {
+    if (resetPage) currentPage = 1;
 
-    if (!container) {
-        console.error("searchResults container not found");
-        return;
-    }
+    const container = document.getElementById('searchResults');
+    if (!container) return;
 
-    container.innerHTML = ""; // Clear previous content
+    container.innerHTML = '';
 
     if (vehicles.length === 0) {
         container.innerHTML = `
-            <p style="text-align: center; color: var(--text-light); padding: 40px;">
+            <p style="text-align:center;color:var(--text-light);padding:40px;">
                 No vehicles found matching your criteria.
-            </p>
-        `;
+            </p>`;
+        renderPagination(vehicles);
         return;
     }
 
-    vehicles.forEach(vehicle => {
-        const vehicleCard = document.createElement("div");
-        vehicleCard.className = "vehicle-card";
-        vehicleCard.onclick = () => viewVehicle(vehicle.vehicleId);
+    // Slice to current page
+    const start    = (currentPage - 1) * PAGE_SIZE;
+    const pageSlice = vehicles.slice(start, start + PAGE_SIZE);
 
-        vehicleCard.innerHTML = `
+    pageSlice.forEach(vehicle => {
+        const card = document.createElement('div');
+        card.className = 'vehicle-card';
+        card.onclick = () => viewVehicle(vehicle.vehicleId);
+
+        const companyName = getCompanyName(vehicle.companyId);
+
+        // Build image URL using the real servlet endpoint
+        const imageUrl = `/vehicle/image?vehicleid=${vehicle.vehicleId}`;
+
+        card.innerHTML = `
             <div class="vehicle-image">
-                <i class="fas fa-car"></i>
+                <img
+                    src="${imageUrl}"
+                    alt="${vehicle.vehicleBrand} ${vehicle.vehicleModel}"
+                    onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+                    style="width:100%;height:100%;object-fit:cover;border-radius:8px 8px 0 0;"
+                />
+                <div class="vehicle-image-fallback" style="display:none;width:100%;height:100%;align-items:center;justify-content:center;">
+                    <i class="fas fa-car" style="font-size:48px;color:var(--text-light);"></i>
+                </div>
             </div>
 
             <div class="vehicle-info">
-                <!-- Vehicle name -->
                 <h4>${vehicle.vehicleBrand} ${vehicle.vehicleModel}</h4>
 
-                <!-- Price -->
                 <p class="price">
-                    LKR ${vehicle.pricePerDay ? vehicle.pricePerDay.toLocaleString() : "N/A"}/day
+                    LKR ${vehicle.pricePerDay ? vehicle.pricePerDay.toLocaleString() : 'N/A'}/day
                 </p>
 
-                <!-- Company -->
                 <p class="category"
-                   style="cursor:pointer; color:var(--primary); text-decoration:underline;"
+                   style="cursor:pointer;color:var(--primary);text-decoration:underline;"
                    onclick="event.stopPropagation(); viewCompany(${vehicle.companyId})">
-                   ${getCompanyName(vehicle.companyId)}
+                   ${companyName}
                 </p>
 
-                <!-- Location -->
-                <p class="location">Sri Lanka</p>
+                <!-- Location from vehicle data -->
+                <p class="location">
+                    <i class="fas fa-map-marker-alt" style="margin-right:4px;"></i>
+                    ${vehicle.location || 'Sri Lanka'}
+                </p>
 
-                <!-- Rating - Always 5 stars -->
-                <div class="rating">
-                    <div class="stars">
-                        ${generateStars(5)}
-                    </div>
-                    <span class="review-count">Excellent Service</span>
+                <!-- Dynamic rating loaded asynchronously -->
+                <div class="rating" id="rating-${vehicle.vehicleId}">
+                    <div class="stars">${generateStars(0)}</div>
+                    <span class="review-count">Loading...</span>
                 </div>
 
-                <!-- Seats -->
                 <div class="seats-info">
                     <i class="fas fa-users"></i>
                     ${vehicle.numberOfPassengers} seats
                 </div>
 
-                <!-- Features -->
                 <div class="features">
-                    <span class="feature-tag">${vehicle.fuelType || "Fuel"}</span>
-                    <span class="feature-tag">${vehicle.vehicleType || "Vehicle"}</span>
-                    ${vehicle.availabilityStatus === 'available' ? '<span class="feature-tag">Available</span>' : ''}
+                    <span class="feature-tag">${vehicle.fuelType || 'Fuel'}</span>
+                    <span class="feature-tag">${vehicle.vehicleType || 'Vehicle'}</span>
+                    ${vehicle.availabilityStatus === 'available'
+            ? '<span class="feature-tag available-tag">Available</span>'
+            : ''}
                 </div>
             </div>
-
-            
         `;
 
-        container.appendChild(vehicleCard);
+        container.appendChild(card);
+
+        // Load rating asynchronously so cards appear instantly
+        loadVehicleRating(vehicle.vehicleId);
     });
+
+    renderPagination(vehicles);
+
+    // Scroll to top of results smoothly on page change
+    container.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 // ========================================
-// Generate 5 Star Rating HTML
+// 6b. Render Pagination Controls
+// ========================================
+function renderPagination(vehicles) {
+    // Remove any existing pagination bar
+    const existing = document.getElementById('paginationBar');
+    if (existing) existing.remove();
+
+    const totalPages = Math.ceil(vehicles.length / PAGE_SIZE);
+    if (totalPages <= 1) return; // No bar needed for single page
+
+    const bar = document.createElement('div');
+    bar.id = 'paginationBar';
+    bar.style.cssText = `
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        padding: 28px 0 12px;
+        flex-wrap: wrap;
+    `;
+
+    // Results summary
+    const start  = (currentPage - 1) * PAGE_SIZE + 1;
+    const end    = Math.min(currentPage * PAGE_SIZE, vehicles.length);
+    const summary = document.createElement('div');
+    summary.style.cssText = `
+        width: 100%;
+        text-align: center;
+        font-size: 13px;
+        color: var(--text-light, #888);
+        margin-bottom: 10px;
+    `;
+    summary.textContent = `Showing ${start}–${end} of ${vehicles.length} vehicles`;
+    bar.appendChild(summary);
+
+    // Helper to create a button
+    function makeBtn(label, page, isActive, isDisabled) {
+        const btn = document.createElement('button');
+        btn.innerHTML = label;
+        btn.disabled  = isDisabled;
+        btn.style.cssText = `
+            min-width: 38px;
+            height: 38px;
+            padding: 0 10px;
+            border-radius: 8px;
+            border: 1.5px solid ${isActive ? 'var(--primary, #4361ee)' : 'var(--border, #e0e0e0)'};
+            background: ${isActive ? 'var(--primary, #4361ee)' : 'white'};
+            color: ${isActive ? 'white' : isDisabled ? '#ccc' : 'var(--text, #333)'};
+            font-size: 14px;
+            font-weight: ${isActive ? '600' : '400'};
+            cursor: ${isDisabled ? 'default' : 'pointer'};
+            transition: background 0.15s, border-color 0.15s, color 0.15s;
+            font-family: inherit;
+            box-shadow: ${isActive ? '0 2px 8px rgba(67,97,238,0.25)' : 'none'};
+        `;
+        if (!isDisabled && !isActive) {
+            btn.onmouseenter = () => { btn.style.borderColor = 'var(--primary, #4361ee)'; btn.style.color = 'var(--primary, #4361ee)'; };
+            btn.onmouseleave = () => { btn.style.borderColor = 'var(--border, #e0e0e0)'; btn.style.color = 'var(--text, #333)'; };
+        }
+        if (!isDisabled) {
+            btn.onclick = () => goToPage(page, vehicles);
+        }
+        return btn;
+    }
+
+    // ← Prev
+    bar.appendChild(makeBtn('<i class="fas fa-chevron-left"></i>', currentPage - 1, false, currentPage === 1));
+
+    // Page number buttons with ellipsis
+    const pageButtons = buildPageRange(currentPage, totalPages);
+    pageButtons.forEach(item => {
+        if (item === '...') {
+            const ellipsis = document.createElement('span');
+            ellipsis.textContent = '…';
+            ellipsis.style.cssText = 'padding: 0 4px; color: var(--text-light, #888); font-size:14px; line-height:38px;';
+            bar.appendChild(ellipsis);
+        } else {
+            bar.appendChild(makeBtn(item, item, item === currentPage, false));
+        }
+    });
+
+    // Next →
+    bar.appendChild(makeBtn('<i class="fas fa-chevron-right"></i>', currentPage + 1, false, currentPage === totalPages));
+
+    // Insert after searchResults
+    const resultsContainer = document.getElementById('searchResults');
+    resultsContainer.insertAdjacentElement('afterend', bar);
+}
+
+// Build a smart page range with ellipsis: [1, ..., 4, 5, 6, ..., 12]
+function buildPageRange(current, total) {
+    if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
+
+    const pages = [];
+    pages.push(1);
+
+    if (current > 3)          pages.push('...');
+    for (let p = Math.max(2, current - 1); p <= Math.min(total - 1, current + 1); p++) {
+        pages.push(p);
+    }
+    if (current < total - 2)  pages.push('...');
+
+    pages.push(total);
+    return pages;
+}
+
+// Navigate to a specific page
+function goToPage(page, vehicles) {
+    currentPage = page;
+    displayVehicles(vehicles, false);  // false = don't reset currentPage again
+}
+
+// ========================================
+// 7. Load Vehicle Rating Asynchronously
+//    GET /ratings/actor?actorType=VEHICLE&actorId=X
+// ========================================
+async function loadVehicleRating(vehicleId) {
+    const ratingEl = document.getElementById(`rating-${vehicleId}`);
+    if (!ratingEl) return;
+
+    try {
+        const response = await fetch(`/ratings/actor?actorType=VEHICLE&actorId=${vehicleId}`, {
+            credentials: 'include'
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            if (data.success) {
+                const avg   = parseFloat(data.average) || 0;
+                const total = data.total || 0;
+                const label = total > 0
+                    ? `${avg.toFixed(1)} (${total} review${total !== 1 ? 's' : ''})`
+                    : 'No reviews yet';
+
+                ratingEl.innerHTML = `
+                    <div class="stars">${generateStars(avg)}</div>
+                    <span class="review-count">${label}</span>
+                `;
+                return;
+            }
+        }
+    } catch (e) {
+        // Silently fall through to default
+    }
+
+    // Fallback when ratings endpoint unavailable
+    ratingEl.innerHTML = `
+        <div class="stars">${generateStars(0)}</div>
+        <span class="review-count">No reviews yet</span>
+    `;
+}
+
+// ========================================
+// 8. Generate Star Rating HTML (supports decimals)
 // ========================================
 function generateStars(rating) {
     let stars = '';
     for (let i = 1; i <= 5; i++) {
-        if (i <= rating) {
+        if (i <= Math.floor(rating)) {
             stars += '<i class="fas fa-star"></i>';
+        } else if (i === Math.ceil(rating) && rating % 1 >= 0.5) {
+            stars += '<i class="fas fa-star-half-alt"></i>';
         } else {
             stars += '<i class="far fa-star"></i>';
         }
@@ -293,103 +416,56 @@ function generateStars(rating) {
 }
 
 // ========================================
-// Get Company Name by ID
-// ========================================
-function getCompanyName(companyId) {
-    const companyMap = {
-        1: "Premium Rentals",
-        2: "City Car Rentals",
-        3: "Budget Wheels",
-        4: "Lanka Van Hire",
-        5: "Luxury Rides LK",
-        6: "Island Transport"
-    };
-    return companyMap[companyId] || `Company ID: ${companyId}`;
-}
-
-// ========================================
-// Search Vehicles by Form Criteria
+// 9. Search Vehicles
 // ========================================
 function performSearch() {
-    // Same as searchVehicles but also applies filters
     applyFilters();
 }
 
 function searchVehicles() {
-    const vehicleType = document.getElementById('vehicleType')?.value.toLowerCase();
-    const pickupLocation = document.getElementById('pickupLocation')?.value.toLowerCase();
-    
-    let results = [...allVehicles];
-    
-    if (vehicleType) {
-        results = results.filter(vehicle => {
-            // Search by vehicle type (Car, SUV, Van) or by vehicle name (brand + model)
-            const vehicleName = `${vehicle.vehicleBrand} ${vehicle.vehicleModel}`.toLowerCase();
-            const type = (vehicle.vehicleType || '').toLowerCase();
-            return type === vehicleType || vehicleName.includes(vehicleType);
-        });
-    }
-    
-    // Note: Location filtering would need backend support
-    // For now, we show all vehicles regardless of pickup location
-    
-    filteredVehicles = results;
-    displayVehicles(filteredVehicles);
+    applyFilters();
 }
 
 // ========================================
-// Apply Filters
+// 10. Apply Filters
 // ========================================
 function applyFilters() {
-    const priceMin = parseInt(document.getElementById('priceMin')?.value || 0);
-    const priceMax = parseInt(document.getElementById('priceMax')?.value || 100000);
-    const companyFilter = document.getElementById('companyFilter')?.value;
-    const fuelType = document.getElementById('fuelType')?.value.toLowerCase();
-    const seats = document.getElementById('seats')?.value;
-    const vehicleType = document.getElementById('vehicleType')?.value.toLowerCase();
-    const pickupLocation = document.getElementById('pickupLocation')?.value.toLowerCase();
+    const priceMin      = parseInt(document.getElementById('priceMin')?.value       || 0);
+    const priceMax      = parseInt(document.getElementById('priceMax')?.value       || 100000);
+    const companyFilter = document.getElementById('companyFilter')?.value           || '';
+    const fuelType      = (document.getElementById('fuelType')?.value               || '').toLowerCase();
+    const seats         = document.getElementById('seats')?.value                   || '';
+    const vehicleType   = (document.getElementById('vehicleType')?.value            || '').toLowerCase();
+    const pickupLoc     = (document.getElementById('pickupLocation')?.value         || '').toLowerCase();
 
     let filtered = [...allVehicles];
 
-    // Price Range Filter
-    filtered = filtered.filter(v =>
-        v.pricePerDay >= priceMin && v.pricePerDay <= priceMax
-    );
+    // Price
+    filtered = filtered.filter(v => v.pricePerDay >= priceMin && v.pricePerDay <= priceMax);
 
-    // Vehicle Type Filter
+    // Vehicle type
     if (vehicleType) {
         filtered = filtered.filter(v => {
             const type = (v.vehicleType || '').toLowerCase();
-            const vehicleName = `${v.vehicleBrand} ${v.vehicleModel}`.toLowerCase();
-            return type === vehicleType || vehicleName.includes(vehicleType);
+            const name = `${v.vehicleBrand} ${v.vehicleModel}`.toLowerCase();
+            return type === vehicleType || name.includes(vehicleType);
         });
     }
 
-    // Company Filter
+    // Company — use the live reverse map (no hardcoding)
     if (companyFilter) {
-        // Map company name to ID
-        const companyIdMap = {
-            "Premium Rentals": 1,
-            "City Car Rentals": 2,
-            "Budget Wheels": 3,
-            "Lanka Van Hire": 4,
-            "Luxury Rides LK": 5,
-            "Island Transport": 6
-        };
-        const companyId = companyIdMap[companyFilter];
+        const companyId = companyNameToId[companyFilter];
         if (companyId) {
             filtered = filtered.filter(v => v.companyId === companyId);
         }
     }
 
-    // Fuel Type Filter
+    // Fuel type
     if (fuelType) {
-        filtered = filtered.filter(v =>
-            v.fuelType && v.fuelType.toLowerCase() === fuelType
-        );
+        filtered = filtered.filter(v => (v.fuelType || '').toLowerCase() === fuelType);
     }
 
-    // Seats Filter
+    // Seats
     if (seats) {
         if (seats === '7+') {
             filtered = filtered.filter(v => v.numberOfPassengers >= 7);
@@ -398,10 +474,10 @@ function applyFilters() {
         }
     }
 
-    // Pickup Location Filter
-    if (pickupLocation) {
+    // Pickup location — uses real v.location field
+    if (pickupLoc) {
         filtered = filtered.filter(v =>
-            v.location && v.location.toLowerCase().includes(pickupLocation)
+            v.location && v.location.toLowerCase().includes(pickupLoc)
         );
     }
 
@@ -410,70 +486,51 @@ function applyFilters() {
 }
 
 // ========================================
-// Clear All Filters
+// 11. Clear All Filters
 // ========================================
 function clearAllFilters() {
-    // Reset all form dropdowns to their default values
-    const vehicleType = document.getElementById('vehicleType');
-    const pickupLocation = document.getElementById('pickupLocation');
-    const fuelType = document.getElementById('fuelType');
-    const seats = document.getElementById('seats');
-    const companyFilter = document.getElementById('companyFilter');
-    const priceMin = document.getElementById('priceMin');
-    const priceMax = document.getElementById('priceMax');
+    ['vehicleType', 'pickupLocation', 'fuelType', 'seats', 'companyFilter'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.value = '';
+    });
+
+    const priceMin      = document.getElementById('priceMin');
+    const priceMax      = document.getElementById('priceMax');
     const priceFromInput = document.getElementById('priceFromInput');
-    const priceToInput = document.getElementById('priceToInput');
-
-    if (vehicleType) vehicleType.value = '';
-    if (pickupLocation) pickupLocation.value = '';
-    if (fuelType) fuelType.value = '';
-    if (seats) seats.value = '';
-    if (companyFilter) companyFilter.value = '';
-
-    // Reset price sliders
-    if (priceMin) priceMin.value = 0;
-    if (priceMax) priceMax.value = 100000;
-    if (priceFromInput) priceFromInput.value = 0;
-    if (priceToInput) priceToInput.value = 100000;
-
-    // Update slider display
+    const priceToInput   = document.getElementById('priceToInput');
     const priceValueFrom = document.getElementById('priceValueFrom');
-    const priceValueTo = document.getElementById('priceValueTo');
-    const sliderRange = document.getElementById('sliderRange');
+    const priceValueTo   = document.getElementById('priceValueTo');
+    const sliderRange    = document.getElementById('sliderRange');
 
+    if (priceMin)      priceMin.value      = 0;
+    if (priceMax)      priceMax.value      = 100000;
+    if (priceFromInput) priceFromInput.value = 0;
+    if (priceToInput)   priceToInput.value   = 100000;
     if (priceValueFrom) priceValueFrom.textContent = '0';
-    if (priceValueTo) priceValueTo.textContent = '100000';
-    if (sliderRange) {
-        sliderRange.style.left = '0%';
-        sliderRange.style.width = '100%';
-    }
+    if (priceValueTo)   priceValueTo.textContent   = '100000';
+    if (sliderRange) { sliderRange.style.left = '0%'; sliderRange.style.width = '100%'; }
 
-    // Reset filtered vehicles to show all vehicles
     filteredVehicles = [...allVehicles];
     displayVehicles(filteredVehicles);
-
-    // Show notification
     showNotification('All filters cleared!', 'info');
 }
 
-
 // ========================================
-// View Vehicle Details
+// 12. View Vehicle Details
 // ========================================
 function viewVehicle(vehicleId) {
     const vehicle = allVehicles.find(v => v.vehicleId === vehicleId);
     if (vehicle) {
         try {
-            // Store vehicle data in sessionStorage
             sessionStorage.setItem('selectedVehicle', JSON.stringify(vehicle));
             sessionStorage.setItem('searchData', JSON.stringify({
-                vehicleType: document.getElementById('vehicleType')?.value || '',
-                pickupLocation: document.getElementById('pickupLocation')?.value || '',
+                vehicleType:     document.getElementById('vehicleType')?.value     || '',
+                pickupLocation:  document.getElementById('pickupLocation')?.value  || '',
                 dropoffLocation: document.getElementById('dropoffLocation')?.value || '',
-                fromDateTime: document.getElementById('fromDateTime')?.value || '',
-                toDateTime: document.getElementById('toDateTime')?.value || ''
+                fromDateTime:    document.getElementById('fromDateTime')?.value    || '',
+                toDateTime:      document.getElementById('toDateTime')?.value      || ''
             }));
-        } catch(e) {
+        } catch (e) {
             console.log('SessionStorage not available:', e);
         }
         window.location.href = `vehicle-profile.html?id=${vehicleId}`;
@@ -481,21 +538,20 @@ function viewVehicle(vehicleId) {
 }
 
 // ========================================
-// View Company Profile
+// 13. View Company Profile
 // ========================================
 function viewCompany(companyId) {
     window.location.href = 'company-profile.html?companyId=' + companyId;
 }
 
 // ========================================
-// Send Message to Company
+// 14. Send Message Popup
 // ========================================
 function sendMessage(vehicleId, vehicleName) {
     const vehicle = allVehicles.find(v => v.vehicleId === vehicleId);
     if (!vehicle) return;
 
     const companyName = getCompanyName(vehicle.companyId);
-
     const popup = document.createElement('div');
     popup.className = 'popup-overlay';
     popup.innerHTML = `
@@ -517,13 +573,9 @@ function sendMessage(vehicleId, vehicleName) {
     document.body.appendChild(popup);
 }
 
-// ========================================
-// Send Message Action
-// ========================================
 function sendMessageAction(vehicleId) {
     const messageInput = document.querySelector('.message-input');
     if (messageInput && messageInput.value.trim()) {
-        // TODO: Implement actual message sending to backend
         showNotification('Message sent successfully!', 'success');
         closePopup();
     } else {
@@ -531,160 +583,89 @@ function sendMessageAction(vehicleId) {
     }
 }
 
-// ========================================
-// Close Popup
-// ========================================
 function closePopup() {
     const popup = document.querySelector('.popup-overlay');
-    if (popup) {
-        popup.remove();
-    }
+    if (popup) popup.remove();
 }
 
 // ========================================
-// Show Error Message
+// 15. UI Helpers
 // ========================================
 function showError(message) {
-    const container = document.getElementById("searchResults");
+    const container = document.getElementById('searchResults');
     if (container) {
         container.innerHTML = `
-            <div style="text-align: center; padding: 40px;">
-                <i class="fas fa-exclamation-circle" style="font-size: 48px; color: var(--danger); margin-bottom: 15px;"></i>
-                <p style="color: var(--text); font-size: 18px;">${message}</p>
-            </div>
-        `;
+            <div style="text-align:center;padding:40px;">
+                <i class="fas fa-exclamation-circle" style="font-size:48px;color:var(--danger);margin-bottom:15px;"></i>
+                <p style="color:var(--text);font-size:18px;">${message}</p>
+            </div>`;
     }
 }
 
-// ========================================
-// Show Notification Toast
-// ========================================
 function showNotification(message, type = 'info') {
-    const notification = document.createElement('div');
-    const icons = {
-        success: 'fa-check-circle',
-        error: 'fa-exclamation-circle',
-        info: 'fa-info-circle'
-    };
-    const colors = {
-        success: '#4caf50',
-        error: '#f44336',
-        info: '#2196f3'
-    };
-
-    notification.style.cssText = `
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        background: ${colors[type]};
-        color: white;
-        padding: 15px 20px;
-        border-radius: 8px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        z-index: 9999;
-        animation: slideInRight 0.3s ease;
-        max-width: 300px;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    `;
-
-    notification.innerHTML = `
-        <i class="fas ${icons[type]}"></i>
-        <span>${message}</span>
-    `;
-
-    document.body.appendChild(notification);
-
+    const colors = { success: '#4caf50', error: '#f44336', info: '#2196f3' };
+    const icons  = { success: 'fa-check-circle', error: 'fa-exclamation-circle', info: 'fa-info-circle' };
+    const n = document.createElement('div');
+    n.style.cssText = `
+        position:fixed;top:20px;right:20px;background:${colors[type]};color:white;
+        padding:15px 20px;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,.15);
+        z-index:9999;animation:slideInRight .3s ease;max-width:300px;
+        display:flex;align-items:center;gap:10px;`;
+    n.innerHTML = `<i class="fas ${icons[type]}"></i><span>${message}</span>`;
+    document.body.appendChild(n);
     setTimeout(() => {
-        notification.style.animation = 'slideOutRight 0.3s ease';
-        setTimeout(() => notification.remove(), 300);
+        n.style.animation = 'slideOutRight .3s ease';
+        setTimeout(() => n.remove(), 300);
     }, 3000);
 }
 
 // ========================================
-// Initialize on Page Load
-// ========================================
-document.addEventListener('DOMContentLoaded', function() {
-    loadVehicles();
-    initializePriceSlider();
-});
-
-// ========================================
-// Price Range Slider Functionality
+// 16. Price Range Slider
 // ========================================
 function initializePriceSlider() {
-    const priceMin = document.getElementById('priceMin');
-    const priceMax = document.getElementById('priceMax');
+    const priceMin      = document.getElementById('priceMin');
+    const priceMax      = document.getElementById('priceMax');
     const priceFromInput = document.getElementById('priceFromInput');
-    const priceToInput = document.getElementById('priceToInput');
+    const priceToInput   = document.getElementById('priceToInput');
     const priceValueFrom = document.getElementById('priceValueFrom');
-    const priceValueTo = document.getElementById('priceValueTo');
-    const sliderRange = document.getElementById('sliderRange');
+    const priceValueTo   = document.getElementById('priceValueTo');
+    const sliderRange    = document.getElementById('sliderRange');
 
     if (!priceMin || !priceMax) return;
 
-    // Update display when sliders move
     function updateSlider() {
         let minVal = parseInt(priceMin.value);
         let maxVal = parseInt(priceMax.value);
 
-        // Ensure min is not greater than max
         if (minVal > maxVal - 1000) {
-            if (this === priceMin) {
-                priceMin.value = maxVal - 1000;
-                minVal = maxVal - 1000;
-            } else {
-                priceMax.value = minVal + 1000;
-                maxVal = minVal + 1000;
-            }
+            if (this === priceMin) { priceMin.value = maxVal - 1000; minVal = maxVal - 1000; }
+            else                   { priceMax.value = minVal + 1000; maxVal = minVal + 1000; }
         }
 
-        // Update display values
         if (priceValueFrom) priceValueFrom.textContent = minVal.toLocaleString();
-        if (priceValueTo) priceValueTo.textContent = maxVal.toLocaleString();
-        if (priceFromInput) priceFromInput.value = minVal;
-        if (priceToInput) priceToInput.value = maxVal;
+        if (priceValueTo)   priceValueTo.textContent   = maxVal.toLocaleString();
+        if (priceFromInput) priceFromInput.value        = minVal;
+        if (priceToInput)   priceToInput.value          = maxVal;
 
-        // Update visual slider range
         if (sliderRange) {
-            const percentMin = (minVal / 100000) * 100;
-            const percentMax = (maxVal / 100000) * 100;
-            sliderRange.style.left = percentMin + '%';
-            sliderRange.style.width = (percentMax - percentMin) + '%';
+            sliderRange.style.left  = (minVal / 100000 * 100) + '%';
+            sliderRange.style.width = ((maxVal - minVal) / 100000 * 100) + '%';
         }
     }
 
-    // Update sliders when input fields change
     function updateFromInput() {
-        let minVal = parseInt(priceFromInput.value) || 0;
-        let maxVal = parseInt(priceToInput.value) || 100000;
-
-        // Validate range
-        minVal = Math.max(0, Math.min(minVal, 100000));
-        maxVal = Math.max(0, Math.min(maxVal, 100000));
-
-        if (minVal > maxVal - 1000) {
-            minVal = maxVal - 1000;
-        }
-
+        let minVal = Math.max(0, Math.min(parseInt(priceFromInput.value) || 0,      100000));
+        let maxVal = Math.max(0, Math.min(parseInt(priceToInput.value)   || 100000, 100000));
+        if (minVal > maxVal - 1000) minVal = maxVal - 1000;
         priceMin.value = minVal;
         priceMax.value = maxVal;
         updateSlider();
     }
 
-    // Add event listeners
     priceMin.addEventListener('input', updateSlider);
     priceMax.addEventListener('input', updateSlider);
+    if (priceFromInput) priceFromInput.addEventListener('change', updateFromInput);
+    if (priceToInput)   priceToInput.addEventListener('change', updateFromInput);
 
-    if (priceFromInput) {
-        priceFromInput.addEventListener('change', updateFromInput);
-    }
-    if (priceToInput) {
-        priceToInput.addEventListener('change', updateFromInput);
-    }
-
-    // Initialize slider display
     updateSlider();
 }
-

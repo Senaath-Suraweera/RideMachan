@@ -11,319 +11,221 @@
     <link rel="stylesheet" href="../css/search.css?v=5" />
 </head>
 <body>
-    <div class="container">
-        <!-- Include Sidebar Navigation -->
-        <div id="navbar-container"></div>
+<div class="container">
+    <!-- Include Sidebar Navigation -->
+    <div id="navbar-container"></div>
 
-        <!-- Include Header -->
-        <div id="header-container"></div>
+    <!-- Include Header -->
+    <div id="header-container"></div>
 
-        <!-- Main Content -->
-        <div class="main-content">
+    <!-- Main Content -->
+    <div class="main-content">
 
-            <!-- Search Form -->
-            <div class="search-form-container">
-                <div class="form-header">
-                    <div class="form-title-section">
-                        <h2><i class="fas fa-search-location"></i> Find Your Perfect Vehicle</h2>
-                        <p class="subtitle">Search and filter through vehicles across Sri Lanka</p>
-                    </div>
-                </div>
-
-                <div class="search-form">
-                    <!-- Row 1 (2 columns) -->
-                    <!-- Row 1: Vehicle Type, Fuel Type, Seats (3 columns) -->
-                    <div class="form-row-grid three-columns">
-                        <div class="form-group">
-                            <label for="vehicleType"><i class="fas fa-car"></i> Vehicle Type</label>
-                            <select class="form-control" id="vehicleType">
-                                <option value="">All Types</option>
-                                <!-- Options will be populated dynamically from backend -->
-                            </select>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="fuelType"><i class="fas fa-gas-pump"></i> Fuel Type</label>
-                            <select class="form-control" id="fuelType">
-                                <option value="">All Fuel Types</option>
-                                <!-- Options will be populated dynamically from backend -->
-                            </select>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="seats"><i class="fas fa-users"></i> Seats</label>
-                            <select class="form-control" id="seats">
-                                <option value="">Any</option>
-                                <!-- Options will be populated dynamically from backend -->
-                            </select>
-                        </div>
-                    </div>
-
-                    <!-- Row 2: Price Range + Company + Pickup Location (2 columns) -->
-                    <div class="form-row-grid">
-                        <!-- Left Column: Price Range Slider -->
-                        <div class="form-group price-slider-group">
-                            <label><i class="fas fa-money-bill-wave"></i> Price Range (per day)</label>
-                            <div class="price-slider-container">
-                                <div class="price-labels">
-                                    <span class="price-min-label">Rs 0</span>
-                                    <span class="price-value-from">Rs <span id="priceValueFrom">0</span></span>
-                                    <span class="price-value-to">Rs <span id="priceValueTo">100000</span></span>
-                                    <span class="price-max-label">Rs 100,000</span>
-                                </div>
-                                <div class="slider-wrapper">
-                                    <div class="slider-track"></div>
-                                    <div class="slider-range" id="sliderRange"></div>
-                                    <input type="range" id="priceMin" min="0" max="100000" value="0" step="1000" class="slider-input">
-                                    <input type="range" id="priceMax" min="0" max="100000" value="100000" step="1000" class="slider-input">
-                                </div>
-                                <div class="price-inputs">
-                                    <div class="price-input-group">
-                                        <label>From (Rs)</label>
-                                        <input type="number" id="priceFromInput" value="0" min="0" max="100000" step="1000" class="price-input">
-                                    </div>
-                                    <div class="price-input-group">
-                                        <label>To (Rs)</label>
-                                        <input type="number" id="priceToInput" value="100000" min="0" max="100000" step="1000" class="price-input">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Right Column: Company + Pickup Location Stacked -->
-                        <div class="form-group-stacked">
-                            <!-- Company Filter -->
-                            <div class="form-group">
-                                <label for="companyFilter"><i class="fas fa-building"></i> Company</label>
-                                <select class="form-control" id="companyFilter">
-                                    <option value="">All Companies</option>
-                                    <!-- Options will be populated dynamically from backend -->
-                                </select>
-                            </div>
-
-                            <!-- Pickup Location -->
-                            <div class="form-group">
-                                <label for="pickupLocation"><i class="fas fa-map-marker-alt"></i> Pickup Location</label>
-                                <select class="form-control" id="pickupLocation">
-                                    <option value="">All Locations</option>
-                                    <!-- Options will be populated dynamically from backend -->
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Actions -->
-                    <div class="form-actions">
-                        <button class="search-btn primary" onclick="performSearch(); applyFilters();" type="button">
-                            <i class="fas fa-search"></i>
-                            <span>Search</span>
-                        </button>
-                        <button class="search-btn secondary" onclick="clearAllFilters()" type="button">
-                            <i class="fas fa-times"></i>
-                            <span>Clear</span>
-                        </button>
-                    </div>
+        <!-- Search Form -->
+        <div class="search-form-container">
+            <div class="form-header">
+                <div class="form-title-section">
+                    <h2><i class="fas fa-search-location"></i> Find Your Perfect Vehicle</h2>
+                    <p class="subtitle">Search and filter through vehicles across Sri Lanka</p>
                 </div>
             </div>
 
-            <!-- Search Results -->
-            <div class="search-results" id="searchResults">
-                <!-- Results will be populated by JavaScript -->
+            <div class="search-form">
+                <!-- Row 1: Vehicle Type, Fuel Type, Seats -->
+                <div class="form-row-grid three-columns">
+                    <div class="form-group">
+                        <label for="vehicleType"><i class="fas fa-car"></i> Vehicle Type</label>
+                        <select class="form-control" id="vehicleType">
+                            <option value="">All Types</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="fuelType"><i class="fas fa-gas-pump"></i> Fuel Type</label>
+                        <select class="form-control" id="fuelType">
+                            <option value="">All Fuel Types</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="seats"><i class="fas fa-users"></i> Seats</label>
+                        <select class="form-control" id="seats">
+                            <option value="">Any</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Row 2: Price Range + Company + Pickup Location -->
+                <div class="form-row-grid">
+                    <!-- Left: Price Range Slider -->
+                    <div class="form-group price-slider-group">
+                        <label><i class="fas fa-money-bill-wave"></i> Price Range (per day)</label>
+                        <div class="price-slider-container">
+                            <div class="price-labels">
+                                <span class="price-min-label">Rs 0</span>
+                                <span class="price-value-from">Rs <span id="priceValueFrom">0</span></span>
+                                <span class="price-value-to">Rs <span id="priceValueTo">100000</span></span>
+                                <span class="price-max-label">Rs 100,000</span>
+                            </div>
+                            <div class="slider-wrapper">
+                                <div class="slider-track"></div>
+                                <div class="slider-range" id="sliderRange"></div>
+                                <input type="range" id="priceMin" min="0" max="100000" value="0" step="1000" class="slider-input">
+                                <input type="range" id="priceMax" min="0" max="100000" value="100000" step="1000" class="slider-input">
+                            </div>
+                            <div class="price-inputs">
+                                <div class="price-input-group">
+                                    <label>From (Rs)</label>
+                                    <input type="number" id="priceFromInput" value="0" min="0" max="100000" step="1000" class="price-input">
+                                </div>
+                                <div class="price-input-group">
+                                    <label>To (Rs)</label>
+                                    <input type="number" id="priceToInput" value="100000" min="0" max="100000" step="1000" class="price-input">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right: Company + Pickup Location stacked -->
+                    <div class="form-group-stacked">
+                        <div class="form-group">
+                            <label for="companyFilter"><i class="fas fa-building"></i> Company</label>
+                            <select class="form-control" id="companyFilter">
+                                <option value="">All Companies</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="pickupLocation"><i class="fas fa-map-marker-alt"></i> Pickup Location</label>
+                            <select class="form-control" id="pickupLocation">
+                                <option value="">All Locations</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="form-actions">
+                    <button class="search-btn primary" onclick="performSearch(); applyFilters();" type="button">
+                        <i class="fas fa-search"></i>
+                        <span>Search</span>
+                    </button>
+                    <button class="search-btn secondary" onclick="clearAllFilters()" type="button">
+                        <i class="fas fa-times"></i>
+                        <span>Clear</span>
+                    </button>
+                </div>
             </div>
         </div>
+
+        <!-- Search Results -->
+        <div class="search-results" id="searchResults">
+            <!-- Results populated by searchVehicles.js -->
+        </div>
     </div>
+</div>
 
-    <!-- Load searchVehicles.js -->
-    <script src="../js/searchVehicles.js"></script>
+<!-- Main JS -->
+<script src="../js/searchVehicles.js"></script>
 
-    <script>
-        // Load external components
-        function loadComponent(elementId, filePath, callback) {
-            fetch(filePath)
-                .then(response => response.text())
-                .then(data => {
-                    // Replace the PAGE_TITLE placeholder with SEARCH
-                    if (elementId === 'header-container') {
-                        data = data.replace('{{PAGE_TITLE}}', 'SEARCH');
-                    }
-                    
-                    document.getElementById(elementId).innerHTML = data;
-                    // Execute any scripts in the loaded content (handles inline script tags)
-                    executeComponentScripts(elementId);
-                    
-                    // Execute callback if provided
-                    if (callback) {
-                        callback();
-                    }
-                })
-                .catch(error => console.error('Error loading component:', error));
-        }
-
-        // Execute scripts inside a loaded component container by creating new script nodes
-        function executeComponentScripts(containerId) {
-            const container = document.getElementById(containerId);
-            if (!container) return;
-
-            const scripts = container.querySelectorAll('script');
-            scripts.forEach(oldScript => {
-                const newScript = document.createElement('script');
-                if (oldScript.src) {
-                    newScript.src = oldScript.src;
-                } else {
-                    newScript.textContent = oldScript.textContent;
+<script>
+    // ── Component loader ──
+    // Returns a Promise so callers can wait for all scripts (incl. external src)
+    // to finish loading before running the callback.
+    function loadComponent(elementId, filePath, callback) {
+        fetch(filePath)
+            .then(r => r.text())
+            .then(html => {
+                if (elementId === 'header-container') {
+                    html = html.replace('{{PAGE_TITLE}}', 'SEARCH');
                 }
-                document.body.appendChild(newScript);
-                // Remove the old script tag to avoid duplication
-                oldScript.parentNode && oldScript.parentNode.removeChild(oldScript);
-            });
-        }
-
-        // Load navbar and header on page load
-        document.addEventListener('DOMContentLoaded', function() {
-            loadComponent('navbar-container', '../components/navbar.html', function() {
-                // Initialize navbar after it's loaded
-                if (typeof initializeNavbar === 'function') initializeNavbar();
-            });
-
-            loadComponent('header-container', '../components/header.html', function() {
-                // Initialize header after it's loaded
-                if (typeof initializeHeader === 'function') initializeHeader();
-            });
-
-            // NOTE: Date/time defaults removed because the search form no longer contains those fields.
-        });
-
-        // Current active tab
-        let currentTab = 'vehicles';
-
-
-        function switchTab(tab) {
-            if (tab === 'drivers') {
-                window.location.href = "driver_search.html";
-                return;
-            }
-
-            currentTab = tab;
-            
-            // Update tab UI
-            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-            const btn = document.querySelector(`[data-tab="${tab}"]`);
-            if (btn) btn.classList.add('active');
-            
-            // Update search button text
-            const searchBtnText = document.getElementById('searchBtnText');
-            searchBtnText.textContent = tab === 'drivers' ? 'Search Drivers' : 'Search Vehicles';
-            
-            // Clear results when switching tabs
-            document.getElementById('searchResults').innerHTML = '';
-        }
-
-        function performSearch() {
-            if (currentTab === 'drivers') {
-                window.location.href = "driver_search.html";
-            } else {
-                searchVehicles();
-            }
-        }
-
-
-        // Header functionality (integrated from header.html)
-        function initializeHeader() {
-            setTimeout(() => {
-                const userName = document.getElementById('userName');
-                const profileInitial = document.getElementById('profileInitial');
-                
-                if (userName) userName.textContent = 'Kamal';
-                if (profileInitial) profileInitial.textContent = 'K';
-                
-                updateNotificationCounts();
-            }, 100);
-        }
-
-        function updateNotificationCounts() {
-            setTimeout(() => {
-                const notificationCount = document.getElementById('notificationCount');
-                const messageCount = document.getElementById('messageCount');
-                
-                if (notificationCount) notificationCount.textContent = '3';
-                if (messageCount) messageCount.textContent = '5';
-            }, 100);
-        }
-
-        function toggleProfileDropdown() {
-            const dropdown = document.getElementById('profileDropdown');
-            if (dropdown) {
-                dropdown.classList.toggle('show');
-            }
-        }
-
-        function showNotifications() {
-            alert('Notifications: You have 3 new notifications!');
-        }
-
-        function showMessages() {
-            alert('Messages: You have 5 new messages!');
-        }
-
-        function handleLogout() {
-            if (confirm('Are you sure you want to logout?')) {
-                alert('Logged out successfully!');
-                // In a real app: window.location.href = '../auth/login.html';
-            }
-        }
-
-        // Navbar functionality (integrated from navbar.html)
-        function initializeNavbar() {
-            setTimeout(() => {
-                setActiveNavItem('search');
-            }, 100);
-        }
-
-        function setActiveNavItem(pageName) {
-            setTimeout(() => {
-                document.querySelectorAll('.nav-item').forEach(item => {
-                    item.classList.remove('active');
+                document.getElementById(elementId).innerHTML = html;
+                // Wait for all scripts inside the component to fully load
+                // (critical for header.js which is loaded via <script src="...">)
+                executeComponentScripts(elementId).then(() => {
+                    if (callback) callback();
                 });
-                
-                const activeItem = document.querySelector(`[data-page="${pageName}"]`);
-                if (activeItem) {
-                    activeItem.classList.add('active');
-                }
-            }, 100);
-        }
+            })
+            .catch(err => console.error('Error loading component:', err));
+    }
 
-        // Initialize everything when page loads
-        window.addEventListener('load', function() {
-            initializeNavbar();
-        });
+    function executeComponentScripts(containerId) {
+        const container = document.getElementById(containerId);
+        if (!container) return Promise.resolve();
 
-        // Close dropdowns when clicking outside
-        document.addEventListener('click', function(event) {
-            setTimeout(() => {
-                const dropdown = document.getElementById('profileDropdown');
-                const profile = document.querySelector('.user-profile');
-                
-                if (dropdown && profile && !profile.contains(event.target)) {
-                    dropdown.classList.remove('show');
-                }
-            }, 100);
-        });
+        const scriptPromises = [];
 
-        // View company profile
-        function viewCompanyProfile(cardElement) {
-            // Extract company ID from the card's data attribute
-            const companyId = cardElement.getAttribute('data-company-id');
+        container.querySelectorAll('script').forEach(oldScript => {
+            const newScript = document.createElement('script');
 
-            if (!companyId) {
-                console.error('❌ No company ID found on card');
-                return;
+            if (oldScript.src) {
+                // External script — must wait for onload before callback fires
+                const p = new Promise((resolve) => {
+                    newScript.onload  = resolve;
+                    newScript.onerror = resolve; // resolve even on error, don't block UI
+                });
+                newScript.src = oldScript.src;
+                scriptPromises.push(p);
+            } else {
+                // Inline script — runs synchronously on append, no waiting needed
+                newScript.textContent = oldScript.textContent;
             }
 
-            console.log('🔗 Navigating to company profile:', companyId);
+            document.body.appendChild(newScript);
+            if (oldScript.parentNode) oldScript.parentNode.removeChild(oldScript);
+        });
 
-            // Use URL parameter instead of sessionStorage
-            window.location.href = `company-profile.html?companyId=${encodeURIComponent(companyId)}`;
-        }
-    </script>
+        return Promise.all(scriptPromises);
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        // Load navbar
+        loadComponent('navbar-container', '../components/navbar.html', function () {
+            if (typeof initializeNavbar === 'function') initializeNavbar();
+        });
+
+        // Load header — header.js inside it will call /customer/profile/info automatically
+        // DO NOT override userName/profileInitial/notificationCount here
+        loadComponent('header-container', '../components/header.html', function () {
+            if (typeof initializeHeader === 'function') initializeHeader();
+        });
+    });
+
+    // ── Tab switching ──
+    let currentTab = 'vehicles';
+
+    function switchTab(tab) {
+        if (tab === 'drivers') { window.location.href = 'driver_search.html'; return; }
+        currentTab = tab;
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        const btn = document.querySelector(`[data-tab="${tab}"]`);
+        if (btn) btn.classList.add('active');
+        document.getElementById('searchResults').innerHTML = '';
+    }
+
+    function performSearch() {
+        if (currentTab === 'drivers') { window.location.href = 'driver_search.html'; }
+        else { searchVehicles(); }
+    }
+
+    // ── Navbar helpers ──
+    function initializeNavbar() {
+        setTimeout(() => setActiveNavItem('search'), 100);
+    }
+
+    function setActiveNavItem(pageName) {
+        setTimeout(() => {
+            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+            const active = document.querySelector(`[data-page="${pageName}"]`);
+            if (active) active.classList.add('active');
+        }, 100);
+    }
+
+    window.addEventListener('load', initializeNavbar);
+
+    // ── Company profile navigation ──
+    function viewCompanyProfile(cardElement) {
+        const companyId = cardElement.getAttribute('data-company-id');
+        if (!companyId) return;
+        window.location.href = `company-profile.html?companyId=${encodeURIComponent(companyId)}`;
+    }
+</script>
 </body>
 </html>

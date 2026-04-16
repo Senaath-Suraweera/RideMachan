@@ -123,18 +123,21 @@
             // Load header and navbar
             async function loadComponents() {
                 try {
-                    // Load navbar
                     const navbarResponse = await fetch('../components/navbar.html');
-                    const navbarHTML = await navbarResponse.text();
-                    document.getElementById('navbar-container').innerHTML = navbarHTML;
+                    document.getElementById('navbar-container').innerHTML = await navbarResponse.text();
 
-                    // Load header and set page title
                     const headerResponse = await fetch('../components/header.html');
-                    let headerHTML = await headerResponse.text();
-                    headerHTML = headerHTML.replace('{{PAGE_TITLE}}', 'Notifications');
-                    document.getElementById('header-container').innerHTML = headerHTML;
-                    
-                    // Initialize components after loading
+                    document.getElementById('header-container').innerHTML = await headerResponse.text();
+
+                    // Re-execute the header script (innerHTML doesn't run scripts)
+                    const headerScript = document.createElement('script');
+                    headerScript.src = '../components/header.js';
+                    headerScript.onload = () => {
+                        initializeHeader();
+                        // setPageTitle() is now handled automatically by header.js
+                    };
+                    document.body.appendChild(headerScript);
+
                     initializeComponents();
                 } catch (error) {
                     console.error('Error loading components:', error);
