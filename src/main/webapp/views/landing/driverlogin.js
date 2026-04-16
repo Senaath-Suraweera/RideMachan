@@ -19,7 +19,7 @@ loginForm.addEventListener("submit", async (e) => {
     const result = await response.json();
 
     if (result.status === "success") {
-      alert("✅ Login successful!");
+      //alert("✅ Login successful!");
       window.location.href = "/views/rentalcompany/driver/pages/dashboard.html";
     } else {
       errorMsg.style.display = "block";

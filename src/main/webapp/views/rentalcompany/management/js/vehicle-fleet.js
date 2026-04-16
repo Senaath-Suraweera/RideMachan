@@ -145,7 +145,6 @@ async function loadVehicles(searchQuery = "") {
                                 <button class="action-btn primary" onclick="openEditModal(${vehicleId})"><i class="fas fa-edit"></i> Update</button>
                                 <button class="action-btn secondary" onclick="removeVehicle(${vehicleId})"><i class="fas fa-trash"></i> Delete</button>
                                 <button class="redirect" onclick="redirectCalenderView(${vehicleId})">Calender View</button>
-                                <button class="redirect" onclick="redirectMaintenanceView(${vehicleId})">Maintenance View</button>
                               </div>
                         </div>
                       `;

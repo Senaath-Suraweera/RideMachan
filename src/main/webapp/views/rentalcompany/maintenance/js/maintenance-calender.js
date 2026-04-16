@@ -2,7 +2,7 @@ async function checkLogin() {
 
     try {
 
-        const response = await fetch("/checklogin");
+        const response = await fetch("/check/login/maintenance");
         const data = await response.json();
 
         if (!data.loggedIn) {
@@ -13,7 +13,7 @@ async function checkLogin() {
 
             document.getElementById("loginOkBtn").onclick = () => {
 
-                window.location.href = "/login";
+                window.location.href = "/views/landing/maintenancelogin.html";
 
             };
 
@@ -32,6 +32,7 @@ async function checkLogin() {
     }
 
 }
+
 
 let AllEvents;
 let currentYear = 2026;
@@ -515,11 +516,11 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     try {
 
-        /*const loggedIn = await checkLogin();
+        const loggedIn = await checkLogin();
 
         if (!loggedIn) {
           return;    // stop here if not logged in
-        }*/
+        }
 
         AllEvents = await LoadCalenderEvents();
         renderEvents(AllEvents);

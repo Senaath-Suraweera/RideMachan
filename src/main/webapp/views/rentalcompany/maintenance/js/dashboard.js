@@ -118,7 +118,7 @@ async function loadUpcomingMaintenance() {
 
     try {
 
-        const response = await fetch("/displayupcomingmaintenance", {method: "POST"});
+        const response = await fetch("/display/upcoming/maintenance", {method: "POST"});
         console.log(response);
 
         if (!response.ok) {
@@ -258,7 +258,7 @@ function renderRecentMaintenance(recentMaintenance) {
 
     const activityList = document.getElementById("recentActivityList");
 
-    function createActivityItem(iconClass, title, description, timeText) {
+    function createActivityItem(iconClass, title, description, completedDate) {
 
         return `
             <div class="activity-item">
@@ -267,7 +267,7 @@ function renderRecentMaintenance(recentMaintenance) {
                     <div class="activity-title">${title}</div>
                     <div class="activity-description">${description}</div>
                 </div>
-                <div class="activity-time">${timeText}</div>
+                <div class="activity-time">Completed on ${completedDate}</div>
             </div>
         `;
 
@@ -276,7 +276,7 @@ function renderRecentMaintenance(recentMaintenance) {
 
     recentMaintenance.forEach(item => {
 
-        activityList.innerHTML += createActivityItem(item.status, item.title, item.description, item.time);
+        activityList.innerHTML += createActivityItem(item.status, item.title, item.description, item.completedDate);
 
     });
 
@@ -284,7 +284,7 @@ function renderRecentMaintenance(recentMaintenance) {
 
 function renderUpcomingTasks(upcomingTasks) {
 
-    const upcomingContainer = document.getElementsByClassName("upcoming-activity")[0];
+    let upcomingContainer = document.getElementsByClassName("upcoming-activity")[0];
     upcomingContainer.innerHTML = "";
 
     upcomingContainer.innerHTML += `
@@ -393,15 +393,15 @@ document.addEventListener("DOMContentLoaded", async function() {
 
         const stats = await loadStatistics();
         const maintenanceDistribution = await loadMaintenanceDistribution();
-        const recentMaintenance = dummyData.recentMaintenance;
-        const upcomingTasks = dummyData.upcomingTasks;
+        const recentMaintenance = await loadRecentMaintenance();
+        const upcomingTasks = await loadUpcomingMaintenance();
         const fleetHealth = dummyData.fleetHealth;
 
         renderStatistics(stats);
         renderMaintenanceDistribution(maintenanceDistribution);
         renderRecentMaintenance(recentMaintenance);
         renderUpcomingTasks(upcomingTasks);
-        renderFleetHealth(fleetHealth);
+        //renderFleetHealth(fleetHealth);
 
     } catch (err) {
 
@@ -455,8 +455,8 @@ function createDummyDataInput() {
         ],
 
         recentMaintenance: [
-            {status: "success",title: "Oil Change - Vehicle ABC-1234",description: "Completed 2 hours ago",time: "Completed"},
-            {status: "success",title: "Brake Check - Vehicle XYZ-5678",description: "Completed yesterday",time: "Completed"}
+            {status: "completed",title: "Oil Change - Vehicle ABC-1234",description: "Completed 2 hours ago",time: "Completed"},
+            {status: "completed",title: "Brake Check - Vehicle XYZ-5678",description: "Completed yesterday",time: "Completed"}
         ],
 
         upcomingTasks: [

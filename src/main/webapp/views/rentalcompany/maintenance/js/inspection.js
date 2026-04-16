@@ -563,7 +563,8 @@ document.addEventListener("DOMContentLoaded", async function() {
 
         //const dummyData = createDummyDataInput();
 
-        assignedVehicles = await LoadAssignedVehicles();
+        const response = await LoadAssignedVehicles();
+        assignedVehicles = response.assignedvehicles;
 
         renderVehicleDropdown();
 

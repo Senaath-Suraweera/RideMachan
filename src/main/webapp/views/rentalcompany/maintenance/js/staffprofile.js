@@ -111,6 +111,54 @@ async function UpdateProfile() {
 
 }
 
+async function changePassword() {
+
+    const newPass = document.getElementById("newPasswordInput").value;
+    const confirm = document.getElementById("confirmPasswordInput").value;
+
+
+    if (!newPass || !confirm) {
+        showNotification("All fields are required", "error");
+        return;
+    }
+
+    if (newPass.length < 6) {
+        showNotification("Password must be at least 6 characters", "error");
+        return;
+    }
+
+    if (newPass !== confirm) {
+        showNotification("Passwords do not match", "error");
+        return;
+    }
+
+    try {
+
+        let params = new URLSearchParams({
+            newPassword: newPass
+        });
+
+        let response = await fetch(`/change/maintenance/password?${params.toString()}`, {
+            method: "POST"
+        });
+
+        let result = await response.json();
+
+        if (result.success) {
+            showNotification("Password updated successfully", "success");
+            closePasswordEditModel();
+        } else {
+            showNotification(result.message || "Update failed", "error");
+        }
+
+    } catch (err) {
+
+        console.log(err);
+
+    }
+
+}
+
 
 function showNotification(message, type = "info") {
 
@@ -118,7 +166,6 @@ function showNotification(message, type = "info") {
 
     notification.textContent = message;
 
-    // basic styling
     notification.style.position = "fixed";
     notification.style.top = "20px";
     notification.style.right = "20px";
@@ -130,7 +177,7 @@ function showNotification(message, type = "info") {
     notification.style.boxShadow = "0 4px 12px rgba(0,0,0,0.2)";
     notification.style.transition = "0.3s ease";
 
-    // color based on type
+
     if (type === "success") {
         notification.style.background = "#28a745";
     } else if (type === "error") {
@@ -143,7 +190,7 @@ function showNotification(message, type = "info") {
 
     document.body.appendChild(notification);
 
-    // auto remove after 3 seconds
+
     setTimeout(() => {
 
         notification.style.opacity = "0";
@@ -176,7 +223,7 @@ function populateProfile(data) {
 
 }
 
-function openStaffEditModel(data) {
+function openStaffProfileEditModel(data) {
 
 
     const existingModal = document.getElementById("editModal");
@@ -250,12 +297,12 @@ function openStaffEditModel(data) {
                 
                             <div style="margin-top:25px; display:flex; gap:10px; width:100%; justify-content:flex-end;">
                 
-                                <button onclick="closeStaffEditModel()"
+                                <button onclick="closeStaffProfileEditModel()"
                                     style="padding:8px 15px; border:none; border-radius:6px; cursor:pointer; background:#ccc; color:#000;">
                                     Cancel
                                 </button>
                 
-                                <button id="update-POPUp-btn" style="padding:8px 15px; border:none; border-radius:6px; cursor:pointer; background:linear-gradient(135deg, #3a0ca3, #4361ee); color:white;">
+                                <button id="update-Profile-POPUP-btn" style="padding:8px 15px; border:none; border-radius:6px; cursor:pointer; background:linear-gradient(135deg, #3a0ca3, #4361ee); color:white;">
                                     Update
                                 </button>
                 
@@ -267,9 +314,74 @@ function openStaffEditModel(data) {
 
 }
 
-function closeStaffEditModel(){
+function closeStaffProfileEditModel(){
 
     document.getElementById('editModal').remove();
+
+}
+
+function openPasswordEditModel() {
+
+    let existingModal = document.getElementById("editPasswordModal");
+    if (existingModal) {
+        existingModal.remove();
+    }
+
+
+    let modal = document.createElement("div");
+    modal.id = "editPasswordModal";
+
+    modal.style.position = "fixed";
+    modal.style.top = "0";
+    modal.style.left = "0";
+    modal.style.width = "100%";
+    modal.style.height = "100vh";
+    modal.style.background = "rgba(0,0,0,0.5)";
+    modal.style.display = "flex";
+    modal.style.justifyContent = "center";
+    modal.style.alignItems = "center";
+    modal.style.zIndex = "1000";
+
+    modal.innerHTML = `
+                    <div style="
+                        background:white; 
+                        padding:20px;
+                        border-radius:12px; 
+                        width:400px;
+                        box-shadow: 0 5px 20px rgba(0,0,0,0.3); 
+                        display:flex; 
+                        flex-direction:column;
+                        gap:15px;
+                    ">
+            
+                        <h3>Change Password</h3>
+            
+                        <input id="newPasswordInput" type="password" placeholder="New Password"/>
+                        <input id="confirmPasswordInput" type="password" placeholder="Confirm Password"/>
+            
+                        <div style="display:flex; justify-content:flex-end; gap:10px;">
+            
+                            <button onclick="closePasswordEditModel()"
+                                style="padding:8px 15px; border:none; border-radius:6px; background:#ccc;">
+                                Cancel
+                            </button>
+            
+                            <button id="update-Password-POPUP-btn"
+                                style="padding:8px 15px; border:none; border-radius:6px; background:linear-gradient(135deg, #3a0ca3, #4361ee); color:white;">
+                                Update
+                            </button>
+            
+                        </div>
+                    </div>
+                `;
+
+    document.body.appendChild(modal);
+
+}
+
+function closePasswordEditModel(){
+
+    document.getElementById('editPasswordModal').remove();
 
 }
 
@@ -287,15 +399,15 @@ document.addEventListener("DOMContentLoaded", async function() {
 
         populateProfile(profileData);
 
-        document.getElementById("update-UI-btn").addEventListener("click",() => {
+        document.getElementById("update-Profile-UI-btn").addEventListener("click",() => {
 
-            openStaffEditModel(profileData);
+            openStaffProfileEditModel(profileData);
 
-            document.getElementById("update-POPUp-btn").addEventListener("click", async() => {
+            document.getElementById("update-Profile-POPUP-btn").addEventListener("click", async() => {
 
                 await UpdateProfile();
 
-                closeStaffEditModel();
+                closeStaffProfileEditModel();
 
                 profileData = await LoadProfile();
 
@@ -306,13 +418,23 @@ document.addEventListener("DOMContentLoaded", async function() {
         })
 
 
-        document.getElementById("changePasswordUIbtn").addEventListener("click", () =>{
+        document.getElementById("update-Password-UI-btn").addEventListener("click", async () =>{
 
             openPasswordEditModel();
 
-            await ;
+            document.getElementById("update-Password-POPUP-btn").addEventListener("click", async() => {
 
-        })
+                await changePassword();
+
+                closePasswordEditModel();
+
+                profileData = await LoadProfile();
+
+                populateProfile(profileData);
+
+            });
+
+        });
 
 
 
@@ -341,32 +463,30 @@ document.addEventListener("DOMContentLoaded", async function() {
 
 
 
-// ===============================
-// GENERIC VALIDATION FUNCTION
-// ===============================
+
 function validate(value, rules, fieldName = "Field") {
 
     value = (value ?? "").toString().trim();
 
-    // REQUIRED CHECK
+
     if (rules.required && value === "") {
         showNotification(`${fieldName} is required`, "error");
         return false;
     }
 
-    // MIN LENGTH
+
     if (rules.minLength && value.length < rules.minLength) {
         showNotification(`${fieldName} must be at least ${rules.minLength} characters`, "error");
         return false;
     }
 
-    // MAX LENGTH
+
     if (rules.maxLength && value.length > rules.maxLength) {
         showNotification(`${fieldName} must be less than ${rules.maxLength} characters`, "error");
         return false;
     }
 
-    // PATTERN CHECK
+
     if (rules.pattern && !rules.pattern.test(value)) {
         showNotification(rules.message || `Invalid ${fieldName}`, "error");
         return false;
@@ -375,9 +495,7 @@ function validate(value, rules, fieldName = "Field") {
     return true;
 }
 
-// ===============================
-// VALIDATION RULES
-// ===============================
+
 const rules = {
 
     name: {
@@ -412,67 +530,4 @@ const rules = {
 
 
 
-    function openPasswordEditModel() {
 
-        let existingModal = document.getElementById("editPasswordModal");
-        if (existingModal) {
-            existingModal.remove();
-        }
-
-
-        let modal = document.createElement("div");
-        modal.id = "editPasswordModal";
-
-        modal.style.position = "fixed";
-        modal.style.top = "0";
-        modal.style.left = "0";
-        modal.style.width = "100%";
-        modal.style.height = "100vh";
-        modal.style.background = "rgba(0,0,0,0.5)";
-        modal.style.display = "flex";
-        modal.style.justifyContent = "center";
-        modal.style.alignItems = "center";
-        modal.style.zIndex = "1000";
-
-        modal.innerHTML = `
-        <div style="
-            background:white; 
-            padding:20px;
-            border-radius:12px; 
-            width:400px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.3); 
-            display:flex; 
-            flex-direction:column;
-            gap:15px;
-        ">
-
-            <h3>Change Password</h3>
-
-            <input id="newPasswordInput" type="password" placeholder="New Password"/>
-            <input id="confirmPasswordInput" type="password" placeholder="Confirm Password"/>
-
-            <div style="display:flex; justify-content:flex-end; gap:10px;">
-
-                <button onclick="closePasswordEditModel()"
-                    style="padding:8px 15px; border:none; border-radius:6px; background:#ccc;">
-                    Cancel
-                </button>
-
-                <button id="change-password-btn"
-                    style="padding:8px 15px; border:none; border-radius:6px; background:linear-gradient(135deg, #3a0ca3, #4361ee); color:white;">
-                    Update
-                </button>
-
-            </div>
-        </div>
-    `;
-
-      document.body.appendChild(modal)
-
-}
-
-function closePasswordEditModel(){
-
-    document.getElementById('editPasswordModal').remove();
-
-}

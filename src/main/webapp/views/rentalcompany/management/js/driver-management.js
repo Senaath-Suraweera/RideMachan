@@ -62,58 +62,7 @@ async function LoadAllDrivers() {
 
 }
 
-async function AssignBooking(driverId) {
 
-    try {
-
-        const bookingId = document.getElementById("bookingIdInput").value.trim();
-
-
-        if (!bookingId) {
-            showNotification("Please fill all fields!", "error");
-            return;
-        }
-
-
-
-
-
-        let response = await fetch("/assignbookingdriver", {
-
-            method: "POST",
-            headers: {
-                "Content-Type": "application/x-www-form-urlencoded"
-            },
-            body: `driverId=${driverId}&bookingId=${bookingId}`
-
-        });
-
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-
-        const data = await response.json();
-        console.log("Booking assigned:", data);
-
-        showNotification("Booking assigned successfully!", "success");
-
-
-        document.getElementById("assignBookingModal").remove();
-
-
-        AllDrivers = await LoadAllDrivers();
-        renderdrivers(AllDrivers);
-
-        return data;
-
-    } catch (err) {
-
-        console.error("Error assigning booking:", err);
-        showNotification("Failed to assign booking. See console for details!", "error");
-
-    }
-
-}
 
 function showNotification(message, type = "info") {
 
@@ -121,7 +70,7 @@ function showNotification(message, type = "info") {
 
     notification.textContent = message;
 
-    // basic styling
+
     notification.style.position = "fixed";
     notification.style.top = "20px";
     notification.style.right = "20px";
@@ -133,7 +82,7 @@ function showNotification(message, type = "info") {
     notification.style.boxShadow = "0 4px 12px rgba(0,0,0,0.2)";
     notification.style.transition = "0.3s ease";
 
-    // color based on type
+
     if (type === "success") {
         notification.style.background = "#28a745";
     } else if (type === "error") {
@@ -146,7 +95,7 @@ function showNotification(message, type = "info") {
 
     document.body.appendChild(notification);
 
-    // auto remove after 3 seconds
+
     setTimeout(() => {
 
         notification.style.opacity = "0";
@@ -203,7 +152,7 @@ function renderdrivers(drivers) {
                                     </div>
     
                                     <div class="driver-header">   
-                                        <div class="driver-avatar" style="border: 1px solid red">${driver.initials}</div>                                                 
+                                        <div class="driver-avatar" style="border: 1px solid red">${driver.firstName.charAt(0)}</div>                                                 
                                         <div class="driver-info">
                                             <h3>${driver.firstName} ${driver.lastName}</h3>
                                             <p class="driver-id">Driver ID: ${driver.driverId}</p>
@@ -235,18 +184,14 @@ function renderdrivers(drivers) {
                                         </div>
                                     </div>
     
-                                    ${bookingsHtml}
+                                    
         
     
-                                   <div class="driver-actions">
-                                       <button class="action-btn" onclick="window.driverManager.messageDriver('${driver.driverId}')">
-                                           <i class="fas fa-comment"></i>
-                                           Message
-                                       </button>    
+                                   <!--<div class="driver-actions">  
                                        <button class="action-btn primary" data-driver-id="${driver.driverId}" onclick="openAssignBookingModel('${driver.driverId}')">
                                            Assign Booking
                                        </button>
-                                   </div>
+                                   </div>-->
                                 `;
 
         driversGrid.appendChild(driverCard);

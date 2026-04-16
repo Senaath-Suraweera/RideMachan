@@ -4,6 +4,8 @@ import common.util.DBConnection;
 import rentalcompany.maintenance.model.MaintenanceStaff;
 import rentalcompany.companyvehicle.model.Vehicle;
 import rentalcompany.companyvehicle.dao.VehicleDAO;
+import rentalcompany.companyvehicle.model.MaintenanceRecord;
+import rentalcompany.maintenance.model.CalendarEvent;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -468,6 +470,42 @@ public class MaintenanceStaffDAO {
         return vehicles;
     }
 
+    public static List<MaintenanceRecord> getMaintenanceLogsByStaffId(int staffId) {
+
+        List<MaintenanceRecord> list = new ArrayList<>();
+
+        String sql = "SELECT jobId, vehicleId, type, description, status, completedDate " +
+                "FROM maintenancejobs " +
+                "WHERE assignedStaffId = ? AND status = 'completed' ";
+
+
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setInt(1, staffId);
+
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+
+                MaintenanceRecord r = new MaintenanceRecord();
+
+                r.setRecordId(rs.getInt("jobId"));
+                r.setVehicleId(rs.getInt("vehicleId"));
+                r.setServiceType(rs.getString("type"));
+                r.setDescription(rs.getString("description"));
+                r.setStatus(rs.getString("status"));
+                r.setCompletedDate(rs.getString("completedDate"));
+
+                list.add(r);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return list;
+    }
 
     public static String getLastServiceDateVehicle(int vehicleId) {
 
@@ -592,5 +630,104 @@ public class MaintenanceStaffDAO {
 
         return result;
     }
+
+
+    public static List<MaintenanceRecord> getRecentMaintenanceByStaff(int staffId) {
+
+        List<MaintenanceRecord> list = new ArrayList<>();
+
+        String sql = "SELECT jobId, vehicleId, type, description, status, completedDate " +
+                     "FROM maintenancejobs " +
+                     "WHERE assignedStaffId = ? AND status = 'completed' " +
+                     "ORDER BY completedDate DESC " +
+                     "LIMIT 3";
+
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setInt(1, staffId);
+
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+
+                MaintenanceRecord r = new MaintenanceRecord();
+
+                r.setRecordId(rs.getInt("jobId"));
+                r.setVehicleId(rs.getInt("vehicleId"));
+                r.setServiceType(rs.getString("type"));
+                r.setDescription(rs.getString("description"));
+                r.setStatus(rs.getString("status"));
+                r.setCompletedDate(rs.getString("completedDate"));
+
+                list.add(r);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return list;
+    }
+
+
+    public static List<CalendarEvent> getUpcomingMaintenanceByStaffId(int staffId) {
+
+        List<CalendarEvent> list = new ArrayList<>();
+
+        String sql =
+                "SELECT ce.eventid, ce.vehicle_id, ce.service_type, ce.status, ce.description, " +
+                        "ce.maintenance_id, ce.scheduled_date, ce.scheduled_time, ce.service_bay, " +
+                        "ce.estimated_duration, " +
+                        "v.numberplatenumber, v.vehiclebrand, v.vehiclemodel " +
+                        "FROM calendarevents ce " +
+                        "JOIN vehicle v ON ce.vehicle_id = v.vehicleid " +
+                        "JOIN maintenancestaff ms ON ce.maintenance_id = ms.maintenanceid " +
+                        "WHERE ms.maintenanceid = ? " +
+                        "AND ce.status IN ('scheduled','in-progress') " +
+                        "ORDER BY ce.scheduled_date ASC " +
+                        "LIMIT 3";
+
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setInt(1, staffId);
+
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+
+                CalendarEvent e = new CalendarEvent();
+
+                e.setEventId(rs.getInt("eventid"));
+                e.setVehicleId(rs.getInt("vehicle_id"));
+                e.setServiceType(rs.getString("service_type"));
+                e.setStatus(rs.getString("status"));
+                e.setDescription(rs.getString("description"));
+                e.setMaintenanceId(rs.getInt("maintenance_id"));
+                e.setScheduledDate(rs.getString("scheduled_date"));
+                e.setScheduledTime(rs.getString("scheduled_time"));
+                e.setServiceBay(rs.getString("service_bay"));
+                e.setEstimatedDuration(rs.getString("estimated_duration"));
+
+                e.setVehicleNumberPlate(rs.getString("numberplatenumber"));
+                e.setVehicleModel(
+                        rs.getString("vehiclebrand") + " " + rs.getString("vehiclemodel")
+                );
+
+                list.add(e);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return list;
+    }
+
+
+
+
+
 
 }

@@ -106,7 +106,7 @@ function viewVehicle(vehiclenumberplate) {
 
 function scheduleMaintenance(vehiclenumberplate) {
 
-    window.location.href = `maintenance-calendar.html?reg=${encodeURIComponent(vehiclenumberplate)}`;
+    window.location.href = `maintenance-calender.html?reg=${encodeURIComponent(vehiclenumberplate)}`;
 
 }
 
@@ -119,7 +119,7 @@ function renderVehicleRecords(vehicles) {
 
         let emptyDivTag = document.createElement("div");
         emptyDivTag.className = 'empty-div';
-        emptyDivTag.innerHTML = `<p>No Vehicles assigned for you.</p>`;
+        emptyDivTag.innerHTML = `<p>No Vehicles Found.</p>`;
         tableCard.appendChild(emptyDivTag);
         return;
 
@@ -141,7 +141,6 @@ function renderVehicleRecords(vehicles) {
                         <th>Status</th>
                         <th>Last Service</th>
                         <th>Next Service</th>
-                        <th>Assigned Staff</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -165,7 +164,6 @@ function renderVehicleRecords(vehicles) {
                         <td><span class="status ${statusClass}"><i class="fas fa-check-circle"></i> ${vehicle.status}</span></td>
                         <td>${vehicle.lastServiceDate || '-'}</td>
                         <td>${vehicle.nextServiceDate || '-'}</td>
-                        <td>${vehicle.assignedStaff || 'N/A'}</td>
                         <td>
                         
                             <div class="action-buttons">
@@ -363,7 +361,8 @@ document.addEventListener("DOMContentLoaded", async function () {
 
         //const dummyData = createDummyDataInput();
 
-        assignedVehicles = await LoadAssignedVehicles();
+        const response = await LoadAssignedVehicles();
+        assignedVehicles = response.assignedvehicles;
 
 
         renderVehicleTypesDropdown();
