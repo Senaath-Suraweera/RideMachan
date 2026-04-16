@@ -1,6 +1,7 @@
 // order-details.js — Provider side
-// API: GET /api/provider/bookings/{bookingId}
-//      PUT /api/provider/bookings/{bookingId}/status
+// API: GET  /api/provider/bookings/{bookingId}
+//      PUT  /api/provider/bookings/{bookingId}/status
+//      POST /api/provider/reports
 
 document.addEventListener("DOMContentLoaded", () => {
   initializeOrderDetails();
@@ -14,22 +15,32 @@ async function fetchJson(url, options = {}) {
     headers: { "Content-Type": "application/json" },
     ...options,
   });
+
   const text = await res.text();
   let data = null;
+
   try {
     data = text ? JSON.parse(text) : null;
   } catch (e) {}
-  if (!res.ok)
-    throw new Error((data && data.error) || `Request failed (${res.status})`);
+
+  if (!res.ok) {
+    throw new Error(
+      (data && (data.error || data.message)) ||
+        `Request failed (${res.status})`,
+    );
+  }
+
   return data;
 }
 
 function initializeOrderDetails() {
   const bookingId = new URLSearchParams(window.location.search).get("id");
+
   if (!bookingId) {
     document.getElementById("orderTitle").textContent = "Order Not Found";
     return;
   }
+
   loadOrderFromApi(bookingId);
 }
 
@@ -116,12 +127,16 @@ function populateOrderData(order) {
     document.getElementById("driverSection").style.display = "block";
     setText("driverName", order.driver.name);
     setText("driverAvatar", initials(order.driver.name || "DR"));
+
     const lic = document.querySelector(".driver-license");
-    if (lic)
+    if (lic) {
       lic.textContent = `License: ${order.driver.licenseNumber || "N/A"}`;
+    }
+
     const contact = document.querySelector(".driver-contact span");
-    if (contact)
+    if (contact) {
       contact.innerHTML = `<i class="fas fa-phone"></i> ${escapeHtml(order.driver.phone || "N/A")}`;
+    }
   } else {
     document.getElementById("driverSection").style.display = "none";
   }
@@ -135,9 +150,10 @@ function populateOrderData(order) {
 function updateStatusBadge(status) {
   const badge = document.getElementById("orderStatusBadge");
   if (!badge) return;
-  badge.className = "order-status";
 
+  badge.className = "order-status";
   const st = (status || "").toLowerCase();
+
   if (st === "pickup-ready") {
     badge.textContent = "Ready for Pickup";
     badge.classList.add("pickup-ready");
@@ -162,8 +178,10 @@ function updateStatusBadge(status) {
 function updatePaymentStatusBadge(paymentStatus) {
   const badge = document.getElementById("paymentStatusBadge");
   if (!badge) return;
+
   badge.className = "order-status";
   const ps = (paymentStatus || "").toLowerCase();
+
   if (ps === "paid") {
     badge.textContent = "Paid";
     badge.classList.add("completed");
@@ -178,6 +196,7 @@ function updatePaymentStatusBadge(paymentStatus) {
 
 function updateProgressTimeline(status) {
   const steps = document.querySelectorAll(".progress-step");
+
   steps.forEach((s) => {
     s.classList.remove("completed", "active", "pending");
     s.classList.add("pending");
@@ -192,8 +211,7 @@ function updateProgressTimeline(status) {
   if (accepted) accepted.classList.replace("pending", "completed");
   if (paid) paid.classList.replace("pending", "completed");
 
-  if (st === "accepted") {
-  } else if (st === "pickup-ready") {
+  if (st === "pickup-ready") {
     if (pickup) pickup.classList.replace("pending", "active");
   } else if (st === "in-progress") {
     if (pickup) pickup.classList.replace("pending", "active");
@@ -221,7 +239,7 @@ function buildOrderTimeline(order) {
     events.push({
       title: "Payment Confirmed",
       time: "—",
-      description: `Payment received`,
+      description: "Payment received",
       type: "completed",
     });
   }
@@ -262,15 +280,15 @@ function buildOrderTimeline(order) {
   container.innerHTML = events
     .map(
       (e) => `
-    <div class="timeline-item ${e.type === "active" ? "active" : ""}">
-      <div class="timeline-dot ${e.type}"></div>
-      <div class="timeline-content">
-        <div class="timeline-title">${escapeHtml(e.title)}</div>
-        <div class="timeline-time">${escapeHtml(e.time)}</div>
-        <div class="timeline-description">${escapeHtml(e.description)}</div>
-      </div>
-    </div>
-  `,
+        <div class="timeline-item ${e.type === "active" ? "active" : ""}">
+          <div class="timeline-dot ${e.type}"></div>
+          <div class="timeline-content">
+            <div class="timeline-title">${escapeHtml(e.title)}</div>
+            <div class="timeline-time">${escapeHtml(e.time)}</div>
+            <div class="timeline-description">${escapeHtml(e.description)}</div>
+          </div>
+        </div>
+      `,
     )
     .join("");
 }
@@ -280,15 +298,19 @@ function renderVehicleImage(vehicle) {
   if (!wrap) return;
 
   if (vehicle?.imageUrl) {
-    wrap.innerHTML = `<img
-      src="${escapeHtml(vehicle.imageUrl)}"
-      alt="${escapeHtml(vehicle.name || "Vehicle")}"
-      class="vehicle-main-image"
-      onerror="this.onerror=null;this.parentElement.innerHTML='<span class=&quot;vehicle-icon&quot;><i class=&quot;fas fa-car-side&quot;></i></span><div class=&quot;image-placeholder&quot;>Vehicle Photo</div>';"
-    />`;
+    wrap.innerHTML = `
+      <img
+        src="${escapeHtml(vehicle.imageUrl)}"
+        alt="${escapeHtml(vehicle.name || "Vehicle")}"
+        style="width:100%; height:100%; object-fit:cover; border-radius:var(--radius-sm); display:block;"
+        onerror="this.onerror=null;this.parentElement.innerHTML='<span class=&quot;vehicle-icon&quot;><i class=&quot;fas fa-car-side&quot;></i></span><div class=&quot;image-placeholder&quot;>Vehicle Photo</div>';"
+      />
+    `;
   } else {
-    wrap.innerHTML = `<span class="vehicle-icon"><i class="fas fa-car-side"></i></span>
-      <div class="image-placeholder">Vehicle Photo</div>`;
+    wrap.innerHTML = `
+      <span class="vehicle-icon"><i class="fas fa-car-side"></i></span>
+      <div class="image-placeholder">Vehicle Photo</div>
+    `;
   }
 }
 
@@ -337,6 +359,7 @@ function renderDocuments(documents, vehicle) {
       const isImage = doc.type === "image";
       const icon = isImage ? "fa-image" : "fa-file-contract";
       const typeLabel = isImage ? "Image" : "Document";
+
       return `
         <div class="document-item">
           <div class="doc-icon">
@@ -394,15 +417,19 @@ function populateVehicleModal(vehicle, documents) {
   const imageWrap = document.getElementById("vehicleModalImageWrap");
   if (imageWrap) {
     if (vehicle?.imageUrl) {
-      imageWrap.innerHTML = `<img
-        src="${escapeHtml(vehicle.imageUrl)}"
-        alt="${escapeHtml(vehicle.name || "Vehicle")}"
-        class="vehicle-modal-image"
-        onerror="this.onerror=null;this.parentElement.innerHTML='<span class=&quot;vehicle-icon&quot;><i class=&quot;fas fa-car-side&quot;></i></span><div class=&quot;image-placeholder&quot;>Vehicle Photo</div>';"
-      />`;
+      imageWrap.innerHTML = `
+        <img
+          src="${escapeHtml(vehicle.imageUrl)}"
+          alt="${escapeHtml(vehicle.name || "Vehicle")}"
+          style="width:100%; height:100%; object-fit:cover; border-radius:var(--radius-sm); display:block;"
+          onerror="this.onerror=null;this.parentElement.innerHTML='<span class=&quot;vehicle-icon&quot;><i class=&quot;fas fa-car-side&quot;></i></span><div class=&quot;image-placeholder&quot;>Vehicle Photo</div>';"
+        />
+      `;
     } else {
-      imageWrap.innerHTML = `<span class="vehicle-icon"><i class="fas fa-car-side"></i></span>
-        <div class="image-placeholder">Vehicle Photo</div>`;
+      imageWrap.innerHTML = `
+        <span class="vehicle-icon"><i class="fas fa-car-side"></i></span>
+        <div class="image-placeholder">Vehicle Photo</div>
+      `;
     }
   }
 
@@ -410,6 +437,7 @@ function populateVehicleModal(vehicle, documents) {
   if (!docWrap) return;
 
   const items = Array.isArray(documents) ? [...documents] : [];
+
   if (
     vehicle?.registrationDocumentUrl &&
     !items.some((d) => d.key === "vehicle-registration")
@@ -422,28 +450,29 @@ function populateVehicleModal(vehicle, documents) {
     });
   }
 
-  docWrap.innerHTML = items.length
-    ? items
-        .filter((d) => d.type !== "image")
+  const legalDocs = items.filter((d) => d.type !== "image");
+
+  docWrap.innerHTML = legalDocs.length
+    ? legalDocs
         .map(
           (doc) => `
-        <div class="document-item">
-          <div class="doc-icon">
-            <i class="fas fa-file-contract" style="color: var(--primary-light); font-size: 18px"></i>
-          </div>
-          <div class="doc-info">
-            <div class="doc-name">${escapeHtml(doc.name || "Document")}</div>
-            <div class="doc-size">Legal Document</div>
-          </div>
-          <button
-            class="btn btn-sm btn-secondary"
-            type="button"
-            onclick="openDocument('${escapeJs(doc.url || "")}')"
-          >
-            <i class="fas fa-eye"></i>
-          </button>
-        </div>
-      `,
+            <div class="document-item">
+              <div class="doc-icon">
+                <i class="fas fa-file-contract" style="color: var(--primary-light); font-size: 18px"></i>
+              </div>
+              <div class="doc-info">
+                <div class="doc-name">${escapeHtml(doc.name || "Document")}</div>
+                <div class="doc-size">Legal Document</div>
+              </div>
+              <button
+                class="btn btn-sm btn-secondary"
+                type="button"
+                onclick="openDocument('${escapeJs(doc.url || "")}')"
+              >
+                <i class="fas fa-eye"></i>
+              </button>
+            </div>
+          `,
         )
         .join("")
     : `
@@ -460,6 +489,7 @@ function populateVehicleModal(vehicle, documents) {
 function goBack() {
   window.history.back();
 }
+
 function printOrder() {
   window.print();
 }
@@ -477,13 +507,18 @@ function closeStatusModal() {
 async function confirmStatusUpdate() {
   const bookingId = new URLSearchParams(window.location.search).get("id");
   const newStatus = document.getElementById("newStatus")?.value;
+
   if (!bookingId || !newStatus) return;
 
   try {
     await fetchJson(
       `${API_BASE}/api/provider/bookings/${encodeURIComponent(bookingId)}/status`,
-      { method: "PUT", body: JSON.stringify({ status: newStatus }) },
+      {
+        method: "PUT",
+        body: JSON.stringify({ status: newStatus }),
+      },
     );
+
     closeStatusModal();
     await loadOrderFromApi(bookingId);
     alert("Status updated successfully!");
@@ -502,23 +537,67 @@ function markAsCompleted() {
 function contactCustomer() {
   alert("Contact feature can be wired to your chat/call module.");
 }
+
 function contactDriver() {
   alert("Contact driver feature can be wired to your chat/call module.");
 }
-function sendMessage() {
-  alert("Message feature can be wired to your chat module.");
+
+async function sendMessage() {
+  try {
+    const companyId =
+      CURRENT_ORDER?.company?.companyId ||
+      CURRENT_ORDER?.companyId ||
+      CURRENT_ORDER?.booking?.companyId ||
+      null;
+
+    if (!companyId) {
+      alert("Rental company details are not available for messaging.");
+      return;
+    }
+
+    const body = new URLSearchParams();
+    body.set("toType", "COMPANY");
+    body.set("toId", String(companyId));
+
+    const res = await fetch(`${API_BASE}/api/chat/direct`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      credentials: "include",
+      body: body.toString(),
+    });
+
+    const text = await res.text();
+    let data = {};
+    try {
+      data = text ? JSON.parse(text) : {};
+    } catch (e) {}
+
+    if (!res.ok || !data.ok) {
+      throw new Error(
+        data.error || data.message || `Request failed (${res.status})`,
+      );
+    }
+
+    sessionStorage.setItem("openConversationId", String(data.conversationId));
+    window.location.href = `messages.html?conversationId=${encodeURIComponent(data.conversationId)}`;
+  } catch (err) {
+    console.error(err);
+    alert(err.message || "Failed to open conversation.");
+  }
 }
-function reportIssue() {
-  alert("Report issue can be wired to your Support module.");
-}
+
 function viewVehicleDetails() {
   const modal = document.getElementById("vehicleDetailsModal");
   if (modal) modal.classList.add("active");
 }
+
 function closeVehicleModal() {
   const modal = document.getElementById("vehicleDetailsModal");
   if (modal) modal.classList.remove("active");
 }
+
 function openDocument(url) {
   if (!url) {
     alert("Document not available.");
@@ -526,6 +605,7 @@ function openDocument(url) {
   }
   window.open(url, "_blank", "noopener,noreferrer");
 }
+
 function downloadDocument(type) {
   if (!CURRENT_ORDER) {
     alert("Order data not loaded yet.");
@@ -563,13 +643,16 @@ function initials(name) {
 
 function durationText(start, end) {
   if (!start || !end) return "—";
+
   const days =
     Math.round((new Date(end) - new Date(start)) / (1000 * 60 * 60 * 24)) + 1;
+
   return `${days} Days`;
 }
 
 function formatDateTime(dateStr, timeStr) {
   if (!dateStr || dateStr === "N/A") return "—";
+
   try {
     const d = new Date(dateStr);
     const date = d.toLocaleDateString("en-GB", {
@@ -577,6 +660,7 @@ function formatDateTime(dateStr, timeStr) {
       month: "short",
       year: "numeric",
     });
+
     return timeStr ? `${date} at ${timeStr}` : date;
   } catch {
     return dateStr;
@@ -585,6 +669,7 @@ function formatDateTime(dateStr, timeStr) {
 
 function formatDateShort(dateStr) {
   if (!dateStr) return "—";
+
   try {
     return new Date(dateStr).toLocaleDateString("en-GB", {
       day: "2-digit",
@@ -601,6 +686,30 @@ function prettyPayment(ps) {
   if (v === "paid") return "Paid";
   if (v === "pending") return "Pending";
   return ps || "—";
+}
+
+function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+
+    reader.onload = () => {
+      const result = String(reader.result || "");
+      const base64 = result.includes(",") ? result.split(",")[1] : result;
+      resolve(base64);
+    };
+
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+function fileToDataUrl(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result || ""));
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
 }
 
 function escapeHtml(str) {
@@ -628,7 +737,6 @@ window.markAsCompleted = markAsCompleted;
 window.contactCustomer = contactCustomer;
 window.contactDriver = contactDriver;
 window.sendMessage = sendMessage;
-window.reportIssue = reportIssue;
 window.viewVehicleDetails = viewVehicleDetails;
 window.closeVehicleModal = closeVehicleModal;
 window.openDocument = openDocument;

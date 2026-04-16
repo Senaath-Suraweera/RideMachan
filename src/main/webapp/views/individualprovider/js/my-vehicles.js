@@ -1,4 +1,4 @@
-// my-vehicles.js (UPDATED: fetch providerId from backend session via /api/vehicles/me)
+// my-vehicles.js — Dashboard-themed version with Details modal & Document viewer
 
 const BASE_URL = "http://localhost:8080";
 // If you have context path:
@@ -8,6 +8,9 @@ const API_BASE = `${BASE_URL}/api/vehicles`;
 
 // providerId will be loaded from session (NO localStorage fallback)
 let providerId = null;
+
+// Cache of the most recently loaded vehicles (for details modal)
+let vehiclesCache = [];
 
 // Offline fallback image (no internet/DNS needed)
 const FALLBACK_IMG =
@@ -21,7 +24,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     console.error("No provider session found.");
     const grid = document.getElementById("vehiclesGrid");
     if (grid)
-      grid.innerHTML = `<p>Session expired / not logged in. Please login again.</p>`;
+      grid.innerHTML = `<p class="empty-state-message">Session expired / not logged in. Please login again.</p>`;
     return;
   }
 
@@ -36,24 +39,45 @@ document.addEventListener("DOMContentLoaded", async () => {
   document
     .getElementById("updateVehicleForm")
     .addEventListener("submit", updateVehicle);
+
+  // 4) Close modals with ESC
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+      closeDetailsModal();
+      closeDocViewer();
+      closeRegisterModal();
+      closeUpdateModal();
+    }
+  });
+
+  // 5) Close modals by clicking the dark overlay
+  document.querySelectorAll(".modal-overlay").forEach((overlay) => {
+    overlay.addEventListener("click", (e) => {
+      if (e.target === overlay) {
+        overlay.classList.remove("active");
+        document.body.style.overflow = "";
+        // Clear doc iframe when closing
+        const docFrame = document.getElementById("docFrame");
+        if (docFrame && overlay.id === "docViewerModal") docFrame.src = "";
+      }
+    });
+  });
 });
 
 // ---------- Helper: always send cookies ----------
 async function apiFetch(url, options = {}) {
   return fetch(url, {
     ...options,
-    credentials: "include", // ✅ send JSESSIONID
+    credentials: "include",
   });
 }
 
-// ---------- NEW: get providerId from session ----------
+// ---------- get providerId from session ----------
 async function getProviderIdFromSession() {
   try {
     const res = await apiFetch(`${API_BASE}/me`);
     if (!res.ok) return null;
-
     const me = await res.json();
-    // response expected: { actor:"PROVIDER", providerId: 4, ... }
     return Number(me.providerId) || null;
   } catch (e) {
     console.error("Failed to fetch /me:", e);
@@ -64,16 +88,15 @@ async function getProviderIdFromSession() {
 // ================= LOAD VEHICLES =================
 async function loadVehicles() {
   const vehiclesGrid = document.getElementById("vehiclesGrid");
-  vehiclesGrid.innerHTML = `<p>Loading vehicles...</p>`;
+  vehiclesGrid.innerHTML = `<p class="empty-state-message"><i class="fas fa-spinner fa-spin"></i> Loading vehicles...</p>`;
 
   try {
-    // Uses providerId from session->/me, then filters list by provider_id
     const response = await apiFetch(
       `${API_BASE}?provider_id=${providerId}&limit=200`,
     );
 
     if (response.status === 401) {
-      vehiclesGrid.innerHTML = `<p>Session expired. Please login again.</p>`;
+      vehiclesGrid.innerHTML = `<p class="empty-state-message">Session expired. Please login again.</p>`;
       return;
     }
     if (!response.ok) throw new Error(await response.text());
@@ -81,10 +104,21 @@ async function loadVehicles() {
     const data = await response.json();
     const vehicles = Array.isArray(data) ? data : data.vehicles || [];
 
+    // cache for details modal
+    vehiclesCache = vehicles;
+
+    // Update stats
+    updateStats(vehicles);
+
     vehiclesGrid.innerHTML = "";
 
     if (!vehicles || vehicles.length === 0) {
-      vehiclesGrid.innerHTML = `<p>No vehicles registered yet.</p>`;
+      vehiclesGrid.innerHTML = `
+        <div class="empty-state-message">
+          <i class="fas fa-car" style="font-size:32px;color:var(--primary-light);margin-bottom:12px;display:block;"></i>
+          <strong>No vehicles registered yet.</strong><br>
+          Click "Register Vehicle" above to add your first one.
+        </div>`;
       return;
     }
 
@@ -94,6 +128,7 @@ async function loadVehicles() {
 
       const card = document.createElement("div");
       card.className = "vehicle-card";
+      card.dataset.vehicleId = vehicleId;
 
       const statusClass = (v.availability_status || "available").toLowerCase();
       const statusLabel = v.availability_status || "available";
@@ -115,7 +150,7 @@ async function loadVehicles() {
         <div class="vehicle-info">
           <div class="vehicle-name">${safe(v.vehiclebrand)} ${safe(v.vehiclemodel)}</div>
 
-          <div class="vehicle-price">Rs. ${safe(v.price_per_day ?? "0.00")} / day</div>
+          <div class="vehicle-price">Rs. ${safe(formatMoney(v.price_per_day))} <span style="font-size:12px;color:var(--text-light);font-weight:500;">/ day</span></div>
 
           <div class="vehicle-category">
             <i class="fa-solid fa-car"></i>
@@ -130,7 +165,6 @@ async function loadVehicles() {
 
           <p><b>Plate:</b> ${safe(v.numberplatenumber)}</p>
           <p><b>Passengers:</b> ${safe(v.numberofpassengers || "0")} | <b>Engine:</b> ${safe(v.enginecapacity || "0")}cc</p>
-          <p><b>Milage:</b> ${safe(v.milage || "N/A")}</p>
 
           <div class="vehicle-features">
             ${
@@ -143,18 +177,214 @@ async function loadVehicles() {
           </div>
 
           <div class="vehicle-buttons">
-            <button class="btn btn-primary" onclick="openUpdateModal(${vehicleId})">Update</button>
-            <button class="btn btn-danger" onclick="deleteVehicle(${vehicleId})">Delete</button>
+            <button class="btn btn-outline" data-action="update" data-id="${vehicleId}">
+              <i class="fas fa-pen"></i> Update
+            </button>
+            <button class="btn btn-danger" data-action="delete" data-id="${vehicleId}">
+              <i class="fas fa-trash"></i> Delete
+            </button>
           </div>
         </div>
       `;
 
+      // Card click -> details modal. Buttons stop propagation.
+      card.addEventListener("click", (e) => {
+        // ignore clicks on the inner buttons
+        const actionBtn = e.target.closest("[data-action]");
+        if (actionBtn) {
+          e.stopPropagation();
+          const action = actionBtn.dataset.action;
+          const id = actionBtn.dataset.id;
+          if (action === "update") openUpdateModal(id);
+          else if (action === "delete") deleteVehicle(id);
+          return;
+        }
+        openDetailsModal(vehicleId);
+      });
+
       vehiclesGrid.appendChild(card);
     });
   } catch (err) {
-    vehiclesGrid.innerHTML = `<p>Error loading vehicles.</p>`;
+    vehiclesGrid.innerHTML = `<p class="empty-state-message">Error loading vehicles.</p>`;
     console.error("Error loading vehicles:", err);
   }
+}
+
+// ================= STATS =================
+function updateStats(vehicles) {
+  const total = vehicles.length;
+  let available = 0,
+    maintenance = 0,
+    unavailable = 0;
+
+  vehicles.forEach((v) => {
+    const s = (v.availability_status || "").toLowerCase();
+    if (s === "available") available++;
+    else if (s === "maintenance") maintenance++;
+    else if (s === "unavailable") unavailable++;
+  });
+
+  setText("statTotal", total);
+  setText("statAvailable", available);
+  setText("statMaintenance", maintenance);
+  setText("statUnavailable", unavailable);
+}
+
+// ================= DETAILS MODAL =================
+async function openDetailsModal(vehicleId) {
+  if (!vehicleId) return;
+
+  const modal = document.getElementById("vehicleDetailsModal");
+  modal.classList.add("active");
+  document.body.style.overflow = "hidden";
+
+  // Try cache first for snappy UX
+  let v = vehiclesCache.find((x) => String(x.vehicleid) === String(vehicleId));
+
+  try {
+    // Always refresh with latest from backend
+    const res = await apiFetch(`${API_BASE}/${vehicleId}`);
+    if (res.ok) {
+      const fresh = await res.json();
+      if (!fresh.error) v = fresh;
+    }
+  } catch (e) {
+    console.warn("Details fetch fell back to cache:", e);
+  }
+
+  if (!v) {
+    alert("Failed to load vehicle details.");
+    closeDetailsModal();
+    return;
+  }
+
+  const imgUrl = `${API_BASE}/${v.vehicleid}/image`;
+  const statusClass = (v.availability_status || "available").toLowerCase();
+
+  // Header
+  setText(
+    "detailsTitle",
+    `${v.vehiclebrand || ""} ${v.vehiclemodel || ""}`.trim() ||
+      "Vehicle Details",
+  );
+  setText("detailsSubtitle", `Complete overview • Vehicle #${v.vehicleid}`);
+
+  // Hero
+  const imgEl = document.getElementById("detailsImage");
+  imgEl.src = imgUrl;
+  imgEl.onerror = function () {
+    this.onerror = null;
+    this.src = FALLBACK_IMG;
+  };
+
+  const badge = document.getElementById("detailsStatusBadge");
+  badge.className = `vehicle-status ${statusClass}`;
+  badge.textContent = v.availability_status || "available";
+
+  setText(
+    "detailsName",
+    `${v.vehiclebrand || ""} ${v.vehiclemodel || ""}`.trim() || "—",
+  );
+  setText("detailsPrice", `Rs. ${formatMoney(v.price_per_day)} / day`);
+  setText("detailsLocation", v.location || "No location");
+  setText("detailsPlate", v.numberplatenumber || "—");
+  setText("detailsYear", v.manufacture_year || "—");
+
+  // Specs
+  setText("detailsType", v.vehicle_type || "—");
+  setText("detailsFuel", v.fuel_type || "—");
+  setText("detailsTransmission", v.transmission || "—");
+  setText(
+    "detailsEngineCapacity",
+    v.enginecapacity ? `${v.enginecapacity} cc` : "—",
+  );
+  setText("detailsTareWeight", v.tareweight ? `${v.tareweight} kg` : "—");
+  setText("detailsPassengers", v.numberofpassengers || "—");
+  setText("detailsColor", v.color || "—");
+  setText("detailsMilage", v.milage || "—");
+
+  // Identifiers
+  setText("detailsEngineNo", v.enginenumber || "—");
+  setText("detailsChasisNo", v.chasisnumber || "—");
+
+  // Features
+  const featuresArr = (v.features || "")
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
+  const featWrap = document.getElementById("detailsFeatures");
+  if (featuresArr.length) {
+    featWrap.innerHTML = featuresArr
+      .map((f) => `<span class="feature">${safe(f)}</span>`)
+      .join("");
+  } else {
+    featWrap.innerHTML = `<span class="feature">No features listed</span>`;
+  }
+
+  // Description
+  setText("detailsDescription", v.description || "No description provided.");
+
+  // Timestamps
+  setText("detailsCreatedAt", formatDate(v.created_at));
+  setText("detailsUpdatedAt", formatDate(v.updated_at));
+
+  // Wire action buttons (re-bind each time to capture current id)
+  const editBtn = document.getElementById("detailsEditBtn");
+  editBtn.onclick = () => {
+    closeDetailsModal();
+    openUpdateModal(v.vehicleid);
+  };
+
+  const deleteBtn = document.getElementById("detailsDeleteBtn");
+  deleteBtn.onclick = () => {
+    closeDetailsModal();
+    deleteVehicle(v.vehicleid);
+  };
+
+  // Store id for doc viewer
+  const docBtn = document.getElementById("detailsViewDocBtn");
+  docBtn.dataset.vehicleId = v.vehicleid;
+  docBtn.dataset.vehicleName =
+    `${v.vehiclebrand || ""} ${v.vehiclemodel || ""}`.trim();
+  docBtn.dataset.vehiclePlate = v.numberplatenumber || "";
+}
+
+function closeDetailsModal() {
+  const modal = document.getElementById("vehicleDetailsModal");
+  if (modal) modal.classList.remove("active");
+  document.body.style.overflow = "";
+}
+
+// ================= DOCUMENT VIEWER =================
+function viewRegistrationDoc() {
+  const btn = document.getElementById("detailsViewDocBtn");
+  const vid = btn?.dataset?.vehicleId;
+  if (!vid) return;
+
+  const name = btn.dataset.vehicleName || "Vehicle";
+  const plate = btn.dataset.vehiclePlate || "";
+
+  const docUrl = `${API_BASE}/${vid}/doc`;
+
+  const modal = document.getElementById("docViewerModal");
+  const frame = document.getElementById("docFrame");
+  const dl = document.getElementById("docDownloadBtn");
+  const sub = document.getElementById("docViewerSubtitle");
+
+  sub.textContent = `${name}${plate ? " • " + plate : ""}`;
+  frame.src = docUrl;
+  dl.href = docUrl;
+
+  modal.classList.add("active");
+  document.body.style.overflow = "hidden";
+}
+
+function closeDocViewer() {
+  const modal = document.getElementById("docViewerModal");
+  const frame = document.getElementById("docFrame");
+  if (modal) modal.classList.remove("active");
+  if (frame) frame.src = "";
+  document.body.style.overflow = "";
 }
 
 // ================= REGISTER VEHICLE =================
@@ -164,7 +394,6 @@ async function registerVehicle(e) {
   const form = e.target;
   const formData = new FormData(form);
 
-  // send provider id so your existing backend logic works
   formData.set("provider_id", String(providerId));
 
   if (!formData.get("price_per_day")) {
@@ -280,7 +509,6 @@ async function updateVehicle(e) {
     return;
   }
 
-  // send provider id so your existing backend logic works
   formData.set("provider_id", String(providerId));
 
   if (!formData.get("price_per_day")) {
@@ -350,4 +578,34 @@ function safe(v) {
     .replaceAll("<", "&lt;")
     .replaceAll(">", "&gt;")
     .replaceAll('"', "&quot;");
+}
+
+function setText(id, value) {
+  const el = document.getElementById(id);
+  if (el)
+    el.textContent =
+      value === null || value === undefined || value === ""
+        ? "—"
+        : String(value);
+}
+
+function formatMoney(v) {
+  if (v === null || v === undefined || v === "") return "0.00";
+  const n = Number(v);
+  if (Number.isNaN(n)) return String(v);
+  return n.toLocaleString("en-US", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+}
+
+function formatDate(v) {
+  if (!v || v === "null") return "—";
+  try {
+    const d = new Date(v);
+    if (Number.isNaN(d.getTime())) return String(v);
+    return d.toLocaleString();
+  } catch {
+    return String(v);
+  }
 }

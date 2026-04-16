@@ -879,3 +879,19 @@ ALTER TABLE companybookings
 
 CREATE INDEX idx_ride_id ON companybookings (ride_id);
 CREATE INDEX idx_driver_status ON companybookings (driverid, status);
+
+CREATE TABLE IF NOT EXISTS Issue (
+                                     issue_id INT AUTO_INCREMENT PRIMARY KEY,
+                                     driver_id INT NOT NULL,
+                                     category VARCHAR(50) NOT NULL,
+    location VARCHAR(255) NOT NULL,
+    description TEXT NOT NULL,
+    booking_id VARCHAR(50),
+    plate_number VARCHAR(20),
+    photo_path VARCHAR(500),
+    is_driveable BOOLEAN,
+    status VARCHAR(20) DEFAULT 'pending',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (driver_id) REFERENCES Driver(driverid) ON DELETE CASCADE
+    );

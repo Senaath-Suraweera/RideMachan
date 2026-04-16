@@ -62,6 +62,8 @@ class MessagingSystem {
       await this.loadConversations();
       console.log("[DEBUG] init() — conversations loaded");
 
+      this.openInitialConversationFromUrlOrStorage();
+
       await this.loadAllowedTypes();
       console.log("[DEBUG] init() — allowed types loaded:", this.allowedTypes);
 
@@ -1130,6 +1132,28 @@ class MessagingSystem {
     console.log("[DEBUG] destroy() called — cleaning up WS and polling");
     if (this.ws) this.ws.close();
     if (this.notifPollingInterval) clearInterval(this.notifPollingInterval);
+  }
+
+  openInitialConversationFromUrlOrStorage() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const fromUrl = urlParams.get("conversationId");
+    const fromStorage = sessionStorage.getItem("openConversationId");
+    const rawId = fromUrl || fromStorage;
+
+    if (!rawId) return;
+
+    sessionStorage.removeItem("openConversationId");
+
+    const conversationId = parseInt(rawId, 10);
+    if (isNaN(conversationId)) return;
+
+    const exists = this.conversations.some(
+      (c) => c.conversationId === conversationId,
+    );
+
+    if (exists) {
+      this.selectConversation(conversationId);
+    }
   }
 }
 

@@ -317,23 +317,19 @@ public class VehicleProviderDashboardServlet extends HttpServlet {
 
     // =========================
     // 4) VEHICLES UNDER MAINTENANCE
-    // FIXES:
-    //  - Table name: CalendarEvents (not calendarevents)
-    //  - Vehicle table name: Vehicle
-    //  - scheduled_date is DATETIME -> read as Timestamp
+    // Uses Vehicle.availability_status directly — simpler than joining CalendarEvents.
+    // Accepts any common spelling: 'maintenance', 'under_maintenance', 'under maintenance'.
     // =========================
     private String getVehiclesUnderMaintenance(Connection con, int providerId, int limit) throws SQLException {
         if (limit <= 0) limit = 6;
 
         String sql =
-                "SELECT " +
-                        "  v.vehicleid, v.vehiclebrand, v.vehiclemodel, v.numberplatenumber, " +
-                        "  ce.service_type, ce.status, ce.scheduled_date, ce.scheduled_time " +
-                        "FROM CalendarEvents ce " +
-                        "JOIN Vehicle v ON v.vehicleid = ce.vehicle_id " +
-                        "WHERE v.provider_id = ? " +
-                        "  AND ce.status IN ('scheduled','in-progress') " +
-                        "ORDER BY ce.scheduled_date ASC " +
+                "SELECT vehicleid, vehiclebrand, vehiclemodel, numberplatenumber, availability_status, location " +
+                        "FROM Vehicle " +
+                        "WHERE provider_id = ? " +
+                        "  AND LOWER(REPLACE(REPLACE(availability_status,'_',' '),'-',' ')) " +
+                        "      IN ('maintenance','under maintenance','in maintenance','servicing') " +
+                        "ORDER BY vehicleid DESC " +
                         "LIMIT ?";
 
         StringBuilder sb = new StringBuilder();
@@ -349,29 +345,15 @@ public class VehicleProviderDashboardServlet extends HttpServlet {
                     first = false;
 
                     String name = nvl(rs.getString("vehiclebrand")) + " " + nvl(rs.getString("vehiclemodel"));
-
-                    long etaHours = 0;
-                    Timestamp scheduledTs = rs.getTimestamp("scheduled_date"); // DATETIME
-                    Time t = rs.getTime("scheduled_time"); // TIME (can be null)
-
-                    if (scheduledTs != null) {
-                        LocalDateTime scheduled = scheduledTs.toLocalDateTime();
-                        if (t != null) {
-                            scheduled = scheduled.withHour(t.toLocalTime().getHour())
-                                    .withMinute(t.toLocalTime().getMinute())
-                                    .withSecond(t.toLocalTime().getSecond());
-                        }
-                        long diffMs = Timestamp.valueOf(scheduled).getTime() - System.currentTimeMillis();
-                        etaHours = Math.max(0, diffMs / (1000L * 60L * 60L));
-                    }
+                    String status = nvl(rs.getString("availability_status"), "Maintenance");
 
                     sb.append("{")
                             .append("\"vehicleId\":").append(rs.getInt("vehicleid")).append(",")
                             .append("\"name\":\"").append(escapeJson(name.trim())).append("\",")
                             .append("\"plate\":\"").append(escapeJson(nvl(rs.getString("numberplatenumber")))).append("\",")
-                            .append("\"serviceType\":\"").append(escapeJson(nvl(rs.getString("service_type")))).append("\",")
-                            .append("\"status\":\"").append(escapeJson(nvl(rs.getString("status")))).append("\",")
-                            .append("\"etaHours\":").append(etaHours)
+                            .append("\"location\":\"").append(escapeJson(nvl(rs.getString("location"), ""))).append("\",")
+                            .append("\"serviceType\":\"Maintenance\",")
+                            .append("\"status\":\"").append(escapeJson(status)).append("\"")
                             .append("}");
                 }
             }

@@ -8,9 +8,11 @@ document.addEventListener("DOMContentLoaded", function () {
 const API_ROOT = `${window.location.origin}`; // adjust if your context path differs
 const EARNINGS_API = `${API_ROOT}/api/provider/earnings`;
 
+// Only show 5 recent bookings on the earnings page
+const RECENT_BOOKINGS_LIMIT = 5;
+
 // ---------- Main loader ----------
 async function loadEarningsPage() {
-  // default chart period
   const period =
     document.getElementById("chartPeriod")?.value || "Last 12 months";
   const months = periodToMonths(period);
@@ -83,7 +85,7 @@ function periodToMonths(periodText) {
     case "Last 3 months":
       return 3;
     case "This year":
-      return 12; // keep 12; backend gives last 12 months (good enough for your current UI)
+      return 12;
     default:
       return 12;
   }
@@ -102,29 +104,37 @@ async function loadMonthlyChart(months = 12) {
   drawEarningsChart(ctx, canvas, payload.labels || [], payload.data || []);
 }
 
-// Existing chart renderer kept (your original function)
+// Dashboard-aligned chart renderer
 function drawEarningsChart(ctx, canvas, months, data) {
   const width = (canvas.width = canvas.offsetWidth);
   const height = (canvas.height = canvas.offsetHeight);
 
-  const padding = 80;
+  const padding = 70;
   const chartWidth = width - 2 * padding;
   const chartHeight = height - 2 * padding;
 
   ctx.clearRect(0, 0, width, height);
 
+  if (!data || data.length === 0) {
+    ctx.font = '14px "Poppins", sans-serif';
+    ctx.fillStyle = "#718096";
+    ctx.fillText("No earnings data yet", padding, height / 2);
+    return;
+  }
+
   const maxValue = Math.max(...data, 0);
   const minValue = Math.min(...data, 0);
   const valueRange = Math.max(maxValue - minValue, 1);
 
-  ctx.strokeStyle = "#e8eaed";
+  // Gridlines and y-axis labels
+  ctx.strokeStyle = "#e9ecef";
   ctx.lineWidth = 1;
-  ctx.font = '12px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto';
-  ctx.fillStyle = "#5f6368";
+  ctx.font = '12px "Poppins", sans-serif';
+  ctx.fillStyle = "#718096";
 
-  for (let i = 0; i <= 6; i++) {
-    const y = padding + (chartHeight / 6) * i;
-    const value = maxValue - (valueRange / 6) * i;
+  for (let i = 0; i <= 5; i++) {
+    const y = padding + (chartHeight / 5) * i;
+    const value = maxValue - (valueRange / 5) * i;
 
     ctx.beginPath();
     ctx.moveTo(padding, y);
@@ -134,24 +144,23 @@ function drawEarningsChart(ctx, canvas, months, data) {
     ctx.fillText(`Rs ${(value / 1000).toFixed(0)}k`, 10, y + 4);
   }
 
+  // X-axis month labels
   for (let i = 0; i < months.length; i++) {
-    const x = padding + (chartWidth / (months.length - 1 || 1)) * i;
-    ctx.fillText(months[i], x - 15, height - 30);
+    const x = padding + (chartWidth / Math.max(1, months.length - 1)) * i;
+    ctx.fillText(months[i], x - 15, height - 20);
   }
 
+  // Area fill (gradient using primary purple/blue tones)
   const gradient = ctx.createLinearGradient(0, padding, 0, height - padding);
-  gradient.addColorStop(0, "rgba(26, 188, 156, 0.3)");
-  gradient.addColorStop(1, "rgba(26, 188, 156, 0.05)");
+  gradient.addColorStop(0, "rgba(67, 97, 238, 0.35)");
+  gradient.addColorStop(1, "rgba(67, 97, 238, 0.03)");
 
   ctx.fillStyle = gradient;
-  ctx.strokeStyle = "#1abc9c";
-  ctx.lineWidth = 3;
-
   ctx.beginPath();
   ctx.moveTo(padding, height - padding);
 
   for (let i = 0; i < data.length; i++) {
-    const x = padding + (chartWidth / (data.length - 1 || 1)) * i;
+    const x = padding + (chartWidth / Math.max(1, data.length - 1)) * i;
     const y =
       padding + chartHeight - ((data[i] - minValue) / valueRange) * chartHeight;
     ctx.lineTo(x, y);
@@ -161,32 +170,36 @@ function drawEarningsChart(ctx, canvas, months, data) {
   ctx.closePath();
   ctx.fill();
 
+  // Line
+  ctx.strokeStyle = "#4361ee";
+  ctx.lineWidth = 3;
   ctx.beginPath();
   for (let i = 0; i < data.length; i++) {
-    const x = padding + (chartWidth / (data.length - 1 || 1)) * i;
+    const x = padding + (chartWidth / Math.max(1, data.length - 1)) * i;
     const y =
       padding + chartHeight - ((data[i] - minValue) / valueRange) * chartHeight;
 
     if (i === 0) ctx.moveTo(x, y);
     else ctx.lineTo(x, y);
+  }
+  ctx.stroke();
 
-    ctx.fillStyle = "#1abc9c";
+  // Data points
+  for (let i = 0; i < data.length; i++) {
+    const x = padding + (chartWidth / Math.max(1, data.length - 1)) * i;
+    const y =
+      padding + chartHeight - ((data[i] - minValue) / valueRange) * chartHeight;
+
+    ctx.fillStyle = "#3a0ca3";
     ctx.beginPath();
     ctx.arc(x, y, 5, 0, 2 * Math.PI);
     ctx.fill();
 
     ctx.fillStyle = "white";
     ctx.beginPath();
-    ctx.arc(x, y, 3, 0, 2 * Math.PI);
+    ctx.arc(x, y, 2.5, 0, 2 * Math.PI);
     ctx.fill();
   }
-  ctx.stroke();
-
-  ctx.fillStyle = "#202124";
-  ctx.font = 'bold 16px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto';
-  ctx.textAlign = "center";
-  ctx.fillText("Monthly Earnings Trend", width / 2, 30);
-  ctx.textAlign = "left";
 }
 
 // ---------- Vehicle earnings list ----------
@@ -209,6 +222,15 @@ async function loadVehicleEarnings() {
   container.innerHTML = "";
 
   const vehicles = payload.vehicles || [];
+
+  if (vehicles.length === 0) {
+    container.innerHTML = `
+      <div class="vehicle-earning-item" style="justify-content:center;color:#718096;">
+        No vehicle earnings yet
+      </div>`;
+    return;
+  }
+
   vehicles.forEach((v, idx) => {
     const div = document.createElement("div");
     div.className = "vehicle-earning-item";
@@ -221,14 +243,12 @@ async function loadVehicleEarnings() {
         Rs ${Number(v.earnings || 0).toLocaleString()}
       </div>
     `;
-    // store for sorting
     div.dataset.earnings = String(v.earnings || 0);
     div.dataset.bookings = String(v.bookingCount || 0);
     div.dataset.name = String(v.vehicleName || "");
     container.appendChild(div);
   });
 
-  // apply current sort if user already changed it
   sortVehicleEarnings();
 }
 
@@ -262,14 +282,17 @@ function sortVehicleEarnings() {
   });
 
   items.forEach((item, index) => {
-    item.querySelector(".ranking").textContent = `#${index + 1}`;
+    const rankEl = item.querySelector(".ranking");
+    if (rankEl) rankEl.textContent = `#${index + 1}`;
     container.appendChild(item);
   });
 }
 
-// ---------- Recent bookings ----------
+// ---------- Recent bookings (limit = 5) ----------
 async function loadRecentBookings() {
-  const res = await fetch(`${EARNINGS_API}/recent-bookings?limit=10`);
+  const res = await fetch(
+    `${EARNINGS_API}/recent-bookings?limit=${RECENT_BOOKINGS_LIMIT}`,
+  );
   const payload = await res.json();
   if (!res.ok)
     throw new Error(payload?.error || "Failed to load recent bookings");
@@ -279,7 +302,17 @@ async function loadRecentBookings() {
 
   container.innerHTML = "";
 
-  const bookings = payload.bookings || [];
+  // Cap at 5 even if server returns more
+  const bookings = (payload.bookings || []).slice(0, RECENT_BOOKINGS_LIMIT);
+
+  if (bookings.length === 0) {
+    container.innerHTML = `
+      <div class="booking-item" style="text-align:center;color:#718096;">
+        No recent bookings
+      </div>`;
+    return;
+  }
+
   bookings.forEach((b) => {
     const status = (b.status || "").toLowerCase();
     const uiStatus = status || "ongoing";
@@ -291,14 +324,14 @@ async function loadRecentBookings() {
     el.innerHTML = `
       <div class="booking-info">
         <div class="booking-header">
-          <span class="vehicle-id">Vehicle VH${String(b.vehicleId || "").padStart(3, "0")}</span>
+          <span class="vehicle-id">${escapeHtml(b.vehicleName || "Vehicle")} · VH${String(b.vehicleId || "").padStart(3, "0")}</span>
           <span class="booking-status ${uiStatus}">${escapeHtml(uiStatus)}</span>
         </div>
         <div class="booking-details">
           <div class="booking-id">Booking ID: BK${b.bookingId}</div>
-          <div class="rental-company">Rental Company: ${escapeHtml(b.companyName || "")}</div>
+          <div class="rental-company">Rental Co: ${escapeHtml(b.companyName || "")}</div>
           <div class="customer">Customer: ${escapeHtml(b.customerName || "")}</div>
-          <div class="duration">⏱️ Duration: ${Number(b.durationDays || 0)} days</div>
+          <div class="duration">⏱ Duration: ${Number(b.durationDays || 0)} days</div>
         </div>
       </div>
 
@@ -306,7 +339,7 @@ async function loadRecentBookings() {
         <div class="progress-step ${progress.accepted}">● Accepted</div>
         <div class="progress-step ${progress.paid}">● Paid</div>
         <div class="progress-step ${progress.pickup}">● Pick-up</div>
-        <div class="progress-step ${progress.dropoff}">Drop-off</div>
+        <div class="progress-step ${progress.dropoff}">${progress.dropoff === "completed" ? "●" : ""} Drop-off</div>
       </div>
 
       <div class="booking-earnings">
@@ -326,10 +359,6 @@ async function loadRecentBookings() {
 }
 
 function buildProgress(status) {
-  // Since DB has only a single status column, we approximate progress for UI
-  // completed -> all completed
-  // ongoing -> accepted/paid/pickup completed, dropoff pending
-  // other -> accepted completed, rest pending
   const s = (status || "").toLowerCase();
   if (s === "completed") {
     return {
@@ -339,7 +368,7 @@ function buildProgress(status) {
       dropoff: "completed",
     };
   }
-  if (s === "ongoing") {
+  if (s === "ongoing" || s === "in-progress" || s === "confirmed") {
     return {
       accepted: "completed",
       paid: "completed",
@@ -360,7 +389,7 @@ function viewBookingDetails(bookingId) {
   // window.location.href = `booking-details.html?id=${bookingId}`;
 }
 
-// ---------- small util ----------
+// ---------- utils ----------
 function escapeHtml(str) {
   return String(str).replace(
     /[&<>"']/g,
@@ -375,7 +404,7 @@ function escapeHtml(str) {
   );
 }
 
-// Responsive redraw (re-fetch only chart for correct sizing)
+// Responsive redraw (re-fetch chart for correct sizing)
 window.addEventListener("resize", function () {
   clearTimeout(window.__earningsResizeTimer);
   window.__earningsResizeTimer = setTimeout(async () => {

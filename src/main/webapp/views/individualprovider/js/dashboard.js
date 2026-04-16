@@ -376,9 +376,10 @@ async function loadSummary(baseUrl, providerId) {
     statValues[3].textContent = formatLKR(data.pendingPayout);
 
     if (statChanges[0]) {
-      const pct = Number(data.incomeChangePct || 0).toFixed(1);
-      statChanges[0].textContent = `${pct >= 0 ? "+" : ""} ${pct}%`;
-      statChanges[0].className = `stat-change ${pct >= 0 ? "positive" : "negative"}`;
+      const pctNum = Number(data.incomeChangePct || 0);
+      const pctText = pctNum.toFixed(1);
+      statChanges[0].textContent = `${pctNum >= 0 ? "+" : ""}${pctText}%`;
+      statChanges[0].className = `stat-change ${pctNum >= 0 ? "positive" : "negative"}`;
     }
 
     if (statChanges[3]) {
@@ -390,6 +391,8 @@ async function loadSummary(baseUrl, providerId) {
   }
 }
 
+let __lastChart = null; // { months, income } — used for resize redraws
+
 async function loadMonthlyIncome(baseUrl, providerId) {
   const url = `${baseUrl}/monthly-income?months=12${providerId ? `&providerId=${providerId}` : ""}`;
 
@@ -400,11 +403,33 @@ async function loadMonthlyIncome(baseUrl, providerId) {
     const months = points.map((p) => p.label);
     const income = points.map((p) => Number(p.income || 0));
 
+    __lastChart = { months, income };
+
     const canvas = document.getElementById("incomeChart");
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
 
     drawIncomeChart(ctx, canvas, months, income);
+
+    // Redraw on resize (debounced) so the chart stays crisp.
+    if (!window.__chartResizeWired) {
+      window.__chartResizeWired = true;
+      let t = null;
+      window.addEventListener("resize", () => {
+        clearTimeout(t);
+        t = setTimeout(() => {
+          if (!__lastChart) return;
+          const c = document.getElementById("incomeChart");
+          if (!c) return;
+          drawIncomeChart(
+            c.getContext("2d"),
+            c,
+            __lastChart.months,
+            __lastChart.income,
+          );
+        }, 120);
+      });
+    }
   } catch (e) {
     console.error("Monthly income load failed:", e.message);
   }
@@ -452,24 +477,49 @@ async function loadMaintenance(baseUrl, providerId) {
     if (!maintenanceCard) return;
 
     maintenanceCard.innerHTML = "";
-    (data.vehicles || []).forEach((v) => {
+
+    const vehicles = data.vehicles || [];
+    if (vehicles.length === 0) {
+      maintenanceCard.innerHTML = `
+        <div class="empty-state">
+          <i class="fas fa-wrench"></i>
+          <div class="empty-title">No vehicles in maintenance</div>
+          <div class="empty-msg">All your vehicles are road-ready.</div>
+        </div>
+      `;
+      return;
+    }
+
+    vehicles.forEach((v) => {
       const div = document.createElement("div");
       div.className = "vehicle-item";
+      const locationLine = v.location ? ` • ${escapeHtml(v.location)}` : "";
       div.innerHTML = `
         <div class="vehicle-info">
           <span class="vehicle-icon"></span>
           <div>
             <div class="vehicle-name">${escapeHtml(v.name || "")}</div>
-            <div class="vehicle-id">${escapeHtml(v.plate || "")}</div>
+            <div class="vehicle-id">${escapeHtml(v.plate || "")}${locationLine}</div>
           </div>
         </div>
         <span class="status-badge status-maintenance">${escapeHtml(v.serviceType || "Maintenance")}</span>
-        <span class="eta">ETA: ${Number(v.etaHours || 0)} hours</span>
       `;
       maintenanceCard.appendChild(div);
     });
   } catch (e) {
     console.error("Maintenance load failed:", e.message);
+    const maintenanceCard = document.querySelector(
+      ".maintenance-section .vehicle-list",
+    );
+    if (maintenanceCard) {
+      maintenanceCard.innerHTML = `
+        <div class="empty-state error">
+          <i class="fas fa-triangle-exclamation"></i>
+          <div class="empty-title">Couldn't load maintenance list</div>
+          <div class="empty-msg">${escapeHtml(e.message || "Please try again.")}</div>
+        </div>
+      `;
+    }
   }
 }
 
@@ -484,7 +534,20 @@ async function loadAvailable(baseUrl, providerId) {
     if (!availableCard) return;
 
     availableCard.innerHTML = "";
-    (data.vehicles || []).forEach((v) => {
+
+    const vehicles = data.vehicles || [];
+    if (vehicles.length === 0) {
+      availableCard.innerHTML = `
+        <div class="empty-state">
+          <i class="fas fa-car-side"></i>
+          <div class="empty-title">No vehicles available</div>
+          <div class="empty-msg">Add a vehicle or mark one as available.</div>
+        </div>
+      `;
+      return;
+    }
+
+    vehicles.forEach((v) => {
       const div = document.createElement("div");
       div.className = "vehicle-item";
       div.innerHTML = `
@@ -506,67 +569,226 @@ async function loadAvailable(baseUrl, providerId) {
 }
 
 // --- chart ---
+// Smooth area chart with gradient fill, niceified y-axis, and hover tooltip.
 function drawIncomeChart(ctx, canvas, months, data) {
-  const width = (canvas.width = canvas.offsetWidth);
-  const height = (canvas.height = canvas.offsetHeight);
+  // --- HiDPI setup ---
+  const dpr = window.devicePixelRatio || 1;
+  const cssWidth = canvas.offsetWidth;
+  const cssHeight = canvas.offsetHeight;
+  canvas.width = Math.round(cssWidth * dpr);
+  canvas.height = Math.round(cssHeight * dpr);
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-  const padding = 60;
-  const chartWidth = width - 2 * padding;
-  const chartHeight = height - 2 * padding;
+  const width = cssWidth;
+  const height = cssHeight;
+
+  const padLeft = 64;
+  const padRight = 24;
+  const padTop = 20;
+  const padBottom = 36;
+  const chartW = width - padLeft - padRight;
+  const chartH = height - padTop - padBottom;
 
   ctx.clearRect(0, 0, width, height);
 
   if (!data || data.length === 0) {
     ctx.font = '14px "Poppins", sans-serif';
-    ctx.fillStyle = "#718096";
-    ctx.fillText("No income data", padding, padding);
+    ctx.fillStyle = "#a0aec0";
+    ctx.textAlign = "center";
+    ctx.fillText("No income data yet", width / 2, height / 2);
     return;
   }
 
-  const maxValue = Math.max(...data);
-  const minValue = Math.min(...data);
-  const valueRange = Math.max(1, maxValue - minValue);
+  // --- Nice y-axis bounds (round to sensible step) ---
+  const rawMax = Math.max(...data, 1);
+  const niceMax = niceCeil(rawMax);
+  const tickCount = 5;
+  const step = niceMax / tickCount;
 
-  ctx.strokeStyle = "#e9ecef";
+  const xFor = (i) => padLeft + (chartW / Math.max(1, data.length - 1)) * i;
+  const yFor = (v) => padTop + chartH - (v / niceMax) * chartH;
+
+  // --- Gridlines + y labels ---
+  ctx.font = '11px "Poppins", sans-serif';
+  ctx.fillStyle = "#a0aec0";
+  ctx.textAlign = "right";
+  ctx.textBaseline = "middle";
+  ctx.strokeStyle = "rgba(203, 213, 225, 0.5)";
   ctx.lineWidth = 1;
-  ctx.font = '12px "Poppins", sans-serif';
-  ctx.fillStyle = "#718096";
 
-  for (let i = 0; i <= 5; i++) {
-    const y = padding + (chartHeight / 5) * i;
-    const value = maxValue - (valueRange / 5) * i;
+  for (let i = 0; i <= tickCount; i++) {
+    const y = padTop + (chartH / tickCount) * i;
+    const value = niceMax - step * i;
+
     ctx.beginPath();
-    ctx.moveTo(padding, y);
-    ctx.lineTo(width - padding, y);
+    ctx.setLineDash(i === tickCount ? [] : [3, 4]);
+    ctx.moveTo(padLeft, y);
+    ctx.lineTo(width - padRight, y);
     ctx.stroke();
-    ctx.fillText(`Rs ${(value / 1000).toFixed(0)}k`, 10, y + 4);
-  }
 
+    ctx.fillText(formatAxis(value), padLeft - 10, y);
+  }
+  ctx.setLineDash([]);
+
+  // --- X labels ---
+  ctx.fillStyle = "#718096";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "top";
   for (let i = 0; i < months.length; i++) {
-    const x = padding + (chartWidth / Math.max(1, months.length - 1)) * i;
-    ctx.fillText(months[i], x - 15, height - 20);
+    ctx.fillText(months[i], xFor(i), padTop + chartH + 10);
   }
 
+  // --- Build smooth path once, reuse for fill + stroke ---
+  const points = data.map((v, i) => ({ x: xFor(i), y: yFor(v) }));
+  const linePath = buildSmoothPath(points);
+
+  // --- Gradient area fill ---
+  const areaPath = new Path2D(linePath);
+  areaPath.lineTo(points[points.length - 1].x, padTop + chartH);
+  areaPath.lineTo(points[0].x, padTop + chartH);
+  areaPath.closePath();
+
+  const gradient = ctx.createLinearGradient(0, padTop, 0, padTop + chartH);
+  gradient.addColorStop(0, "rgba(67, 97, 238, 0.35)");
+  gradient.addColorStop(1, "rgba(67, 97, 238, 0.02)");
+  ctx.fillStyle = gradient;
+  ctx.fill(areaPath);
+
+  // --- Line stroke ---
+  const strokePath = new Path2D(linePath);
   ctx.strokeStyle = "#4361ee";
-  ctx.lineWidth = 3;
-  ctx.beginPath();
+  ctx.lineWidth = 2.5;
+  ctx.lineJoin = "round";
+  ctx.lineCap = "round";
+  ctx.stroke(strokePath);
 
-  for (let i = 0; i < data.length; i++) {
-    const x = padding + (chartWidth / Math.max(1, data.length - 1)) * i;
-    const y =
-      padding + chartHeight - ((data[i] - minValue) / valueRange) * chartHeight;
-
-    if (i === 0) ctx.moveTo(x, y);
-    else ctx.lineTo(x, y);
-
-    ctx.fillStyle = "#3a0ca3";
+  // --- Points on top ---
+  for (const p of points) {
     ctx.beginPath();
-    ctx.arc(x, y, 4, 0, 2 * Math.PI);
+    ctx.fillStyle = "#ffffff";
+    ctx.arc(p.x, p.y, 4.5, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.beginPath();
+    ctx.fillStyle = "#3a0ca3";
+    ctx.arc(p.x, p.y, 2.75, 0, Math.PI * 2);
     ctx.fill();
   }
 
-  ctx.strokeStyle = "#4361ee";
-  ctx.stroke();
+  // --- Wire hover tooltip (once) ---
+  attachChartHover(canvas, points, data, months, {
+    padLeft,
+    padTop,
+    chartH,
+  });
+}
+
+// Catmull-Rom -> Bezier smoothing. Gives a clean curve without overshoot.
+function buildSmoothPath(pts) {
+  if (pts.length === 0) return "";
+  if (pts.length === 1) return `M ${pts[0].x} ${pts[0].y}`;
+
+  let d = `M ${pts[0].x} ${pts[0].y}`;
+  const tension = 0.5; // 0 = straight lines, 1 = very loose
+  for (let i = 0; i < pts.length - 1; i++) {
+    const p0 = pts[i - 1] || pts[i];
+    const p1 = pts[i];
+    const p2 = pts[i + 1];
+    const p3 = pts[i + 2] || p2;
+
+    const cp1x = p1.x + ((p2.x - p0.x) / 6) * tension * 2;
+    const cp1y = p1.y + ((p2.y - p0.y) / 6) * tension * 2;
+    const cp2x = p2.x - ((p3.x - p1.x) / 6) * tension * 2;
+    const cp2y = p2.y - ((p3.y - p1.y) / 6) * tension * 2;
+
+    d += ` C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${p2.x} ${p2.y}`;
+  }
+  return d;
+}
+
+function niceCeil(v) {
+  if (v <= 0) return 1;
+  const exp = Math.pow(10, Math.floor(Math.log10(v)));
+  const n = v / exp;
+  let niceN;
+  if (n <= 1) niceN = 1;
+  else if (n <= 2) niceN = 2;
+  else if (n <= 2.5) niceN = 2.5;
+  else if (n <= 5) niceN = 5;
+  else niceN = 10;
+  return niceN * exp;
+}
+
+function formatAxis(v) {
+  if (v >= 1_000_000) return `Rs ${(v / 1_000_000).toFixed(1)}M`;
+  if (v >= 1_000) return `Rs ${Math.round(v / 1000)}k`;
+  return `Rs ${Math.round(v)}`;
+}
+
+// Lightweight hover tooltip — renders into an absolutely-positioned div
+// that sits on top of the canvas. Created once per canvas.
+function attachChartHover(canvas, points, data, months, metrics) {
+  const parent = canvas.parentElement;
+  if (!parent) return;
+  if (getComputedStyle(parent).position === "static") {
+    parent.style.position = "relative";
+  }
+
+  let tooltip = parent.querySelector(".chart-tooltip");
+  if (!tooltip) {
+    tooltip = document.createElement("div");
+    tooltip.className = "chart-tooltip";
+    parent.appendChild(tooltip);
+  }
+
+  let marker = parent.querySelector(".chart-marker");
+  if (!marker) {
+    marker = document.createElement("div");
+    marker.className = "chart-marker";
+    parent.appendChild(marker);
+  }
+
+  // Replace existing handlers so redraws don't stack listeners.
+  canvas.onmousemove = (e) => {
+    const rect = canvas.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+
+    // find nearest point by x
+    let best = 0;
+    let bestDist = Infinity;
+    for (let i = 0; i < points.length; i++) {
+      const d = Math.abs(points[i].x - x);
+      if (d < bestDist) {
+        bestDist = d;
+        best = i;
+      }
+    }
+
+    const p = points[best];
+    tooltip.style.display = "block";
+    tooltip.innerHTML = `
+      <div class="chart-tooltip-label">${months[best] ?? ""}</div>
+      <div class="chart-tooltip-value">Rs ${Math.round(data[best]).toLocaleString()}</div>
+    `;
+
+    // position tooltip above the point, keep inside parent bounds
+    const tipRect = tooltip.getBoundingClientRect();
+    const tipW = tipRect.width || 120;
+    let left = p.x - tipW / 2;
+    left = Math.max(6, Math.min(canvas.offsetWidth - tipW - 6, left));
+    tooltip.style.left = `${left}px`;
+    tooltip.style.top = `${Math.max(0, p.y - tipRect.height - 12)}px`;
+
+    marker.style.display = "block";
+    marker.style.left = `${p.x}px`;
+    marker.style.top = `${metrics.padTop}px`;
+    marker.style.height = `${metrics.chartH}px`;
+  };
+
+  canvas.onmouseleave = () => {
+    tooltip.style.display = "none";
+    marker.style.display = "none";
+  };
 }
 
 function updateLastModified() {

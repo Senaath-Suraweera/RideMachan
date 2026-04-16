@@ -1,12 +1,20 @@
 /* =========================================================
-   Earnings — Theme-aligned (matches main.css + home.css reference)
+   Earnings — Theme-aligned with Dashboard
    ========================================================= */
+
+/* Page Header */
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
 
 .page-header h1 {
   font-size: 28px;
   font-weight: 700;
   color: var(--dark, #1a1a2e);
-  margin: 0 0 12px 0;
+  margin: 0;
   position: relative;
   padding-bottom: 10px;
 }
@@ -29,11 +37,13 @@
 .page-subtitle {
   font-size: 14px;
   color: var(--text-light, #718096);
-  margin-bottom: 30px;
+  margin: 12px 0 0 0;
   font-weight: 500;
 }
 
-/* Stats Grid */
+/* =========================
+   Stats Grid — mirrors dashboard
+   ========================= */
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -45,7 +55,7 @@
 .stat-card {
   background: white;
   border-radius: var(--radius, 10px);
-  padding: 24px;
+  padding: 28px;
   box-shadow: var(--shadow-sm, 0 4px 6px -1px rgba(0, 0, 0, 0.1));
   display: flex;
   align-items: center;
@@ -54,6 +64,7 @@
   border: 1px solid rgba(0, 0, 0, 0.03);
   position: relative;
   overflow: hidden;
+  cursor: pointer;
 }
 
 .stat-card::before {
@@ -61,17 +72,10 @@
   position: absolute;
   top: 0;
   left: 0;
-  width: 4px;
+  width: 6px;
   height: 100%;
-}
-
-.stat-card:hover {
-  transform: translateY(-5px);
-  box-shadow: var(
-    --shadow-lg,
-    0 20px 25px -5px rgba(0, 0, 0, 0.1),
-    0 10px 10px -5px rgba(0, 0, 0, 0.04)
-  );
+  opacity: 0.9;
+  transition: var(--transition, all 0.3s ease);
 }
 
 .stat-card.income::before {
@@ -90,22 +94,48 @@
   );
 }
 
+.stat-card:hover {
+  transform: translateY(-7px);
+  box-shadow: var(
+    --shadow-lg,
+    0 20px 25px -5px rgba(0, 0, 0, 0.1),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04)
+  );
+}
+
+/* Stat Icon Circle — gradient like dashboard profile-img */
 .stat-icon {
-  font-size: 36px;
   width: 60px;
   height: 60px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(67, 97, 238, 0.08);
   border-radius: 50%;
-  color: var(--primary, #3a0ca3);
-  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.06);
+  color: white;
+  font-size: 24px;
+  box-shadow: 0 6px 14px rgba(67, 97, 238, 0.25);
   transition: var(--transition, all 0.3s ease);
+  flex-shrink: 0;
+}
+
+.stat-card.income .stat-icon {
+  background: linear-gradient(
+    135deg,
+    var(--secondary, #7209b7),
+    var(--primary, #3a0ca3)
+  );
+}
+
+.stat-card.bookings .stat-icon {
+  background: linear-gradient(
+    135deg,
+    var(--info, #4895ef),
+    var(--success, #4cc9f0)
+  );
 }
 
 .stat-card:hover .stat-icon {
-  transform: scale(1.1);
+  transform: scale(1.1) rotate(-5deg);
 }
 
 .stat-content {
@@ -127,25 +157,36 @@
 .stat-label {
   font-size: 15px;
   color: var(--text-light, #718096);
-  margin-bottom: 8px;
+  margin-bottom: 10px;
   font-weight: 500;
 }
 
 .stat-change {
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 600;
-  padding: 4px 0;
+  padding: 4px 10px;
+  border-radius: 12px;
+  display: inline-block;
 }
 
 .stat-change.positive {
   color: #059669;
+  background-color: rgba(16, 185, 129, 0.15);
 }
 
 .stat-change.negative {
   color: #db2777;
+  background-color: rgba(247, 37, 133, 0.12);
 }
 
-/* Chart Section */
+.stat-change.pending {
+  color: #d97706;
+  background-color: rgba(248, 150, 30, 0.15);
+}
+
+/* =========================
+   Chart Section — dashboard look
+   ========================= */
 .chart-section {
   margin-bottom: 30px;
 }
@@ -158,23 +199,25 @@
   border: 1px solid rgba(0, 0, 0, 0.03);
 }
 
-.chart-header {
+.chart-card .card-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 24px;
+  border-bottom: 1px solid var(--border, #e9ecef);
+  padding-bottom: 16px;
+  margin-bottom: 20px;
   flex-wrap: wrap;
   gap: 16px;
 }
 
-.chart-header h2 {
+.chart-card .card-header h2 {
   font-size: 20px;
   font-weight: 600;
   color: var(--dark, #1a1a2e);
-  margin-bottom: 8px;
+  margin-bottom: 6px;
 }
 
-.chart-header p {
+.chart-card .card-header p {
   font-size: 14px;
   color: var(--text-light, #718096);
   margin: 0;
@@ -187,29 +230,57 @@
 }
 
 .chart-container {
-  height: 400px;
+  height: 350px;
   position: relative;
 }
 
-/* Earnings Grid */
+#earningsChart {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* =========================
+   Earnings Grid
+   ========================= */
 .earnings-grid {
   display: grid;
   grid-template-columns: 400px 1fr;
   gap: 25px;
 }
 
-/* Vehicle Earnings Section */
-.vehicle-earnings-section .card-header {
+/* Card base */
+.earnings-grid .card {
+  background: white;
+  border-radius: var(--radius, 10px);
+  padding: 24px;
+  box-shadow: var(--shadow-sm, 0 4px 6px -1px rgba(0, 0, 0, 0.1));
+  border: 1px solid rgba(0, 0, 0, 0.03);
+}
+
+.earnings-grid .card-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
+  border-bottom: 1px solid var(--border, #e9ecef);
+  padding-bottom: 14px;
+  margin-bottom: 18px;
 }
 
+.earnings-grid .card-header h2 {
+  font-size: 19px;
+  font-weight: 600;
+  color: var(--dark, #1a1a2e);
+  margin: 0;
+}
+
+/* =========================
+   Vehicle Earnings list
+   ========================= */
 .vehicle-earnings-list {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 14px;
 }
 
 .vehicle-earning-item {
@@ -219,18 +290,27 @@
   background: #f8f9fa;
   border-radius: var(--radius-sm, 6px);
   transition: all 0.2s ease;
+  border: 1px solid transparent;
 }
 
 .vehicle-earning-item:hover {
   background: rgba(67, 97, 238, 0.05);
+  border-color: rgba(67, 97, 238, 0.12);
   transform: translateY(-2px);
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
 .ranking {
   font-size: 18px;
   font-weight: 700;
-  color: var(--primary, #3a0ca3);
+  background: linear-gradient(
+    135deg,
+    var(--primary, #3a0ca3),
+    var(--primary-light, #4361ee)
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
   width: 40px;
   text-align: center;
 }
@@ -241,15 +321,15 @@
 }
 
 .vehicle-name {
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 600;
   color: var(--dark, #1a1a2e);
 }
 
 .earnings-amount {
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 700;
-  color: var(--dark, #1a1a2e);
+  color: var(--primary, #3a0ca3);
   display: flex;
   align-items: center;
   gap: 8px;
@@ -267,11 +347,13 @@
   color: #db2777;
 }
 
-/* Recent Bookings Section */
+/* =========================
+   Recent Bookings
+   ========================= */
 .bookings-list {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 18px;
 }
 
 .booking-item {
@@ -279,19 +361,22 @@
   border-radius: var(--radius, 10px);
   padding: 20px;
   border-left: 4px solid var(--border, #e9ecef);
-  transition: all 0.2s ease;
+  transition: all 0.25s ease;
 }
 
 .booking-item:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
+  background: #fff;
 }
 
 .booking-item.completed {
   border-left-color: #059669;
 }
 
-.booking-item.ongoing {
+.booking-item.ongoing,
+.booking-item.confirmed,
+.booking-item\[in-progress\] {
   border-left-color: var(--primary-light, #4361ee);
 }
 
@@ -299,7 +384,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 12px;
+  margin-bottom: 14px;
 }
 
 .vehicle-id {
@@ -311,9 +396,10 @@
 .booking-status {
   padding: 4px 12px;
   border-radius: 999px;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
+  letter-spacing: 0.3px;
   border: 1px solid rgba(0, 0, 0, 0.04);
 }
 
@@ -323,18 +409,25 @@
   border-color: rgba(16, 185, 129, 0.22);
 }
 
-.booking-status.ongoing {
+.booking-status.ongoing,
+.booking-status.confirmed {
   background: rgba(72, 149, 239, 0.15);
   color: #2563eb;
   border-color: rgba(72, 149, 239, 0.22);
 }
 
+.booking-status.pending {
+  background: rgba(248, 150, 30, 0.15);
+  color: #d97706;
+  border-color: rgba(248, 150, 30, 0.22);
+}
+
 .booking-details {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 8px;
+  gap: 8px 16px;
   margin-bottom: 16px;
-  font-size: 14px;
+  font-size: 13px;
   color: var(--text-light, #718096);
 }
 
@@ -343,17 +436,25 @@
   justify-content: space-between;
 }
 
+.booking-details > div span,
+.booking-details .booking-id,
+.booking-details .rental-company,
+.booking-details .customer,
+.booking-details .duration {
+  font-weight: 500;
+}
+
 .booking-progress {
   display: flex;
-  gap: 16px;
+  gap: 10px;
   margin-bottom: 16px;
   flex-wrap: wrap;
 }
 
 .progress-step {
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 600;
-  padding: 4px 8px;
+  padding: 5px 10px;
   border-radius: 999px;
   display: flex;
   align-items: center;
@@ -385,7 +486,8 @@
   justify-content: space-between;
   align-items: center;
   padding: 8px 0;
-  font-size: 14px;
+  font-size: 13px;
+  color: var(--text, #2d3748);
 }
 
 .fare-item:not(:last-child) {
@@ -395,11 +497,12 @@
 .fare-item.platform-fee span:last-child,
 .fare-item.company-fee span:last-child {
   color: #db2777;
+  font-weight: 600;
 }
 
 .fare-item.net-earnings {
   font-weight: 600;
-  font-size: 16px;
+  font-size: 15px;
   background: rgba(16, 185, 129, 0.12);
   margin: 8px -16px -16px -16px;
   padding: 12px 16px;
@@ -409,21 +512,44 @@
 .fare-item.net-earnings span:last-child {
   color: #059669;
   font-weight: 700;
+  font-size: 16px;
 }
 
-#earningsChart {
-  width: 100%;
-  height: 100%;
-  display: block;
+/* Sort select cleanup */
+.sort-control .form-select,
+.chart-controls .form-select {
+  height: 38px;
+  padding: 0 32px 0 12px;
+  border-radius: var(--radius-sm, 6px);
+  border: 1px solid var(--border, #e9ecef);
+  background-color: #fff;
+  color: var(--text, #2d3748);
+  font-size: 13px;
+  font-weight: 500;
+  outline: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  appearance: none;
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' width='14' height='14' fill='%235f6368'><path d='M5.25 7.5l4.75 4.75L14.75 7.5'/></svg>");
 }
 
-/* Responsive Design */
+.sort-control .form-select:focus,
+.chart-controls .form-select:focus {
+  border-color: var(--primary-light, #4361ee);
+  box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.15);
+}
+
+/* =========================
+   Responsive
+   ========================= */
 @media (max-width: 1024px) {
   .earnings-grid {
     grid-template-columns: 1fr;
   }
 
-  .chart-header {
+  .chart-card .card-header {
     flex-direction: column;
     align-items: flex-start;
   }
@@ -435,31 +561,13 @@
   }
 
   .stat-card {
-    flex-direction: column;
-    text-align: center;
-  }
-
-  .stat-icon {
-    margin-bottom: 16px;
+    flex-direction: row;
+    text-align: left;
   }
 
   .vehicle-earning-item {
-    flex-direction: column;
-    align-items: flex-start;
+    flex-wrap: wrap;
     gap: 8px;
-  }
-
-  .ranking {
-    width: auto;
-  }
-
-  .vehicle-info {
-    margin-left: 0;
-    width: 100%;
-  }
-
-  .earnings-amount {
-    align-self: flex-end;
   }
 
   .booking-details {
@@ -483,7 +591,7 @@
   }
 
   .chart-container {
-    height: 300px;
+    height: 280px;
   }
 
   .booking-header {
@@ -494,11 +602,21 @@
 
   .booking-progress {
     flex-direction: column;
-    gap: 8px;
+    gap: 6px;
   }
 
   .progress-step {
     justify-content: flex-start;
+  }
+
+  .stat-icon {
+    width: 50px;
+    height: 50px;
+    font-size: 20px;
+  }
+
+  .stat-value {
+    font-size: 26px;
   }
 }
 

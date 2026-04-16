@@ -40,9 +40,6 @@
             <button class="btn btn-secondary" onclick="printOrder()">
               <i class="fas fa-print"></i> Print
             </button>
-            <button class="btn btn-primary" onclick="updateOrderStatus()">
-              <i class="fas fa-pen-to-square"></i> Update Status
-            </button>
           </div>
         </div>
 
@@ -339,27 +336,11 @@
                 </h3>
               </div>
               <div class="action-buttons">
-                <button class="action-btn complete" onclick="markAsCompleted()">
-                  <span class="btn-icon"
-                    ><i class="fas fa-circle-check"></i
-                  ></span>
-                  <span class="btn-text">Mark as Completed</span>
-                </button>
-                <button class="action-btn contact" onclick="contactCustomer()">
-                  <span class="btn-icon"><i class="fas fa-phone"></i></span>
-                  <span class="btn-text">Call Customer</span>
-                </button>
                 <button class="action-btn message" onclick="sendMessage()">
                   <span class="btn-icon"
                     ><i class="fas fa-comment-dots"></i
                   ></span>
                   <span class="btn-text">Send Message</span>
-                </button>
-                <button class="action-btn emergency" onclick="reportIssue()">
-                  <span class="btn-icon"
-                    ><i class="fas fa-triangle-exclamation"></i
-                  ></span>
-                  <span class="btn-text">Report Issue</span>
                 </button>
               </div>
             </div>
@@ -579,6 +560,318 @@
               Close
             </button>
           </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Submit Report Modal -->
+    <div class="modal-overlay" id="submitReportModal">
+      <div class="modal report-modal">
+        <div class="modal-header">
+          <h2>
+            <i
+              class="fas fa-flag"
+              style="color: var(--danger); margin-right: 8px; font-size: 16px"
+            ></i
+            >Submit Report
+          </h2>
+          <button class="modal-close" onclick="closeReportModal()">
+            <i class="fas fa-xmark"></i>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div
+            class="report-booking-ref"
+            id="reportBookingRef"
+            style="
+              background: rgba(67, 97, 238, 0.06);
+              border: 1px solid rgba(67, 97, 238, 0.15);
+              border-radius: var(--radius-sm);
+              padding: 10px 14px;
+              font-size: 13px;
+              color: var(--primary);
+              font-weight: 500;
+              margin-bottom: 18px;
+              display: flex;
+              align-items: center;
+              gap: 8px;
+            "
+          >
+            <i class="fas fa-bookmark" style="font-size: 13px"></i>
+            <span id="reportRefText">Booking Reference: —</span>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 14px">
+            <label
+              class="form-label"
+              style="
+                font-size: 12px;
+                font-weight: 600;
+                color: var(--text-light);
+                text-transform: uppercase;
+                letter-spacing: 0.4px;
+                display: block;
+                margin-bottom: 6px;
+              "
+              >Report Category
+              <span style="color: var(--danger)">*</span></label
+            >
+            <select
+              class="form-select"
+              id="reportCategory"
+              style="
+                width: 100%;
+                height: 42px;
+                padding: 0 12px;
+                border-radius: var(--radius-sm);
+                border: 1px solid var(--border);
+                font-family: &quot;Poppins&quot;, sans-serif;
+                font-size: 13px;
+                color: var(--text);
+                outline: none;
+                appearance: none;
+                background: #fff;
+              "
+            >
+              <option value="">— Select a category —</option>
+              <option value="vehicle">Vehicle Issue</option>
+              <option value="behavior">Driver / Customer Behavior</option>
+              <option value="payment">Payment Dispute</option>
+              <option value="safety">Safety Concern</option>
+              <option value="app">App / Platform Issue</option>
+            </select>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 14px">
+            <label
+              class="form-label"
+              style="
+                font-size: 12px;
+                font-weight: 600;
+                color: var(--text-light);
+                text-transform: uppercase;
+                letter-spacing: 0.4px;
+                display: block;
+                margin-bottom: 6px;
+              "
+              >Subject <span style="color: var(--danger)">*</span></label
+            >
+            <input
+              type="text"
+              class="form-control"
+              id="reportSubject"
+              placeholder="Brief title of your report"
+              style="
+                width: 100%;
+                height: 42px;
+                padding: 0 12px;
+                border-radius: var(--radius-sm);
+                border: 1px solid var(--border);
+                font-family: &quot;Poppins&quot;, sans-serif;
+                font-size: 13px;
+                color: var(--text);
+                outline: none;
+              "
+            />
+          </div>
+
+          <div class="form-group" style="margin-bottom: 14px">
+            <label
+              class="form-label"
+              style="
+                font-size: 12px;
+                font-weight: 600;
+                color: var(--text-light);
+                text-transform: uppercase;
+                letter-spacing: 0.4px;
+                display: block;
+                margin-bottom: 6px;
+              "
+              >Reported Party <span style="color: var(--danger)">*</span></label
+            >
+            <select
+              class="form-select"
+              id="reportedRole"
+              style="
+                width: 100%;
+                height: 42px;
+                padding: 0 12px;
+                border-radius: var(--radius-sm);
+                border: 1px solid var(--border);
+                font-family: &quot;Poppins&quot;, sans-serif;
+                font-size: 13px;
+                color: var(--text);
+                outline: none;
+                appearance: none;
+                background: #fff;
+              "
+            >
+              <option value="">— Who are you reporting? —</option>
+              <option value="CUSTOMER">Customer</option>
+              <option value="DRIVER">Driver</option>
+              <option value="COMPANY">Company</option>
+            </select>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 14px">
+            <label
+              class="form-label"
+              style="
+                font-size: 12px;
+                font-weight: 600;
+                color: var(--text-light);
+                text-transform: uppercase;
+                letter-spacing: 0.4px;
+                display: block;
+                margin-bottom: 6px;
+              "
+              >Priority</label
+            >
+            <div style="display: flex; gap: 8px; flex-wrap: wrap">
+              <label class="priority-option" data-value="Low">
+                <input
+                  type="radio"
+                  name="reportPriority"
+                  value="Low"
+                  checked
+                  style="display: none"
+                />
+                <span class="priority-pill low">Low</span>
+              </label>
+              <label class="priority-option" data-value="Medium">
+                <input
+                  type="radio"
+                  name="reportPriority"
+                  value="Medium"
+                  style="display: none"
+                />
+                <span class="priority-pill medium">Medium</span>
+              </label>
+              <label class="priority-option" data-value="High">
+                <input
+                  type="radio"
+                  name="reportPriority"
+                  value="High"
+                  style="display: none"
+                />
+                <span class="priority-pill high">High</span>
+              </label>
+              <label class="priority-option" data-value="Urgent">
+                <input
+                  type="radio"
+                  name="reportPriority"
+                  value="Urgent"
+                  style="display: none"
+                />
+                <span class="priority-pill urgent">Urgent</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 4px">
+            <label
+              class="form-label"
+              style="
+                font-size: 12px;
+                font-weight: 600;
+                color: var(--text-light);
+                text-transform: uppercase;
+                letter-spacing: 0.4px;
+                display: block;
+                margin-bottom: 6px;
+              "
+              >Description <span style="color: var(--danger)">*</span></label
+            >
+            <textarea
+              class="form-control"
+              id="reportDescription"
+              rows="4"
+              placeholder="Describe the issue in detail…"
+              style="
+                width: 100%;
+                padding: 10px 12px;
+                border-radius: var(--radius-sm);
+                border: 1px solid var(--border);
+                font-family: &quot;Poppins&quot;, sans-serif;
+                font-size: 13px;
+                color: var(--text);
+                outline: none;
+                resize: vertical;
+                line-height: 1.6;
+              "
+            ></textarea>
+
+            <div class="form-group report-attachment-group">
+              <label class="form-label report-label">
+                Attach Images
+                <span class="report-optional">(Optional)</span>
+              </label>
+
+              <div class="report-upload-box">
+                <label for="reportImages" class="report-upload-label">
+                  <i class="fas fa-image"></i>
+                  <span>Choose up to 5 images</span>
+                  <small>PNG, JPG, JPEG, WEBP</small>
+                </label>
+
+                <input
+                  type="file"
+                  id="reportImages"
+                  accept="image/png,image/jpeg,image/jpg,image/webp"
+                  multiple
+                  hidden
+                />
+              </div>
+
+              <div class="report-attachment-help">
+                Add photos related to the issue. Maximum 5 images, 5MB each.
+              </div>
+
+              <div
+                class="report-image-preview-list"
+                id="reportImagePreviewList"
+              ></div>
+            </div>
+          </div>
+
+          <div
+            id="reportError"
+            style="
+              display: none;
+              margin-top: 12px;
+              padding: 10px 14px;
+              background: rgba(247, 37, 133, 0.08);
+              border: 1px solid rgba(247, 37, 133, 0.2);
+              border-radius: var(--radius-sm);
+              color: #be185d;
+              font-size: 13px;
+              font-weight: 500;
+            "
+          >
+            <i
+              class="fas fa-circle-exclamation"
+              style="margin-right: 6px; font-size: 13px"
+            ></i>
+            <span id="reportErrorText"
+              >Please fill in all required fields.</span
+            >
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            onclick="closeReportModal()"
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            class="btn btn-danger-submit"
+            onclick="submitReport()"
+          >
+            <i class="fas fa-flag"></i> Submit Report
+          </button>
         </div>
       </div>
     </div>

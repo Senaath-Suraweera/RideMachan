@@ -25,232 +25,515 @@
     <!-- Page container -->
     <div class="container">
       <div class="main-content">
+        <!-- Dashboard-style page header -->
         <div class="page-header">
-          <h1>My Vehicles</h1>
-          <button class="btn btn-primary" onclick="openRegisterModal()">
-            <i class="fas fa-plus"></i> Register Vehicle
-          </button>
+          <div>
+            <h1>My Vehicles</h1>
+            <span class="page-subtitle"
+              >Manage your registered fleet and documentation</span
+            >
+          </div>
+
+          <div class="header-actions">
+            <button class="btn btn-primary" onclick="openRegisterModal()">
+              <i class="fas fa-plus"></i> Register Vehicle
+            </button>
+          </div>
+        </div>
+
+        <!-- Stats strip -->
+        <div class="stats-grid vehicles-stats">
+          <div class="stat-card">
+            <div class="stat-value" id="statTotal">0</div>
+            <div class="stat-label">Total Vehicles</div>
+            <div class="stat-change positive">
+              <i class="fas fa-car"></i> Fleet
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="statAvailable">0</div>
+            <div class="stat-label">Available</div>
+            <div class="stat-change positive">
+              <i class="fas fa-check-circle"></i> Active
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="statMaintenance">0</div>
+            <div class="stat-label">Maintenance</div>
+            <div class="stat-change pending">
+              <i class="fas fa-wrench"></i> In service
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="statUnavailable">0</div>
+            <div class="stat-label">Unavailable</div>
+            <div class="stat-change negative">
+              <i class="fas fa-ban"></i> Offline
+            </div>
+          </div>
         </div>
 
         <!-- Vehicles grid -->
         <div id="vehiclesGrid" class="vehicles-grid">
-          <p>Loading vehicles...</p>
+          <p class="empty-state-message">Loading vehicles...</p>
         </div>
       </div>
     </div>
 
-    <!-- Register Vehicle Modal -->
-    <div class="modal-overlay" id="registerVehicleModal">
-      <div class="modal">
+    <!-- ================= VEHICLE DETAILS MODAL ================= -->
+    <div class="modal-overlay" id="vehicleDetailsModal">
+      <div class="modal modal-large">
         <div class="modal-header">
-          <h2>Register a Vehicle</h2>
-          <button class="modal-close" onclick="closeRegisterModal()">×</button>
+          <div class="modal-header-content">
+            <h2 id="detailsTitle">Vehicle Details</h2>
+            <p id="detailsSubtitle" class="modal-subtitle">
+              Complete overview of your vehicle
+            </p>
+          </div>
+          <button
+            class="modal-close"
+            onclick="closeDetailsModal()"
+            aria-label="Close"
+          >
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+
+        <div class="modal-body details-body">
+          <!-- Hero image + quick meta -->
+          <div class="details-hero">
+            <div class="details-hero-image">
+              <img id="detailsImage" src="" alt="Vehicle image" />
+              <span id="detailsStatusBadge" class="vehicle-status available"
+                >Available</span
+              >
+            </div>
+            <div class="details-hero-info">
+              <h3 id="detailsName">Brand Model</h3>
+              <div class="details-price" id="detailsPrice">Rs. 0.00 / day</div>
+              <div class="details-meta-row">
+                <div class="meta-pill">
+                  <i class="fa-solid fa-location-dot"></i>
+                  <span id="detailsLocation">—</span>
+                </div>
+                <div class="meta-pill">
+                  <i class="fa-solid fa-id-card"></i>
+                  <span id="detailsPlate">—</span>
+                </div>
+                <div class="meta-pill">
+                  <i class="fa-solid fa-calendar"></i>
+                  <span id="detailsYear">—</span>
+                </div>
+              </div>
+
+              <div class="details-actions">
+                <button
+                  class="btn btn-outline"
+                  id="detailsViewDocBtn"
+                  onclick="viewRegistrationDoc()"
+                >
+                  <i class="fas fa-file-pdf"></i> View Registration Document
+                </button>
+                <button class="btn btn-primary" id="detailsEditBtn">
+                  <i class="fas fa-pen"></i> Edit Vehicle
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Specifications grid -->
+          <div class="details-section">
+            <div class="section-title">
+              <i class="fas fa-cogs"></i>
+              <h4>Specifications</h4>
+            </div>
+            <div class="spec-grid">
+              <div class="spec-item">
+                <div class="spec-label">Vehicle Type</div>
+                <div class="spec-value" id="detailsType">—</div>
+              </div>
+              <div class="spec-item">
+                <div class="spec-label">Fuel Type</div>
+                <div class="spec-value" id="detailsFuel">—</div>
+              </div>
+              <div class="spec-item">
+                <div class="spec-label">Transmission</div>
+                <div class="spec-value" id="detailsTransmission">—</div>
+              </div>
+              <div class="spec-item">
+                <div class="spec-label">Engine Capacity</div>
+                <div class="spec-value" id="detailsEngineCapacity">—</div>
+              </div>
+              <div class="spec-item">
+                <div class="spec-label">Tare Weight</div>
+                <div class="spec-value" id="detailsTareWeight">—</div>
+              </div>
+              <div class="spec-item">
+                <div class="spec-label">Passengers</div>
+                <div class="spec-value" id="detailsPassengers">—</div>
+              </div>
+              <div class="spec-item">
+                <div class="spec-label">Color</div>
+                <div class="spec-value" id="detailsColor">—</div>
+              </div>
+              <div class="spec-item">
+                <div class="spec-label">Milage</div>
+                <div class="spec-value" id="detailsMilage">—</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Identifiers -->
+          <div class="details-section">
+            <div class="section-title">
+              <i class="fas fa-fingerprint"></i>
+              <h4>Identifiers</h4>
+            </div>
+            <div class="spec-grid">
+              <div class="spec-item">
+                <div class="spec-label">Engine Number</div>
+                <div class="spec-value mono" id="detailsEngineNo">—</div>
+              </div>
+              <div class="spec-item">
+                <div class="spec-label">Chasis Number</div>
+                <div class="spec-value mono" id="detailsChasisNo">—</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Features -->
+          <div class="details-section">
+            <div class="section-title">
+              <i class="fas fa-star"></i>
+              <h4>Features</h4>
+            </div>
+            <div class="vehicle-features" id="detailsFeatures">
+              <span class="feature">No features</span>
+            </div>
+          </div>
+
+          <!-- Description -->
+          <div class="details-section">
+            <div class="section-title">
+              <i class="fas fa-align-left"></i>
+              <h4>Description</h4>
+            </div>
+            <p class="details-description" id="detailsDescription">
+              No description provided.
+            </p>
+          </div>
+
+          <!-- Timestamps -->
+          <div class="details-footer-meta">
+            <span
+              ><i class="fas fa-clock"></i> Registered:
+              <strong id="detailsCreatedAt">—</strong></span
+            >
+            <span
+              ><i class="fas fa-rotate"></i> Updated:
+              <strong id="detailsUpdatedAt">—</strong></span
+            >
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn btn-secondary" onclick="closeDetailsModal()">
+            Close
+          </button>
+          <button class="btn btn-danger" id="detailsDeleteBtn">
+            <i class="fas fa-trash"></i> Delete
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= DOCUMENT VIEWER MODAL ================= -->
+    <div class="modal-overlay" id="docViewerModal">
+      <div class="modal modal-doc">
+        <div class="modal-header">
+          <div class="modal-header-content">
+            <h2><i class="fas fa-file-pdf"></i> Registration Document</h2>
+            <p class="modal-subtitle" id="docViewerSubtitle">
+              Legal registration documentation
+            </p>
+          </div>
+          <button
+            class="modal-close"
+            onclick="closeDocViewer()"
+            aria-label="Close"
+          >
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <div class="modal-body doc-body">
+          <iframe id="docFrame" src="" title="Registration Document"></iframe>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" onclick="closeDocViewer()">
+            Close
+          </button>
+          <a
+            id="docDownloadBtn"
+            class="btn btn-primary"
+            href="#"
+            target="_blank"
+            rel="noopener"
+          >
+            <i class="fas fa-download"></i> Open in New Tab
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= REGISTER VEHICLE MODAL ================= -->
+    <div class="modal-overlay" id="registerVehicleModal">
+      <div class="modal modal-large">
+        <div class="modal-header">
+          <div class="modal-header-content">
+            <h2><i class="fas fa-plus-circle"></i> Register a Vehicle</h2>
+            <p class="modal-subtitle">Add a new vehicle to your fleet</p>
+          </div>
+          <button
+            class="modal-close"
+            onclick="closeRegisterModal()"
+            aria-label="Close"
+          >
+            <i class="fas fa-times"></i>
+          </button>
         </div>
         <div class="modal-body">
           <form id="registerVehicleForm" enctype="multipart/form-data">
-            <!-- NEW REQUIRED FIELD -->
-            <div class="form-row">
-              <div class="form-group">
-                <label class="form-label">Price Per Day (Rs.)</label>
-                <input
-                  type="number"
-                  step="0.01"
-                  name="price_per_day"
-                  class="form-control"
-                  required
-                />
+            <!-- Pricing & Location -->
+            <div class="form-section">
+              <div class="form-section-title">
+                <i class="fas fa-tag"></i> Pricing & Location
               </div>
-              <div class="form-group">
-                <label class="form-label">Location</label>
-                <input type="text" name="location" class="form-control" />
-              </div>
-            </div>
-
-            <!-- NEW FIELDS -->
-            <div class="form-row">
-              <div class="form-group">
-                <label class="form-label">Vehicle Type</label>
-                <input
-                  type="text"
-                  name="vehicle_type"
-                  class="form-control"
-                  placeholder="Car / SUV / Van..."
-                />
-              </div>
-              <div class="form-group">
-                <label class="form-label">Fuel Type</label>
-                <input
-                  type="text"
-                  name="fuel_type"
-                  class="form-control"
-                  placeholder="Petrol / Diesel / Hybrid..."
-                />
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Price Per Day (Rs.)</label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    name="price_per_day"
+                    class="form-control"
+                    required
+                  />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Location</label>
+                  <input type="text" name="location" class="form-control" />
+                </div>
               </div>
             </div>
 
-            <div class="form-row">
-              <div class="form-group">
-                <label class="form-label">Manufacture Year</label>
-                <input
-                  type="number"
-                  name="manufacture_year"
-                  class="form-control"
-                />
+            <!-- Vehicle Classification -->
+            <div class="form-section">
+              <div class="form-section-title">
+                <i class="fas fa-car-side"></i> Classification
               </div>
-              <div class="form-group">
-                <label class="form-label">Transmission</label>
-                <input
-                  type="text"
-                  name="transmission"
-                  class="form-control"
-                  placeholder="Automatic / Manual"
-                />
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Vehicle Type</label>
+                  <input
+                    type="text"
+                    name="vehicle_type"
+                    class="form-control"
+                    placeholder="Car / SUV / Van..."
+                  />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Fuel Type</label>
+                  <input
+                    type="text"
+                    name="fuel_type"
+                    class="form-control"
+                    placeholder="Petrol / Diesel / Hybrid..."
+                  />
+                </div>
               </div>
-            </div>
-
-            <div class="form-row">
-              <div class="form-group">
-                <label class="form-label">Availability Status</label>
-                <select name="availability_status" class="form-control">
-                  <option value="available" selected>available</option>
-                  <option value="unavailable">unavailable</option>
-                  <option value="maintenance">maintenance</option>
-                </select>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Manufacture Year</label>
+                  <input
+                    type="number"
+                    name="manufacture_year"
+                    class="form-control"
+                  />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Transmission</label>
+                  <input
+                    type="text"
+                    name="transmission"
+                    class="form-control"
+                    placeholder="Automatic / Manual"
+                  />
+                </div>
               </div>
-              <div class="form-group">
-                <label class="form-label">Features</label>
-                <input
-                  type="text"
-                  name="features"
-                  class="form-control"
-                  placeholder="AC, Bluetooth, Camera..."
-                />
-              </div>
-            </div>
-
-            <hr />
-
-            <!-- EXISTING FIELDS -->
-            <div class="form-row">
-              <div class="form-group">
-                <label class="form-label">Vehicle Brand</label>
-                <input
-                  type="text"
-                  name="vehiclebrand"
-                  class="form-control"
-                  required
-                />
-              </div>
-              <div class="form-group">
-                <label class="form-label">Vehicle Model</label>
-                <input
-                  type="text"
-                  name="vehiclemodel"
-                  class="form-control"
-                  required
-                />
-              </div>
-            </div>
-
-            <div class="form-row">
-              <div class="form-group">
-                <label class="form-label">Number Plate</label>
-                <input
-                  type="text"
-                  name="numberplatenumber"
-                  class="form-control"
-                  required
-                />
-              </div>
-              <div class="form-group">
-                <label class="form-label">Color</label>
-                <input type="text" name="color" class="form-control" required />
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Availability Status</label>
+                  <select name="availability_status" class="form-control">
+                    <option value="available" selected>available</option>
+                    <option value="unavailable">unavailable</option>
+                    <option value="maintenance">maintenance</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Features</label>
+                  <input
+                    type="text"
+                    name="features"
+                    class="form-control"
+                    placeholder="AC, Bluetooth, Camera..."
+                  />
+                </div>
               </div>
             </div>
 
-            <div class="form-row">
-              <div class="form-group">
-                <label class="form-label">Tare Weight (kg)</label>
-                <input
-                  type="number"
-                  name="tareweight"
-                  class="form-control"
-                  required
-                />
+            <!-- Identification -->
+            <div class="form-section">
+              <div class="form-section-title">
+                <i class="fas fa-id-card"></i> Identification
               </div>
-              <div class="form-group">
-                <label class="form-label">Engine Capacity (cc)</label>
-                <input
-                  type="number"
-                  name="enginecapacity"
-                  class="form-control"
-                  required
-                />
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Vehicle Brand</label>
+                  <input
+                    type="text"
+                    name="vehiclebrand"
+                    class="form-control"
+                    required
+                  />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Vehicle Model</label>
+                  <input
+                    type="text"
+                    name="vehiclemodel"
+                    class="form-control"
+                    required
+                  />
+                </div>
               </div>
-            </div>
-
-            <div class="form-row">
-              <div class="form-group">
-                <label class="form-label">Passengers</label>
-                <input
-                  type="number"
-                  name="numberofpassengers"
-                  class="form-control"
-                  required
-                />
-              </div>
-              <div class="form-group">
-                <label class="form-label">Milage</label>
-                <input type="text" name="milage" class="form-control" />
-              </div>
-            </div>
-
-            <div class="form-row">
-              <div class="form-group">
-                <label class="form-label">Engine Number</label>
-                <input
-                  type="text"
-                  name="enginenumber"
-                  class="form-control"
-                  required
-                />
-              </div>
-              <div class="form-group">
-                <label class="form-label">Chasis Number</label>
-                <input
-                  type="text"
-                  name="chasisnumber"
-                  class="form-control"
-                  required
-                />
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Number Plate</label>
+                  <input
+                    type="text"
+                    name="numberplatenumber"
+                    class="form-control"
+                    required
+                  />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Color</label>
+                  <input
+                    type="text"
+                    name="color"
+                    class="form-control"
+                    required
+                  />
+                </div>
               </div>
             </div>
 
-            <div class="form-group">
-              <label class="form-label">Description</label>
-              <textarea name="description" class="form-control"></textarea>
+            <!-- Technical -->
+            <div class="form-section">
+              <div class="form-section-title">
+                <i class="fas fa-cogs"></i> Technical Details
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Tare Weight (kg)</label>
+                  <input
+                    type="number"
+                    name="tareweight"
+                    class="form-control"
+                    required
+                  />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Engine Capacity (cc)</label>
+                  <input
+                    type="number"
+                    name="enginecapacity"
+                    class="form-control"
+                    required
+                  />
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Passengers</label>
+                  <input
+                    type="number"
+                    name="numberofpassengers"
+                    class="form-control"
+                    required
+                  />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Milage</label>
+                  <input type="text" name="milage" class="form-control" />
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Engine Number</label>
+                  <input
+                    type="text"
+                    name="enginenumber"
+                    class="form-control"
+                    required
+                  />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Chasis Number</label>
+                  <input
+                    type="text"
+                    name="chasisnumber"
+                    class="form-control"
+                    required
+                  />
+                </div>
+              </div>
             </div>
 
-            <div class="form-row">
-              <div class="form-group">
-                <label class="form-label">Registration Document (PDF)</label>
-                <input
-                  type="file"
-                  name="registrationdocumentation"
-                  class="form-control"
-                  accept=".pdf"
-                  required
-                />
+            <!-- Description & Files -->
+            <div class="form-section">
+              <div class="form-section-title">
+                <i class="fas fa-folder-open"></i> Description & Documents
               </div>
               <div class="form-group">
-                <label class="form-label">Vehicle Image</label>
-                <input
-                  type="file"
-                  name="vehicleimages"
+                <label class="form-label">Description</label>
+                <textarea
+                  name="description"
                   class="form-control"
-                  accept="image/*"
-                  required
-                />
+                  placeholder="Tell customers about this vehicle..."
+                ></textarea>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Registration Document (PDF)</label>
+                  <input
+                    type="file"
+                    name="registrationdocumentation"
+                    class="form-control"
+                    accept=".pdf"
+                    required
+                  />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Vehicle Image</label>
+                  <input
+                    type="file"
+                    name="vehicleimages"
+                    class="form-control"
+                    accept="image/*"
+                    required
+                  />
+                </div>
               </div>
             </div>
           </form>
@@ -265,263 +548,289 @@
             form="registerVehicleForm"
             class="btn btn-primary"
           >
-            Register
+            <i class="fas fa-check"></i> Register
           </button>
         </div>
       </div>
     </div>
 
-    <!-- Update Vehicle Modal -->
+    <!-- ================= UPDATE VEHICLE MODAL ================= -->
     <div class="modal-overlay" id="updateVehicleModal">
-      <div class="modal">
+      <div class="modal modal-large">
         <div class="modal-header">
-          <h2>Update Vehicle</h2>
-          <button class="modal-close" onclick="closeUpdateModal()">×</button>
+          <div class="modal-header-content">
+            <h2><i class="fas fa-pen-to-square"></i> Update Vehicle</h2>
+            <p class="modal-subtitle">Modify vehicle information</p>
+          </div>
+          <button
+            class="modal-close"
+            onclick="closeUpdateModal()"
+            aria-label="Close"
+          >
+            <i class="fas fa-times"></i>
+          </button>
         </div>
 
         <div class="modal-body">
           <form id="updateVehicleForm" enctype="multipart/form-data">
             <input type="hidden" id="updateVehicleId" name="vehicleid" />
 
-            <!-- NEW FIELDS -->
-            <div class="form-row">
-              <div class="form-group">
-                <label class="form-label">Price Per Day (Rs.)</label>
-                <input
-                  type="number"
-                  step="0.01"
-                  id="updatePricePerDay"
-                  name="price_per_day"
-                  class="form-control"
-                />
+            <div class="form-section">
+              <div class="form-section-title">
+                <i class="fas fa-tag"></i> Pricing & Location
               </div>
-              <div class="form-group">
-                <label class="form-label">Location</label>
-                <input
-                  type="text"
-                  id="updateLocation"
-                  name="location"
-                  class="form-control"
-                />
-              </div>
-            </div>
-
-            <div class="form-row">
-              <div class="form-group">
-                <label class="form-label">Vehicle Type</label>
-                <input
-                  type="text"
-                  id="updateVehicleType"
-                  name="vehicle_type"
-                  class="form-control"
-                />
-              </div>
-              <div class="form-group">
-                <label class="form-label">Fuel Type</label>
-                <input
-                  type="text"
-                  id="updateFuelType"
-                  name="fuel_type"
-                  class="form-control"
-                />
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Price Per Day (Rs.)</label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    id="updatePricePerDay"
+                    name="price_per_day"
+                    class="form-control"
+                  />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Location</label>
+                  <input
+                    type="text"
+                    id="updateLocation"
+                    name="location"
+                    class="form-control"
+                  />
+                </div>
               </div>
             </div>
 
-            <div class="form-row">
-              <div class="form-group">
-                <label class="form-label">Manufacture Year</label>
-                <input
-                  type="number"
-                  id="updateManufactureYear"
-                  name="manufacture_year"
-                  class="form-control"
-                />
+            <div class="form-section">
+              <div class="form-section-title">
+                <i class="fas fa-car-side"></i> Classification
               </div>
-              <div class="form-group">
-                <label class="form-label">Transmission</label>
-                <input
-                  type="text"
-                  id="updateTransmission"
-                  name="transmission"
-                  class="form-control"
-                />
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Vehicle Type</label>
+                  <input
+                    type="text"
+                    id="updateVehicleType"
+                    name="vehicle_type"
+                    class="form-control"
+                  />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Fuel Type</label>
+                  <input
+                    type="text"
+                    id="updateFuelType"
+                    name="fuel_type"
+                    class="form-control"
+                  />
+                </div>
               </div>
-            </div>
-
-            <div class="form-row">
-              <div class="form-group">
-                <label class="form-label">Availability Status</label>
-                <select
-                  id="updateAvailabilityStatus"
-                  name="availability_status"
-                  class="form-control"
-                >
-                  <option value="available">available</option>
-                  <option value="unavailable">unavailable</option>
-                  <option value="maintenance">maintenance</option>
-                </select>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Manufacture Year</label>
+                  <input
+                    type="number"
+                    id="updateManufactureYear"
+                    name="manufacture_year"
+                    class="form-control"
+                  />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Transmission</label>
+                  <input
+                    type="text"
+                    id="updateTransmission"
+                    name="transmission"
+                    class="form-control"
+                  />
+                </div>
               </div>
-              <div class="form-group">
-                <label class="form-label">Features</label>
-                <input
-                  type="text"
-                  id="updateFeatures"
-                  name="features"
-                  class="form-control"
-                />
-              </div>
-            </div>
-
-            <hr />
-
-            <!-- EXISTING FIELDS -->
-            <div class="form-row">
-              <div class="form-group">
-                <label class="form-label">Vehicle Brand</label>
-                <input
-                  type="text"
-                  id="updateBrand"
-                  name="vehiclebrand"
-                  class="form-control"
-                  required
-                />
-              </div>
-              <div class="form-group">
-                <label class="form-label">Vehicle Model</label>
-                <input
-                  type="text"
-                  id="updateModel"
-                  name="vehiclemodel"
-                  class="form-control"
-                  required
-                />
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Availability Status</label>
+                  <select
+                    id="updateAvailabilityStatus"
+                    name="availability_status"
+                    class="form-control"
+                  >
+                    <option value="available">available</option>
+                    <option value="unavailable">unavailable</option>
+                    <option value="maintenance">maintenance</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Features</label>
+                  <input
+                    type="text"
+                    id="updateFeatures"
+                    name="features"
+                    class="form-control"
+                  />
+                </div>
               </div>
             </div>
 
-            <div class="form-row">
-              <div class="form-group">
-                <label class="form-label">Number Plate</label>
-                <input
-                  type="text"
-                  id="updatePlate"
-                  name="numberplatenumber"
-                  class="form-control"
-                  required
-                />
+            <div class="form-section">
+              <div class="form-section-title">
+                <i class="fas fa-id-card"></i> Identification
               </div>
-              <div class="form-group">
-                <label class="form-label">Color</label>
-                <input
-                  type="text"
-                  id="updateColor"
-                  name="color"
-                  class="form-control"
-                  required
-                />
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Vehicle Brand</label>
+                  <input
+                    type="text"
+                    id="updateBrand"
+                    name="vehiclebrand"
+                    class="form-control"
+                    required
+                  />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Vehicle Model</label>
+                  <input
+                    type="text"
+                    id="updateModel"
+                    name="vehiclemodel"
+                    class="form-control"
+                    required
+                  />
+                </div>
               </div>
-            </div>
-
-            <div class="form-row">
-              <div class="form-group">
-                <label class="form-label">Tare Weight (kg)</label>
-                <input
-                  type="number"
-                  id="updateTareWeight"
-                  name="tareweight"
-                  class="form-control"
-                  required
-                />
-              </div>
-              <div class="form-group">
-                <label class="form-label">Engine Capacity (cc)</label>
-                <input
-                  type="number"
-                  id="updateEngineCapacity"
-                  name="enginecapacity"
-                  class="form-control"
-                  required
-                />
-              </div>
-            </div>
-
-            <div class="form-row">
-              <div class="form-group">
-                <label class="form-label">Passengers</label>
-                <input
-                  type="number"
-                  id="updatePassengers"
-                  name="numberofpassengers"
-                  class="form-control"
-                  required
-                />
-              </div>
-              <div class="form-group">
-                <label class="form-label">Milage</label>
-                <input
-                  type="text"
-                  id="updateMilage"
-                  name="milage"
-                  class="form-control"
-                />
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Number Plate</label>
+                  <input
+                    type="text"
+                    id="updatePlate"
+                    name="numberplatenumber"
+                    class="form-control"
+                    required
+                  />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Color</label>
+                  <input
+                    type="text"
+                    id="updateColor"
+                    name="color"
+                    class="form-control"
+                    required
+                  />
+                </div>
               </div>
             </div>
 
-            <div class="form-row">
-              <div class="form-group">
-                <label class="form-label">Engine Number</label>
-                <input
-                  type="text"
-                  id="updateEngineNumber"
-                  name="enginenumber"
-                  class="form-control"
-                  required
-                />
+            <div class="form-section">
+              <div class="form-section-title">
+                <i class="fas fa-cogs"></i> Technical Details
               </div>
-              <div class="form-group">
-                <label class="form-label">Chasis Number</label>
-                <input
-                  type="text"
-                  id="updateChasisNumber"
-                  name="chasisnumber"
-                  class="form-control"
-                  required
-                />
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Tare Weight (kg)</label>
+                  <input
+                    type="number"
+                    id="updateTareWeight"
+                    name="tareweight"
+                    class="form-control"
+                    required
+                  />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Engine Capacity (cc)</label>
+                  <input
+                    type="number"
+                    id="updateEngineCapacity"
+                    name="enginecapacity"
+                    class="form-control"
+                    required
+                  />
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Passengers</label>
+                  <input
+                    type="number"
+                    id="updatePassengers"
+                    name="numberofpassengers"
+                    class="form-control"
+                    required
+                  />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Milage</label>
+                  <input
+                    type="text"
+                    id="updateMilage"
+                    name="milage"
+                    class="form-control"
+                  />
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Engine Number</label>
+                  <input
+                    type="text"
+                    id="updateEngineNumber"
+                    name="enginenumber"
+                    class="form-control"
+                    required
+                  />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Chasis Number</label>
+                  <input
+                    type="text"
+                    id="updateChasisNumber"
+                    name="chasisnumber"
+                    class="form-control"
+                    required
+                  />
+                </div>
               </div>
             </div>
 
-            <div class="form-group">
-              <label class="form-label">Description</label>
-              <textarea
-                id="updateDescription"
-                name="description"
-                class="form-control"
-              ></textarea>
-            </div>
-
-            <div class="form-row">
-              <div class="form-group">
-                <label class="form-label">Registration Document (PDF)</label>
-                <input
-                  type="file"
-                  id="updateRegDoc"
-                  name="registrationdocumentation"
-                  class="form-control"
-                  accept=".pdf"
-                />
-                <small class="muted"
-                  >Leave empty to keep current document.</small
-                >
+            <div class="form-section">
+              <div class="form-section-title">
+                <i class="fas fa-folder-open"></i> Description & Documents
               </div>
               <div class="form-group">
-                <label class="form-label">Vehicle Image</label>
-                <input
-                  type="file"
-                  id="updateImage"
-                  name="vehicleimages"
+                <label class="form-label">Description</label>
+                <textarea
+                  id="updateDescription"
+                  name="description"
                   class="form-control"
-                  accept="image/*"
-                />
-                <small class="muted">Leave empty to keep current image.</small>
+                ></textarea>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Registration Document (PDF)</label>
+                  <input
+                    type="file"
+                    id="updateRegDoc"
+                    name="registrationdocumentation"
+                    class="form-control"
+                    accept=".pdf"
+                  />
+                  <small class="form-hint"
+                    >Leave empty to keep current document.</small
+                  >
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Vehicle Image</label>
+                  <input
+                    type="file"
+                    id="updateImage"
+                    name="vehicleimages"
+                    class="form-control"
+                    accept="image/*"
+                  />
+                  <small class="form-hint"
+                    >Leave empty to keep current image.</small
+                  >
+                </div>
               </div>
             </div>
           </form>
@@ -536,7 +845,7 @@
             form="updateVehicleForm"
             class="btn btn-primary"
           >
-            Update
+            <i class="fas fa-check"></i> Save Changes
           </button>
         </div>
       </div>
