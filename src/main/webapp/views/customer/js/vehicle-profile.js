@@ -1,68 +1,58 @@
+// =====================================================
+//  vehicle-profile.js  –  fully wired to backend
+// =====================================================
+
 // Global vehicle data
-let vehicleData = null;
-let isWishlisted = false;
-let selectedMode = 'self-drive';
-let bookingData = {
-    pickupDate: null,
-    pickupTime: null,
-    returnDate: null,
-    returnTime: null,
+let vehicleData      = null;
+let isWishlisted     = false;
+let selectedMode     = 'self-drive';
+let bookingData      = {
+    pickupDate: null, pickupTime: null,
+    returnDate: null, returnTime: null,
     pickupLocation: '',
-    hours: 0,
-    subtotal: 0,
-    serviceFee: 500,
-    total: 500
+    hours: 0, subtotal: 0, serviceFee: 500, total: 500
 };
 let currentCalendarMonth = new Date();
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     loadVehicleDetails();
 });
 
 // =====================================================
 // HELPER: Format date to yyyy-MM-dd using LOCAL time
-// This fixes the timezone bug where toISOString() shifts
-// dates back by 1 day in UTC+ timezones like Sri Lanka
 // =====================================================
 function toLocalDateString(date) {
-    const year = date.getFullYear();
+    const year  = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
+    const day   = String(date.getDate()).padStart(2, '0');
     return `${year}-${month}-${day}`;
 }
 
+// =====================================================
+// LOAD: Vehicle details + image + ratings
+// =====================================================
 async function loadVehicleDetails() {
-    // Get vehicle ID from URL parameter
     const urlParams = new URLSearchParams(window.location.search);
     const vehicleId = urlParams.get('id');
 
     if (!vehicleId) {
         showNotification('No vehicle ID provided', 'error');
-        setTimeout(() => {
-            window.location.href = 'search.html';
-        }, 2000);
+        setTimeout(() => { window.location.href = 'search.html'; }, 2000);
         return;
     }
 
     try {
-        // Fetch vehicle details from servlet
+        // 1. Vehicle details
         const response = await fetch(`/customer/vehicle-details?vehicleId=${vehicleId}`);
-
-        if (!response.ok) {
-            throw new Error('Failed to fetch vehicle details');
-        }
-
+        if (!response.ok) throw new Error('Failed to fetch vehicle details');
         vehicleData = await response.json();
+        if (!vehicleData) throw new Error('Vehicle not found');
 
-        if (!vehicleData) {
-            throw new Error('Vehicle not found');
-        }
-
-        // Fetch company name using FK (company_id)
+        // 2. Company name via FK
         if (vehicleData.companyId) {
-            const companyResponse = await fetch(`/customer/company-name?companyId=${vehicleData.companyId}`);
-            if (companyResponse.ok) {
-                const companyData = await companyResponse.json();
+            const companyRes = await fetch(`/customer/company-name?companyId=${vehicleData.companyId}`);
+            if (companyRes.ok) {
+                const companyData = await companyRes.json();
                 vehicleData.companyName = companyData.companyName || 'N/A';
             } else {
                 vehicleData.companyName = 'N/A';
@@ -71,49 +61,195 @@ async function loadVehicleDetails() {
             vehicleData.companyName = 'N/A';
         }
 
-        // Populate the page with vehicle data
+        // 3. Populate static details first
         populateVehicleDetails(vehicleData);
+
+        // 4. Load vehicle image (non-blocking)
+        loadVehicleImage(vehicleData.vehicleId || vehicleData.vehicleid);
+
+        // 5. Load ratings (non-blocking)
+        loadVehicleRatings(vehicleData.vehicleId || vehicleData.vehicleid);
 
     } catch (error) {
         console.error('Error loading vehicle details:', error);
         showNotification('Failed to load vehicle details', 'error');
-        setTimeout(() => {
-            window.location.href = 'search.html';
-        }, 2000);
+        setTimeout(() => { window.location.href = 'search.html'; }, 2000);
     }
 }
 
+// =====================================================
+// LOAD: Vehicle image from /vehicle/image?vehicleid=X
+// =====================================================
+function loadVehicleImage(vehicleId) {
+    if (!vehicleId) return;
+
+    const img      = document.getElementById('vehicleImage');
+    const fallback = document.getElementById('vehicleImageFallback');
+
+    if (!img) return;
+
+    // Build the URL that GetVehicleImageServlet responds to
+    img.src = `/vehicle/image?vehicleid=${vehicleId}`;
+
+    img.onload = function () {
+        img.style.display   = 'block';
+        fallback.style.display = 'none';
+    };
+
+    img.onerror = function () {
+        img.style.display      = 'none';
+        fallback.style.display = 'flex';
+    };
+}
+
+// =====================================================
+// LOAD: Ratings from GET /ratings/actor?actorType=VEHICLE&actorId=X
+// =====================================================
+async function loadVehicleRatings(vehicleId) {
+    if (!vehicleId) return;
+
+    try {
+        const res  = await fetch(`/ratings/actor?actorType=VEHICLE&actorId=${vehicleId}`);
+        if (!res.ok) throw new Error('Ratings fetch failed');
+        const data = await res.json();
+
+        if (!data.success) throw new Error('Ratings response not success');
+
+        const rating  = data.average || 0;
+        const reviews = data.total   || 0;
+
+        // Update both star blocks
+        updateStars('vehicleStars', rating);
+        updateStars('reviewStars',  rating);
+
+        // Score text
+        document.getElementById('overallRating').textContent = rating.toFixed(1);
+        document.getElementById('ratingText').textContent    = `${reviews} review${reviews !== 1 ? 's' : ''}`;
+        document.getElementById('ratingSummary').textContent =
+            reviews > 0
+                ? `Based on ${reviews} customer review${reviews !== 1 ? 's' : ''}`
+                : 'No reviews yet';
+
+        // Render individual review cards
+        renderReviews(data.reviews || []);
+
+    } catch (err) {
+        console.warn('Could not load ratings:', err);
+
+        // Graceful fallback — clear placeholders
+        updateStars('vehicleStars', 0);
+        updateStars('reviewStars',  0);
+        document.getElementById('overallRating').textContent = '—';
+        document.getElementById('ratingText').textContent    = 'No reviews yet';
+        document.getElementById('ratingSummary').textContent = 'No reviews available';
+    }
+}
+
+// Render the list of review cards
+function renderReviews(reviews) {
+    const container = document.getElementById('reviewsList');
+    if (!container) return;
+
+    if (reviews.length === 0) {
+        container.innerHTML = '<p style="color: var(--text-light); font-size:14px; margin-top:12px;">No customer reviews yet.</p>';
+        return;
+    }
+
+    container.innerHTML = reviews.map(r => `
+        <div class="review-card" style="
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 14px 16px;
+            margin-top: 12px;
+            background: #fafbff;
+        ">
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:6px;">
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <div style="
+                        width:36px; height:36px; border-radius:50%;
+                        background: linear-gradient(135deg, var(--secondary), var(--primary));
+                        display:flex; align-items:center; justify-content:center;
+                        color:white; font-weight:600; font-size:14px;
+                    ">${(r.name || 'A').charAt(0).toUpperCase()}</div>
+                    <div>
+                        <div style="font-weight:600; font-size:14px;">${escapeHtml(r.name || 'Anonymous')}</div>
+                        <div style="font-size:12px; color:var(--text-light);">${r.date || ''}</div>
+                    </div>
+                </div>
+                <div style="display:flex; gap:2px; color:#f4c430; font-size:13px;">
+                    ${renderStarHTML(r.rating || 0)}
+                </div>
+            </div>
+            ${r.text ? `<p style="font-size:13px; color:var(--text); margin:0; line-height:1.5;">${escapeHtml(r.text)}</p>` : ''}
+        </div>
+    `).join('');
+}
+
+function renderStarHTML(rating) {
+    let html = '';
+    for (let i = 1; i <= 5; i++) {
+        html += i <= rating
+            ? '<i class="fas fa-star"></i>'
+            : '<i class="far fa-star"></i>';
+    }
+    return html;
+}
+
+function escapeHtml(str) {
+    const div = document.createElement('div');
+    div.appendChild(document.createTextNode(str));
+    return div.innerHTML;
+}
+
+// =====================================================
+// POPULATE: Static vehicle details
+// =====================================================
 function populateVehicleDetails(vehicle) {
-    // Basic info
     const vehicleName = `${vehicle.vehicleBrand} ${vehicle.vehicleModel}`;
-    document.getElementById('vehicleName').textContent = vehicleName;
+    document.getElementById('vehicleName').textContent    = vehicleName;
     document.getElementById('vehicleCompany').textContent = vehicle.companyName || 'N/A';
     document.getElementById('vehicleLocation').textContent = vehicle.location || 'N/A';
 
-    // Price - convert daily rate to hourly (assuming 24 hours)
-    const hourlyRate = Math.round(vehicle.pricePerDay / 24);
-    const hourlyRateWithDriver = Math.round(hourlyRate * 1.3); // 30% more for with driver
-    document.getElementById('vehiclePrice').innerHTML = `LKR ${hourlyRate.toLocaleString()}<span class="price-period">/hour</span>`;
+    // ── Hourly rate ──────────────────────────────────────────
+    // Prefer explicit fields if backend ever adds them;
+    // fall back to pricePerDay / 24 formula.
+    const hourlyRate = vehicle.hourlyRate
+        ? Math.round(vehicle.hourlyRate)
+        : Math.round(vehicle.pricePerDay / 24);
 
-    // Store rates for booking
-    vehicleData.hourlyRate = hourlyRate;
+    const hourlyRateWithDriver = vehicle.withDriverRate
+        ? Math.round(vehicle.withDriverRate)
+        : Math.round(hourlyRate * 1.3);   // 30 % markup stays until backend provides it
+
+    document.getElementById('vehiclePrice').innerHTML =
+        `LKR ${hourlyRate.toLocaleString()}<span class="price-period">/hour</span>`;
+
+    // Attach computed rates to vehicleData for booking popup
+    vehicleData.hourlyRate           = hourlyRate;
     vehicleData.hourlyRateWithDriver = hourlyRateWithDriver;
-    vehicleData.name = vehicleName;
-    vehicleData.company = vehicle.companyName || 'N/A';
-    vehicleData.companyId = vehicle.companyId;
+    vehicleData.name                 = vehicleName;
+    vehicleData.company              = vehicle.companyName || 'N/A';
+    vehicleData.companyId            = vehicle.companyId;
 
-    // Rating (hardcoded for now - can be fetched from a ratings table later)
-    const rating = 4.7;
-    const reviews = 47;
-    document.getElementById('overallRating').textContent = rating.toFixed(1);
-    document.getElementById('ratingText').textContent = `${reviews} reviews`;
-    document.getElementById('ratingSummary').textContent = `Based on ${reviews} customer reviews`;
-    updateStars('vehicleStars', rating);
+    // ── Availability ─────────────────────────────────────────
+    const availDiv  = document.getElementById('availabilityStatus');
+    const availText = document.getElementById('availabilityText');
 
-    // Vehicle Meta Information
+    if (vehicle.availabilityStatus === 'available') {
+        availDiv.className = 'availability-status available';
+        availDiv.innerHTML = '<i class="fas fa-check-circle"></i><span>Available Now</span>';
+        availText.textContent = 'Next available: Immediately';
+    } else {
+        availDiv.className = 'availability-status unavailable';
+        availDiv.innerHTML = '<i class="fas fa-times-circle"></i><span>Currently Unavailable</span>';
+        // Show real next-available date if backend provides it
+        availText.textContent = vehicle.nextAvailableDate
+            ? `Next available: ${vehicle.nextAvailableDate}`
+            : 'Check back later for availability';
+    }
+
+    // ── Vehicle meta ─────────────────────────────────────────
     const metaContainer = document.getElementById('vehicleMeta');
-    const features = parseFeatures(vehicle.features);
-
     metaContainer.innerHTML = `
         <div class="meta-item">
             <span class="meta-label">Type:</span>
@@ -133,7 +269,15 @@ function populateVehicleDetails(vehicle) {
         </div>
     `;
 
-    // Key Features
+    // ── Key features ─────────────────────────────────────────
+    // transmission now comes from the dedicated DB column (vehicle.transmission).
+    // AC is parsed from features string as fallback; a dedicated hasAC field is
+    // used if the backend ever adds it.
+    const transmission = vehicle.transmission || parseTransmissionFromFeatures(vehicle.features);
+    const hasAC        = (vehicle.hasAC !== undefined)
+        ? vehicle.hasAC
+        : checkACInFeatures(vehicle.features);
+
     const featuresContainer = document.querySelector('.features-list');
     featuresContainer.innerHTML = `
         <div class="feature-item">
@@ -142,7 +286,7 @@ function populateVehicleDetails(vehicle) {
             </div>
             <div class="feature-content">
                 <div class="feature-title">Transmission</div>
-                <div class="feature-subtitle">${features.transmission || 'Automatic'}</div>
+                <div class="feature-subtitle">${transmission || 'N/A'}</div>
             </div>
         </div>
         <div class="feature-item">
@@ -169,65 +313,47 @@ function populateVehicleDetails(vehicle) {
             </div>
             <div class="feature-content">
                 <div class="feature-title">Air Conditioning</div>
-                <div class="feature-subtitle">${features.ac ? 'Yes' : 'Standard AC'}</div>
+                <div class="feature-subtitle">${hasAC ? 'Yes' : 'No'}</div>
             </div>
         </div>
         <div class="feature-item">
             <div class="feature-icon luggage">
-                <i class="fas fa-suitcase"></i>
+                <i class="fas fa-info-circle"></i>
             </div>
             <div class="feature-content">
                 <div class="feature-title">Description</div>
-                <div class="feature-subtitle">${vehicle.description || 'Comfortable ride'}</div>
+                <div class="feature-subtitle">${vehicle.description || 'No description available'}</div>
             </div>
         </div>
     `;
 
-    // Availability status
-    const availabilityDiv = document.querySelector('.availability-status');
-    if (vehicle.availabilityStatus === 'available') {
-        availabilityDiv.className = 'availability-status available';
-        availabilityDiv.innerHTML = '<i class="fas fa-check-circle"></i><span>Available Now</span>';
-        document.querySelector('.availability-text').textContent = 'Next available: Immediately';
-    } else {
-        availabilityDiv.className = 'availability-status unavailable';
-        availabilityDiv.innerHTML = '<i class="fas fa-times-circle"></i><span>Currently Unavailable</span>';
-        document.querySelector('.availability-text').textContent = 'Check back later for availability';
-    }
-
-    // Set pickup locations (use vehicle location as default)
+    // ── Pickup locations ──────────────────────────────────────
     const locationParts = vehicle.location ? vehicle.location.split(',') : ['Colombo'];
     vehicleData.pickupLocations = [vehicle.location, ...generateNearbyLocations(locationParts[0])];
 }
 
-function parseFeatures(featuresString) {
-    // Parse comma-separated features string
-    if (!featuresString) return {};
-
-    const features = {};
+// ── Feature helpers ───────────────────────────────────────────
+// Reads from the new dedicated `transmission` column first; this is only
+// the string-parse fallback for older rows that pre-date the column.
+function parseTransmissionFromFeatures(featuresString) {
+    if (!featuresString) return null;
     const parts = featuresString.split(',');
+    for (const f of parts) {
+        const lower = f.trim().toLowerCase();
+        if (lower.includes('automatic') || lower.includes('manual') || lower.includes('cvt')) {
+            return f.trim();
+        }
+    }
+    return null;
+}
 
-    parts.forEach(feature => {
-        const lower = feature.trim().toLowerCase();
-        if (lower.includes('a/c') || lower.includes('ac')) {
-            features.ac = true;
-        }
-        if (lower.includes('gps')) {
-            features.gps = true;
-        }
-        if (lower.includes('leather')) {
-            features.leather = true;
-        }
-        if (lower.includes('automatic') || lower.includes('cvt')) {
-            features.transmission = feature.trim();
-        }
-    });
-
-    return features;
+function checkACInFeatures(featuresString) {
+    if (!featuresString) return false;
+    const lower = featuresString.toLowerCase();
+    return lower.includes('a/c') || lower.includes(' ac') || lower.includes('air conditioning');
 }
 
 function generateNearbyLocations(city) {
-    // Generate nearby locations based on city
     const baseCity = city.trim();
     return [
         `${baseCity} 01`, `${baseCity} 02`, `${baseCity} 03`, `${baseCity} 04`,
@@ -235,22 +361,26 @@ function generateNearbyLocations(city) {
     ];
 }
 
+// =====================================================
+// STARS
+// =====================================================
 function updateStars(containerId, rating) {
     const container = document.getElementById(containerId);
-    let starsHTML = '';
-
+    if (!container) return;
+    let html = '';
     for (let i = 1; i <= 5; i++) {
-        starsHTML += i <= rating ? '<i class="fas fa-star"></i>' : '<i class="far fa-star"></i>';
+        html += i <= Math.round(rating)
+            ? '<i class="fas fa-star"></i>'
+            : '<i class="far fa-star"></i>';
     }
-
-    container.innerHTML = starsHTML;
+    container.innerHTML = html;
 }
 
+// =====================================================
+// BOOKING POPUP
+// =====================================================
 function bookVehicle() {
-    if (!vehicleData) {
-        showNotification('Vehicle data not loaded', 'error');
-        return;
-    }
+    if (!vehicleData) { showNotification('Vehicle data not loaded', 'error'); return; }
     showBookingPopup(vehicleData);
 }
 
@@ -258,6 +388,9 @@ function showBookingPopup(vehicle) {
     const locationOptions = (vehicle.pickupLocations || [vehicle.location]).map(loc =>
         `<option value="${loc}"${loc === vehicle.location ? ' selected' : ''}>${loc}</option>`
     ).join('');
+
+    // Service fee: use backend value if present, default LKR 500
+    const serviceFee = vehicle.serviceFee || 500;
 
     const popup = document.createElement('div');
     popup.className = 'popup-overlay';
@@ -273,28 +406,20 @@ function showBookingPopup(vehicle) {
                     <h4 class="section-title"><i class="fas fa-cog"></i> Select Booking Mode</h4>
                     <div class="mode-selection">
                         <div class="mode-option active" data-mode="self-drive" onclick="selectMode('self-drive')">
-                            <div class="mode-icon">
-                                <i class="fas fa-car"></i>
-                            </div>
+                            <div class="mode-icon"><i class="fas fa-car"></i></div>
                             <div class="mode-details">
                                 <div class="mode-title">Self Drive</div>
                                 <div class="mode-price">LKR ${vehicle.hourlyRate.toLocaleString()}/hour</div>
                             </div>
-                            <div class="mode-check">
-                                <i class="fas fa-check-circle"></i>
-                            </div>
+                            <div class="mode-check"><i class="fas fa-check-circle"></i></div>
                         </div>
                         <div class="mode-option" data-mode="with-driver" onclick="selectMode('with-driver')">
-                            <div class="mode-icon">
-                                <i class="fas fa-user-tie"></i>
-                            </div>
+                            <div class="mode-icon"><i class="fas fa-user-tie"></i></div>
                             <div class="mode-details">
                                 <div class="mode-title">With Driver</div>
                                 <div class="mode-price">LKR ${vehicle.hourlyRateWithDriver.toLocaleString()}/hour</div>
                             </div>
-                            <div class="mode-check">
-                                <i class="fas fa-check-circle"></i>
-                            </div>
+                            <div class="mode-check"><i class="fas fa-check-circle"></i></div>
                         </div>
                     </div>
                 </div>
@@ -302,13 +427,10 @@ function showBookingPopup(vehicle) {
                 <!-- Date Time Picker -->
                 <div class="booking-section">
                     <div class="datetime-picker-container">
-                        <h4 class="datetime-section-title"><i class="fas fa-calendar-alt"></i> Select Dates & Times</h4>
-                        
+                        <h4 class="datetime-section-title"><i class="fas fa-calendar-alt"></i> Select Dates &amp; Times</h4>
                         <div class="datetime-row">
                             <div class="datetime-field">
-                                <label class="datetime-label">
-                                    <i class="fas fa-map-marker-alt"></i> PICK-UP DATE
-                                </label>
+                                <label class="datetime-label"><i class="fas fa-map-marker-alt"></i> PICK-UP DATE</label>
                                 <div class="datetime-input-wrapper">
                                     <input type="text" id="pickupDateDisplay" class="datetime-input" placeholder="Select date" readonly onclick="focusPickupDate()" />
                                     <i class="fas fa-calendar datetime-input-icon"></i>
@@ -316,9 +438,7 @@ function showBookingPopup(vehicle) {
                                 <input type="hidden" id="pickupDate" />
                             </div>
                             <div class="datetime-field">
-                                <label class="datetime-label">
-                                    <i class="fas fa-clock"></i> PICK-UP TIME
-                                </label>
+                                <label class="datetime-label"><i class="fas fa-clock"></i> PICK-UP TIME</label>
                                 <div class="datetime-input-wrapper">
                                     <select id="pickupTime" class="datetime-input" onchange="updatePickupDisplay(); calculateDuration();">
                                         <option value="">Select time</option>
@@ -328,12 +448,9 @@ function showBookingPopup(vehicle) {
                                 </div>
                             </div>
                         </div>
-
                         <div class="datetime-row">
                             <div class="datetime-field">
-                                <label class="datetime-label">
-                                    <i class="fas fa-map-marker-alt"></i> DROP-OFF DATE
-                                </label>
+                                <label class="datetime-label"><i class="fas fa-map-marker-alt"></i> DROP-OFF DATE</label>
                                 <div class="datetime-input-wrapper">
                                     <input type="text" id="returnDateDisplay" class="datetime-input" placeholder="Select date" readonly onclick="focusReturnDate()" />
                                     <i class="fas fa-calendar datetime-input-icon"></i>
@@ -341,9 +458,7 @@ function showBookingPopup(vehicle) {
                                 <input type="hidden" id="returnDate" />
                             </div>
                             <div class="datetime-field">
-                                <label class="datetime-label">
-                                    <i class="fas fa-clock"></i> DROP-OFF TIME
-                                </label>
+                                <label class="datetime-label"><i class="fas fa-clock"></i> DROP-OFF TIME</label>
                                 <div class="datetime-input-wrapper">
                                     <select id="returnTime" class="datetime-input" onchange="updateReturnDisplay(); calculateDuration();">
                                         <option value="">Select time</option>
@@ -354,7 +469,7 @@ function showBookingPopup(vehicle) {
                             </div>
                         </div>
 
-                        <!-- Calendar View -->
+                        <!-- Calendar -->
                         <div class="calendar-wrapper">
                             <div class="calendar-header">
                                 <div class="calendar-nav">
@@ -365,18 +480,9 @@ function showBookingPopup(vehicle) {
                             </div>
                             <div class="calendar-grid" id="calendarGrid"></div>
                             <div class="calendar-legend">
-                                <div class="legend-item">
-                                    <div class="legend-color selected"></div>
-                                    <span>Selected</span>
-                                </div>
-                                <div class="legend-item">
-                                    <div class="legend-color unavailable"></div>
-                                    <span>Unavailable</span>
-                                </div>
-                                <div class="legend-item">
-                                    <div class="legend-color available"></div>
-                                    <span>Available</span>
-                                </div>
+                                <div class="legend-item"><div class="legend-color selected"></div><span>Selected</span></div>
+                                <div class="legend-item"><div class="legend-color unavailable"></div><span>Unavailable</span></div>
+                                <div class="legend-item"><div class="legend-color available"></div><span>Available</span></div>
                             </div>
                         </div>
 
@@ -421,99 +527,84 @@ function showBookingPopup(vehicle) {
                         </div>
                         <div class="cost-row">
                             <span>Service Fee:</span>
-                            <span id="serviceFee">LKR 500</span>
+                            <span id="serviceFeeDisplay">LKR ${serviceFee.toLocaleString()}</span>
                         </div>
                         <div class="cost-row total">
                             <span>Total Cost:</span>
-                            <span id="totalCost">LKR 500</span>
+                            <span id="totalCost">LKR ${serviceFee.toLocaleString()}</span>
                         </div>
                     </div>
                 </div>
             </div>
             <div class="popup-footer">
                 <button class="btn btn-outline" onclick="closePopup()">Cancel</button>
-                <button class="btn btn-primary" id="confirmBookingBtn" onclick="confirmBooking()" disabled style="opacity: 0.6; cursor: not-allowed;">
-                    <i class="fas fa-arrow-right"></i>
-                    Proceed to Payment
+                <button class="btn btn-primary" id="confirmBookingBtn" onclick="confirmBooking()" disabled style="opacity:0.6;cursor:not-allowed;">
+                    <i class="fas fa-arrow-right"></i> Proceed to Payment
                 </button>
             </div>
         </div>
     `;
     document.body.appendChild(popup);
 
-    setTimeout(() => {
-        renderCalendar();
-    }, 100);
+    // Store live service fee on bookingData
+    bookingData.serviceFee = serviceFee;
+
+    setTimeout(() => { renderCalendar(); }, 100);
 }
 
+// =====================================================
+// CALENDAR
+// =====================================================
 function renderCalendar() {
     if (!vehicleData) return;
 
-    const vehicle = vehicleData;
-    const bookedDates = vehicle.bookedDates || [];
+    const bookedDates = vehicleData.bookedDates || [];
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
     const month = currentCalendarMonth.getMonth();
-    const year = currentCalendarMonth.getFullYear();
+    const year  = currentCalendarMonth.getFullYear();
 
-    const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
-        'July', 'August', 'September', 'October', 'November', 'December'];
+    const monthNames = ['January','February','March','April','May','June',
+        'July','August','September','October','November','December'];
 
     document.getElementById('calendarMonthYear').textContent = `${monthNames[month]} ${year}`;
 
-    const firstDay = new Date(year, month, 1).getDay();
+    const firstDay    = new Date(year, month, 1).getDay();
     const daysInMonth = new Date(year, month + 1, 0).getDate();
 
     const grid = document.getElementById('calendarGrid');
     let html = '';
 
-    // Day headers
-    const dayHeaders = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-    dayHeaders.forEach(day => {
-        html += `<div class="calendar-day-header">${day}</div>`;
+    ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].forEach(d => {
+        html += `<div class="calendar-day-header">${d}</div>`;
     });
 
-    // Empty cells before month starts
     for (let i = 0; i < firstDay; i++) {
         html += '<div class="calendar-day other-month"></div>';
     }
 
-    // Get selected dates
     const selectedPickupDate = document.getElementById('pickupDate').value;
     const selectedReturnDate = document.getElementById('returnDate').value;
+    const todayStr           = toLocalDateString(today);
 
-    // Today's date string using LOCAL time
-    const todayStr = toLocalDateString(today);
-
-    // Days of month
     for (let day = 1; day <= daysInMonth; day++) {
-        const date = new Date(year, month, day);
+        const date    = new Date(year, month, day);
         date.setHours(0, 0, 0, 0);
-
         const dateStr = toLocalDateString(date);
 
-        const isToday = dateStr === todayStr;
-        const isBooked = bookedDates.includes(dateStr);
-        const isPastDate = date < today;
-        const isPickupSelected = dateStr === selectedPickupDate;
-        const isReturnSelected = dateStr === selectedReturnDate;
+        const isToday      = dateStr === todayStr;
+        const isBooked     = bookedDates.includes(dateStr);
+        const isPastDate   = date < today;
+        const isPickup     = dateStr === selectedPickupDate;
+        const isReturn     = dateStr === selectedReturnDate;
 
-        let classes = 'calendar-day';
+        let classes  = 'calendar-day';
         let clickable = true;
 
-        if (isBooked || isPastDate) {
-            classes += ' disabled';
-            clickable = false;
-        }
-
-        if (isToday && !isBooked && !isPastDate) {
-            classes += ' today';
-        }
-
-        if (isPickupSelected || isReturnSelected) {
-            classes += ' selected';
-        }
+        if (isBooked || isPastDate) { classes += ' disabled'; clickable = false; }
+        if (isToday && !isBooked && !isPastDate) classes += ' today';
+        if (isPickup || isReturn) classes += ' selected';
 
         const onclick = clickable ? `onclick="selectDate('${dateStr}')"` : '';
         html += `<div class="${classes}" ${onclick}>${day}</div>`;
@@ -524,39 +615,29 @@ function renderCalendar() {
 
 let selectingPickup = true;
 
-function focusPickupDate() {
-    selectingPickup = true;
-}
+function focusPickupDate() { selectingPickup = true; }
 
 function focusReturnDate() {
     const pickupDate = document.getElementById('pickupDate').value;
-    if (!pickupDate) {
-        showNotification('Please select pickup date first', 'warning');
-        return;
-    }
+    if (!pickupDate) { showNotification('Please select pickup date first', 'warning'); return; }
     selectingPickup = false;
 }
 
 function selectDate(dateStr) {
     const pickupDate = document.getElementById('pickupDate').value;
-    const returnDate = document.getElementById('returnDate').value;
 
-    // If selecting pickup date
     if (selectingPickup || !pickupDate) {
-        document.getElementById('pickupDate').value = dateStr;
-        document.getElementById('returnDate').value = '';
+        document.getElementById('pickupDate').value       = dateStr;
+        document.getElementById('returnDate').value       = '';
         document.getElementById('returnDateDisplay').value = '';
-        document.getElementById('returnTime').value = '';
+        document.getElementById('returnTime').value       = '';
         updatePickupDisplay();
         selectingPickup = false;
-    }
-    // If selecting return date
-    else {
+    } else {
         if (dateStr <= pickupDate) {
             showNotification('Drop-off date must be after pick-up date', 'warning');
             return;
         }
-
         document.getElementById('returnDate').value = dateStr;
         updateReturnDisplay();
     }
@@ -566,13 +647,13 @@ function selectDate(dateStr) {
 }
 
 function updatePickupDisplay() {
-    const dateValue = document.getElementById('pickupDate').value;
-    const timeValue = document.getElementById('pickupTime').value;
+    const dateValue   = document.getElementById('pickupDate').value;
+    const timeValue   = document.getElementById('pickupTime').value;
     const displayInput = document.getElementById('pickupDateDisplay');
 
     if (dateValue) {
-        const parts = dateValue.split('-');
-        const date = new Date(parts[0], parts[1] - 1, parts[2]);
+        const parts    = dateValue.split('-');
+        const date     = new Date(parts[0], parts[1] - 1, parts[2]);
         const formatted = formatDateForDisplay(date);
         displayInput.value = timeValue ? `${formatted}, ${formatTimeDisplay(timeValue)}` : formatted;
         displayInput.classList.add('filled');
@@ -580,18 +661,17 @@ function updatePickupDisplay() {
         displayInput.value = '';
         displayInput.classList.remove('filled');
     }
-
     validateBookingForm();
 }
 
 function updateReturnDisplay() {
-    const dateValue = document.getElementById('returnDate').value;
-    const timeValue = document.getElementById('returnTime').value;
+    const dateValue    = document.getElementById('returnDate').value;
+    const timeValue    = document.getElementById('returnTime').value;
     const displayInput = document.getElementById('returnDateDisplay');
 
     if (dateValue) {
-        const parts = dateValue.split('-');
-        const date = new Date(parts[0], parts[1] - 1, parts[2]);
+        const parts     = dateValue.split('-');
+        const date      = new Date(parts[0], parts[1] - 1, parts[2]);
         const formatted = formatDateForDisplay(date);
         displayInput.value = timeValue ? `${formatted}, ${formatTimeDisplay(timeValue)}` : formatted;
         displayInput.classList.add('filled');
@@ -599,35 +679,32 @@ function updateReturnDisplay() {
         displayInput.value = '';
         displayInput.classList.remove('filled');
     }
-
     validateBookingForm();
 }
 
 function formatDateForDisplay(date) {
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    const days   = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
     return `${days[date.getDay()]}, ${months[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`;
 }
 
 function formatTimeDisplay(timeStr) {
     if (!timeStr) return '';
     const [hours, minutes] = timeStr.split(':');
-    const hour = parseInt(hours);
+    const hour   = parseInt(hours);
     const period = hour >= 12 ? 'PM' : 'AM';
-    const displayHour = hour === 0 ? 12 : hour > 12 ? hour - 12 : hour;
-    return `${displayHour}:${minutes} ${period}`;
+    const display = hour === 0 ? 12 : hour > 12 ? hour - 12 : hour;
+    return `${display}:${minutes} ${period}`;
 }
 
 function previousMonth() {
     const today = new Date();
     currentCalendarMonth.setMonth(currentCalendarMonth.getMonth() - 1);
-
     if (currentCalendarMonth < new Date(today.getFullYear(), today.getMonth(), 1)) {
         currentCalendarMonth.setMonth(currentCalendarMonth.getMonth() + 1);
         showNotification('Cannot select past dates', 'warning');
         return;
     }
-
     renderCalendar();
 }
 
@@ -641,31 +718,33 @@ function generateTimeOptions() {
     for (let hour = 0; hour < 24; hour++) {
         for (let min = 0; min < 60; min += 30) {
             const timeStr = `${hour.toString().padStart(2, '0')}:${min.toString().padStart(2, '0')}`;
-            const displayTime = formatTimeDisplay(timeStr);
-            options += `<option value="${timeStr}">${displayTime}</option>`;
+            options += `<option value="${timeStr}">${formatTimeDisplay(timeStr)}</option>`;
         }
     }
     return options;
 }
 
+// =====================================================
+// MODE SELECTION
+// =====================================================
 function selectMode(mode) {
     if (!vehicleData) return;
 
     selectedMode = mode;
-    const vehicle = vehicleData;
-
-    document.querySelectorAll('.mode-option').forEach(opt => {
-        opt.classList.remove('active');
-    });
+    document.querySelectorAll('.mode-option').forEach(opt => opt.classList.remove('active'));
     document.querySelector(`[data-mode="${mode}"]`).classList.add('active');
 
-    const rate = mode === 'self-drive' ? vehicle.hourlyRate : vehicle.hourlyRateWithDriver;
-    document.getElementById('selectedModeText').textContent = mode === 'self-drive' ? 'Self Drive' : 'With Driver';
+    const rate = mode === 'self-drive' ? vehicleData.hourlyRate : vehicleData.hourlyRateWithDriver;
+    document.getElementById('selectedModeText').textContent =
+        mode === 'self-drive' ? 'Self Drive' : 'With Driver';
     document.getElementById('hourlyRate').textContent = `LKR ${rate.toLocaleString()}`;
 
     calculateDuration();
 }
 
+// =====================================================
+// DURATION & COST CALCULATION
+// =====================================================
 function calculateDuration() {
     const pickupDate = document.getElementById('pickupDate').value;
     const pickupTime = document.getElementById('pickupTime').value;
@@ -674,13 +753,14 @@ function calculateDuration() {
 
     if (!pickupDate || !pickupTime || !returnDate || !returnTime) {
         document.getElementById('durationSummaryContainer').style.display = 'none';
-        document.getElementById('durationText').textContent = '0 hours';
-        document.getElementById('totalCost').textContent = 'LKR 500';
+        document.getElementById('durationText').textContent  = '0 hours';
+        document.getElementById('totalCost').textContent =
+            `LKR ${bookingData.serviceFee.toLocaleString()}`;
         validateBookingForm();
         return;
     }
 
-    const pickup = new Date(`${pickupDate}T${pickupTime}`);
+    const pickup   = new Date(`${pickupDate}T${pickupTime}`);
     const returnDT = new Date(`${returnDate}T${returnTime}`);
 
     if (returnDT <= pickup) {
@@ -690,108 +770,85 @@ function calculateDuration() {
         return;
     }
 
-    const diffMs = returnDT - pickup;
-    const hours = Math.ceil(diffMs / (1000 * 60 * 60));
-
-    if (!vehicleData) return;
-    const vehicle = vehicleData;
-    const rate = selectedMode === 'self-drive' ? vehicle.hourlyRate : vehicle.hourlyRateWithDriver;
-    const serviceFee = 500;
+    const diffMs  = returnDT - pickup;
+    const hours   = Math.ceil(diffMs / (1000 * 60 * 60));
+    const rate     = selectedMode === 'self-drive' ? vehicleData.hourlyRate : vehicleData.hourlyRateWithDriver;
+    const fee      = bookingData.serviceFee;
     const subtotal = hours * rate;
-    const total = subtotal + serviceFee;
+    const total    = subtotal + fee;
 
-    document.getElementById('totalHours').textContent = `${hours} hour${hours > 1 ? 's' : ''}`;
-    document.getElementById('durationText').textContent = `${hours} hour${hours > 1 ? 's' : ''}`;
-    document.getElementById('totalCost').textContent = `LKR ${total.toLocaleString()}`;
+    document.getElementById('totalHours').textContent   = `${hours} hour${hours > 1 ? 's' : ''}`;
+    document.getElementById('durationText').textContent  = `${hours} hour${hours > 1 ? 's' : ''}`;
+    document.getElementById('totalCost').textContent     = `LKR ${total.toLocaleString()}`;
     document.getElementById('durationSummaryContainer').style.display = 'block';
 
-    const days = Math.floor(hours / 24);
+    const days           = Math.floor(hours / 24);
     const remainingHours = hours % 24;
     let note = '';
     if (days > 0) {
         note = `Approximately ${days} day${days > 1 ? 's' : ''}`;
-        if (remainingHours > 0) {
-            note += ` and ${remainingHours} hour${remainingHours > 1 ? 's' : ''}`;
-        }
+        if (remainingHours > 0) note += ` and ${remainingHours} hour${remainingHours > 1 ? 's' : ''}`;
     }
     document.getElementById('durationNote').textContent = note;
 
-    bookingData = {
-        pickupDate,
-        pickupTime,
-        returnDate,
-        returnTime,
-        hours,
-        subtotal,
-        serviceFee,
-        total
-    };
+    bookingData = { ...bookingData, pickupDate, pickupTime, returnDate, returnTime, hours, subtotal, total };
 
     validateBookingForm();
 }
 
 function validateBookingForm() {
-    const pickupDate = document.getElementById('pickupDate').value;
-    const pickupTime = document.getElementById('pickupTime').value;
-    const returnDate = document.getElementById('returnDate').value;
-    const returnTime = document.getElementById('returnTime').value;
-    const pickupLocation = document.getElementById('pickupLocation').value;
+    const ok =
+        document.getElementById('pickupDate').value &&
+        document.getElementById('pickupTime').value &&
+        document.getElementById('returnDate').value &&
+        document.getElementById('returnTime').value &&
+        document.getElementById('pickupLocation').value;
 
-    const confirmBtn = document.getElementById('confirmBookingBtn');
-
-    if (pickupDate && pickupTime && returnDate && returnTime && pickupLocation) {
-        confirmBtn.disabled = false;
-        confirmBtn.style.opacity = '1';
-        confirmBtn.style.cursor = 'pointer';
-    } else {
-        confirmBtn.disabled = true;
-        confirmBtn.style.opacity = '0.6';
-        confirmBtn.style.cursor = 'not-allowed';
-    }
+    const btn = document.getElementById('confirmBookingBtn');
+    if (!btn) return;
+    btn.disabled         = !ok;
+    btn.style.opacity    = ok ? '1'           : '0.6';
+    btn.style.cursor     = ok ? 'pointer'     : 'not-allowed';
 }
 
+// =====================================================
+// CONFIRM BOOKING
+// =====================================================
 async function confirmBooking() {
-    if (!vehicleData) {
-        showNotification('Vehicle data not loaded', 'error');
-        return;
-    }
+    if (!vehicleData) { showNotification('Vehicle data not loaded', 'error'); return; }
 
-    const vehicle = vehicleData;
     const pickupLocation = document.getElementById('pickupLocation').value.trim();
-
     if (!pickupLocation || !bookingData.pickupDate || !bookingData.pickupTime ||
-        !bookingData.returnDate || !bookingData.returnTime) {
+        !bookingData.returnDate  || !bookingData.returnTime) {
         showNotification('Please fill in all booking details', 'warning');
         return;
     }
 
     const confirmBtn = document.getElementById('confirmBookingBtn');
-    confirmBtn.disabled = true;
-    confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+    confirmBtn.disabled   = true;
+    confirmBtn.innerHTML  = '<i class="fas fa-spinner fa-spin"></i> Processing...';
 
     const requestBody = {
-        vehicleId: vehicle.vehicleId,
-        companyId: vehicle.companyId,
-        vehicleName: vehicle.name,
-        mode: selectedMode,
-        pickupDate: bookingData.pickupDate,
-        returnDate: bookingData.returnDate,
-        pickupTime: bookingData.pickupTime,
-        returnTime: bookingData.returnTime,
-        pickupLocation: pickupLocation,
-        hours: bookingData.hours,
-        hourlyRate: selectedMode === 'self-drive' ? vehicle.hourlyRate : vehicle.hourlyRateWithDriver,
-        subtotal: bookingData.subtotal,
-        serviceFee: bookingData.serviceFee,
-        totalCost: bookingData.total
+        vehicleId:       vehicleData.vehicleId,
+        companyId:       vehicleData.companyId,
+        vehicleName:     vehicleData.name,
+        mode:            selectedMode,
+        pickupDate:      bookingData.pickupDate,
+        returnDate:      bookingData.returnDate,
+        pickupTime:      bookingData.pickupTime,
+        returnTime:      bookingData.returnTime,
+        pickupLocation:  pickupLocation,
+        hours:           bookingData.hours,
+        hourlyRate:      selectedMode === 'self-drive' ? vehicleData.hourlyRate : vehicleData.hourlyRateWithDriver,
+        subtotal:        bookingData.subtotal,
+        serviceFee:      bookingData.serviceFee,
+        totalCost:       bookingData.total
     };
 
     try {
         const response = await fetch('/customer/create-booking', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(requestBody)
         });
 
@@ -800,7 +857,6 @@ async function confirmBooking() {
         if (result.success) {
             showNotification('Booking created! Ride ID: ' + result.rideId, 'success');
 
-            // Build booking details object for payment page
             const pParts = bookingData.pickupDate.split('-');
             const rParts = bookingData.returnDate.split('-');
             const pickupDateTime = new Date(pParts[0], pParts[1] - 1, pParts[2],
@@ -809,82 +865,72 @@ async function confirmBooking() {
                 ...bookingData.returnTime.split(':').map(Number));
 
             const bookingDetailsObj = {
-                rideId: result.rideId,
-                vehicleId: vehicle.vehicleId,
-                vehicleName: vehicle.name,
-                company: vehicle.company,
-                mode: selectedMode,
-                modeDisplay: selectedMode === 'self-drive' ? 'Self Drive' : 'With Driver',
-                pickupDate: bookingData.pickupDate,
-                pickupTime: bookingData.pickupTime,
-                pickupDateTime: pickupDateTime.toLocaleString('en-US', {
-                    weekday: 'short', year: 'numeric', month: 'short', day: 'numeric',
-                    hour: '2-digit', minute: '2-digit'
+                rideId:          result.rideId,
+                vehicleId:       vehicleData.vehicleId,
+                vehicleName:     vehicleData.name,
+                company:         vehicleData.company,
+                mode:            selectedMode,
+                modeDisplay:     selectedMode === 'self-drive' ? 'Self Drive' : 'With Driver',
+                pickupDate:      bookingData.pickupDate,
+                pickupTime:      bookingData.pickupTime,
+                pickupDateTime:  pickupDateTime.toLocaleString('en-US', {
+                    weekday:'short', year:'numeric', month:'short', day:'numeric',
+                    hour:'2-digit', minute:'2-digit'
                 }),
-                returnDate: bookingData.returnDate,
-                returnTime: bookingData.returnTime,
-                returnDateTime: returnDateTime.toLocaleString('en-US', {
-                    weekday: 'short', year: 'numeric', month: 'short', day: 'numeric',
-                    hour: '2-digit', minute: '2-digit'
+                returnDate:      bookingData.returnDate,
+                returnTime:      bookingData.returnTime,
+                returnDateTime:  returnDateTime.toLocaleString('en-US', {
+                    weekday:'short', year:'numeric', month:'short', day:'numeric',
+                    hour:'2-digit', minute:'2-digit'
                 }),
-                pickupLocation: pickupLocation,
-                hours: bookingData.hours,
-                hourlyRate: selectedMode === 'self-drive' ? vehicle.hourlyRate : vehicle.hourlyRateWithDriver,
-                subtotal: bookingData.subtotal,
-                serviceFee: bookingData.serviceFee,
-                totalCost: bookingData.total
+                pickupLocation,
+                hours:           bookingData.hours,
+                hourlyRate:      selectedMode === 'self-drive' ? vehicleData.hourlyRate : vehicleData.hourlyRateWithDriver,
+                subtotal:        bookingData.subtotal,
+                serviceFee:      bookingData.serviceFee,
+                totalCost:       bookingData.total
             };
 
-            // Store in BOTH memory and sessionStorage so the data survives page navigation
             window.bookingDetails = bookingDetailsObj;
-            try {
-                sessionStorage.setItem('bookingDetails', JSON.stringify(bookingDetailsObj));
-            } catch (e) {
-                console.error('Failed to save booking details to sessionStorage', e);
-            }
+            try { sessionStorage.setItem('bookingDetails', JSON.stringify(bookingDetailsObj)); }
+            catch (e) { console.error('sessionStorage save failed', e); }
 
-            // Navigate to payment page
-            setTimeout(() => {
-                window.location.href = 'payment.html';
-            }, 1500);
+            setTimeout(() => { window.location.href = 'payment.html'; }, 1500);
 
         } else {
             showNotification(result.message || 'Booking failed', 'error');
-            confirmBtn.disabled = false;
+            confirmBtn.disabled  = false;
             confirmBtn.innerHTML = '<i class="fas fa-arrow-right"></i> Proceed to Payment';
         }
 
     } catch (error) {
         console.error('Booking error:', error);
         showNotification('Failed to create booking. Please try again.', 'error');
-        confirmBtn.disabled = false;
+        confirmBtn.disabled  = false;
         confirmBtn.innerHTML = '<i class="fas fa-arrow-right"></i> Proceed to Payment';
     }
 }
 
-function messageOwner() {
-    showNotification('Message feature coming soon!', 'info');
-}
+// =====================================================
+// MISC ACTIONS
+// =====================================================
+function messageOwner() { showNotification('Message feature coming soon!', 'info'); }
 
 function toggleWishlist() {
-    const btn = document.getElementById('wishlistBtn');
-    const icon = btn.querySelector('i');
-
+    const btn  = document.getElementById('wishlistBtn');
     if (!isWishlisted) {
-        icon.classList.replace('far', 'fas');
-        btn.style.background = 'var(--danger)';
-        btn.style.color = 'white';
+        btn.style.background  = 'var(--danger)';
+        btn.style.color       = 'white';
         btn.style.borderColor = 'var(--danger)';
-        btn.innerHTML = '<i class="fas fa-heart"></i> Added to Wishlist';
-        isWishlisted = true;
+        btn.innerHTML         = '<i class="fas fa-heart"></i> Added to Wishlist';
+        isWishlisted          = true;
         showNotification('Added to wishlist!', 'success');
     } else {
-        icon.classList.replace('fas', 'far');
-        btn.style.background = 'transparent';
-        btn.style.color = 'var(--primary)';
+        btn.style.background  = 'transparent';
+        btn.style.color       = 'var(--primary)';
         btn.style.borderColor = 'var(--primary-light)';
-        btn.innerHTML = '<i class="far fa-heart"></i> Add to Wishlist';
-        isWishlisted = false;
+        btn.innerHTML         = '<i class="far fa-heart"></i> Add to Wishlist';
+        isWishlisted          = false;
         showNotification('Removed from wishlist!', 'info');
     }
 }
@@ -894,24 +940,18 @@ function closePopup() {
     if (popup) popup.remove();
 
     bookingData = {
-        pickupDate: null,
-        pickupTime: null,
-        returnDate: null,
-        returnTime: null,
+        pickupDate: null, pickupTime: null,
+        returnDate: null, returnTime: null,
         pickupLocation: '',
-        hours: 0,
-        subtotal: 0,
-        serviceFee: 500,
-        total: 500
+        hours: 0, subtotal: 0,
+        serviceFee: vehicleData?.serviceFee || 500,
+        total: vehicleData?.serviceFee || 500
     };
-
     currentCalendarMonth = new Date();
-    selectingPickup = true;
+    selectingPickup      = true;
 }
 
-function viewCompany() {
-    window.location.href = 'company-profile.html';
-}
+function viewCompany() { window.location.href = 'company-profile.html'; }
 
 function goBack() {
     if (document.referrer && document.referrer !== window.location.href) {
@@ -921,60 +961,36 @@ function goBack() {
     }
 }
 
-function handleLogout() {
-    if (confirm('Are you sure you want to logout?')) {
-        fetch('/customer/logout', { method: 'GET' })
-            .then(response => {
-                if (response.redirected) {
-                    window.location.href = response.url;
-                } else {
-                    window.location.href = '/views/landing/index.html';
-                }
-            })
-            .catch(error => {
-                console.error('Logout failed:', error);
-                window.location.href = '/views/landing/index.html';
-            });
-    }
-}
+// handleLogout is provided by header.js — no duplicate needed here.
 
-
+// =====================================================
+// NOTIFICATIONS
+// =====================================================
 function showNotification(message, type) {
     const notification = document.createElement('div');
 
-    const bgColor = type === 'success' ? 'var(--success)' :
-        type === 'warning' ? 'var(--warning)' :
-            type === 'error' ? 'var(--danger)' :
+    const bgColor = type === 'success' ? 'var(--success)'  :
+        type === 'warning' ? 'var(--warning)'  :
+            type === 'error'   ? 'var(--danger)'   :
                 'var(--info)';
 
-    const icon = type === 'success' ? 'fa-check-circle' :
+    const icon    = type === 'success' ? 'fa-check-circle'        :
         type === 'warning' ? 'fa-exclamation-triangle' :
-            type === 'error' ? 'fa-times-circle' :
+            type === 'error'   ? 'fa-times-circle'         :
                 'fa-info-circle';
 
     notification.style.cssText = `
-        position: fixed;
-        top: 20px;
-        right: 20px;
+        position: fixed; top: 20px; right: 20px;
         padding: 15px 20px;
-        background: ${bgColor};
-        color: white;
+        background: ${bgColor}; color: white;
         border-radius: var(--radius);
         box-shadow: var(--shadow-lg);
-        z-index: 10001;
-        font-weight: 500;
-        display: flex;
-        align-items: center;
-        gap: 10px;
+        z-index: 10001; font-weight: 500;
+        display: flex; align-items: center; gap: 10px;
         animation: slideInRight 0.3s ease;
         max-width: 400px;
     `;
-
-    notification.innerHTML = `
-        <i class="fas ${icon}"></i>
-        <span>${message}</span>
-    `;
-
+    notification.innerHTML = `<i class="fas ${icon}"></i><span>${message}</span>`;
     document.body.appendChild(notification);
 
     setTimeout(() => {
