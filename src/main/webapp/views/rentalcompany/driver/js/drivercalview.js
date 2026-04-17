@@ -1,5 +1,6 @@
 let selectedDate = null;
-
+let currentMonth = new Date().getMonth();
+let currentYear = new Date().getFullYear();
 
 document.addEventListener('DOMContentLoaded', async function () {
 
@@ -201,14 +202,54 @@ function createBookingCard(booking) {
 function initializeCalendar() {
 
     const today = new Date();
+
     selectedDate = today.toISOString().split('T')[0];
 
-    updateMonthLabel(today);
+    currentMonth = today.getMonth();
+    currentYear = today.getFullYear();
 
-    generateCalendarDays(today.getFullYear(), today.getMonth());
+    updateMonthLabel(currentYear, currentMonth);
+    generateCalendarDays(currentYear, currentMonth);
+    attachCalendarNavigation(); // 🔥 only call
 }
 
-function updateMonthLabel(date) {
+function attachCalendarNavigation() {
+
+    document.getElementById('prevMonth')?.addEventListener('click', goToPrevMonth);
+    document.getElementById('nextMonth')?.addEventListener('click', goToNextMonth);
+}
+
+function goToPrevMonth() {
+
+    currentMonth--;
+
+    if (currentMonth < 0) {
+        currentMonth = 11;
+        currentYear--;
+    }
+
+    refreshCalendar();
+}
+
+function goToNextMonth() {
+
+    currentMonth++;
+
+    if (currentMonth > 11) {
+        currentMonth = 0;
+        currentYear++;
+    }
+
+    refreshCalendar();
+}
+
+function refreshCalendar() {
+
+    updateMonthLabel(currentYear, currentMonth);
+    generateCalendarDays(currentYear, currentMonth);
+}
+
+function updateMonthLabel(year, month) {
 
     const months = [
         'January','February','March','April','May','June',
@@ -216,7 +257,7 @@ function updateMonthLabel(date) {
     ];
 
     document.getElementById('currentMonthYear').textContent =
-        `${months[date.getMonth()]} ${date.getFullYear()}`;
+        `${months[month]} ${year}`;
 }
 
 function generateCalendarDays(year, month) {
