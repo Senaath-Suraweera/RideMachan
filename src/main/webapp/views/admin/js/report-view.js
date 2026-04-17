@@ -2,6 +2,11 @@
 (() => {
   const $ = (selector, root = document) => root.querySelector(selector);
 
+  // ---------- Pagination State ----------
+  let currentRows = [];
+  let currentPage = 1;
+  let pageSize = 10;
+
   // ---------- Helpers ----------
   function escapeHTML(str) {
     return String(str ?? "")
@@ -137,17 +142,32 @@
   }
 
   function renderRows(rows) {
+    // Cache full list for paging + re-render current page
+    currentRows = rows || [];
+    renderCurrentPage();
+    renderPagination();
+  }
+
+  function renderCurrentPage() {
     const tbody = getTbody();
     if (!tbody) return;
 
+    const total = currentRows.length;
+    const totalPages = Math.max(1, Math.ceil(total / pageSize));
+    if (currentPage > totalPages) currentPage = totalPages;
+
     tbody.innerHTML = "";
 
-    if (!rows.length) {
+    if (!total) {
       renderEmptyRow();
       return;
     }
 
-    rows.forEach((r) => {
+    const start = (currentPage - 1) * pageSize;
+    const end = start + pageSize;
+    const pageRows = currentRows.slice(start, end);
+
+    pageRows.forEach((r) => {
       const reportId = r.reportId ?? r.report_id;
       const subject = r.subject || "";
       const cat = r.category || "";
@@ -183,6 +203,74 @@
     });
   }
 
+  // ---------- Pagination ----------
+  function buildPageButtons(current, totalPages) {
+    const parts = [];
+    const btn = (page, label, { active = false, disabled = false } = {}) =>
+      `<button type="button" class="pagination-btn${active ? " active" : ""}" data-page="${page}"${disabled ? " disabled" : ""}>${label}</button>`;
+
+    parts.push(
+      btn(current - 1, '<i class="fas fa-chevron-left"></i>', {
+        disabled: current <= 1,
+      }),
+    );
+
+    const pages = new Set([1, totalPages, current - 1, current, current + 1]);
+    const visible = [...pages]
+      .filter((p) => p >= 1 && p <= totalPages)
+      .sort((a, b) => a - b);
+
+    let prev = 0;
+    for (const p of visible) {
+      if (p - prev > 1) {
+        parts.push(`<span class="pagination-ellipsis">…</span>`);
+      }
+      parts.push(btn(p, String(p), { active: p === current }));
+      prev = p;
+    }
+
+    parts.push(
+      btn(current + 1, '<i class="fas fa-chevron-right"></i>', {
+        disabled: current >= totalPages,
+      }),
+    );
+
+    return parts.join("");
+  }
+
+  function renderPagination() {
+    const info = $("#reportsPaginationInfo");
+    const pagesEl = $("#reportsPages");
+    if (!info || !pagesEl) return;
+
+    const total = currentRows.length;
+    const totalPages = Math.max(1, Math.ceil(total / pageSize));
+    if (currentPage > totalPages) currentPage = totalPages;
+
+    if (total === 0) {
+      info.innerHTML = `Showing <strong>0</strong> of <strong>0</strong>`;
+      pagesEl.innerHTML = "";
+      return;
+    }
+
+    const start = (currentPage - 1) * pageSize + 1;
+    const end = Math.min(currentPage * pageSize, total);
+    info.innerHTML = `Showing <strong>${start}–${end}</strong> of <strong>${total}</strong> reports`;
+
+    pagesEl.innerHTML = buildPageButtons(currentPage, totalPages);
+    pagesEl.querySelectorAll("button[data-page]").forEach((b) => {
+      b.addEventListener("click", () => {
+        if (b.disabled || b.classList.contains("active")) return;
+        const p = parseInt(b.getAttribute("data-page"), 10);
+        if (!Number.isNaN(p)) {
+          currentPage = p;
+          renderCurrentPage();
+          renderPagination();
+        }
+      });
+    });
+  }
+
   // ---------- Render Stats ----------
   function renderStats(stats) {
     $("#totalReports").textContent = stats.total ?? 0;
@@ -198,7 +286,8 @@
   };
 
   // ---------- Loaders ----------
-  async function loadReports() {
+  async function loadReports({ resetPage = true } = {}) {
+    if (resetPage) currentPage = 1;
     const { status, category, search } = getFilters();
     const rows = await apiListReports({ status, category, search });
     renderRows(rows);
@@ -235,6 +324,13 @@
       window.__rptSearchTimer = setTimeout(() => {
         loadReports().catch((e) => console.error(e));
       }, 250);
+    });
+
+    $("#reportsPageSize")?.addEventListener("change", (e) => {
+      pageSize = parseInt(e.target.value, 10) || 10;
+      currentPage = 1;
+      renderCurrentPage();
+      renderPagination();
     });
   }
 

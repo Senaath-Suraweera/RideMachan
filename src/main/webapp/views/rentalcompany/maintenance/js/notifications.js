@@ -1,61 +1,65 @@
-// Select the user-profile div
-const userProfile = document.querySelector(".user-profile");
-
-// Create the dropdown menu dynamically
-const dropdownMenu = document.createElement("div");
-dropdownMenu.style.position = "absolute";
-dropdownMenu.style.top = "60px"; // adjust based on your header height
-dropdownMenu.style.right = "0";
-dropdownMenu.style.backgroundColor = "#fff";
-dropdownMenu.style.border = "1px solid #ccc";
-dropdownMenu.style.borderRadius = "5px";
-dropdownMenu.style.width = "150px";
-dropdownMenu.style.boxShadow = "0 2px 8px rgba(0,0,0,0.2)";
-dropdownMenu.style.display = "none";
-dropdownMenu.style.zIndex = "1000";
-dropdownMenu.style.fontFamily = "sans-serif";
-
-// Create "Profile" item
-const profileItem = document.createElement("div");
-profileItem.textContent = "Profile";
-profileItem.style.padding = "10px";
-profileItem.style.cursor = "pointer";
-profileItem.addEventListener("click", () => {
-  window.location.href = "staffprofile.html";
-});
-dropdownMenu.appendChild(profileItem);
-
-// Create "Logout" item
-const logoutItem = document.createElement("div");
-logoutItem.textContent = "Logout";
-logoutItem.style.padding = "10px";
-logoutItem.style.cursor = "pointer";
-logoutItem.addEventListener("click", () => {
-  alert("Logging out...");
-  window.location.href = "login.html"; // replace with your logout page
-});
-dropdownMenu.appendChild(logoutItem);
-
-// Append dropdown to userProfile and set relative position
-userProfile.style.position = "relative";
-userProfile.appendChild(dropdownMenu);
-
-// Toggle dropdown visibility when clicking the user profile
-userProfile.addEventListener("click", (e) => {
-  e.stopPropagation(); // prevent closing immediately
-  dropdownMenu.style.display =
-    dropdownMenu.style.display === "block" ? "none" : "block";
-});
-
-// Close dropdown if clicking outside
-document.addEventListener("click", () => {
-  dropdownMenu.style.display = "none";
-});
+// =========================================================
+//  notifications.js — Maintenance Staff page helpers
+//  Handles: user-profile dropdown, schedule-maintenance popup,
+//           and the vehicle condition report popup.
+//
+//  The notification list/count and "Mark as Read" buttons are
+//  handled by the inline <script> in notification.html which
+//  talks to /api/notifications/* directly.
+// =========================================================
 
 // ========================
-// Schedule Maintenance Popup - FULL CONTROL
+//  User profile dropdown
 // ========================
+(function initUserProfileDropdown() {
+  const userProfile = document.querySelector(".user-profile");
+  if (!userProfile) return;
 
+  const dropdownMenu = document.createElement("div");
+  dropdownMenu.style.cssText = `
+        position: absolute; top: 60px; right: 0;
+        background-color: #fff; border: 1px solid #ccc;
+        border-radius: 5px; width: 150px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        display: none; z-index: 1000; font-family: sans-serif;
+    `;
+
+  const profileItem = document.createElement("div");
+  profileItem.textContent = "Profile";
+  profileItem.style.padding = "10px";
+  profileItem.style.cursor = "pointer";
+  profileItem.addEventListener("click", () => {
+    window.location.href = "staffprofile.html";
+  });
+  dropdownMenu.appendChild(profileItem);
+
+  const logoutItem = document.createElement("div");
+  logoutItem.textContent = "Logout";
+  logoutItem.style.padding = "10px";
+  logoutItem.style.cursor = "pointer";
+  logoutItem.addEventListener("click", () => {
+    alert("Logging out...");
+    window.location.href = "login.html";
+  });
+  dropdownMenu.appendChild(logoutItem);
+
+  userProfile.style.position = "relative";
+  userProfile.appendChild(dropdownMenu);
+
+  userProfile.addEventListener("click", (e) => {
+    e.stopPropagation();
+    dropdownMenu.style.display =
+      dropdownMenu.style.display === "block" ? "none" : "block";
+  });
+
+  document.addEventListener("click", () => {
+    dropdownMenu.style.display = "none";
+  });
+})();
+
+// ========================
+//  Schedule Maintenance Popup
+// ========================
 document.addEventListener("DOMContentLoaded", () => {
   let overlay, modal, form, vehicleInput, dateInput, notesInput;
 
@@ -96,7 +100,7 @@ document.addEventListener("DOMContentLoaded", () => {
       "Vehicle ID",
       "text",
       "vehicleId",
-      "Enter vehicle ID"
+      "Enter vehicle ID",
     );
     form.appendChild(vehicleInput.wrapper);
 
@@ -132,7 +136,7 @@ document.addEventListener("DOMContentLoaded", () => {
     form.addEventListener("submit", (e) => {
       e.preventDefault();
       alert(
-        `✅ Maintenance scheduled!\n\nVehicle: ${vehicleInput.input.value}\nDate: ${dateInput.input.value}\nNotes: ${notesInput.input.value}`
+        `✅ Maintenance scheduled!\n\nVehicle: ${vehicleInput.input.value}\nDate: ${dateInput.input.value}\nNotes: ${notesInput.input.value}`,
       );
       closePopup();
     });
@@ -190,34 +194,45 @@ document.addEventListener("DOMContentLoaded", () => {
     if (overlay) overlay.style.display = "none";
   }
 
-  // ======= IMPORTANT: find the correct button =======
-  // Your HTML shows the button id is "openScheduleBtn".
+  // Only wire up if the Schedule button actually exists on the current page.
+  // (Maintenance notification page doesn't have it — dashboard does.)
   const scheduleBtn =
-    document.getElementById("openScheduleBtn") || // matches your HTML
-    document.getElementById("scheduleBtn") || // fallback if you rename later
-    document.querySelector('button[id^="open"]') || // fallback example
-    document.querySelector(".btn.btn-primary"); // last-resort fallback
-
-  if (!scheduleBtn) {
-    console.warn(
-      "Schedule button not found. Make sure the button has id='openScheduleBtn' or id='scheduleBtn'."
-    );
-    return;
+    document.getElementById("openScheduleBtn") ||
+    document.getElementById("scheduleBtn");
+  if (scheduleBtn) {
+    scheduleBtn.addEventListener("click", openPopup);
   }
-
-  scheduleBtn.addEventListener("click", openPopup);
 });
 
+// ========================
+//  Vehicle Condition Report Popup
+//  Uses event delegation so it works with dynamically-loaded notifications
+//  (REPORT type cards get the .vehicle-report CSS class from the renderer).
+// ========================
 document.addEventListener("DOMContentLoaded", () => {
-  const vehicleReport = document.getElementById("vehicleReportAlert");
-  if (!vehicleReport) return;
+  const notificationList = document.getElementById("notificationList");
+  if (!notificationList) return;
 
-  vehicleReport.addEventListener("click", () => {
-    openVehiclePopup();
+  notificationList.addEventListener("click", (e) => {
+    // Ignore clicks on the "Mark as Read" button itself
+    if (e.target.closest(".mark-read-btn")) return;
+
+    const card = e.target.closest(".notification-card.vehicle-report");
+    if (!card) return;
+
+    // Pull data off the card rendered by notification.html
+    const title =
+      card.querySelector(".sender-name")?.textContent?.trim() ||
+      "Vehicle Report";
+    const message =
+      card.querySelector(".notification-message")?.textContent?.trim() || "";
+    const refType = card.dataset.refType || "";
+    const refId = card.dataset.refId || "";
+
+    openVehiclePopup({ title, message, refType, refId });
   });
 
-  function openVehiclePopup() {
-    // Overlay
+  function openVehiclePopup({ title, message, refType, refId }) {
     const overlay = document.createElement("div");
     overlay.style.cssText = `
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -226,7 +241,6 @@ document.addEventListener("DOMContentLoaded", () => {
             z-index: 3000;
         `;
 
-    // Popup box
     const popup = document.createElement("div");
     popup.style.cssText = `
             background: #fff; padding: 30px;
@@ -234,42 +248,35 @@ document.addEventListener("DOMContentLoaded", () => {
             box-shadow: 0 10px 25px rgba(0,0,0,0.3);
             font-family: 'Poppins', sans-serif;
             position: relative;
-            animation: fadeIn 0.3s ease-in-out;
         `;
 
-    // Close button (×)
     const closeBtn = document.createElement("span");
     closeBtn.innerHTML = "&times;";
     closeBtn.style.cssText = `
             position: absolute; top: 12px; right: 18px;
             font-size: 26px; color: #666; cursor: pointer;
-            transition: 0.2s;
         `;
     closeBtn.onmouseover = () => (closeBtn.style.color = "#000");
     closeBtn.onmouseout = () => (closeBtn.style.color = "#666");
     closeBtn.onclick = () => document.body.removeChild(overlay);
 
-    // Title
-    const title = document.createElement("h2");
-    title.textContent = "Vehicle DEF-789 Condition Report";
-    title.style.cssText = `
+    const titleEl = document.createElement("h2");
+    titleEl.textContent = title;
+    titleEl.style.cssText = `
             margin-bottom: 20px; color: #333;
             font-size: 1.4em; text-align: center;
         `;
 
-    // Input section
+    // Build readable fields from what we actually know
     const fields = [
-      { label: "Category of Issue", value: "Engine Overheating" },
-      { label: "Location of Issue", value: "Downtown Mall" },
-      { label: "Related Booking ID", value: "#BK-2345" },
-      { label: "Vehicle Plate Number", value: "DEF-789" },
+      {
+        label: "Report Reference",
+        value: refType && refId ? `#${refType}-${refId}` : "N/A",
+      },
     ];
 
     const formContainer = document.createElement("div");
-    formContainer.style.cssText = `
-            display: flex; flex-direction: column; gap: 15px;
-            margin-bottom: 20px;
-        `;
+    formContainer.style.cssText = `display: flex; flex-direction: column; gap: 15px; margin-bottom: 20px;`;
 
     fields.forEach((f) => {
       const wrapper = document.createElement("div");
@@ -293,7 +300,7 @@ document.addEventListener("DOMContentLoaded", () => {
       formContainer.appendChild(wrapper);
     });
 
-    // Description (textarea)
+    // Description
     const descWrapper = document.createElement("div");
     const descLabel = document.createElement("label");
     descLabel.textContent = "Description";
@@ -301,8 +308,7 @@ document.addEventListener("DOMContentLoaded", () => {
       "font-weight: 500; color: #444; margin-bottom: 5px;";
     const descArea = document.createElement("textarea");
     descArea.readOnly = true;
-    descArea.value =
-      "Driver reported engine overheating with temperature gauge in red. Vehicle parked at Downtown Mall awaiting inspection.";
+    descArea.value = message;
     descArea.style.cssText = `
             width: 100%; height: 80px; resize: none;
             padding: 8px 10px; border: 1px solid #ccc;
@@ -310,72 +316,47 @@ document.addEventListener("DOMContentLoaded", () => {
         `;
     descWrapper.appendChild(descLabel);
     descWrapper.appendChild(descArea);
-
     formContainer.appendChild(descWrapper);
 
-    // Download Image Button
-    const downloadBtn = document.createElement("button");
-    downloadBtn.textContent = "Download Issue Image";
-    downloadBtn.style.cssText = `
-            background: #2196F3; color: #fff; border: none;
-            padding: 10px 16px; border-radius: 6px;
-            cursor: pointer; font-size: 0.95em;
-            width: 100%; margin-bottom: 20px;
-        `;
-    downloadBtn.onclick = () => {
-      const link = document.createElement("a");
-      link.href = "images/engine-issue.jpg"; // <-- replace with your image path
-      link.download = "vehicle-DEF-789-issue.jpg";
-      link.click();
-    };
-
-    // Buttons container
     const btnContainer = document.createElement("div");
     btnContainer.style.cssText =
       "display: flex; justify-content: center; gap: 10px;";
 
-    // View Calendar
     const viewBtn = document.createElement("button");
     viewBtn.textContent = "Go to Maintenance Calendar";
     viewBtn.style.cssText = `
             background: #4CAF50; color: #fff;
             border: none; padding: 10px 20px;
-            border-radius: 6px; cursor: pointer;
-            font-size: 0.95em;
+            border-radius: 6px; cursor: pointer; font-size: 0.95em;
         `;
-    viewBtn.onclick = () =>
-      window.open("../html/maintenance-calender - ABC-1234.html", "_blank");
+    viewBtn.onclick = () => window.open("maintenance-calender.html", "_blank");
 
-    // Cancel
     const cancelBtn = document.createElement("button");
     cancelBtn.textContent = "Close";
     cancelBtn.style.cssText = `
             background: #f44336; color: #fff;
             border: none; padding: 10px 20px;
-            border-radius: 6px; cursor: pointer;
-            font-size: 0.95em;
+            border-radius: 6px; cursor: pointer; font-size: 0.95em;
         `;
     cancelBtn.onclick = () => document.body.removeChild(overlay);
 
     btnContainer.appendChild(viewBtn);
     btnContainer.appendChild(cancelBtn);
 
-    // Combine everything
     popup.appendChild(closeBtn);
-    popup.appendChild(title);
+    popup.appendChild(titleEl);
     popup.appendChild(formContainer);
-    popup.appendChild(downloadBtn);
     popup.appendChild(btnContainer);
 
     overlay.appendChild(popup);
     document.body.appendChild(overlay);
 
-    // Close when clicking outside
     overlay.addEventListener("click", (e) => {
       if (e.target === overlay) document.body.removeChild(overlay);
     });
   }
 });
 
-const btn = document.getElementsByClassName("btn-secondary")[0];
-btn.onclick = () => alert("All marked as read!");
+// NOTE: The old "btn.onclick = alert('All marked as read!')" handler has been
+// removed. The real Mark-All-as-Read button is wired up to the API in
+// notification.html's inline script via #markAllReadBtn.

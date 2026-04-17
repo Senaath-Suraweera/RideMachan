@@ -111,20 +111,16 @@
           <div style="padding: 16px; color: #6b7280">Loading bookings…</div>
         </div>
 
-        <!-- Load More -->
-        <div
-          class="load-more-section"
-          id="loadMoreSection"
+        <!-- Pagination -->
+        <nav
+          class="pagination-section"
+          id="paginationSection"
+          aria-label="Bookings pagination"
           style="display: none"
         >
-          <button
-            class="btn btn-secondary"
-            id="loadMoreBtn"
-            onclick="loadMoreBookings()"
-          >
-            <i class="fas fa-chevron-down"></i> Load More Bookings
-          </button>
-        </div>
+          <div class="pagination-info" id="paginationInfo"></div>
+          <ul class="pagination" id="paginationList"></ul>
+        </nav>
       </div>
       <!-- /.main-content -->
     </div>

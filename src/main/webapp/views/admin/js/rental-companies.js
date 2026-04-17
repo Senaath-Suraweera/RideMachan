@@ -1,4 +1,4 @@
-// rental-companies.js — list, filters, + register company modal (backend-driven)
+// rental-companies.js — list, filters, pagination + register company modal (backend-driven)
 
 class RentalCompaniesApp {
   constructor() {
@@ -6,6 +6,11 @@ class RentalCompaniesApp {
     this.filteredCompanies = [];
     this.minRating = 0;
     this.API_LIST = "/admin/rentalcompanies";
+
+    // Pagination state
+    this.page = 1;
+    this.pageSize = 10;
+
     this.init();
   }
 
@@ -14,6 +19,7 @@ class RentalCompaniesApp {
     this.initializeRatingFilter();
     this.bindEventListeners();
     this.bindRegisterCompanyModal();
+    this.bindPaginationControls();
     await this.loadCompanies();
     this.populateLocationFilter();
     this.applyFilters();
@@ -39,6 +45,12 @@ class RentalCompaniesApp {
 
     this.searchBtn = document.getElementById("btnSearch");
     this.resetBtn = document.getElementById("btnReset");
+
+    // Pagination elements
+    this.paginationWrapper = document.getElementById("paginationWrapper");
+    this.paginationInfo = document.getElementById("paginationInfo");
+    this.paginationControls = document.getElementById("paginationControls");
+    this.pageSizeSelect = document.getElementById("pageSizeSelect");
   }
 
   async loadCompanies() {
@@ -80,6 +92,7 @@ class RentalCompaniesApp {
       this.grid.innerHTML =
         '<div class="no-results">Failed to load companies from server.</div>';
       this.countEl.textContent = "0 companies";
+      this.renderPagination();
     }
   }
 
@@ -144,6 +157,18 @@ class RentalCompaniesApp {
       e.preventDefault();
       this.resetFilters();
     });
+  }
+
+  bindPaginationControls() {
+    if (this.pageSizeSelect) {
+      this.pageSizeSelect.addEventListener("change", () => {
+        this.pageSize = parseInt(this.pageSizeSelect.value, 10) || 10;
+        this.page = 1;
+        this.renderCompanies();
+        this.updateCount();
+        this.renderPagination();
+      });
+    }
   }
 
   bindRegisterCompanyModal() {
@@ -272,8 +297,13 @@ class RentalCompaniesApp {
     });
 
     this.sortCompanies(filters.sort);
+
+    // Reset to page 1 whenever filters change
+    this.page = 1;
+
     this.renderCompanies();
     this.updateCount();
+    this.renderPagination();
   }
 
   sortCompanies(sortBy) {
@@ -292,15 +322,26 @@ class RentalCompaniesApp {
     }
   }
 
+  getPagedCompanies() {
+    const totalPages = Math.max(
+      1,
+      Math.ceil(this.filteredCompanies.length / this.pageSize),
+    );
+    if (this.page > totalPages) this.page = totalPages;
+    if (this.page < 1) this.page = 1;
+    const start = (this.page - 1) * this.pageSize;
+    const end = start + this.pageSize;
+    return this.filteredCompanies.slice(start, end);
+  }
+
   renderCompanies() {
     if (!this.filteredCompanies.length) {
       this.grid.innerHTML =
         '<div class="no-results">No companies match your filters. Try adjusting your search criteria.</div>';
       return;
     }
-    this.grid.innerHTML = this.filteredCompanies
-      .map((c) => this.createCompanyCard(c))
-      .join("");
+    const paged = this.getPagedCompanies();
+    this.grid.innerHTML = paged.map((c) => this.createCompanyCard(c)).join("");
   }
 
   createCompanyCard(company) {
@@ -354,6 +395,95 @@ class RentalCompaniesApp {
 
     </div>
   `;
+  }
+
+  /* ================================================================
+     PAGINATION
+     ================================================================ */
+  renderPagination() {
+    if (!this.paginationWrapper) return;
+
+    const total = this.filteredCompanies.length;
+    const totalPages = Math.max(1, Math.ceil(total / this.pageSize));
+
+    if (total === 0) {
+      this.paginationWrapper.style.display = "none";
+      return;
+    }
+
+    this.paginationWrapper.style.display = "";
+
+    const start = (this.page - 1) * this.pageSize + 1;
+    const end = Math.min(this.page * this.pageSize, total);
+
+    if (this.paginationInfo) {
+      this.paginationInfo.innerHTML = `Showing <strong>${start}–${end}</strong> of <strong>${total}</strong>`;
+    }
+
+    if (this.paginationControls) {
+      this.paginationControls.innerHTML = this.buildPageButtonsHTML(
+        this.page,
+        totalPages,
+      );
+      this.paginationControls.querySelectorAll("[data-page]").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const p = parseInt(btn.dataset.page, 10);
+          if (!Number.isFinite(p) || p === this.page) return;
+          this.page = p;
+          this.renderCompanies();
+          this.updateCount();
+          this.renderPagination();
+          this.grid.scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+      });
+    }
+  }
+
+  buildPageButtonsHTML(current, totalPages) {
+    const pages = this.getPageRange(current, totalPages);
+    let html = "";
+
+    // Prev
+    html += `<button class="pagination-btn" data-page="${current - 1}" ${current === 1 ? "disabled" : ""} aria-label="Previous page">
+      <i class="fas fa-chevron-left"></i>
+    </button>`;
+
+    pages.forEach((p) => {
+      if (p === "...") {
+        html += `<span class="pagination-ellipsis">…</span>`;
+      } else {
+        html += `<button class="pagination-btn ${p === current ? "active" : ""}" data-page="${p}">${p}</button>`;
+      }
+    });
+
+    // Next
+    html += `<button class="pagination-btn" data-page="${current + 1}" ${current === totalPages ? "disabled" : ""} aria-label="Next page">
+      <i class="fas fa-chevron-right"></i>
+    </button>`;
+
+    return html;
+  }
+
+  getPageRange(current, total) {
+    const pages = [];
+    const delta = 1; // pages shown either side of current
+
+    if (total <= 7) {
+      for (let i = 1; i <= total; i++) pages.push(i);
+      return pages;
+    }
+
+    pages.push(1);
+    if (current - delta > 2) pages.push("...");
+
+    const from = Math.max(2, current - delta);
+    const to = Math.min(total - 1, current + delta);
+    for (let i = from; i <= to; i++) pages.push(i);
+
+    if (current + delta < total - 1) pages.push("...");
+    pages.push(total);
+
+    return pages;
   }
 
   updateCount() {

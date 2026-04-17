@@ -1,533 +1,529 @@
+/* =============================================================================
+ * staffprofile.js — fixed version
+ *   - Proper event wiring (no stacked listeners, no accidental modal opens)
+ *   - Full edit-profile modal with every editable field
+ *   - Change-password flow with current-password verification
+ * ============================================================================= */
+
+// ---------- Login guard --------------------------------------------------------
 async function checkLogin() {
-
-    try {
-
-        const response = await fetch("/check/login/maintenance");
-        const data = await response.json();
-
-        if (!data.loggedIn) {
-
-            const modal = document.getElementById("loginModal");
-            modal.style.display = "flex";
-
-
-            document.getElementById("loginOkBtn").onclick = () => {
-
-                window.location.href = "/views/landing/maintenancelogin.html";
-
-            };
-
-            return false;
-
-        }
-
-        console.log("User is logged in.");
-        return true;
-
-    } catch (err) {
-
-        console.error("Error checking login:", err);
-        return false;
-
-    }
-
-}
-
-let profileData;
-
-async function LoadProfile() {
-
-    try {
-
-        let response = await fetch(`/load/maintenance/profile`);
-
-        if(!response.ok){
-            throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-
-        let data = await response.json();
-
-        console.log(data);
-
-
-        return data;
-
-    }catch (err) {
-
-        console.log(err);
-
-    }
-
-}
-
-
-async function UpdateProfile() {
-
-    try {
-
-        const firstname = document.getElementById("firstNameInput").value;
-        const lastname  = document.getElementById("lastNameInput").value;
-        const phone     = document.getElementById("phoneInput").value;
-        const email     = document.getElementById("emailInput").value;
-
-
-        if (!validate(firstname, rules.name, "First Name")) return;
-        if (!validate(lastname, rules.name, "Last Name")) return;
-        if (!validate(phone, rules.phone, "Phone Number")) return;
-        if (!validate(email, rules.email, "Email")) return;
-
-        let params = new URLSearchParams({
-            firstname,
-            lastname,
-            phone,
-            email
-        });
-
-        let response = await fetch(`/update/maintenance/profile?${params.toString()}`, {
-            method: "POST"
-        });
-
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-
-        const result = await response.json();
-
-        if (result.success) {
-
-            showNotification("Profile updated successfully!", "success");
-
-        } else {
-
-            showNotification("Update failed!", "error");
-
-        }
-
-    } catch (err) {
-
-        console.log(err);
-
-    }
-
-}
-
-async function changePassword() {
-
-    const newPass = document.getElementById("newPasswordInput").value;
-    const confirm = document.getElementById("confirmPasswordInput").value;
-
-
-    if (!newPass || !confirm) {
-        showNotification("All fields are required", "error");
-        return;
-    }
-
-    if (newPass.length < 6) {
-        showNotification("Password must be at least 6 characters", "error");
-        return;
-    }
-
-    if (newPass !== confirm) {
-        showNotification("Passwords do not match", "error");
-        return;
-    }
-
-    try {
-
-        let params = new URLSearchParams({
-            newPassword: newPass
-        });
-
-        let response = await fetch(`/change/maintenance/password?${params.toString()}`, {
-            method: "POST"
-        });
-
-        let result = await response.json();
-
-        if (result.success) {
-            showNotification("Password updated successfully", "success");
-            closePasswordEditModel();
-        } else {
-            showNotification(result.message || "Update failed", "error");
-        }
-
-    } catch (err) {
-
-        console.log(err);
-
-    }
-
-}
-
-
-function showNotification(message, type = "info") {
-
-    const notification = document.createElement("div");
-
-    notification.textContent = message;
-
-    notification.style.position = "fixed";
-    notification.style.top = "20px";
-    notification.style.right = "20px";
-    notification.style.padding = "12px 18px";
-    notification.style.borderRadius = "8px";
-    notification.style.color = "#fff";
-    notification.style.fontSize = "14px";
-    notification.style.zIndex = "9999";
-    notification.style.boxShadow = "0 4px 12px rgba(0,0,0,0.2)";
-    notification.style.transition = "0.3s ease";
-
-
-    if (type === "success") {
-        notification.style.background = "#28a745";
-    } else if (type === "error") {
-        notification.style.background = "#dc3545";
-    } else if (type === "info") {
-        notification.style.background = "#17a2b8";
-    } else {
-        notification.style.background = "#333";
-    }
-
-    document.body.appendChild(notification);
-
-
-    setTimeout(() => {
-
-        notification.style.opacity = "0";
-        setTimeout(() => notification.remove(), 300);
-
-    }, 3000);
-
-}
-
-function populateProfile(data) {
-
-    if (!data) {
-        return;
-    }
-
-
-    document.getElementById("staffName").innerText = (data.firstname || "") + " " + (data.lastname || "");
-
-    document.getElementById("staffPhone").innerText = data.contactNumber || "";
-    document.getElementById("staffEmail").innerText = data.email || "";
-
-
-    document.getElementById("companyName").innerText = data.companyName || "";
-    document.getElementById("garage").innerText = data.companyCity || "";
-
-
-    document.getElementById("employeeId").innerText = data.staffId || "";
-    document.getElementById("shiftTime").innerText = data.status || "";
-
-
-}
-
-function openStaffProfileEditModel(data) {
-
-
-    const existingModal = document.getElementById("editModal");
-    if(existingModal) {
-        existingModal.remove();
-    }
-
-    let editStaffModel = document.createElement("div");
-    editStaffModel.id = "editModal";
-    editStaffModel.style.position = "fixed";
-    editStaffModel.style.top = "0";
-    editStaffModel.style.left = "0";
-    editStaffModel.style.width = "100%";
-    editStaffModel.style.height = "100vh";
-    editStaffModel.style.background = "rgba(0,0,0,0.5)";
-    editStaffModel.style.display = "flex";
-    editStaffModel.style.justifyContent = "center";
-    editStaffModel.style.alignItems = "center";
-    editStaffModel.style.zIndex = "1000";
-    editStaffModel.style.padding = "2px";
-
-    editStaffModel.innerHTML = `
-                        <div style="
-                            background:white; 
-                            padding:20px;
-                            max-height:70vh;
-                            overflow-y:auto;
-                            border-radius:12px; 
-                            width:720px; 
-                            height: 140vh;
-                            margin: auto 0;
-                            box-shadow: 0 5px 20px rgba(0,0,0,0.3); 
-                            display:flex; 
-                            gap:30px;
-                            flex-direction:column;
-                            align-items:center;
-                        ">
-                            <h3 style="margin-bottom:20px;">Edit Maintenance Staff</h3>
-                
-                            <div class="form-row" style="
-                                width:100%;
-                                display:grid;
-                                grid-template-columns: 1fr 1fr;
-                                gap:15px 30px;
-                            ">
-                            
-                                <div class="form-group" style="display:flex; flex-direction:column;">
-                                    <label>First Name</label>
-                                    <input id="firstNameInput" type="text" value="${data.firstname || ''}"
-                                        style="padding:8px; border-radius:5px; border:1px solid #ccc;"/>
-                                </div>
-                            
-                                <div class="form-group" style="display:flex; flex-direction:column;">
-                                    <label>Last Name</label>
-                                    <input id="lastNameInput" type="text" value="${data.lastname || ''}"
-                                        style="padding:8px; border-radius:5px; border:1px solid #ccc;"/>
-                                </div>
-                            
-                                <div class="form-group" style="display:flex; flex-direction:column;">
-                                    <label>Phone Number</label>
-                                    <input id="phoneInput" type="text" value="${data.contactNumber || ''}"
-                                        style="padding:8px; border-radius:5px; border:1px solid #ccc;"/>
-                                </div>
-                            
-                                <div class="form-group" style="display:flex; flex-direction:column;">
-                                    <label>Email</label>
-                                    <input id="emailInput" type="email" value="${data.email || ''}"
-                                        style="padding:8px; border-radius:5px; border:1px solid #ccc;"/>
-                                </div>                            
-                            </div>
-                
-                            <div style="margin-top:25px; display:flex; gap:10px; width:100%; justify-content:flex-end;">
-                
-                                <button onclick="closeStaffProfileEditModel()"
-                                    style="padding:8px 15px; border:none; border-radius:6px; cursor:pointer; background:#ccc; color:#000;">
-                                    Cancel
-                                </button>
-                
-                                <button id="update-Profile-POPUP-btn" style="padding:8px 15px; border:none; border-radius:6px; cursor:pointer; background:linear-gradient(135deg, #3a0ca3, #4361ee); color:white;">
-                                    Update
-                                </button>
-                
-                            </div>
-                        </div>
-                    `;
-
-    document.body.appendChild(editStaffModel);
-
-}
-
-function closeStaffProfileEditModel(){
-
-    document.getElementById('editModal').remove();
-
-}
-
-function openPasswordEditModel() {
-
-    let existingModal = document.getElementById("editPasswordModal");
-    if (existingModal) {
-        existingModal.remove();
-    }
-
-
-    let modal = document.createElement("div");
-    modal.id = "editPasswordModal";
-
-    modal.style.position = "fixed";
-    modal.style.top = "0";
-    modal.style.left = "0";
-    modal.style.width = "100%";
-    modal.style.height = "100vh";
-    modal.style.background = "rgba(0,0,0,0.5)";
-    modal.style.display = "flex";
-    modal.style.justifyContent = "center";
-    modal.style.alignItems = "center";
-    modal.style.zIndex = "1000";
-
-    modal.innerHTML = `
-                    <div style="
-                        background:white; 
-                        padding:20px;
-                        border-radius:12px; 
-                        width:400px;
-                        box-shadow: 0 5px 20px rgba(0,0,0,0.3); 
-                        display:flex; 
-                        flex-direction:column;
-                        gap:15px;
-                    ">
-            
-                        <h3>Change Password</h3>
-            
-                        <input id="newPasswordInput" type="password" placeholder="New Password"/>
-                        <input id="confirmPasswordInput" type="password" placeholder="Confirm Password"/>
-            
-                        <div style="display:flex; justify-content:flex-end; gap:10px;">
-            
-                            <button onclick="closePasswordEditModel()"
-                                style="padding:8px 15px; border:none; border-radius:6px; background:#ccc;">
-                                Cancel
-                            </button>
-            
-                            <button id="update-Password-POPUP-btn"
-                                style="padding:8px 15px; border:none; border-radius:6px; background:linear-gradient(135deg, #3a0ca3, #4361ee); color:white;">
-                                Update
-                            </button>
-            
-                        </div>
-                    </div>
-                `;
-
-    document.body.appendChild(modal);
-
-}
-
-function closePasswordEditModel(){
-
-    document.getElementById('editPasswordModal').remove();
-
-}
-
-document.addEventListener("DOMContentLoaded", async function() {
-
-    try {
-
-        const loggedIn = await checkLogin();
-
-        if (!loggedIn) {
-            return;    // stop here if not logged in
-        }
-
-        profileData = await LoadProfile();
-
-        populateProfile(profileData);
-
-        document.getElementById("update-Profile-UI-btn").addEventListener("click",() => {
-
-            openStaffProfileEditModel(profileData);
-
-            document.getElementById("update-Profile-POPUP-btn").addEventListener("click", async() => {
-
-                await UpdateProfile();
-
-                closeStaffProfileEditModel();
-
-                profileData = await LoadProfile();
-
-                populateProfile(profileData);
-
-            })
-
-        })
-
-
-        document.getElementById("update-Password-UI-btn").addEventListener("click", async () =>{
-
-            openPasswordEditModel();
-
-            document.getElementById("update-Password-POPUP-btn").addEventListener("click", async() => {
-
-                await changePassword();
-
-                closePasswordEditModel();
-
-                profileData = await LoadProfile();
-
-                populateProfile(profileData);
-
-            });
-
-        });
-
-
-
-        //handleProfilePictureUpload();
-        //setupChangePassword();
-        //setupUpdateProfileModal();
-
-
-
-    } catch (err) {
-
-        console.error("Error during initialization:", err);
-
-    }
-
-});
-
-
-
-
-
-
-
-
-
-
-
-
-
-function validate(value, rules, fieldName = "Field") {
-
-    value = (value ?? "").toString().trim();
-
-
-    if (rules.required && value === "") {
-        showNotification(`${fieldName} is required`, "error");
-        return false;
-    }
-
-
-    if (rules.minLength && value.length < rules.minLength) {
-        showNotification(`${fieldName} must be at least ${rules.minLength} characters`, "error");
-        return false;
-    }
-
-
-    if (rules.maxLength && value.length > rules.maxLength) {
-        showNotification(`${fieldName} must be less than ${rules.maxLength} characters`, "error");
-        return false;
-    }
-
-
-    if (rules.pattern && !rules.pattern.test(value)) {
-        showNotification(rules.message || `Invalid ${fieldName}`, "error");
-        return false;
+  try {
+    const response = await fetch("/check/login/maintenance");
+    const data = await response.json();
+
+    if (!data.loggedIn) {
+      const modal = document.getElementById("loginModal");
+      modal.style.display = "flex";
+
+      document.getElementById("loginOkBtn").onclick = () => {
+        window.location.href = "/views/landing/maintenancelogin.html";
+      };
+      return false;
     }
 
     return true;
+  } catch (err) {
+    console.error("Error checking login:", err);
+    return false;
+  }
 }
 
+// ---------- Profile load / populate -------------------------------------------
+let profileData;
+
+async function LoadProfile() {
+  try {
+    const response = await fetch(`/load/maintenance/profile`);
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+    return await response.json();
+  } catch (err) {
+    console.error(err);
+    return null;
+  }
+}
+
+function populateProfile(data) {
+  if (!data) return;
+
+  // Greeting heading — prefer username, fall back to full name
+  const greetingEl = document.getElementById("staffGreeting");
+  if (greetingEl) {
+    const username = (data.username || "").trim();
+    const fullName = (
+      (data.firstname || "") +
+      " " +
+      (data.lastname || "")
+    ).trim();
+    greetingEl.innerText = "Hi, " + (username || fullName || "there");
+  }
+
+  document.getElementById("staffName").innerText =
+    (data.firstname || "") + " " + (data.lastname || "");
+  document.getElementById("staffPhone").innerText = data.contactNumber || "";
+  document.getElementById("staffEmail").innerText = data.email || "";
+
+  document.getElementById("companyName").innerText = data.companyName || "";
+  document.getElementById("garage").innerText = data.companyCity || "";
+
+  document.getElementById("employeeId").innerText = data.staffId || "";
+
+  // Additional fields now populated on the profile page
+  const usernameEl = document.getElementById("staffUsername");
+  const specEl = document.getElementById("staffSpecialization");
+  const yearsEl = document.getElementById("staffYearsOfExperience");
+  const statusEl = document.getElementById("staffStatus");
+
+  if (usernameEl) usernameEl.innerText = data.username || "";
+  if (specEl) specEl.innerText = data.specialization || "Not set";
+  if (yearsEl)
+    yearsEl.innerText =
+      (data.yearsOfExperience != null ? data.yearsOfExperience : 0) + " yrs";
+  if (statusEl) {
+    statusEl.innerText = data.status || "";
+    statusEl.className =
+      "info-value status-badge " +
+      (data.status === "available" ? "ok" : "busy");
+  }
+
+  // Avatar initials
+  const avatar = document.querySelector(".profile-avatar");
+  if (avatar) {
+    const initials =
+      ((data.firstname || "?")[0] || "") + ((data.lastname || "")[0] || "");
+    avatar.innerText = initials.toUpperCase();
+  }
+}
+
+// ---------- Update profile ----------------------------------------------------
+async function UpdateProfile() {
+  const username = document.getElementById("usernameInput").value;
+  const firstname = document.getElementById("firstNameInput").value;
+  const lastname = document.getElementById("lastNameInput").value;
+  const phone = document.getElementById("phoneInput").value;
+  const email = document.getElementById("emailInput").value;
+  const specialization = document.getElementById("specializationInput").value;
+  const status = document.getElementById("statusInput").value;
+  const years = document.getElementById("yearsInput").value;
+
+  if (!validate(username, rules.username, "Username")) return false;
+  if (!validate(firstname, rules.name, "First Name")) return false;
+  if (!validate(lastname, rules.name, "Last Name")) return false;
+  if (!validate(phone, rules.phone, "Phone Number")) return false;
+  if (!validate(email, rules.email, "Email")) return false;
+  if (!validate(years, rules.years, "Years of Experience")) return false;
+
+  try {
+    const params = new URLSearchParams({
+      username,
+      firstname,
+      lastname,
+      phone,
+      email,
+      specialization: specialization || "",
+      status: status || "available",
+      yearsOfExperience: years || "0",
+    });
+
+    const response = await fetch(`/update/maintenance/profile`, {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: params.toString(),
+    });
+
+    if (!response.ok && response.status !== 200) {
+      showNotification("Update failed", "error");
+      return false;
+    }
+
+    const result = await response.json();
+
+    if (result.success) {
+      showNotification(
+        result.message || "Profile updated successfully!",
+        "success",
+      );
+      return true;
+    } else {
+      showNotification(result.message || "Update failed", "error");
+      return false;
+    }
+  } catch (err) {
+    console.error(err);
+    showNotification("Network error", "error");
+    return false;
+  }
+}
+
+// ---------- Change password ---------------------------------------------------
+async function changePassword() {
+  const currentPass = document.getElementById("currentPasswordInput").value;
+  const newPass = document.getElementById("newPasswordInput").value;
+  const confirm = document.getElementById("confirmPasswordInput").value;
+
+  if (!currentPass || !newPass || !confirm) {
+    showNotification("All fields are required", "error");
+    return false;
+  }
+
+  if (newPass.length < 6) {
+    showNotification("New password must be at least 6 characters", "error");
+    return false;
+  }
+
+  if (newPass !== confirm) {
+    showNotification("Passwords do not match", "error");
+    return false;
+  }
+
+  if (newPass === currentPass) {
+    showNotification(
+      "New password must be different from current password",
+      "error",
+    );
+    return false;
+  }
+
+  try {
+    const params = new URLSearchParams({
+      currentPassword: currentPass,
+      newPassword: newPass,
+    });
+
+    const response = await fetch(`/change/maintenance/password`, {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: params.toString(),
+    });
+
+    const result = await response.json();
+
+    if (result.success) {
+      showNotification(
+        result.message || "Password updated successfully",
+        "success",
+      );
+      return true;
+    } else {
+      showNotification(result.message || "Update failed", "error");
+      return false;
+    }
+  } catch (err) {
+    console.error(err);
+    showNotification("Network error", "error");
+    return false;
+  }
+}
+
+// ---------- Notifications ------------------------------------------------------
+function showNotification(message, type = "info") {
+  const notification = document.createElement("div");
+  notification.textContent = message;
+
+  Object.assign(notification.style, {
+    position: "fixed",
+    top: "20px",
+    right: "20px",
+    padding: "12px 18px",
+    borderRadius: "8px",
+    color: "#fff",
+    fontSize: "14px",
+    zIndex: "10000",
+    boxShadow: "0 4px 12px rgba(0,0,0,0.2)",
+    transition: "opacity 0.3s ease",
+  });
+
+  if (type === "success") notification.style.background = "#28a745";
+  else if (type === "error") notification.style.background = "#dc3545";
+  else if (type === "info") notification.style.background = "#17a2b8";
+  else notification.style.background = "#333";
+
+  document.body.appendChild(notification);
+
+  setTimeout(() => {
+    notification.style.opacity = "0";
+    setTimeout(() => notification.remove(), 300);
+  }, 3000);
+}
+
+// ---------- Edit-profile modal ------------------------------------------------
+function openStaffProfileEditModel(data) {
+  const existing = document.getElementById("editModal");
+  if (existing) existing.remove();
+
+  const modal = document.createElement("div");
+  modal.id = "editModal";
+  modal.className = "sp-modal-overlay";
+
+  modal.innerHTML = `
+      <div class="sp-modal-card">
+        <div class="sp-modal-header">
+          <h3>Edit Profile</h3>
+          <button type="button" class="sp-modal-close" id="closeEditProfileBtn" aria-label="Close">&times;</button>
+        </div>
+
+        <div class="sp-modal-body">
+          <div class="sp-form-grid">
+            <div class="sp-form-group">
+              <label>Username</label>
+              <input id="usernameInput" type="text" value="${escapeAttr(data.username)}" />
+            </div>
+
+            <div class="sp-form-group">
+              <label>Status</label>
+              <select id="statusInput">
+                <option value="available" ${data.status === "available" ? "selected" : ""}>Available</option>
+                <option value="on Job"    ${data.status === "on Job" ? "selected" : ""}>On Job</option>
+                <option value="offline"   ${data.status === "offline" ? "selected" : ""}>Offline</option>
+              </select>
+            </div>
+
+            <div class="sp-form-group">
+              <label>First Name</label>
+              <input id="firstNameInput" type="text" value="${escapeAttr(data.firstname)}" />
+            </div>
+
+            <div class="sp-form-group">
+              <label>Last Name</label>
+              <input id="lastNameInput" type="text" value="${escapeAttr(data.lastname)}" />
+            </div>
+
+            <div class="sp-form-group">
+              <label>Phone Number</label>
+              <input id="phoneInput" type="text" placeholder="+947XXXXXXXX or 07XXXXXXXX"
+                     value="${escapeAttr(data.contactNumber)}" />
+            </div>
+
+            <div class="sp-form-group">
+              <label>Email</label>
+              <input id="emailInput" type="email" value="${escapeAttr(data.email)}" />
+            </div>
+
+            <div class="sp-form-group">
+              <label>Specialization</label>
+              <input id="specializationInput" type="text"
+                     placeholder="e.g. Engine, Electrical, Brakes"
+                     value="${escapeAttr(data.specialization)}" />
+            </div>
+
+            <div class="sp-form-group">
+              <label>Years of Experience</label>
+              <input id="yearsInput" type="number" min="0" max="60" step="0.5"
+                     value="${data.yearsOfExperience != null ? data.yearsOfExperience : 0}" />
+            </div>
+          </div>
+        </div>
+
+        <div class="sp-modal-footer">
+          <button type="button" class="sp-btn sp-btn-secondary" id="cancelEditProfileBtn">Cancel</button>
+          <button type="button" class="sp-btn sp-btn-primary" id="update-Profile-POPUP-btn">Save Changes</button>
+        </div>
+      </div>
+    `;
+
+  document.body.appendChild(modal);
+
+  // Close handlers (bound here — not nested in other handlers)
+  document
+    .getElementById("closeEditProfileBtn")
+    .addEventListener("click", closeStaffProfileEditModel);
+  document
+    .getElementById("cancelEditProfileBtn")
+    .addEventListener("click", closeStaffProfileEditModel);
+
+  modal.addEventListener("click", (e) => {
+    if (e.target === modal) closeStaffProfileEditModel();
+  });
+
+  // Save handler
+  document
+    .getElementById("update-Profile-POPUP-btn")
+    .addEventListener("click", async () => {
+      const ok = await UpdateProfile();
+      if (ok) {
+        closeStaffProfileEditModel();
+        profileData = await LoadProfile();
+        populateProfile(profileData);
+      }
+    });
+}
+
+function closeStaffProfileEditModel() {
+  const m = document.getElementById("editModal");
+  if (m) m.remove();
+}
+
+// ---------- Change-password modal ---------------------------------------------
+function openPasswordEditModel() {
+  const existing = document.getElementById("editPasswordModal");
+  if (existing) existing.remove();
+
+  const modal = document.createElement("div");
+  modal.id = "editPasswordModal";
+  modal.className = "sp-modal-overlay";
+
+  modal.innerHTML = `
+      <div class="sp-modal-card sp-modal-card-sm">
+        <div class="sp-modal-header">
+          <h3>Change Password</h3>
+          <button type="button" class="sp-modal-close" id="closePasswordBtn" aria-label="Close">&times;</button>
+        </div>
+
+        <div class="sp-modal-body">
+          <div class="sp-form-group">
+            <label>Current Password</label>
+            <input id="currentPasswordInput" type="password" placeholder="Enter current password" autocomplete="current-password" />
+          </div>
+
+          <div class="sp-form-group">
+            <label>New Password</label>
+            <input id="newPasswordInput" type="password" placeholder="At least 6 characters" autocomplete="new-password" />
+          </div>
+
+          <div class="sp-form-group">
+            <label>Confirm New Password</label>
+            <input id="confirmPasswordInput" type="password" placeholder="Re-enter new password" autocomplete="new-password" />
+          </div>
+        </div>
+
+        <div class="sp-modal-footer">
+          <button type="button" class="sp-btn sp-btn-secondary" id="cancelPasswordBtn">Cancel</button>
+          <button type="button" class="sp-btn sp-btn-primary" id="update-Password-POPUP-btn">Update Password</button>
+        </div>
+      </div>
+    `;
+
+  document.body.appendChild(modal);
+
+  document
+    .getElementById("closePasswordBtn")
+    .addEventListener("click", closePasswordEditModel);
+  document
+    .getElementById("cancelPasswordBtn")
+    .addEventListener("click", closePasswordEditModel);
+
+  modal.addEventListener("click", (e) => {
+    if (e.target === modal) closePasswordEditModel();
+  });
+
+  document
+    .getElementById("update-Password-POPUP-btn")
+    .addEventListener("click", async () => {
+      const ok = await changePassword();
+      if (ok) closePasswordEditModel();
+    });
+}
+
+function closePasswordEditModel() {
+  const m = document.getElementById("editPasswordModal");
+  if (m) m.remove();
+}
+
+// ---------- Init --------------------------------------------------------------
+document.addEventListener("DOMContentLoaded", async function () {
+  try {
+    const loggedIn = await checkLogin();
+    if (!loggedIn) return;
+
+    profileData = await LoadProfile();
+    populateProfile(profileData);
+
+    // IMPORTANT: bind ONCE, on the actual buttons — not nested inside each other.
+    const editProfileBtn = document.getElementById("update-Profile-UI-btn");
+    const editPasswordBtn = document.getElementById("update-Password-UI-btn");
+
+    if (editProfileBtn) {
+      editProfileBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        openStaffProfileEditModel(profileData);
+      });
+    }
+
+    if (editPasswordBtn) {
+      editPasswordBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        openPasswordEditModel();
+      });
+    }
+  } catch (err) {
+    console.error("Error during initialization:", err);
+  }
+});
+
+// ---------- Validation --------------------------------------------------------
+function validate(value, rules, fieldName = "Field") {
+  value = (value ?? "").toString().trim();
+
+  if (rules.required && value === "") {
+    showNotification(`${fieldName} is required`, "error");
+    return false;
+  }
+  if (rules.minLength && value.length < rules.minLength) {
+    showNotification(
+      `${fieldName} must be at least ${rules.minLength} characters`,
+      "error",
+    );
+    return false;
+  }
+  if (rules.maxLength && value.length > rules.maxLength) {
+    showNotification(
+      `${fieldName} must be less than ${rules.maxLength} characters`,
+      "error",
+    );
+    return false;
+  }
+  if (rules.pattern && !rules.pattern.test(value)) {
+    showNotification(rules.message || `Invalid ${fieldName}`, "error");
+    return false;
+  }
+  return true;
+}
 
 const rules = {
-
-    name: {
-        required: true,
-        minLength: 2,
-        maxLength: 50,
-        pattern: /^[A-Za-z\s]+$/,
-        message: "Name must contain only letters"
-    },
-
-    phone: {
-        required: true,
-        pattern: /^(?:\+94|0)(7\d{8})$/,
-        message: "Invalid Sri Lankan phone number"
-    },
-
-    email: {
-        required: true,
-        pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-        message: "Invalid email format"
-    },
-
-    nic: {
-        required: true,
-        minLength: 10,
-        maxLength: 12
-    }
+  username: {
+    required: true,
+    minLength: 3,
+    maxLength: 50,
+    pattern: /^[A-Za-z0-9_.\-]+$/,
+    message: "Username may only contain letters, numbers, _ . -",
+  },
+  name: {
+    required: true,
+    minLength: 2,
+    maxLength: 50,
+    pattern: /^[A-Za-z\s]+$/,
+    message: "Name must contain only letters",
+  },
+  phone: {
+    required: true,
+    pattern: /^(?:\+94|0)(7\d{8})$/,
+    message: "Invalid Sri Lankan phone number",
+  },
+  email: {
+    required: true,
+    pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+    message: "Invalid email format",
+  },
+  years: {
+    required: false,
+    pattern: /^(?:\d{1,2}(?:\.\d+)?)?$/,
+    message: "Years of experience must be a non-negative number",
+  },
+  nic: {
+    required: true,
+    minLength: 10,
+    maxLength: 12,
+  },
 };
 
-
-
-
-
-
-
+// ---------- Helpers -----------------------------------------------------------
+function escapeAttr(s) {
+  if (s == null) return "";
+  return String(s)
+    .replace(/&/g, "&amp;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+}

@@ -1,303 +1,172 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Ride Machan - Staff Profile</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../css/staffprofile.css">
-
-    <script src="../js/staffprofile.js" defer></script>
-</head>
-<body>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../css/staffprofile.css" />
+  </head>
+  <body data-active-page="profile">
     <div class="container">
-    <!-- Sidebar -->
-        <aside class="sidebar">
-            <div class="logo-section">
-                <img src="../assets/ridemachan-logo.png" alt="RideMachan Logo" class="logo">
-            </div>
-            
-            <nav class="nav-menu">
-                <ul>
-                    <h3>Main Navigation</h3>
+      <!-- Sidebar (injected by layout.js) -->
+      <aside id="sidebar-mount"></aside>
 
-                    <li class="nav-item active">
-                        <a href="dashboard.html" class="nav-link">
-                            <i class="fas fa-tachometer-alt"></i>
-                            <span>Dashboard</span>
-                        </a>
-                    </li>
-                    
-                    <li class="nav-item">
-                        <a href="inspection.html" class="nav-link">
-                            <i class="fas fa-tools"></i>
-                            <span>Maintenance Logs</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="vehiclerecords.html" class="nav-link">
-                            <i class="fas fa-file"></i> 
-                            <span>Vehicle Records</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="maintenance-calender.html" class="nav-link">
-                            <i class="fas fa-calendar"></i>
-                            <span>Calendar</span>
-                        </a>
-                    </li>
-                  
+      <!-- Header (injected by layout.js) -->
+      <header id="header-mount"></header>
 
-                </ul> 
-            </nav>
-            
-            <div class="logout-section">
-                <a href="#" class="nav-link">
-                    <i class="fas fa-sign-out-alt"></i>
-                    <span>Logout</span>
-                </a>
+      <!-- Main Content -->
+      <div class="main-content" id="staff-main">
+        <!-- Profile Header -->
+        <div class="profile-header">
+          <div class="profile-main">
+            <div class="profile-avatar">MS</div>
+            <div class="profile-info">
+              <h2 id="staffGreeting">Hi,</h2>
+              <p class="profile-role">Maintenance Staff</p>
             </div>
-        </aside>
-
-        <!-- Header -->
-        <div class="header">
-            <div class="search-bar">
-                <i class="fas fa-search"></i>
-                <input type="text" placeholder="Search vehicles, maintenance records..." id="searchInput">
-            </div>
-
-            <div class="header-actions">
-                <div class="notification">
-                    <a href="notification.html" class="notification">
-                            <i class="fas fa-bell"></i>
-                            <div class="badge">3</div>
-                    </a>
-                </div>
-                <div class="user-profile">
-                    <div class="profile-img">MS</div>
-                    <div class="user-info">
-                        <div class="user-name">Mr. Sivajan</div>
-                        <div class="user-role">Maintenance Staff</div>
-                    </div>
-                </div>
-            </div>
+          </div>
         </div>
 
-        <!-- Main Content -->
-        <div class="main-content" id="staff-main">
-            <!-- Profile Header -->
-            <div class="profile-header">
-                <div class="profile-main">
-                    <div class="profile-avatar">MS</div>
-                    <div class="profile-info">
-                        <h2>Hi, Mr. Sivajan</h2>
-                        <p class="profile-role">Maintenance Staff</p>
-                        <div class="profile-actions">
-                            <button class="choose-files-btn">
-                                <i class="fas fa-camera"></i>
-                                Upload Photo
-                            </button>
-                            <input type="file" id="fileInput" multiple accept="image/*" style="display: none;">
-                        </div>
-                    </div>
-                </div>
+        <!-- Profile Details -->
+        <div class="profile-details">
+          <!-- Personal Information -->
+          <div class="profile-card">
+            <div class="card-header">
+              <h3 class="card-title">
+                <i class="fas fa-user card-icon-small"></i>
+                Personal Information
+              </h3>
             </div>
-
-            <!-- Profile Details -->
-            <div class="profile-details">
-                <!-- Personal Information -->
-                <div class="profile-card">
-                    <div class="card-header">
-                        <h3 class="card-title">
-                            <i class="fas fa-user card-icon-small"></i>
-                            Personal Information
-                        </h3>
-                    </div>
-                    <div class="info-grid">
-                        <div class="info-item">
-                            <span class="info-label">Full Name</span>
-                            <span class="info-value" id="staffName"></span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">Phone no</span>
-                            <span class="info-value" id="staffPhone"></span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">Email</span>
-                            <span class="info-value email" id="staffEmail"></span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Company/Employment Information -->
-                <div class="profile-card">
-                    <div class="card-header">
-                        <h3 class="card-title">
-                            <i class="fas fa-building card-icon-small"></i>
-                            Company/Employment Information
-                        </h3>
-                    </div>
-                    <div class="info-grid">
-                        <div class="info-item">
-                            <span class="info-label">Rental Company</span>
-                            <span class="info-value" id="companyName"></span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">Company Location</span>
-                            <span class="info-value" id="garage">Main Service Center</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">Employee ID</span>
-                            <span class="info-value" id="employeeId"></span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">Joined On</span>
-                            <span class="info-value" id="joinedDate">25/02/2023</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label" id="shiftTime">Shift Time</span>
-                            <span class="info-value"></span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">Status</span>
-                            <span class="info-value">
-                                <span class="status active">
-                                    <i class="fas fa-check-circle"></i>
-
-                                </span>
-                            </span>
-                        </div>
-                    </div>
-                </div>
+            <div class="info-grid">
+              <div class="info-item">
+                <span class="info-label">Username</span>
+                <span class="info-value" id="staffUsername"></span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">Full Name</span>
+                <span class="info-value" id="staffName"></span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">Phone no</span>
+                <span class="info-value" id="staffPhone"></span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">Email</span>
+                <span class="info-value email" id="staffEmail"></span>
+              </div>
             </div>
+          </div>
 
-            <!-- Quick Actions -->
-            <div class="quick-actions">
-                <h3>Account Actions</h3>
-                <div class="quick-actions-grid" id="update-Password-UI-btn">
-                    <button class="action-btn">
-                        <i class="fas fa-key"></i>
-                        <span>Change Password</span>
-                    </button>
-                    <button class="action-btn outline" id="update-Profile-UI-btn">
-                        <i class="fas fa-edit"></i>
-                        <span>Update Profile</span>
-                    </button>
-
-                </div>
+          <!-- Company/Employment Information -->
+          <div class="profile-card">
+            <div class="card-header">
+              <h3 class="card-title">
+                <i class="fas fa-building card-icon-small"></i>
+                Company/Employment Information
+              </h3>
             </div>
-
-            <div id="changePasswordUIbtn" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:9999; align-items:center; justify-content:center;">
-                <div style="background:#fff; padding:30px; border-radius:8px; min-width:300px; position:relative; box-shadow:0 2px 10px rgba(0,0,0,0.2); margin:auto;">
-                    <span id="closeChangePassword" style="position:absolute; top:10px; right:15px; font-size:24px; cursor:pointer;">&times;</span>
-                    <button style="margin-top:0;">Change Password</button>
-                </div>
+            <div class="info-grid">
+              <div class="info-item">
+                <span class="info-label">Rental Company</span>
+                <span class="info-value" id="companyName"></span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">Company Location</span>
+                <span class="info-value" id="garage"></span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">Employee ID</span>
+                <span class="info-value" id="employeeId"></span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">Specialization</span>
+                <span class="info-value" id="staffSpecialization"></span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">Years of Experience</span>
+                <span class="info-value" id="staffYearsOfExperience"></span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">Status</span>
+                <span
+                  class="info-value status-badge ok"
+                  id="staffStatus"
+                ></span>
+              </div>
             </div>
-
-
-
-
-
-
-
-                        <!-- Settings Content -->
-                        <div class="settings-container">
-                            
-                            <h1>Notifications</h1>
-
-                            <!-- Notification Settings -->
-                            <div class="settings-content" id="notification-content">
-                                <div class="settings-section">
-                                    <div class="section-header">
-                                        <i class="fas fa-bell"></i>
-                                        <h2>Notification Preferences</h2>
-                                    </div>
-                                    <p class="section-description">Configure how you receive notifications and alerts</p>
-
-                                    <!--Email Notifications--> 
-                                    <div class="notification-group">
-                                        <h3>Email Notifications</h3>
-                                        
-                                        <div class="notification-item">
-                                            <div class="notification-info">
-                                                <h4>Maintenance Reminders</h4>
-                                                <p>Get notified about upcoming maintenance tasks</p>
-                                            </div>
-                                            <label class="toggle-switch">
-                                                <input type="checkbox" id="maintenance-reminders" checked>
-                                                <span class="slider"></span>
-                                            </label>
-                                        </div>
-
-                                        <div class="notification-item">
-                                            <div class="notification-info">
-                                                <h4>Task Assignments</h4>
-                                                <p>Receive notifications when new tasks are assigned</p>
-                                            </div>
-                                            <label class="toggle-switch">
-                                                <input type="checkbox" id="task-assignments" checked>
-                                                <span class="slider"></span>
-                                            </label>
-                                        </div>
-
-                                        <div class="notification-item">
-                                            <div class="notification-info">
-                                                <h4>System Updates</h4>
-                                                <p>Stay informed about system changes and updates</p>
-                                            </div>
-                                            <label class="toggle-switch">
-                                                <input type="checkbox" id="system-updates" checked>
-                                                <span class="slider"></span>
-                                            </label>
-                                        </div>
-                                    </div>
-
-                                    <!-- Push Notifications -->
-                                    <div class="notification-group">
-                                        <h3>Push Notifications</h3>
-                                        
-                                        <div class="notification-item">
-                                            <div class="notification-info">
-                                                <h4>Urgent Alerts</h4>
-                                                <p>Critical maintenance issues and emergencies</p>
-                                            </div>
-                                            <label class="toggle-switch">
-                                                <input type="checkbox" id="urgent-alerts" checked>
-                                                <span class="slider"></span>
-                                            </label>
-                                        </div>
-
-                                        <div class="notification-item">
-                                            <div class="notification-info">
-                                                <h4>Schedule Changes</h4>
-                                                <p>When maintenance schedules are modified</p>
-                                            </div>
-                                            <label class="toggle-switch">
-                                                <input type="checkbox" id="schedule-changes" checked>
-                                                <span class="slider"></span>
-                                            </label>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            
-                        </div>
-                    </div>
+          </div>
         </div>
+
+        <!-- Quick Actions -->
+        <div class="quick-actions">
+          <h3>Account Actions</h3>
+          <div class="quick-actions-grid">
+            <button
+              class="action-btn"
+              id="update-Password-UI-btn"
+              type="button"
+            >
+              <i class="fas fa-key"></i>
+              <span>Change Password</span>
+            </button>
+            <button
+              class="action-btn outline"
+              id="update-Profile-UI-btn"
+              type="button"
+            >
+              <i class="fas fa-edit"></i>
+              <span>Update Profile</span>
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
 
-
-
-    <div id="loginModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%;
-    background: rgba(0,0,0,0.5); justify-content:center; align-items:center; z-index:1000;">
-        <div style="background:white; padding:20px; border-radius:8px; text-align:center; width:300px;">
-            <p style="margin-bottom:20px;">Login First</p>
-            <button id="loginOkBtn" style="padding:8px 16px; cursor:pointer;">OK</button>
-        </div>
+    <!-- Login-required modal -->
+    <div
+      id="loginModal"
+      style="
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+      "
+    >
+      <div
+        style="
+          background: white;
+          padding: 20px;
+          border-radius: 8px;
+          text-align: center;
+          width: 300px;
+        "
+      >
+        <p style="margin-bottom: 20px">Login First</p>
+        <button id="loginOkBtn" style="padding: 8px 16px; cursor: pointer">
+          OK
+        </button>
+      </div>
     </div>
 
-</body>
+    <script src="../js/layout.js" defer></script>
+    <script src="../js/staffprofile.js" defer></script>
+  </body>
 </html>

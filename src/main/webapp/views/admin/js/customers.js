@@ -1,12 +1,16 @@
-// js/customers.js  (API-wired version with direct signup flow)
+// js/customers.js  (API-wired version with direct signup flow + pagination)
 
 class CustomersManager {
   constructor() {
     this.customers = [];
     this.filteredCustomers = [];
     this.minRating = 0;
+
+    // Pagination state
     this.page = 1;
-    this.pageSize = 50;
+    this.pageSize = 10;
+    this.totalCount = 0; // total across all pages (from server if provided)
+    this.serverPaginates = false; // true if backend returns a total count
 
     this.API_BASE = "/api/admin/customers";
 
@@ -22,6 +26,7 @@ class CustomersManager {
     this.initializeRatingFilter();
     this.setupEventListeners();
     this.setupFileInputs();
+    this.setupPaginationControls();
     this.loadCustomers();
   }
 
@@ -40,12 +45,18 @@ class CustomersManager {
     this.bookMinEl = document.getElementById("bookingsMin");
     this.bookMaxEl = document.getElementById("bookingsMax");
     this.sortEl = document.getElementById("sortOrder");
+
+    // Pagination elements
+    this.paginationWrapper = document.getElementById("paginationWrapper");
+    this.paginationInfo = document.getElementById("paginationInfo");
+    this.paginationControls = document.getElementById("paginationControls");
+    this.pageSizeSelect = document.getElementById("pageSizeSelect");
   }
 
   setupEventListeners() {
     document
       .querySelector(".search-actions .btn-primary")
-      ?.addEventListener("click", () => this.loadCustomers());
+      ?.addEventListener("click", () => this.goToPageAndLoad(1));
 
     document
       .querySelector(".search-actions .btn-secondary")
@@ -56,7 +67,7 @@ class CustomersManager {
     );
 
     [this.locEl, this.statEl, this.sortEl, this.joinFrom, this.joinTo].forEach(
-      (el) => el?.addEventListener("change", () => this.loadCustomers()),
+      (el) => el?.addEventListener("change", () => this.goToPageAndLoad(1)),
     );
 
     // Card click -> customer view
@@ -110,9 +121,27 @@ class CustomersManager {
     });
   }
 
+  setupPaginationControls() {
+    if (this.pageSizeSelect) {
+      this.pageSizeSelect.addEventListener("change", () => {
+        this.pageSize = parseInt(this.pageSizeSelect.value, 10) || 10;
+        this.page = 1;
+        this.loadCustomers();
+      });
+    }
+  }
+
+  goToPageAndLoad(p) {
+    this.page = p;
+    this.loadCustomers();
+  }
+
   debouncedReload() {
     clearTimeout(this._t);
-    this._t = setTimeout(() => this.loadCustomers(), 250);
+    this._t = setTimeout(() => {
+      this.page = 1;
+      this.loadCustomers();
+    }, 250);
   }
 
   /* ================================================================
@@ -131,7 +160,7 @@ class CustomersManager {
       star.addEventListener("click", () => {
         this.minRating = Number(star.dataset.value || 0);
         paint(this.minRating);
-        this.loadCustomers();
+        this.goToPageAndLoad(1);
       });
       star.addEventListener("mouseenter", () =>
         paint(Number(star.dataset.value || 0)),
@@ -490,17 +519,36 @@ class CustomersManager {
       const data = await res.json();
 
       this.customers = Array.isArray(data.customers) ? data.customers : [];
-      this.filteredCustomers = [...this.customers];
+
+      // Detect if backend supports server-side pagination.
+      // Accept a few common field names.
+      const totalFromServer =
+        data.total ?? data.totalCount ?? data.totalRecords ?? null;
+
+      if (totalFromServer != null && Number.isFinite(Number(totalFromServer))) {
+        this.serverPaginates = true;
+        this.totalCount = Number(totalFromServer);
+        // Server already sliced; use as-is.
+        this.filteredCustomers = [...this.customers];
+      } else {
+        // Fallback: server returned everything. Paginate client-side.
+        this.serverPaginates = false;
+        this.totalCount = this.customers.length;
+        this.filteredCustomers = [...this.customers];
+      }
 
       this.populateLocationFilterFromData(this.customers);
       this.applyLocalSort();
       this.renderCustomers();
-      this.updateCustomerCount(this.filteredCustomers.length);
+      this.updateCustomerCount(this.totalCount);
+      this.renderPagination();
     } catch (err) {
       console.error("Failed to load customers:", err);
       this.renderError(
         "Failed to load customers. Check admin login/session and servlet mapping.",
       );
+      this.totalCount = 0;
+      this.renderPagination();
     }
   }
 
@@ -534,16 +582,27 @@ class CustomersManager {
     this.grid.innerHTML = `<div style="padding:16px;color:#b91c1c;">${msg}</div>`;
   }
 
+  getPagedCustomers() {
+    if (this.serverPaginates) return this.filteredCustomers;
+    const totalPages = Math.max(
+      1,
+      Math.ceil(this.filteredCustomers.length / this.pageSize),
+    );
+    if (this.page > totalPages) this.page = totalPages;
+    if (this.page < 1) this.page = 1;
+    const start = (this.page - 1) * this.pageSize;
+    return this.filteredCustomers.slice(start, start + this.pageSize);
+  }
+
   renderCustomers() {
     if (!this.grid) return;
     this.grid.innerHTML = "";
-    if (!this.filteredCustomers.length) {
+    const pageItems = this.getPagedCustomers();
+    if (!pageItems.length) {
       this.grid.innerHTML = `<div style="padding:16px;color:#6b7280;">No customers match your filters.</div>`;
       return;
     }
-    this.filteredCustomers.forEach((c) =>
-      this.grid.appendChild(this.createCustomerCard(c)),
-    );
+    pageItems.forEach((c) => this.grid.appendChild(this.createCustomerCard(c)));
   }
 
   createCustomerCard(c) {
@@ -597,6 +656,96 @@ class CustomersManager {
 
   updateCustomerCount(n) {
     if (this.listTitle) this.listTitle.textContent = `Customer List (${n})`;
+  }
+
+  /* ================================================================
+     PAGINATION
+     ================================================================ */
+  renderPagination() {
+    if (!this.paginationWrapper) return;
+
+    const total = this.totalCount;
+    const totalPages = Math.max(1, Math.ceil(total / this.pageSize));
+
+    if (total === 0) {
+      this.paginationWrapper.style.display = "none";
+      return;
+    }
+
+    this.paginationWrapper.style.display = "";
+
+    const start = (this.page - 1) * this.pageSize + 1;
+    const end = Math.min(this.page * this.pageSize, total);
+
+    if (this.paginationInfo) {
+      this.paginationInfo.innerHTML = `Showing <strong>${start}–${end}</strong> of <strong>${total}</strong>`;
+    }
+
+    if (this.paginationControls) {
+      this.paginationControls.innerHTML = this.buildPageButtonsHTML(
+        this.page,
+        totalPages,
+      );
+      this.paginationControls.querySelectorAll("[data-page]").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const p = parseInt(btn.dataset.page, 10);
+          if (!Number.isFinite(p) || p === this.page) return;
+          this.page = p;
+          if (this.serverPaginates) {
+            this.loadCustomers();
+          } else {
+            this.renderCustomers();
+            this.renderPagination();
+          }
+          this.grid?.scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+      });
+    }
+  }
+
+  buildPageButtonsHTML(current, totalPages) {
+    const pages = this.getPageRange(current, totalPages);
+    let html = "";
+
+    html += `<button class="pagination-btn" data-page="${current - 1}" ${current === 1 ? "disabled" : ""} aria-label="Previous page">
+      <i class="fas fa-chevron-left"></i>
+    </button>`;
+
+    pages.forEach((p) => {
+      if (p === "...") {
+        html += `<span class="pagination-ellipsis">…</span>`;
+      } else {
+        html += `<button class="pagination-btn ${p === current ? "active" : ""}" data-page="${p}">${p}</button>`;
+      }
+    });
+
+    html += `<button class="pagination-btn" data-page="${current + 1}" ${current === totalPages ? "disabled" : ""} aria-label="Next page">
+      <i class="fas fa-chevron-right"></i>
+    </button>`;
+
+    return html;
+  }
+
+  getPageRange(current, total) {
+    const pages = [];
+    const delta = 1;
+
+    if (total <= 7) {
+      for (let i = 1; i <= total; i++) pages.push(i);
+      return pages;
+    }
+
+    pages.push(1);
+    if (current - delta > 2) pages.push("...");
+
+    const from = Math.max(2, current - delta);
+    const to = Math.min(total - 1, current + delta);
+    for (let i = from; i <= to; i++) pages.push(i);
+
+    if (current + delta < total - 1) pages.push("...");
+    pages.push(total);
+
+    return pages;
   }
 
   getInitials(name) {
@@ -662,7 +811,7 @@ window.addEventListener("DOMContentLoaded", () => {
 });
 
 function searchCustomers() {
-  mgr?.loadCustomers();
+  mgr?.goToPageAndLoad(1);
 }
 
 function clearFilters() {

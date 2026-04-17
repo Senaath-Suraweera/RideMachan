@@ -3,11 +3,10 @@
 //          showMessages, handleLogout (all on window)
 
 (function () {
-
   // ---- CONFIG: adjust to match your backend ----
-  var PROFILE_ENDPOINT = '/customer/profile/info';
-  var LOGOUT_ENDPOINT  = '/customer/logout';
-  var LOGIN_PAGE       = '../../landing/customer_sign-in.html';
+  var PROFILE_ENDPOINT = "/customer/profile/info";
+  var LOGOUT_ENDPOINT = "/customer/logout";
+  var LOGIN_PAGE = "../../landing/customer_sign-in.html";
   // ----------------------------------------------
 
   /**
@@ -22,30 +21,30 @@
    * Wire the profile dropdown toggle + outside-click close.
    */
   function wireDropdown() {
-    var profile  = document.getElementById('userProfile');
-    var dropdown = document.getElementById('profileDropdown');
+    var profile = document.getElementById("userProfile");
+    var dropdown = document.getElementById("profileDropdown");
     if (!profile || !dropdown) return;
 
     // Avoid double-binding if header is reloaded
-    if (profile.dataset.dropdownWired === 'true') return;
-    profile.dataset.dropdownWired = 'true';
+    if (profile.dataset.dropdownWired === "true") return;
+    profile.dataset.dropdownWired = "true";
 
-    profile.addEventListener('click', function (e) {
+    profile.addEventListener("click", function (e) {
       // Don't toggle when clicking links inside the dropdown
-      if (e.target.closest('.profile-dropdown a')) return;
+      if (e.target.closest(".profile-dropdown a")) return;
       e.stopPropagation();
-      dropdown.classList.toggle('show');
+      dropdown.classList.toggle("show");
     });
 
-    document.addEventListener('click', function (e) {
+    document.addEventListener("click", function (e) {
       if (!profile.contains(e.target)) {
-        dropdown.classList.remove('show');
+        dropdown.classList.remove("show");
       }
     });
 
     // Close on Escape
-    document.addEventListener('keydown', function (e) {
-      if (e.key === 'Escape') dropdown.classList.remove('show');
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape") dropdown.classList.remove("show");
     });
   }
 
@@ -54,104 +53,93 @@
    */
   function loadUserData() {
     fetch(PROFILE_ENDPOINT, {
-      method: 'GET',
-      credentials: 'include',
-      headers: { 'Accept': 'application/json' }
+      method: "GET",
+      credentials: "include",
+      headers: { Accept: "application/json" },
     })
-        .then(function (res) {
-          if (res.status === 401) {
-            // Not logged in → bounce to login page
-            window.location.href = LOGIN_PAGE;
-            throw new Error('HTTP 401');
-          }
-          if (!res.ok) throw new Error('HTTP ' + res.status);
-          return res.json();
-        })
-        .then(function (data) {
-          // Try common field name variations — adjust if your backend differs
-          var firstName =
-              data.firstname ||
-              data.firstName ||
-              data.first_name ||
-              data.fname ||
-              (data.name     ? String(data.name).trim().split(/\s+/)[0]     : null) ||
-              (data.fullName ? String(data.fullName).trim().split(/\s+/)[0] : null) ||
-              'Customer';
+      .then(function (res) {
+        if (res.status === 401) {
+          // Not logged in → bounce to login page
+          window.location.href = LOGIN_PAGE;
+          throw new Error("HTTP 401");
+        }
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        return res.json();
+      })
+      .then(function (data) {
+        // Try common field name variations — adjust if your backend differs
+        var firstName =
+          data.firstname ||
+          data.firstName ||
+          data.first_name ||
+          data.fname ||
+          (data.name ? String(data.name).trim().split(/\s+/)[0] : null) ||
+          (data.fullName
+            ? String(data.fullName).trim().split(/\s+/)[0]
+            : null) ||
+          "Customer";
 
-          var nameEl = document.getElementById('userName');
-          var initEl = document.getElementById('profileInitial');
-          if (nameEl) nameEl.textContent = firstName;
-          if (initEl) initEl.textContent = firstName.charAt(0).toUpperCase();
+        var nameEl = document.getElementById("userName");
+        var initEl = document.getElementById("profileInitial");
+        if (nameEl) nameEl.textContent = firstName;
+        if (initEl) initEl.textContent = firstName.charAt(0).toUpperCase();
 
-          // On the dashboard, show "Welcome back <Name>"
-          var path     = window.location.pathname;
-          var filename = path.substring(path.lastIndexOf('/') + 1) || 'index.html';
-          if (filename === 'dashboard.html' || filename === 'index.html' || filename === 'home.html') {
-            setPageTitle('Welcome back, ' + firstName);
-          }
+        // On the dashboard, show "Welcome back <Name>"
+        var path = window.location.pathname;
+        var filename =
+          path.substring(path.lastIndexOf("/") + 1) || "index.html";
+        if (
+          filename === "dashboard.html" ||
+          filename === "index.html" ||
+          filename === "home.html"
+        ) {
+          setPageTitle("Welcome back, " + firstName);
+        }
 
-          // Optional: notification / message counts if backend returns them
-          if (typeof data.notificationCount === 'number') {
-            var nc = document.getElementById('notificationCount');
-            if (nc) nc.textContent = data.notificationCount;
-          }
-          if (typeof data.messageCount === 'number') {
-            var mc = document.getElementById('messageCount');
-            if (mc) mc.textContent = data.messageCount;
-          }
-        })
-        .catch(function (err) {
-          console.error('Profile fetch failed:', err);
-          // If it was a 401 we've already redirected — don't overwrite the UI
-          if (err.message === 'HTTP 401') return;
+        // Optional: notification / message counts if backend returns them
+        if (typeof data.notificationCount === "number") {
+          var nc = document.getElementById("notificationCount");
+          if (nc) nc.textContent = data.notificationCount;
+        }
+        if (typeof data.messageCount === "number") {
+          var mc = document.getElementById("messageCount");
+          if (mc) mc.textContent = data.messageCount;
+        }
+      })
+      .catch(function (err) {
+        console.error("Profile fetch failed:", err);
+        // If it was a 401 we've already redirected — don't overwrite the UI
+        if (err.message === "HTTP 401") return;
 
-          var nameEl = document.getElementById('userName');
-          var initEl = document.getElementById('profileInitial');
-          if (nameEl) nameEl.textContent = 'Guest';
-          if (initEl) initEl.textContent = 'G';
-        });
+        var nameEl = document.getElementById("userName");
+        var initEl = document.getElementById("profileInitial");
+        if (nameEl) nameEl.textContent = "Guest";
+        if (initEl) initEl.textContent = "G";
+      });
   }
 
   /**
    * Update the header <h1> title.
    */
   function setPageTitle(title) {
-    var el = document.getElementById('pageTitle');
+    var el = document.getElementById("pageTitle");
     if (el) el.textContent = title;
-    document.title = title + ' | RideMachan';
+    document.title = title + " | RideMachan";
   }
 
   // ---------- Action handlers ----------
 
   function showNotifications() {
-    window.location.href = '../pages/notifications.html';
+    window.location.href = "../pages/notifications.html";
   }
 
   function showMessages() {
-    window.location.href = '../pages/messages.html';
-  }
-
-  function handleLogout() {
-    if (!confirm('Are you sure you want to log out?')) return;
-
-    fetch(LOGOUT_ENDPOINT, {
-      method: 'POST',
-      credentials: 'include'
-    })
-        .then(function () {
-          window.location.href = LOGIN_PAGE;
-        })
-        .catch(function (err) {
-          console.error('Logout failed:', err);
-          // Redirect anyway so the user isn't stuck
-          window.location.href = LOGIN_PAGE;
-        });
+    window.location.href = "../pages/messages.html";
   }
 
   // ---- Expose globals (the loader and inline onclick handlers need these) ----
-  window.initializeHeader  = initializeHeader;
-  window.setPageTitle      = setPageTitle;
+  window.initializeHeader = initializeHeader;
+  window.setPageTitle = setPageTitle;
   window.showNotifications = showNotifications;
-  window.showMessages      = showMessages;
-  window.handleLogout      = handleLogout;
+  window.showMessages = showMessages;
 })();

@@ -24,6 +24,22 @@ public class ListCalendarEventServlet extends HttpServlet {
         resp.setHeader("Access-Control-Allow-Methods", "GET");
         resp.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
+        // ── Guard: must be logged in ──────────────────────────────────────
+        HttpSession session = req.getSession(false);
+        if (session == null || session.getAttribute("actorId") == null) {
+            resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            resp.getWriter().write("{\"status\":\"error\",\"message\":\"Not logged in\"}");
+            return;
+        }
+
+        // ── Read identity from session ────────────────────────────────────
+        int loggedInStaffId;
+        try {
+            loggedInStaffId = (int) session.getAttribute("actorId");
+        } catch (ClassCastException e) {
+            loggedInStaffId = Integer.parseInt(session.getAttribute("actorId").toString());
+        }
+
         try (Connection con = DBConnection.getConnection()) {
             CalendarEventDAO dao = new CalendarEventDAO(con);
             Gson gson = new Gson();
@@ -38,7 +54,8 @@ public class ListCalendarEventServlet extends HttpServlet {
             if (eventIdParam != null) {
                 int eventId = Integer.parseInt(eventIdParam);
                 CalendarEvent event = dao.getEventById(eventId);
-                if (event != null) {
+                // Only return the event if it belongs to the logged-in staff
+                if (event != null && event.getMaintenanceId() == loggedInStaffId) {
                     resp.getWriter().write(gson.toJson(convertToFrontendFormat(event)));
                 } else {
                     resp.getWriter().write("{\"status\":\"error\",\"message\":\"Event not found\"}");
@@ -49,6 +66,7 @@ public class ListCalendarEventServlet extends HttpServlet {
             // Handle single date (today’s tasks)
             if (date != null) {
                 List<CalendarEvent> events = dao.getEventsByDate(date);
+                events = filterByStaff(events, loggedInStaffId);
                 List<Map<String, Object>> formatted = convertListToFrontendFormat(events);
                 resp.getWriter().write(gson.toJson(formatted));
                 return;
@@ -57,6 +75,7 @@ public class ListCalendarEventServlet extends HttpServlet {
             // Handle date range (monthly calendar)
             if (startDate != null && endDate != null) {
                 List<CalendarEvent> events = dao.getEventsByDateRange(startDate, endDate);
+                events = filterByStaff(events, loggedInStaffId);
 
                 // ✅ FIX: group strictly by date part only (YYYY-MM-DD)
                 Map<String, List<Map<String, Object>>> grouped = new LinkedHashMap<>();
@@ -73,12 +92,14 @@ public class ListCalendarEventServlet extends HttpServlet {
             // Handle status filter
             if (status != null) {
                 List<CalendarEvent> events = dao.getEventsByStatus(status);
+                events = filterByStaff(events, loggedInStaffId);
                 resp.getWriter().write(gson.toJson(convertListToFrontendFormat(events)));
                 return;
             }
 
-            // Default: return all events
+            // Default: return all events for the logged-in staff member only
             List<CalendarEvent> all = dao.listEvents();
+            all = filterByStaff(all, loggedInStaffId);
             resp.getWriter().write(gson.toJson(convertListToFrontendFormat(all)));
 
         } catch (NumberFormatException e) {
@@ -88,6 +109,19 @@ public class ListCalendarEventServlet extends HttpServlet {
             e.printStackTrace();
             resp.getWriter().write("{\"status\":\"error\",\"message\":\"" + e.getMessage() + "\"}");
         }
+    }
+
+    /**
+     * Keep only events whose maintenance_id matches the logged-in staff.
+     */
+    private List<CalendarEvent> filterByStaff(List<CalendarEvent> events, int staffId) {
+        List<CalendarEvent> filtered = new ArrayList<>();
+        for (CalendarEvent e : events) {
+            if (e.getMaintenanceId() == staffId) {
+                filtered.add(e);
+            }
+        }
+        return filtered;
     }
 
     private Map<String, Object> convertToFrontendFormat(CalendarEvent event) {

@@ -8,9 +8,14 @@ const PROVIDER_REQ_API = `${BASE_URL}/api/provider/rental-requests`;
 
 let providerId = null;
 let companies = [];
+let filteredCompanies = [];
 let myRequests = [];
 let currentDetailCompany = null;
 let currentDetailTab = "overview";
+
+// Pagination state
+let currentPage = 1;
+let pageSize = 10;
 
 // ─────────────────────────────────────────
 // Init
@@ -23,7 +28,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   await Promise.all([loadCompanies(), loadMyRequests()]);
-  renderCompanies(companies);
+  applyFiltersAndSort();
   bindEvents();
 });
 
@@ -101,15 +106,25 @@ function renderCompanies(list) {
     container.innerHTML = `
       <div style="text-align:center;padding:60px 20px;color:var(--text-light);">
         <i class="fas fa-building-circle-xmark" style="font-size:48px;margin-bottom:16px;display:block;color:#dde1e7;"></i>
-        <p style="font-size:16px;font-weight:600;">No companies available at the moment.</p>
-        <p style="font-size:14px;margin-top:6px;">Check back later or adjust your filters.</p>
+        <p style="font-size:16px;font-weight:600;">No companies match your filters.</p>
+        <p style="font-size:14px;margin-top:6px;">Try adjusting your search or filter criteria.</p>
       </div>`;
+    renderPagination(0);
     return;
   }
 
+  // Clamp currentPage to valid range
+  const totalPages = Math.max(1, Math.ceil(list.length / pageSize));
+  if (currentPage > totalPages) currentPage = totalPages;
+  if (currentPage < 1) currentPage = 1;
+
+  const startIdx = (currentPage - 1) * pageSize;
+  const endIdx = startIdx + pageSize;
+  const pageItems = list.slice(startIdx, endIdx);
+
   container.innerHTML = "";
 
-  list.forEach((c) => {
+  pageItems.forEach((c) => {
     const companyId = c.companyid;
     const pending = hasAnyPendingForCompany(companyId);
     // rating can be null from backend when no reviews exist yet
@@ -197,6 +212,97 @@ function renderCompanies(list) {
 
     container.appendChild(card);
   });
+
+  renderPagination(list.length);
+}
+
+// ─────────────────────────────────────────
+// Pagination
+// ─────────────────────────────────────────
+function renderPagination(totalItems) {
+  const section = document.getElementById("paginationSection");
+  const infoText = document.getElementById("paginationInfoText");
+  const pagesEl = document.getElementById("paginationPages");
+  const prevBtn = document.getElementById("prevPageBtn");
+  const nextBtn = document.getElementById("nextPageBtn");
+  if (!section || !pagesEl) return;
+
+  // Hide pagination entirely when empty
+  if (totalItems === 0) {
+    section.classList.add("hidden");
+    return;
+  }
+  section.classList.remove("hidden");
+
+  const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
+  if (currentPage > totalPages) currentPage = totalPages;
+
+  const startIdx = (currentPage - 1) * pageSize + 1;
+  const endIdx = Math.min(currentPage * pageSize, totalItems);
+
+  // Info text
+  infoText.innerHTML = `Showing <strong>${startIdx}–${endIdx}</strong> of <strong>${totalItems}</strong> companies`;
+
+  // Prev / Next state
+  prevBtn.disabled = currentPage <= 1;
+  nextBtn.disabled = currentPage >= totalPages;
+
+  // Build page buttons (with ellipsis for long ranges)
+  pagesEl.innerHTML = "";
+  const pageNumbers = buildPageNumberList(currentPage, totalPages);
+
+  pageNumbers.forEach((p) => {
+    if (p === "…") {
+      const span = document.createElement("span");
+      span.className = "pagination-page ellipsis";
+      span.textContent = "…";
+      pagesEl.appendChild(span);
+      return;
+    }
+
+    const btn = document.createElement("button");
+    btn.className = "pagination-page" + (p === currentPage ? " active" : "");
+    btn.textContent = String(p);
+    btn.setAttribute("aria-label", `Page ${p}`);
+    if (p === currentPage) btn.setAttribute("aria-current", "page");
+    btn.addEventListener("click", () => goToPage(p));
+    pagesEl.appendChild(btn);
+  });
+}
+
+/**
+ * Build a compact page list: [1, '…', 4, 5, 6, '…', 20]
+ */
+function buildPageNumberList(current, total) {
+  if (total <= 7) {
+    return Array.from({ length: total }, (_, i) => i + 1);
+  }
+
+  const pages = [];
+  const window = 1; // how many pages to show on each side of current
+
+  pages.push(1);
+  if (current - window > 2) pages.push("…");
+
+  const start = Math.max(2, current - window);
+  const end = Math.min(total - 1, current + window);
+  for (let i = start; i <= end; i++) pages.push(i);
+
+  if (current + window < total - 1) pages.push("…");
+  pages.push(total);
+
+  return pages;
+}
+
+function goToPage(page) {
+  if (page === currentPage) return;
+  currentPage = page;
+  renderCompanies(filteredCompanies);
+  // Scroll to top of list for a cleaner transition
+  const container = document.querySelector(".companies-container");
+  if (container) {
+    container.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
 }
 
 // ─────────────────────────────────────────
@@ -755,57 +861,64 @@ async function loadEligibleVehiclesIntoModal() {
 }
 
 // ─────────────────────────────────────────
-// Filter / Sort
+// Filter / Sort Pipeline
 // ─────────────────────────────────────────
-function applyFilters() {
+function applyFiltersAndSort(resetPage = true) {
   const locationFilter =
-    document.getElementById("locationFilter")?.value?.toLowerCase() || "";
+    document.getElementById("locationFilter")?.value?.toLowerCase().trim() ||
+    "";
   const nameFilter =
-    document.getElementById("companyNameFilter")?.value?.toLowerCase() || "";
+    document.getElementById("companyNameFilter")?.value?.toLowerCase().trim() ||
+    "";
   const ratingRaw = document.getElementById("ratingFilter")?.value || "0";
   const minRating = parseInt(ratingRaw.match(/\d+/)?.[0] || "0", 10);
+  const sortValue = document.getElementById("sortSelect")?.value || "";
 
-  document.querySelectorAll(".company-card").forEach((card) => {
-    const cardLoc = (card.dataset.location || "").toLowerCase();
-    const cardName = (card.dataset.name || "").toLowerCase();
-    const cardRating = parseInt(card.dataset.rating || "0", 10);
+  // Filter
+  let result = companies.filter((c) => {
+    const cardLoc = (c.location || "").toLowerCase();
+    const cardName = (c.companyname || "").toLowerCase();
+    const cardRating = c.rating != null ? Number(c.rating) : 0;
 
     const okLoc = !locationFilter || cardLoc.includes(locationFilter);
     const okName = !nameFilter || cardName.includes(nameFilter);
     const okRating = cardRating >= minRating;
 
-    card.style.display = okLoc && okName && okRating ? "" : "none";
+    return okLoc && okName && okRating;
   });
-}
 
-function applySorting() {
-  const sortValue = document.getElementById("sortSelect")?.value || "";
-  const container = document.querySelector(".companies-container");
-  if (!container) return;
+  // Sort
+  result.sort((a, b) => {
+    const aName = (a.companyname || "").toLowerCase();
+    const bName = (b.companyname || "").toLowerCase();
+    const aLoc = (a.location || "").toLowerCase();
+    const bLoc = (b.location || "").toLowerCase();
+    const aRating = a.rating != null ? Number(a.rating) : 0;
+    const bRating = b.rating != null ? Number(b.rating) : 0;
+    const aReviews = Number(a.reviews || 0);
+    const bReviews = Number(b.reviews || 0);
 
-  const cards = Array.from(container.querySelectorAll(".company-card"));
-  cards.sort((a, b) => {
     switch (sortValue) {
       case "Sort by Name (A-Z)":
-        return (a.dataset.name || "").localeCompare(b.dataset.name || "");
+        return aName.localeCompare(bName);
       case "Sort by Name (Z-A)":
-        return (b.dataset.name || "").localeCompare(a.dataset.name || "");
+        return bName.localeCompare(aName);
       case "Sort by Location":
-        return (a.dataset.location || "").localeCompare(
-          b.dataset.location || "",
-        );
-      default:
-        return (
-          parseInt(b.dataset.rating || "0", 10) -
-          parseInt(a.dataset.rating || "0", 10)
-        );
+        return aLoc.localeCompare(bLoc);
+      case "Sort by Reviews":
+        return bReviews - aReviews;
+      default: // Sort by Rating
+        return bRating - aRating;
     }
   });
-  cards.forEach((c) => container.appendChild(c));
+
+  filteredCompanies = result;
+  if (resetPage) currentPage = 1;
+  renderCompanies(filteredCompanies);
 }
 
 function searchCompanies() {
-  applyFilters();
+  applyFiltersAndSort();
 }
 
 // ─────────────────────────────────────────
@@ -871,7 +984,7 @@ function bindEvents() {
         alert("Application submitted successfully!");
         closeApplicationModal();
         await loadMyRequests();
-        renderCompanies(companies);
+        applyFiltersAndSort(false); // preserve current page
       } catch (err) {
         console.error(err);
         alert("Failed to submit application.\n" + err.message);
@@ -912,18 +1025,35 @@ function bindEvents() {
   // Sort select
   document
     .getElementById("sortSelect")
-    ?.addEventListener("change", applySorting);
+    ?.addEventListener("change", () => applyFiltersAndSort());
 
   // Filter inputs
   document
     .getElementById("ratingFilter")
-    ?.addEventListener("change", applyFilters);
+    ?.addEventListener("change", () => applyFiltersAndSort());
   document
     .getElementById("locationFilter")
-    ?.addEventListener("input", applyFilters);
+    ?.addEventListener("input", () => applyFiltersAndSort());
   document
     .getElementById("companyNameFilter")
-    ?.addEventListener("input", applyFilters);
+    ?.addEventListener("input", () => applyFiltersAndSort());
+
+  // Pagination controls
+  document.getElementById("prevPageBtn")?.addEventListener("click", () => {
+    if (currentPage > 1) goToPage(currentPage - 1);
+  });
+  document.getElementById("nextPageBtn")?.addEventListener("click", () => {
+    const totalPages = Math.max(
+      1,
+      Math.ceil(filteredCompanies.length / pageSize),
+    );
+    if (currentPage < totalPages) goToPage(currentPage + 1);
+  });
+  document.getElementById("pageSizeSelect")?.addEventListener("change", (e) => {
+    pageSize = parseInt(e.target.value, 10) || 10;
+    currentPage = 1;
+    renderCompanies(filteredCompanies);
+  });
 }
 
 // ─────────────────────────────────────────
@@ -960,8 +1090,4 @@ function escapeHtml(str) {
     .replaceAll(">", "&gt;")
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#039;");
-}
-
-function loadMoreCompanies() {
-  alert("No more companies available at the moment.");
 }

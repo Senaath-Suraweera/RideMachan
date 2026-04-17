@@ -282,23 +282,26 @@
   }
 
   function handleLogout() {
-    if (confirm("Are you sure you want to logout?")) {
-      // Call backend servlet
-      fetch("/customer/logout", { method: "GET" })
-        .then((response) => {
-          // Follow redirect from servlet
-          if (response.redirected) {
-            window.location.href = response.url;
-          } else {
-            // Manual fallback
-            window.location.href = "/views/landing/index.html";
-          }
-        })
-        .catch((error) => {
-          console.error("Logout failed:", error);
+    fetch("/customer/logout", {
+      method: "POST",
+      credentials: "include",
+      headers: { Accept: "application/json" },
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.status === "success") {
           window.location.href = "/views/landing/index.html";
-        });
-    }
+        } else {
+          console.error("Logout failed:", data.message);
+          // Still redirect — session is probably gone anyway
+          window.location.href = "/views/landing/index.html";
+        }
+      })
+      .catch((error) => {
+        console.error("Logout request failed:", error);
+        // Network failure — redirect anyway so the user isn't stuck
+        window.location.href = "/views/landing/index.html";
+      });
   }
 
   // Initialize when DOM is loaded

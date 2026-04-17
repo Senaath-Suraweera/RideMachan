@@ -127,7 +127,27 @@
         <!-- Results -->
         <section class="companies-section">
           <div class="companies-grid" id="companiesGrid"></div>
+
+          <!-- Pagination -->
+          <div
+            class="pagination-wrapper"
+            id="paginationWrapper"
+            style="display: none"
+          >
+            <div class="pagination-info" id="paginationInfo"></div>
+            <div class="pagination-controls" id="paginationControls"></div>
+            <div class="pagination-size">
+              <label for="pageSizeSelect">Per page:</label>
+              <select id="pageSizeSelect">
+                <option value="5">5</option>
+                <option value="10" selected>10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+              </select>
+            </div>
+          </div>
         </section>
+
         <!-- Register Company Modal -->
         <div class="modal" id="registerCompanyModal" aria-hidden="true">
           <div

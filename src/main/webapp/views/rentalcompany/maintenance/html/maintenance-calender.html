@@ -17,87 +17,16 @@
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
     />
-
-    <script src="../js/maintenance-calender.js" defer></script>
   </head>
-  <body>
+  <body data-active-page="calendar">
     <div class="dashboard-container">
-      <!-- Sidebar -->
-      <aside class="sidebar">
-        <div class="logo-section">
-          <img
-            src="../assets/ridemachan-logo.png"
-            alt="RideMachan Logo"
-            class="logo"
-          />
-        </div>
-
-        <nav class="nav-menu">
-          <ul>
-            <h3>Main Navigation</h3>
-            <li class="nav-item">
-              <a href="dashboard.html" class="nav-link">
-                <i class="fas fa-tachometer-alt"></i>
-                <span>Dashboard</span>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a href="inspection.html" class="nav-link">
-                <i class="fas fa-tools"></i>
-                <span>Maintenance Logs</span>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a href="vehiclerecords.html" class="nav-link">
-                <i class="fas fa-file"></i>
-                <span>Vehicle Records</span>
-              </a>
-            </li>
-            <li class="nav-item active">
-              <a href="maintenance-calender.html" class="nav-link">
-                <i class="fas fa-calendar"></i>
-                <span>Calendar</span>
-              </a>
-            </li>
-          </ul>
-        </nav>
-
-        <div class="logout-section">
-          <a href="#" class="nav-link">
-            <i class="fas fa-sign-out-alt"></i>
-            <span>Logout</span>
-          </a>
-        </div>
-      </aside>
+      <!-- Sidebar (injected by layout.js) -->
+      <aside id="sidebar-mount"></aside>
 
       <!-- Main Content -->
       <div class="main-content main">
-        <!-- Header -->
-        <header class="header own">
-          <div class="search-bar">
-            <i class="fas fa-search"></i>
-            <input
-              type="text"
-              placeholder="Search vehicles, maintenance records..."
-              id="searchInput"
-            />
-          </div>
-          <div class="header-actions">
-            <div class="notification">
-              <a href="notification.html" class="notification">
-                <i class="fas fa-bell"></i>
-                <div class="badge">3</div>
-              </a>
-            </div>
-            <div class="user-profile" onclick="toggleUserMenu()">
-              <div class="profile-img">MS</div>
-              <div class="user-info">
-                <div class="user-name">Mr. Sivajan</div>
-                <div class="user-role">Maintenance Staff</div>
-              </div>
-            </div>
-          </div>
-        </header>
+        <!-- Header (injected by layout.js) -->
+        <header id="header-mount"></header>
 
         <!-- Page Content -->
         <div class="page-content">
@@ -129,13 +58,8 @@
               </div>
             </div>
 
-            <div class="tasks-list" id="todayTasksList">
-              <!-- Tasks will be populated by JavaScript -->
-            </div>
-
-            <div id="eventsContainer">
-              <!-- Calendar events will be rendered here -->
-            </div>
+            <div class="tasks-list" id="todayTasksList"></div>
+            <div id="eventsContainer"></div>
           </div>
 
           <div class="calendar-main-section">
@@ -169,9 +93,7 @@
                       <div class="day-header">Sat</div>
                     </div>
 
-                    <div class="calendar-dates" id="calendarDates">
-                      <!-- Dates will be populated by JavaScript -->
-                    </div>
+                    <div class="calendar-dates" id="calendarDates"></div>
                   </div>
                 </div>
 
@@ -272,7 +194,6 @@
               >
                 <option value="">Loading vehicles…</option>
               </select>
-              <!-- hidden fields populated by JS when dropdown changes -->
               <input
                 type="hidden"
                 id="vehiclenumberplate"
@@ -353,7 +274,6 @@
               <i class="fas fa-user"></i>
               Assigned Technician
             </label>
-            <!-- Read-only: always the logged-in maintenance staff member -->
             <input
               type="text"
               id="technician"
@@ -424,5 +344,8 @@
         </button>
       </div>
     </div>
+
+    <script src="../js/layout.js" defer></script>
+    <script src="../js/maintenance-calender.js" defer></script>
   </body>
 </html>

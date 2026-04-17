@@ -81,10 +81,10 @@ public class AdminMaintenanceStaffServlet extends HttpServlet {
                         .append("ms.maintenanceid, ms.username, ms.firstname, ms.lastname, ms.email, ms.mobilenumber, ")
                         .append("ms.company_id, ms.specialization, ms.status, ms.yearsOfExperience, ")
                         .append("rc.companyname, ")
-                        .append("(SELECT COUNT(*) FROM maintenanceJobs mj ")
-                        .append(" WHERE mj.assignedStaffId = ms.maintenanceid AND mj.status = 'completed') AS completedJobs, ")
-                        .append("(SELECT COUNT(*) FROM maintenanceJobs mj ")
-                        .append(" WHERE mj.assignedStaffId = ms.maintenanceid AND mj.status IN ('pending','on Job')) AS activeJobs, ")
+                        .append("(SELECT COUNT(*) FROM CalendarEvents ce ")
+                        .append(" WHERE ce.maintenance_id = ms.maintenanceid AND ce.status = 'completed') AS completedJobs, ")
+                        .append("(SELECT COUNT(*) FROM CalendarEvents ce ")
+                        .append(" WHERE ce.maintenance_id = ms.maintenanceid AND ce.status IN ('scheduled','in-progress')) AS activeJobs, ")
                         .append("(SELECT COUNT(*) FROM maintenance_vehicle_assignment mva ")
                         .append(" WHERE mva.maintenanceid = ms.maintenanceid AND LOWER(COALESCE(mva.status,'assigned')) = 'assigned') AS assignedVehicleCount ")
                         .append("FROM MaintenanceStaff ms ")
@@ -179,9 +179,9 @@ public class AdminMaintenanceStaffServlet extends HttpServlet {
                             "ms.maintenanceid, ms.username, ms.firstname, ms.lastname, ms.email, ms.mobilenumber, " +
                             "ms.company_id, ms.specialization, ms.status, ms.yearsOfExperience, " +
                             "rc.companyname, " +
-                            "(SELECT COUNT(*) FROM maintenanceJobs mj WHERE mj.assignedStaffId = ms.maintenanceid AND mj.status = 'completed') AS completedJobs, " +
-                            "(SELECT COUNT(*) FROM maintenanceJobs mj WHERE mj.assignedStaffId = ms.maintenanceid AND mj.status IN ('pending','on Job')) AS activeJobs, " +
-                            "(SELECT COUNT(*) FROM maintenanceJobs mj WHERE mj.assignedStaffId = ms.maintenanceid) AS totalJobs, " +
+                            "(SELECT COUNT(*) FROM CalendarEvents ce WHERE ce.maintenance_id = ms.maintenanceid AND ce.status = 'completed') AS completedJobs, " +
+                            "(SELECT COUNT(*) FROM CalendarEvents ce WHERE ce.maintenance_id = ms.maintenanceid AND ce.status IN ('scheduled','in-progress')) AS activeJobs, " +
+                            "(SELECT COUNT(*) FROM CalendarEvents ce WHERE ce.maintenance_id = ms.maintenanceid) AS totalJobs, " +
                             "(SELECT COUNT(*) FROM maintenance_vehicle_assignment mva WHERE mva.maintenanceid = ms.maintenanceid AND LOWER(COALESCE(mva.status,'assigned')) = 'assigned') AS assignedVehicleCount " +
                             "FROM MaintenanceStaff ms " +
                             "JOIN RentalCompany rc ON rc.companyid = ms.company_id " +
@@ -697,7 +697,7 @@ public class AdminMaintenanceStaffServlet extends HttpServlet {
     }
 
     private String getJobHistoryJson(Connection con, int maintenanceId, int companyId) throws SQLException {
-        // Pull from CalendarEvents (service schedule) for richer data, plus maintenanceJobs as fallback
+        // Pull from CalendarEvents (service schedule) for job history
         String sql =
                 "SELECT " +
                         "ce.eventid AS jobId, ce.vehicle_id AS vehicleId, ce.status, " +

@@ -8,7 +8,6 @@ loginForm.addEventListener("submit", async (e) => {
   const password = document.getElementById("password").value.trim();
 
   try {
-    // ✅ Send JSON data to servlet
     const response = await fetch("http://localhost:8080/maintenance/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -19,7 +18,6 @@ loginForm.addEventListener("submit", async (e) => {
     const result = await response.json();
 
     if (result.status === "success") {
-      alert("✅ Login successful!");
       window.location.href =
         "/views/rentalcompany/maintenance/html/dashboard.html";
     } else {

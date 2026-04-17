@@ -18,6 +18,16 @@ class DriversManager {
 
     this.ratingText = document.getElementById("ratingText");
 
+    // Pagination
+    this.currentPage = 1;
+    this.pageSize = 10;
+    this.paginationWrap = document.getElementById("driversPagination");
+    this.paginationInfo = document.getElementById("driversPaginationInfo");
+    this.paginationControls = document.getElementById(
+      "driversPaginationControls",
+    );
+    this.pageSizeSelect = document.getElementById("driversPageSize");
+
     this.wireEvents();
     this.initializeRatingFilter();
     this.searchDrivers();
@@ -38,6 +48,13 @@ class DriversManager {
       if (e.key === "Enter") this.searchDrivers();
     });
     this.sortInput?.addEventListener("change", () => this.searchDrivers());
+
+    this.pageSizeSelect?.addEventListener("change", () => {
+      this.pageSize = Number(this.pageSizeSelect.value) || 10;
+      this.currentPage = 1;
+      this.renderDrivers();
+      this.renderPagination();
+    });
 
     this.grid?.addEventListener("click", (e) => {
       const card = e.target.closest(".driver-card");
@@ -116,6 +133,7 @@ class DriversManager {
       this.filteredDrivers = [];
       this.renderDrivers();
       this.updateCount();
+      this.renderPagination();
       this.showEmptyState("Failed to load drivers.");
     }
   }
@@ -166,8 +184,11 @@ class DriversManager {
       return true;
     });
 
+    this.currentPage = 1;
+
     this.renderDrivers();
     this.updateCount();
+    this.renderPagination();
   }
 
   clearFilters() {
@@ -186,6 +207,10 @@ class DriversManager {
       .forEach((s) => s.classList.remove("active"));
     if (this.ratingText) this.ratingText.textContent = "Any";
 
+    if (this.pageSizeSelect) this.pageSizeSelect.value = "10";
+    this.pageSize = 10;
+    this.currentPage = 1;
+
     this.searchDrivers();
   }
 
@@ -198,9 +223,110 @@ class DriversManager {
       return;
     }
 
-    this.filteredDrivers.forEach((d) =>
-      this.grid.appendChild(this.createCard(d)),
+    const totalPages = Math.max(
+      1,
+      Math.ceil(this.filteredDrivers.length / this.pageSize),
     );
+    if (this.currentPage > totalPages) this.currentPage = totalPages;
+    if (this.currentPage < 1) this.currentPage = 1;
+
+    const start = (this.currentPage - 1) * this.pageSize;
+    const end = start + this.pageSize;
+    const pageItems = this.filteredDrivers.slice(start, end);
+
+    pageItems.forEach((d) => this.grid.appendChild(this.createCard(d)));
+  }
+
+  renderPagination() {
+    if (!this.paginationWrap) return;
+
+    const total = this.filteredDrivers.length;
+    const totalPages = Math.max(1, Math.ceil(total / this.pageSize));
+
+    if (total === 0) {
+      this.paginationWrap.style.display = "none";
+      return;
+    }
+
+    this.paginationWrap.style.display = "flex";
+
+    const start = (this.currentPage - 1) * this.pageSize + 1;
+    const end = Math.min(this.currentPage * this.pageSize, total);
+
+    if (this.paginationInfo) {
+      this.paginationInfo.innerHTML = `Showing <strong>${start}</strong>–<strong>${end}</strong> of <strong>${total}</strong>`;
+    }
+
+    if (!this.paginationControls) return;
+    this.paginationControls.innerHTML = "";
+
+    const makeBtn = (
+      label,
+      page,
+      { disabled = false, active = false } = {},
+    ) => {
+      const btn = document.createElement("button");
+      btn.className = "pagination-btn" + (active ? " active" : "");
+      btn.textContent = label;
+      btn.disabled = disabled;
+      if (!disabled && !active) {
+        btn.addEventListener("click", () => {
+          this.currentPage = page;
+          this.renderDrivers();
+          this.renderPagination();
+          this.grid?.scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+      }
+      return btn;
+    };
+
+    const makeEllipsis = () => {
+      const s = document.createElement("span");
+      s.className = "pagination-ellipsis";
+      s.textContent = "…";
+      return s;
+    };
+
+    // Prev
+    this.paginationControls.appendChild(
+      makeBtn("‹ Prev", this.currentPage - 1, {
+        disabled: this.currentPage === 1,
+      }),
+    );
+
+    // Page numbers
+    const pages = this.getPageList(this.currentPage, totalPages);
+    pages.forEach((p) => {
+      if (p === "…") {
+        this.paginationControls.appendChild(makeEllipsis());
+      } else {
+        this.paginationControls.appendChild(
+          makeBtn(String(p), p, { active: p === this.currentPage }),
+        );
+      }
+    });
+
+    // Next
+    this.paginationControls.appendChild(
+      makeBtn("Next ›", this.currentPage + 1, {
+        disabled: this.currentPage === totalPages,
+      }),
+    );
+  }
+
+  getPageList(current, total) {
+    if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
+
+    const pages = [1];
+    if (current > 3) pages.push("…");
+
+    const startP = Math.max(2, current - 1);
+    const endP = Math.min(total - 1, current + 1);
+    for (let i = startP; i <= endP; i++) pages.push(i);
+
+    if (current < total - 2) pages.push("…");
+    pages.push(total);
+    return pages;
   }
 
   showEmptyState(message) {
@@ -235,10 +361,10 @@ class DriversManager {
         <p class="driver-company">${this.escape(d.company || "—")}</p>
 
         <div class="driver-details">
-          <span>📍 ${this.escape(d.location || "—")}</span>
-          <span>🪪 ${this.escape(d.licenseNumber || "—")}</span>
-          <span>📅 Joined ${this.escape(d.appliedDate || "—")}</span>
-          <span>🚗 ${Number(d.totalRides || 0)} rides</span>
+          <span><i class="fas fa-location-dot"></i>  ${this.escape(d.location || "—")}</span>
+          <span><i class="fas fa-id-card"></i> ${this.escape(d.licenseNumber || "—")}</span>
+          <span><i class="fas fa-road"></i> Joined ${this.escape(d.appliedDate || "—")}</span>
+          <span><i class="fas fa-building"></i> ${Number(d.totalRides || 0)} rides</span>
         </div>
 
         <div class="driver-description"><p>${this.escape(d.description || "")}</p></div>

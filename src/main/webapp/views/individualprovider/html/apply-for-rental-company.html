@@ -112,11 +112,40 @@
         <!-- Companies List -->
         <div class="companies-container"></div>
 
-        <!-- Load More Button -->
-        <div class="load-more-section">
-          <button class="btn btn-secondary" onclick="loadMoreCompanies()">
-            <i class="fas fa-rotate"></i> Load More Companies
-          </button>
+        <!-- Pagination -->
+        <div class="pagination-section" id="paginationSection">
+          <div class="pagination-info" id="paginationInfo">
+            <i class="fas fa-list-ul"></i>
+            <span id="paginationInfoText">Showing 0 of 0 companies</span>
+          </div>
+          <div class="pagination-controls" id="paginationControls">
+            <button
+              class="pagination-btn"
+              id="prevPageBtn"
+              aria-label="Previous page"
+            >
+              <i class="fas fa-chevron-left"></i>
+              <span>Prev</span>
+            </button>
+            <div class="pagination-pages" id="paginationPages"></div>
+            <button
+              class="pagination-btn"
+              id="nextPageBtn"
+              aria-label="Next page"
+            >
+              <span>Next</span>
+              <i class="fas fa-chevron-right"></i>
+            </button>
+          </div>
+          <div class="pagination-size">
+            <label for="pageSizeSelect">Per page</label>
+            <select class="form-select" id="pageSizeSelect">
+              <option value="5">5</option>
+              <option value="10" selected>10</option>
+              <option value="20">20</option>
+              <option value="50">50</option>
+            </select>
+          </div>
         </div>
       </div>
     </div>

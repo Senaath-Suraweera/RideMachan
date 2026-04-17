@@ -3,6 +3,8 @@ class SupportTicketsManager {
   constructor() {
     this.tickets = [];
     this.filteredTickets = [];
+    this.currentPage = 1;
+    this.pageSize = 10;
     this.init();
   }
 
@@ -38,8 +40,22 @@ class SupportTicketsManager {
     const priorityFilter = document.getElementById("priorityFilter");
 
     [statusFilter, roleFilter, priorityFilter].forEach((el) => {
-      if (el) el.addEventListener("change", () => this.loadAndRender());
+      if (el)
+        el.addEventListener("change", () => {
+          this.currentPage = 1;
+          this.loadAndRender();
+        });
     });
+
+    const pageSizeSel = document.getElementById("ticketsPageSize");
+    if (pageSizeSel) {
+      pageSizeSel.addEventListener("change", (e) => {
+        this.pageSize = parseInt(e.target.value, 10) || 10;
+        this.currentPage = 1;
+        this.renderTickets();
+        this.renderPagination();
+      });
+    }
   }
 
   readUIFilters() {
@@ -65,12 +81,14 @@ class SupportTicketsManager {
 
       this.renderTickets();
       this.renderStats();
+      this.renderPagination();
     } catch (err) {
       console.error(err);
       this.tickets = [];
       this.filteredTickets = [];
       this.renderTickets();
       this.renderStats();
+      this.renderPagination();
       alert(err.message || "Failed to load tickets");
     }
   }
@@ -82,7 +100,49 @@ class SupportTicketsManager {
 
     tbody.innerHTML = "";
 
-    this.filteredTickets.forEach((t) => tbody.appendChild(this.row(t)));
+    const total = this.filteredTickets.length;
+    const totalPages = Math.max(1, Math.ceil(total / this.pageSize));
+    if (this.currentPage > totalPages) this.currentPage = totalPages;
+
+    const start = (this.currentPage - 1) * this.pageSize;
+    const end = start + this.pageSize;
+    const pageItems = this.filteredTickets.slice(start, end);
+
+    if (pageItems.length === 0) {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td colspan="6" class="empty-state-cell" style="text-align:center;padding:24px;color:var(--text-light);">No tickets found.</td>`;
+      tbody.appendChild(tr);
+      return;
+    }
+
+    pageItems.forEach((t) => tbody.appendChild(this.row(t)));
+  }
+
+  renderPagination() {
+    const info = document.getElementById("ticketsPaginationInfo");
+    const pagesEl = document.getElementById("ticketsPages");
+    if (!info || !pagesEl) return;
+
+    const total = this.filteredTickets.length;
+    const totalPages = Math.max(1, Math.ceil(total / this.pageSize));
+    if (this.currentPage > totalPages) this.currentPage = totalPages;
+
+    if (total === 0) {
+      info.innerHTML = `Showing <strong>0</strong> of <strong>0</strong>`;
+      pagesEl.innerHTML = "";
+      return;
+    }
+
+    const start = (this.currentPage - 1) * this.pageSize + 1;
+    const end = Math.min(this.currentPage * this.pageSize, total);
+    info.innerHTML = `Showing <strong>${start}–${end}</strong> of <strong>${total}</strong> tickets`;
+
+    pagesEl.innerHTML = buildPageButtons(this.currentPage, totalPages);
+    attachPageButtonHandlers(pagesEl, (p) => {
+      this.currentPage = p;
+      this.renderTickets();
+      this.renderPagination();
+    });
   }
 
   renderStats() {
@@ -160,6 +220,54 @@ function escapeHTML(str) {
     .replaceAll(">", "&gt;")
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#039;");
+}
+
+/**
+ * Builds pagination button HTML.
+ * Strategy: always show first & last; show current +/- 1; ellipsis for gaps.
+ */
+function buildPageButtons(current, totalPages) {
+  const parts = [];
+  const btn = (page, label, { active = false, disabled = false } = {}) =>
+    `<button type="button" class="pagination-btn${active ? " active" : ""}" data-page="${page}"${disabled ? " disabled" : ""}>${label}</button>`;
+
+  parts.push(
+    btn(current - 1, '<i class="fas fa-chevron-left"></i>', {
+      disabled: current <= 1,
+    }),
+  );
+
+  const pages = new Set([1, totalPages, current - 1, current, current + 1]);
+  const visible = [...pages]
+    .filter((p) => p >= 1 && p <= totalPages)
+    .sort((a, b) => a - b);
+
+  let prev = 0;
+  for (const p of visible) {
+    if (p - prev > 1) {
+      parts.push(`<span class="pagination-ellipsis">…</span>`);
+    }
+    parts.push(btn(p, String(p), { active: p === current }));
+    prev = p;
+  }
+
+  parts.push(
+    btn(current + 1, '<i class="fas fa-chevron-right"></i>', {
+      disabled: current >= totalPages,
+    }),
+  );
+
+  return parts.join("");
+}
+
+function attachPageButtonHandlers(container, onSelect) {
+  container.querySelectorAll("button[data-page]").forEach((b) => {
+    b.addEventListener("click", () => {
+      if (b.disabled || b.classList.contains("active")) return;
+      const p = parseInt(b.getAttribute("data-page"), 10);
+      if (!Number.isNaN(p)) onSelect(p);
+    });
+  });
 }
 
 window.addEventListener("DOMContentLoaded", () => {

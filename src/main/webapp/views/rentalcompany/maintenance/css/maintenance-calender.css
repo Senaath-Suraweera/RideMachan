@@ -1,6 +1,5 @@
 @import url(common.css);
 
-
 /* Page Content */
 .page-content {
   padding: 32px 62px 64px 32px;
@@ -10,7 +9,6 @@
   position: relative;
   left: -42px;
   top: -20px;
-  border: 1px solid red;
 }
 
 .page-header {

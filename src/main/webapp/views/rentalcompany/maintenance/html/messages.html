@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Messages - RideMachan</title>
+
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Maintenance shared theme -->
+    <link rel="stylesheet" href="../css/common.css" />
+
+    <!-- Page-specific messages styling -->
+    <link rel="stylesheet" href="../css/messages.css" />
+  </head>
+
+  <body data-active-page="messages">
+    <div class="dashboard-container">
+      <aside id="sidebar-mount"></aside>
+
+      <div class="main-content">
+        <header id="header-mount"></header>
+
+        <div class="messages-page-shell">
+          <div class="messages-page-top">
+            <div class="messages-page-title-wrap">
+              <h2 class="messages-page-title">
+                <i class="fas fa-comments"></i>
+                Messages
+              </h2>
+              <p class="messages-page-subtitle">
+                View and manage your conversations in one place
+              </p>
+            </div>
+
+            <div class="messages-page-actions">
+              <button
+                class="btn btn-primary"
+                id="newConversationBtn"
+                type="button"
+              >
+                <i class="fas fa-plus"></i>
+                New Conversation
+              </button>
+            </div>
+          </div>
+
+          <div class="messaging-layout">
+            <div class="conversations-sidebar" id="conversationsSidebar">
+              <div class="conversations-header">
+                <div class="search-box">
+                  <i class="fas fa-search"></i>
+                  <input
+                    type="text"
+                    id="conversationSearch"
+                    placeholder="Search conversations..."
+                  />
+                </div>
+              </div>
+
+              <div class="conversations-list" id="conversationsList">
+                <div class="loading-state">
+                  <i class="fas fa-spinner fa-spin"></i>
+                  <p>Loading conversations...</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="chat-area" id="chatArea">
+              <div class="no-conversation-selected">
+                <i class="fas fa-comments"></i>
+                <h3>Select a conversation</h3>
+                <p>Choose a conversation from the sidebar or start a new one</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- New Conversation Modal -->
+    <div class="modal" id="newConversationModal">
+      <div class="modal-overlay"></div>
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>New Conversation</h2>
+          <button class="modal-close" id="closeModalBtn" type="button">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label">Select User Type</label>
+            <select class="form-select" id="userTypeSelect">
+              <option value="">-- Select Type --</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Select User</label>
+            <select class="form-select" id="userSelect">
+              <option value="">-- Select a user type first --</option>
+            </select>
+          </div>
+
+          <div
+            class="permission-info"
+            id="permissionInfo"
+            style="display: none"
+          >
+            <i class="fas fa-info-circle"></i>
+            <span id="permissionInfoText"></span>
+          </div>
+
+          <div class="modal-actions">
+            <button class="btn btn-outline" id="cancelModalBtn" type="button">
+              Cancel
+            </button>
+            <button
+              class="btn btn-primary"
+              id="startConversationBtn"
+              type="button"
+            >
+              <i class="fas fa-paper-plane"></i>
+              Start Conversation
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="toastContainer" class="toast-container"></div>
+
+    <script src="../js/layout.js" defer></script>
+    <script src="../js/messages.js"></script>
+  </body>
+</html>

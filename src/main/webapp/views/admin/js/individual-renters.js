@@ -13,6 +13,8 @@
   const state = {
     providers: [],
     filtered: [],
+    currentPage: 1,
+    pageSize: 10,
   };
 
   // ---- elements ----
@@ -25,6 +27,12 @@
   const sortSelect = $("#sortOrder");
   const applyBtn = $("#applyFiltersBtn");
   const resetBtn = $("#resetFiltersBtn");
+
+  // pagination elements
+  const paginationWrap = $("#rentersPagination");
+  const paginationInfo = $("#rentersPaginationInfo");
+  const paginationControls = $("#rentersPaginationControls");
+  const pageSizeSelect = $("#rentersPageSize");
 
   // ---- API ----
   async function apiGet(url) {
@@ -167,6 +175,7 @@
     else if (sort === "id_asc") state.filtered.sort(byIdAsc);
     else state.filtered.sort(byNameAsc);
 
+    state.currentPage = 1;
     render();
   }
 
@@ -177,12 +186,24 @@
 
     if (!state.filtered.length) {
       grid.innerHTML = `<div style="padding:12px;color:#6b7280;">No providers found.</div>`;
+      renderPagination();
       return;
     }
 
+    const totalPages = Math.max(
+      1,
+      Math.ceil(state.filtered.length / state.pageSize),
+    );
+    if (state.currentPage > totalPages) state.currentPage = totalPages;
+    if (state.currentPage < 1) state.currentPage = 1;
+
+    const start = (state.currentPage - 1) * state.pageSize;
+    const end = start + state.pageSize;
+    const pageItems = state.filtered.slice(start, end);
+
     grid.innerHTML = "";
 
-    state.filtered.forEach((p) => {
+    pageItems.forEach((p) => {
       const id = p.id;
       const fullName = (p.name || p.username || "—").trim();
       const location = p.location || "—";
@@ -211,10 +232,10 @@
           </div>
 
           <div class="renter-details">
-            <span>📍 ${esc(location)}</span>
-            <span>🗓️ Joined: ${esc(joinDate)}</span>
-            <span>📞 ${esc(phone)}</span>
-            <span>📧 ${esc(email)}</span>
+            <span><i class="fas fa-location-dot"></i> ${esc(location)}</span>
+            <span><i class="fas fa-calendar"></i> Joined: ${esc(joinDate)}</span>
+            <span><i class="fas fa-phone"></i> ${esc(phone)}</span>
+            <span><i class="fas fa-envelope"></i> ${esc(email)}</span>
             <span>#${esc(id)}</span>
           </div>
 
@@ -224,6 +245,99 @@
 
       grid.appendChild(card);
     });
+
+    renderPagination();
+  }
+
+  // ---- pagination ----
+  function renderPagination() {
+    if (!paginationWrap) return;
+
+    const total = state.filtered.length;
+    const totalPages = Math.max(1, Math.ceil(total / state.pageSize));
+
+    if (total === 0) {
+      paginationWrap.style.display = "none";
+      return;
+    }
+
+    paginationWrap.style.display = "flex";
+
+    const start = (state.currentPage - 1) * state.pageSize + 1;
+    const end = Math.min(state.currentPage * state.pageSize, total);
+
+    if (paginationInfo) {
+      paginationInfo.innerHTML = `Showing <strong>${start}</strong>–<strong>${end}</strong> of <strong>${total}</strong>`;
+    }
+
+    if (!paginationControls) return;
+    paginationControls.innerHTML = "";
+
+    const makeBtn = (
+      label,
+      page,
+      { disabled = false, active = false } = {},
+    ) => {
+      const btn = document.createElement("button");
+      btn.className = "pagination-btn" + (active ? " active" : "");
+      btn.textContent = label;
+      btn.disabled = disabled;
+      if (!disabled && !active) {
+        btn.addEventListener("click", () => {
+          state.currentPage = page;
+          render();
+        });
+      }
+      return btn;
+    };
+
+    const makeEllipsis = () => {
+      const s = document.createElement("span");
+      s.className = "pagination-ellipsis";
+      s.textContent = "…";
+      return s;
+    };
+
+    // Prev
+    paginationControls.appendChild(
+      makeBtn("‹ Prev", state.currentPage - 1, {
+        disabled: state.currentPage === 1,
+      }),
+    );
+
+    // Page numbers with compact truncation
+    const pages = getPageList(state.currentPage, totalPages);
+    pages.forEach((p) => {
+      if (p === "…") {
+        paginationControls.appendChild(makeEllipsis());
+      } else {
+        paginationControls.appendChild(
+          makeBtn(String(p), p, { active: p === state.currentPage }),
+        );
+      }
+    });
+
+    // Next
+    paginationControls.appendChild(
+      makeBtn("Next ›", state.currentPage + 1, {
+        disabled: state.currentPage === totalPages,
+      }),
+    );
+  }
+
+  function getPageList(current, total) {
+    if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
+
+    const pages = [1];
+    if (current > 3) pages.push("…");
+
+    const startP = Math.max(2, current - 1);
+    const endP = Math.min(total - 1, current + 1);
+    for (let i = startP; i <= endP; i++) pages.push(i);
+
+    if (current < total - 2) pages.push("…");
+    pages.push(total);
+    return pages;
   }
 
   // ---- events ----
@@ -233,6 +347,12 @@
     statusFilter?.addEventListener("change", applySortAndRender);
     sortSelect?.addEventListener("change", applySortAndRender);
     minRatingFilter?.addEventListener("change", applySortAndRender);
+
+    pageSizeSelect?.addEventListener("change", () => {
+      state.pageSize = Number(pageSizeSelect.value) || 10;
+      state.currentPage = 1;
+      render();
+    });
 
     applyBtn?.addEventListener("click", async () => {
       try {
@@ -249,6 +369,9 @@
       if (statusFilter) statusFilter.value = "";
       if (minRatingFilter) minRatingFilter.value = "";
       if (sortSelect) sortSelect.value = "name_asc";
+      if (pageSizeSelect) pageSizeSelect.value = "10";
+      state.pageSize = 10;
+      state.currentPage = 1;
 
       try {
         await loadProviders();

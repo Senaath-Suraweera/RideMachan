@@ -1,284 +1,260 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Ride Machan - Vehicle Maintenance</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../css/inspection.css">
-</head>
-<body>
-<div class="container">
-    <!-- Sidebar -->
-    <aside class="sidebar">
-        <div class="logo-section">
-            <img src="../assets/ridemachan-logo.png" alt="RideMachan Logo" class="logo">
-        </div>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../css/inspection.css" />
+  </head>
+  <body data-active-page="inspection">
+    <div class="container">
+      <!-- Sidebar (injected by layout.js) -->
+      <aside id="sidebar-mount"></aside>
 
-        <nav class="nav-menu">
-            <ul>
-                <h3>Main Navigation</h3>
+      <!-- Header (injected by layout.js) -->
+      <header id="header-mount"></header>
 
-                <li class="nav-item">
-                    <a href="dashboard.html" class="nav-link">
-                        <i class="fas fa-tachometer-alt"></i>
-                        <span>Dashboard</span>
-                    </a>
-                </li>
-
-                <li class="nav-item active">
-                    <a href="inspection.html" class="nav-link">
-                        <i class="fas fa-tools"></i>
-                        <span>Maintenance Logs</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="vehiclerecords.html" class="nav-link">
-                        <i class="fas fa-file"></i>
-                        <span>Vehicle Records</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="maintenance-calender.html" class="nav-link">
-                        <i class="fas fa-calendar"></i>
-                        <span>Calendar</span>
-                    </a>
-                </li>
-            </ul>
-        </nav>
-
-        <div class="logout-section">
-            <a href="#" class="nav-link">
-                <i class="fas fa-sign-out-alt"></i>
-                <span>Logout</span>
-            </a>
-        </div>
-    </aside>
-
-    <!-- Header -->
-    <div class="header">
-        <div class="search-bar">
-            <i class="fas fa-search"></i>
-            <input type="text" placeholder="Search vehicles, maintenance records..." id="searchInput">
-        </div>
-
-        <div class="header-actions">
-            <div class="notification">
-                <a href="notification.html" class="notification">
-                    <i class="fas fa-bell"></i>
-                    <div class="badge">3</div>
-                </a>
-            </div>
-            <div class="user-profile" onclick="toggleUserMenu()">
-                <div class="profile-img">MS</div>
-                <div class="user-info">
-                    <div class="user-name">Mr. Sivajan</div>
-                    <div class="user-role">Maintenance Staff</div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Main Content -->
-    <div class="main-content">
+      <!-- Main Content -->
+      <div class="main-content">
         <!-- Page Title & Actions -->
         <div class="page-title">
-            <div class="title">Vehicle Inspection</div>
-            <div class="action-buttons">
-                <!--<button class="btn btn-primary" onclick="newInspection()">
+          <div class="title">Vehicle Inspection</div>
+          <div class="action-buttons">
+            <!--<button class="btn btn-primary" onclick="newInspection()">
                     <i class="fas fa-plus"></i>
                     New Inspection
                 </button>-->
-            </div>
+          </div>
         </div>
 
         <!-- Filters Section -->
         <div class="search-filters">
-            <div class="filter-controls">
-                <h4>Choose Vehicle</h4>
-                <select class="filter-select" id="vehicleFilter">
-                    <!--Javascript will render render options-->
-                </select>
-            </div>
+          <div class="filter-controls">
+            <h4>Choose Vehicle</h4>
+            <select class="filter-select" id="vehicleFilter">
+              <!--Javascript will render render options-->
+            </select>
+          </div>
         </div>
 
         <!-- Tabs -->
         <div class="tabs-container">
-            <div class="tabs">
-                <div class="tab active" onclick="navigateToTab('inspection.html')">
-                    <a href="inspection.html" width="100%">Detailed Inspection</a>
-                </div>
-                <div class="tab" onclick="navigateToTab('maintenancelog.html')">
-                    <a href="maintenancelog.html" width="100%">Maintenance Log</a>
-                </div>
+          <div class="tabs">
+            <div class="tab active" onclick="navigateToTab('inspection.html')">
+              <a href="inspection.html" width="100%">Detailed Inspection</a>
             </div>
+            <div class="tab" onclick="navigateToTab('maintenancelog.html')">
+              <a href="maintenancelog.html" width="100%">Maintenance Log</a>
+            </div>
+          </div>
         </div>
 
         <!-- Content Grid -->
         <div class="content-grid">
-            <!-- Form Card -->
-            <div class="form-card">
-                <div class="form-header">
-                    <h3>Vehicle Inspection Form</h3>
-                    <p>Complete pre/post rental and routine inspections</p>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label class="form-label">Vehicle Registration</label>
-                        <input type="text" class="form-input" placeholder="Enter registration number" id="vehiclenumber">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Inspection Type</label>
-                        <select class="form-select" id="inspectiontype">
-                            <option>Routine Maintenance</option>
-                            <option>Pre-rental Inspection</option>
-                            <option>Post-rental Inspection</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Priority Level</label>
-                    <select class="form-select" id="prioritylevel">
-                        <option>Normal - Scheduled</option>
-                        <option>High - Urgent</option>
-                    </select>
-                </div>
-
-                <!-- Checklist Section -->
-                <div class="checklist-section">
-                    <div class="checklist-header">
-                        <h3 class="checklist-title">Inspection Checklist</h3>
-                        <div class="progress-container">
-                            <div class="progress-bar">
-                                <div class="progress-fill" id="progressFill"></div>
-                            </div>
-                            <span class="progress-text" id="progressText">0%</span>
-                        </div>
-                    </div>
-
-                    <div class="checklist-grid">
-                        <div class="checklist-item">
-                            <div class="checkbox"></div>
-                            <span class="checklist-label">Fluid Levels (Oil, Coolant, Brake)</span>
-                        </div>
-                        <div class="checklist-item">
-                            <div class="checkbox"></div>
-                            <span class="checklist-label">Tire Pressure & Condition</span>
-                        </div>
-                        <div class="checklist-item">
-                            <div class="checkbox"></div>
-                            <span class="checklist-label">Brake System</span>
-                        </div>
-                        <div class="checklist-item">
-                            <div class="checkbox"></div>
-                            <span class="checklist-label">Lights & Indicators</span>
-                        </div>
-                        <div class="checklist-item">
-                            <div class="checkbox"></div>
-                            <span class="checklist-label">Engine Condition</span>
-                        </div>
-                        <div class="checklist-item">
-                            <div class="checkbox"></div>
-                            <span class="checklist-label">Electrical Systems</span>
-                        </div>
-                        <div class="checklist-item">
-                            <div class="checkbox"></div>
-                            <span class="checklist-label">Safety Standards</span>
-                        </div>
-                        <div class="checklist-item">
-                            <div class="checkbox"></div>
-                            <span class="checklist-label">Emission Compliance</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Issues Found / Repairs Needed</label>
-                    <textarea class="form-input form-textarea" placeholder="Document any mechanical, electrical, or hydraulic issues found during inspection..." id="issues"></textarea>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label class="form-label">Upload Photos/Documentation</label>
-                        <div class="file-upload-area">
-                            <div class="upload-icon">
-                                <i class="fas fa-camera"></i>
-                            </div>
-                            <div class="upload-text">Upload inspection photos</div>
-                            <button class="choose-files-btn" type="button">
-                                <i class="fas fa-upload"></i>
-                                Choose Files
-                            </button>
-                            <input type="file" id="fileInput" multiple  style="display: none;">
-                            <div id="selectedFiles" class="selected-files"></div>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Inspection Date</label>
-                        <input type="date" class="form-input" id="inspectionDate">
-                        <br><br>
-
-                    </div>
-                </div>
-
-                <!-- Vehicle Status -->
-                <div class="status-section">
-                    <label class="form-label">Vehicle Status Update</label>
-                    <div class="status-buttons">
-                        <button class="status-btn available" data-status="available">
-                            <i class="fas fa-check-circle"></i>
-                            Available
-                        </button>
-                        <button class="status-btn maintenance" data-status="under maintenance">
-                            <i class="fas fa-tools"></i>
-                            Under Maintenance
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Action Buttons -->
-                <div class="action-buttons">
-                    <button class="btn btn-primary" id="submitbutton">
-                        <i class="fas fa-check"></i>
-                        Submit Inspection Report
-                    </button>
-                </div>
+          <!-- Form Card -->
+          <div class="form-card">
+            <div class="form-header">
+              <h3>Vehicle Inspection Form</h3>
+              <p>Complete pre/post rental and routine inspections</p>
             </div>
 
-            <!-- Vehicle Info -->
-            <div class="vehicle-info">
-                <!--Javascript will render vehicle card-->
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Vehicle Registration</label>
+                <input
+                  type="text"
+                  class="form-input"
+                  placeholder="Enter registration number"
+                  id="vehiclenumber"
+                />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Inspection Type</label>
+                <select class="form-select" id="inspectiontype">
+                  <option>Routine Maintenance</option>
+                  <option>Pre-rental Inspection</option>
+                  <option>Post-rental Inspection</option>
+                </select>
+              </div>
             </div>
-        </div> <!-- end content-grid -->
-    </div> <!-- end main-content -->
-</div> <!-- end container -->
 
+            <div class="form-group">
+              <label class="form-label">Priority Level</label>
+              <select class="form-select" id="prioritylevel">
+                <option>Normal - Scheduled</option>
+                <option>High - Urgent</option>
+              </select>
+            </div>
 
+            <!-- Checklist Section -->
+            <div class="checklist-section">
+              <div class="checklist-header">
+                <h3 class="checklist-title">Inspection Checklist</h3>
+                <div class="progress-container">
+                  <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                  </div>
+                  <span class="progress-text" id="progressText">0%</span>
+                </div>
+              </div>
 
+              <div class="checklist-grid">
+                <div class="checklist-item">
+                  <div class="checkbox"></div>
+                  <span class="checklist-label"
+                    >Fluid Levels (Oil, Coolant, Brake)</span
+                  >
+                </div>
+                <div class="checklist-item">
+                  <div class="checkbox"></div>
+                  <span class="checklist-label">Tire Pressure & Condition</span>
+                </div>
+                <div class="checklist-item">
+                  <div class="checkbox"></div>
+                  <span class="checklist-label">Brake System</span>
+                </div>
+                <div class="checklist-item">
+                  <div class="checkbox"></div>
+                  <span class="checklist-label">Lights & Indicators</span>
+                </div>
+                <div class="checklist-item">
+                  <div class="checkbox"></div>
+                  <span class="checklist-label">Engine Condition</span>
+                </div>
+                <div class="checklist-item">
+                  <div class="checkbox"></div>
+                  <span class="checklist-label">Electrical Systems</span>
+                </div>
+                <div class="checklist-item">
+                  <div class="checkbox"></div>
+                  <span class="checklist-label">Safety Standards</span>
+                </div>
+                <div class="checklist-item">
+                  <div class="checkbox"></div>
+                  <span class="checklist-label">Emission Compliance</span>
+                </div>
+              </div>
+            </div>
 
+            <div class="form-group">
+              <label class="form-label">Issues Found / Repairs Needed</label>
+              <textarea
+                class="form-input form-textarea"
+                placeholder="Document any mechanical, electrical, or hydraulic issues found during inspection..."
+                id="issues"
+              ></textarea>
+            </div>
 
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Upload Photos/Documentation</label>
+                <div class="file-upload-area">
+                  <div class="upload-icon">
+                    <i class="fas fa-camera"></i>
+                  </div>
+                  <div class="upload-text">Upload inspection photos</div>
+                  <button class="choose-files-btn" type="button">
+                    <i class="fas fa-upload"></i>
+                    Choose Files
+                  </button>
+                  <input
+                    type="file"
+                    id="fileInput"
+                    multiple
+                    style="display: none"
+                  />
+                  <div id="selectedFiles" class="selected-files"></div>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Inspection Date</label>
+                <input type="date" class="form-input" id="inspectionDate" />
+                <br /><br />
+              </div>
+            </div>
 
+            <!-- Vehicle Status -->
+            <div class="status-section">
+              <label class="form-label">Vehicle Status Update</label>
+              <div class="status-buttons">
+                <button class="status-btn available" data-status="available">
+                  <i class="fas fa-check-circle"></i>
+                  Available
+                </button>
+                <button
+                  class="status-btn maintenance"
+                  data-status="under maintenance"
+                >
+                  <i class="fas fa-tools"></i>
+                  Under Maintenance
+                </button>
+              </div>
+            </div>
 
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+              <button class="btn btn-primary" id="submitbutton">
+                <i class="fas fa-check"></i>
+                Submit Inspection Report
+              </button>
+            </div>
+          </div>
 
-
-
-
-
-
-<div id="loginModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%;
-    background: rgba(0,0,0,0.5); justify-content:center; align-items:center; z-index:1000;">
-    <div style="background:white; padding:20px; border-radius:8px; text-align:center; width:300px;">
-        <p style="margin-bottom:20px;">Login First</p>
-        <button id="loginOkBtn" style="padding:8px 16px; cursor:pointer;">OK</button>
+          <!-- Vehicle Info -->
+          <div class="vehicle-info">
+            <!--Javascript will render vehicle card-->
+          </div>
+        </div>
+        <!-- end content-grid -->
+      </div>
+      <!-- end main-content -->
     </div>
-</div>
+    <!-- end container -->
 
-<script src="../js/inspection.js"></script>
+    <div
+      id="loginModal"
+      style="
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+      "
+    >
+      <div
+        style="
+          background: white;
+          padding: 20px;
+          border-radius: 8px;
+          text-align: center;
+          width: 300px;
+        "
+      >
+        <p style="margin-bottom: 20px">Login First</p>
+        <button id="loginOkBtn" style="padding: 8px 16px; cursor: pointer">
+          OK
+        </button>
+      </div>
+    </div>
 
-
-</body>
+    <script src="../js/layout.js" defer></script>
+    <script src="../js/inspection.js" defer></script>
+  </body>
 </html>

@@ -1,6 +1,5 @@
 @import url("common.css");
 
-
 /* =========================
   CSS Variables (Matching Home Page)
   ========================= */
@@ -18,13 +17,13 @@
   --border: #e9ecef;
   --text: #2d3748;
   --text-light: #718096;
- 
+
   /* Shadows */
-  --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
-   0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow:
+    0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
   --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-  --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
-   0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  --shadow-lg:
+    0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
 
   /* Border Radius */
   --radius: 10px;
@@ -85,11 +84,22 @@ body {
   min-height: 100vh;
 }
 
-
-
-
-
-
+/* =========================
+  Header (overrides common.css so it sits correctly in the grid)
+  ========================= */
+.header {
+  grid-column: 2;
+  background-color: white;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 30px;
+  box-shadow: var(--shadow-sm);
+  z-index: 100;
+  position: sticky;
+  top: 0;
+  margin-left: -21.4px;
+}
 
 /* =========================
   Main Content
@@ -181,9 +191,9 @@ body {
 }
 
 .tab a {
-  display: block;        /* make it block so it fills parent */
-  width: 100%;           /* full width of parent */
-  color: inherit;        /* keep text color same */
+  display: block; /* make it block so it fills parent */
+  width: 100%; /* full width of parent */
+  color: inherit; /* keep text color same */
   text-decoration: none; /* remove underline */
   /*border: 1px solid red;*/ /* just for testing */
   height: 42px;
@@ -262,7 +272,8 @@ body {
   display: block;
 }
 
-.form-input, .form-select {
+.form-input,
+.form-select {
   width: 100%;
   padding: 12px 15px;
   border: 2px solid var(--border);
@@ -274,7 +285,8 @@ body {
   font-family: "Poppins", sans-serif;
 }
 
-.form-input:focus, .form-select:focus {
+.form-input:focus,
+.form-select:focus {
   outline: none;
   border-color: var(--primary-light);
   box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
@@ -380,7 +392,11 @@ body {
 }
 
 .checklist-item.checked {
-  background: linear-gradient(135deg, rgba(76, 201, 240, 0.1), rgba(16, 185, 129, 0.1));
+  background: linear-gradient(
+    135deg,
+    rgba(76, 201, 240, 0.1),
+    rgba(16, 185, 129, 0.1)
+  );
   border-color: var(--success);
   box-shadow: 0 3px 8px rgba(76, 201, 240, 0.2);
 }
@@ -403,7 +419,7 @@ body {
 }
 
 .checkbox.checked::after {
-  content: '✓';
+  content: "✓";
   position: absolute;
   top: 50%;
   left: 50%;
@@ -494,7 +510,6 @@ body {
 
 .status-buttons:nth-of-type(2) {
   width: 1660px;
-  
 }
 
 .status-btn {
@@ -621,10 +636,10 @@ body {
   top: 0;
   left: -100%;
   background: linear-gradient(
-   90deg,
-   transparent,
-   rgba(255, 255, 255, 0.2),
-   transparent
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
   );
   transition: 0.5s;
 }
@@ -713,8 +728,6 @@ body {
   font-size: 14px;
   margin-bottom: 20px;
 }
-
-
 
 /* =========================
   Compliance Items
@@ -899,10 +912,10 @@ body {
   top: 0;
   left: -100%;
   background: linear-gradient(
-   90deg,
-   transparent,
-   rgba(255, 255, 255, 0.2),
-   transparent
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
   );
   transition: 0.5s;
 }
@@ -947,27 +960,26 @@ body {
   margin-right: 15px;
 }
 
-
 /* =========================
   Animations
   ========================= */
 @keyframes fadeIn {
   from {
-   opacity: 0;
+    opacity: 0;
   }
   to {
-   opacity: 1;
+    opacity: 1;
   }
 }
 
 @keyframes fadeInUp {
   from {
-   opacity: 0;
-   transform: translateY(20px);
+    opacity: 0;
+    transform: translateY(20px);
   }
   to {
-   opacity: 1;
-   transform: translateY(0);
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
@@ -978,7 +990,7 @@ body {
   .content-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .sidebar-content {
     grid-template-columns: 1fr 1fr;
     display: grid;
@@ -1066,34 +1078,6 @@ body {
 .fas {
   font-size: 18px;
 }
-  
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
- 
-
-
-
-
-
-
-
-
-
-
-
 
 .vehicle-info {
   display: none;
@@ -1160,8 +1144,6 @@ body {
   color: #155724;
 }
 
-
-
 @media (max-width: 968px) {
   .main-content {
     padding-left: 40px;
@@ -1177,25 +1159,10 @@ body {
     border: 1px solid red;
   }
 
-  .vehicle-info{
+  .vehicle-info {
     display: none;
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 /* =========================
   Search and Filters Section

@@ -188,36 +188,81 @@ public class MaintenanceStaffDAO {
 
     }
 
-    public static boolean updateMaintenanceProfile(int staffId, String firstname,String lastname,String mobileNumber,String email) {
+    public static boolean updateMaintenanceProfile(int staffId,
+                                                   String username,
+                                                   String firstname,
+                                                   String lastname,
+                                                   String mobileNumber,
+                                                   String email,
+                                                   String specialization,
+                                                   String status,
+                                                   float yearsOfExperience) {
+
+        // Ensure the new username is not already taken by a different staff member.
+        if (isUsernameTaken(username, staffId)) {
+            return false;
+        }
 
         String sql = "UPDATE maintenancestaff SET " +
+                "username = ?, " +
                 "firstname = ?, " +
                 "lastname = ?, " +
                 "mobilenumber = ?, " +
-                "email = ? " +
+                "email = ?, " +
+                "specialization = ?, " +
+                "status = ?, " +
+                "yearsOfExperience = ? " +
                 "WHERE maintenanceid = ?";
 
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            ps.setString(1, firstname);
-            ps.setString(2, lastname);
-            ps.setString(3, mobileNumber);
-            ps.setString(4, email);
-            ps.setInt(5, staffId);
+            ps.setString(1, username);
+            ps.setString(2, firstname);
+            ps.setString(3, lastname);
+            ps.setString(4, mobileNumber);
+            ps.setString(5, email);
+            ps.setString(6, specialization);
+            ps.setString(7, status);
+            ps.setFloat(8, yearsOfExperience);
+            ps.setInt(9, staffId);
 
             int rows = ps.executeUpdate();
-
             return rows > 0;
 
         } catch (Exception e) {
-
             e.printStackTrace();
             return false;
+        }
+    }
 
+    /**
+     * Returns true if another maintenance staff row already uses this username.
+     * The excludeStaffId lets the caller skip the current user's own row.
+     */
+    private static boolean isUsernameTaken(String username, int excludeStaffId) {
+
+        String sql = "SELECT COUNT(*) FROM maintenancestaff WHERE username = ? AND maintenanceid <> ?";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, username);
+            ps.setInt(2, excludeStaffId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
+        return false;
     }
+
 
     public static int getAvailableStaffCount(int companyId) {
 
@@ -264,129 +309,153 @@ public class MaintenanceStaffDAO {
 
     public static int getOverdueMaintenanceCount(int staffId) {
 
-        String sql = "SELECT COUNT(*) FROM maintenanceJobs WHERE assignedStaffId = ? AND status = 'overdue'";
+        // Overdue = scheduled in calendarevents but the scheduled_date has already passed
+        String sql = "SELECT COUNT(*) FROM calendarevents " +
+                "WHERE maintenance_id = ? " +
+                "AND status = 'scheduled' " +
+                "AND scheduled_date < CURDATE()";
 
         try (Connection con = DBConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
 
             ps.setInt(1, staffId);
-            ResultSet rs = ps.executeQuery();
-
-            if (rs.next()) {
-                return rs.getInt(1); // Get the count from the query
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) return rs.getInt(1);
             }
 
         } catch (SQLException e) {
             e.printStackTrace();
         }
         return 0;
-
     }
 
 
     public static int getTodayCompletedJobsCount(int staffId) {
 
-        String sql = "SELECT COUNT(*) FROM maintenanceJobs WHERE assignedStaffId = ? AND status = 'overdue'";
+        // Completed today = status completed AND scheduled_date is today
+        // (calendarevents has no completedDate column, so we use scheduled_date)
+        String sql = "SELECT COUNT(*) FROM calendarevents " +
+                "WHERE maintenance_id = ? " +
+                "AND status = 'completed' " +
+                "AND scheduled_date = CURDATE()";
 
         try (Connection con = DBConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
 
             ps.setInt(1, staffId);
-            ResultSet rs = ps.executeQuery();
-
-            if (rs.next()) {
-                return rs.getInt(1); // Get the count from the query
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) return rs.getInt(1);
             }
 
         } catch (SQLException e) {
             e.printStackTrace();
         }
         return 0;
-
     }
 
 
     public static int getLinkedCount(int staffId) {
 
-        String sql = "SELECT COUNT(*) FROM maintenanceJobs " +
-                     "WHERE assignedStaffId = ? AND status = 'completed' AND completedDate = CURDATE()";
-
+        // Linked Vehicles = distinct vehicles assigned to this staff member.
+        // Uses the maintenance_vehicle_assignment table.
+        String sql = "SELECT COUNT(DISTINCT vehicleid) FROM maintenance_vehicle_assignment " +
+                "WHERE maintenanceid = ?";
 
         try (Connection con = DBConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
 
             ps.setInt(1, staffId);
-            ResultSet rs = ps.executeQuery();
-
-            if (rs.next()) {
-                return rs.getInt(1);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) return rs.getInt(1);
             }
 
         } catch (SQLException e) {
             e.printStackTrace();
         }
         return 0;
-
     }
 
 
     public static int getPendingMaintenanceJobsCount(int staffId) {
 
-        String sql = "SELECT COUNT(*) FROM maintenanceJobs " +
-                "WHERE assignedStaffId = ? AND status = 'pending'";
+        // Pending = scheduled events that haven't happened yet (and aren't overdue).
+        // If you want ALL non-completed events, drop the date filter.
+        String sql = "SELECT COUNT(*) FROM calendarevents " +
+                "WHERE maintenance_id = ? " +
+                "AND status IN ('scheduled','in-progress') " +
+                "AND scheduled_date >= CURDATE()";
 
         try (Connection con = DBConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
 
             ps.setInt(1, staffId);
-            ResultSet rs = ps.executeQuery();
-
-            if (rs.next()) {
-                return rs.getInt(1);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) return rs.getInt(1);
             }
 
         } catch (SQLException e) {
             e.printStackTrace();
         }
         return 0;
-
     }
 
-    public static float calculateMaintenanceStaffPercentage(int staffId,String maintenanceType) {
+    public static float calculateMaintenanceStaffPercentage(int staffId, String maintenanceType) {
 
-        String sql1 = "SELECT COUNT(*) FROM maintenanceJobs WHERE assignedStaffId = ?";
-        String sql2 = "SELECT COUNT(*) FROM maintenanceJobs WHERE assignedStaffId = ? AND type = ?";
+        // Normalize the incoming keyword: lowercase, strip spaces/dashes/underscores/slashes,
+        // and drop a trailing 's' so "Oil Changes" matches "Oil Change".
+        String keyword = normalizeServiceKeyword(maintenanceType);
+
+        // Total events for this staff
+        String sqlTotal = "SELECT COUNT(*) FROM calendarevents WHERE maintenance_id = ?";
+
+        // Normalized service_type column expression (reused)
+        String normalizedCol =
+                "LOWER(REPLACE(REPLACE(REPLACE(REPLACE(service_type,' ',''),'-',''),'_',''),'/',''))";
+
+        String sqlType;
+        boolean isOther = keyword.equals("otherservice") || keyword.equals("other");
+
+        if (isOther) {
+            // "Other" = everything that is NOT oil change / brake service / tire service
+            sqlType =
+                    "SELECT COUNT(*) FROM calendarevents " +
+                            "WHERE maintenance_id = ? " +
+                            "AND " + normalizedCol + " NOT LIKE '%oilchange%' " +
+                            "AND " + normalizedCol + " NOT LIKE '%brakeservice%' " +
+                            "AND " + normalizedCol + " NOT LIKE '%brake%' " +
+                            "AND " + normalizedCol + " NOT LIKE '%tireservice%' " +
+                            "AND " + normalizedCol + " NOT LIKE '%tire%'";
+        } else {
+            sqlType =
+                    "SELECT COUNT(*) FROM calendarevents " +
+                            "WHERE maintenance_id = ? " +
+                            "AND " + normalizedCol + " LIKE CONCAT('%', ?, '%')";
+        }
 
         try (Connection con = DBConnection.getConnection();
-             PreparedStatement psTotal = con.prepareStatement(sql1);
-             PreparedStatement psType = con.prepareStatement(sql2)) {
+             PreparedStatement psTotal = con.prepareStatement(sqlTotal);
+             PreparedStatement psType  = con.prepareStatement(sqlType)) {
 
-
+            // total
             psTotal.setInt(1, staffId);
-            ResultSet rsTotal = psTotal.executeQuery();
             int totalJobs = 0;
-            if (rsTotal.next()) {
-                totalJobs = rsTotal.getInt(1);
+            try (ResultSet rs = psTotal.executeQuery()) {
+                if (rs.next()) totalJobs = rs.getInt(1);
             }
 
-            if (totalJobs == 0) {
-                return 0;
-            }
+            if (totalJobs == 0) return 0;
 
-
+            // per-type
             psType.setInt(1, staffId);
-            psType.setString(2, maintenanceType);
-            ResultSet rsType = psType.executeQuery();
+            if (!isOther) {
+                psType.setString(2, keyword);
+            }
 
             int typeJobs = 0;
-
-            if (rsType.next()) {
-
-                typeJobs = rsType.getInt(1);
-
+            try (ResultSet rs = psType.executeQuery()) {
+                if (rs.next()) typeJobs = rs.getInt(1);
             }
 
-            // Calculate percentage as float
             return (typeJobs * 100.0f) / totalJobs;
 
         } catch (SQLException e) {
@@ -394,7 +463,27 @@ public class MaintenanceStaffDAO {
         }
 
         return 0;
+    }
 
+    /**
+     * Normalizes a service-type keyword so it can be compared loosely against
+     * the free-text service_type column.
+     * "Oil Change"      -> "oilchange"
+     * "Brake Services"  -> "brakeservice"
+     * "Tire Services"   -> "tireservice"
+     * "Other Services"  -> "otherservice"
+     */
+    private static String normalizeServiceKeyword(String raw) {
+        if (raw == null) return "";
+        String k = raw.toLowerCase()
+                .replace(" ", "")
+                .replace("-", "")
+                .replace("_", "")
+                .replace("/", "");
+        if (k.endsWith("s") && k.length() > 1) {
+            k = k.substring(0, k.length() - 1);
+        }
+        return k;
     }
 
 

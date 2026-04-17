@@ -42,10 +42,7 @@ async function loadBookings(type, page) {
   const container = document.querySelector(".bookings-container");
   if (!container) return;
 
-  if (page === 1) {
-    container.innerHTML = `<div style="padding:16px;color:#6b7280;">Loading bookings…</div>`;
-    ALL_BOOKINGS = [];
-  }
+  container.innerHTML = `<div style="padding:16px;color:#6b7280;">Loading bookings…</div>`;
 
   try {
     const q = collectFilterParams(type, page);
@@ -56,13 +53,14 @@ async function loadBookings(type, page) {
     totalBookings = Number(data.total || incoming.length);
     currentPage = page;
 
-    ALL_BOOKINGS = page === 1 ? incoming : ALL_BOOKINGS.concat(incoming);
+    ALL_BOOKINGS = incoming;
 
-    renderBookings(ALL_BOOKINGS, page === 1);
-    updateLoadMoreButton();
+    renderBookings(ALL_BOOKINGS);
+    renderPagination();
   } catch (err) {
     console.error(err);
     container.innerHTML = `<div style="padding:16px;color:#b91c1c;">Failed to load bookings. ${escapeHtml(err.message)}</div>`;
+    hidePagination();
   }
 }
 
@@ -95,25 +93,18 @@ function collectFilterParams(type, page) {
   };
 }
 
-function renderBookings(items, clearFirst) {
+function renderBookings(items) {
   const container = document.querySelector(".bookings-container");
   if (!container) return;
 
-  if (clearFirst) container.innerHTML = "";
+  container.innerHTML = "";
 
   if (!items.length) {
     container.innerHTML = `<div style="padding:16px;color:#6b7280;">No past bookings found.</div>`;
     return;
   }
 
-  if (clearFirst) {
-    items.forEach((b) => container.appendChild(createBookingCard(b)));
-  } else {
-    const startIdx = (currentPage - 1) * PAGE_SIZE;
-    items
-      .slice(startIdx)
-      .forEach((b) => container.appendChild(createBookingCard(b)));
-  }
+  items.forEach((b) => container.appendChild(createBookingCard(b)));
 }
 
 function createBookingCard(b) {
@@ -311,21 +302,126 @@ function applySorting() {
   cards.forEach((c) => container.appendChild(c));
 }
 
-function updateLoadMoreButton() {
-  const section = document.getElementById("loadMoreSection");
-  if (!section) return;
-  if (ALL_BOOKINGS.length < totalBookings) {
-    section.style.display = "block";
-    const btn = document.getElementById("loadMoreBtn");
-    if (btn)
-      btn.innerHTML = `<i class="fas fa-chevron-down"></i> Load More (${ALL_BOOKINGS.length} / ${totalBookings})`;
-  } else {
-    section.style.display = "none";
+function renderPagination() {
+  const section = document.getElementById("paginationSection");
+  const list = document.getElementById("paginationList");
+  const info = document.getElementById("paginationInfo");
+  if (!section || !list) return;
+
+  const totalPages = Math.max(1, Math.ceil(totalBookings / PAGE_SIZE));
+
+  if (totalBookings <= 0) {
+    hidePagination();
+    return;
   }
+
+  section.style.display = "flex";
+
+  if (info) {
+    const start = totalBookings === 0 ? 0 : (currentPage - 1) * PAGE_SIZE + 1;
+    const end = Math.min(currentPage * PAGE_SIZE, totalBookings);
+    info.textContent = `Showing ${start}–${end} of ${totalBookings}`;
+  }
+
+  list.innerHTML = "";
+
+  // Prev
+  list.appendChild(
+    makePageItem(
+      `<i class="fas fa-chevron-left"></i>`,
+      currentPage - 1,
+      currentPage === 1,
+      false,
+      "Previous page",
+    ),
+  );
+
+  // Numbered pages with ellipses
+  getPageNumbers(currentPage, totalPages).forEach((p) => {
+    if (p === "…") {
+      const li = document.createElement("li");
+      li.className = "page-item page-ellipsis";
+      li.setAttribute("aria-hidden", "true");
+      li.textContent = "…";
+      list.appendChild(li);
+    } else {
+      list.appendChild(
+        makePageItem(String(p), p, false, p === currentPage, `Page ${p}`),
+      );
+    }
+  });
+
+  // Next
+  list.appendChild(
+    makePageItem(
+      `<i class="fas fa-chevron-right"></i>`,
+      currentPage + 1,
+      currentPage === totalPages,
+      false,
+      "Next page",
+    ),
+  );
 }
 
-function loadMoreBookings() {
-  loadBookings("past", currentPage + 1);
+function makePageItem(label, page, disabled, active, ariaLabel) {
+  const li = document.createElement("li");
+  li.className =
+    "page-item" + (active ? " active" : "") + (disabled ? " disabled" : "");
+
+  const btn = document.createElement("button");
+  btn.type = "button";
+  btn.className = "page-link";
+  btn.innerHTML = label;
+  if (ariaLabel) btn.setAttribute("aria-label", ariaLabel);
+  if (active) btn.setAttribute("aria-current", "page");
+  if (disabled) btn.disabled = true;
+  btn.addEventListener("click", () => {
+    if (disabled || active) return;
+    goToPage(page);
+  });
+
+  li.appendChild(btn);
+  return li;
+}
+
+function getPageNumbers(current, total) {
+  // Returns an array of page numbers and "…" markers.
+  // Always shows first, last, current, and neighbors. Collapses gaps with "…".
+  const pages = [];
+  const window = 1; // neighbors on each side of current
+
+  const add = (v) => {
+    if (pages[pages.length - 1] !== v) pages.push(v);
+  };
+
+  for (let i = 1; i <= total; i++) {
+    if (
+      i === 1 ||
+      i === total ||
+      (i >= current - window && i <= current + window)
+    ) {
+      add(i);
+    } else if (pages[pages.length - 1] !== "…") {
+      add("…");
+    }
+  }
+  return pages;
+}
+
+function hidePagination() {
+  const section = document.getElementById("paginationSection");
+  if (section) section.style.display = "none";
+}
+
+function goToPage(page) {
+  const totalPages = Math.max(1, Math.ceil(totalBookings / PAGE_SIZE));
+  const target = Math.min(Math.max(1, page), totalPages);
+  if (target === currentPage) return;
+  loadBookings("past", target);
+  // Scroll the bookings list into view so the user sees page 2 content.
+  const container = document.querySelector(".bookings-container");
+  if (container)
+    container.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
 function wireUI() {
@@ -368,4 +464,4 @@ function toggleFilters(btn) {
 
 window.applyFilters = applyFilters;
 window.toggleFilters = toggleFilters;
-window.loadMoreBookings = loadMoreBookings;
+window.goToPage = goToPage;
