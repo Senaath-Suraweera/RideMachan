@@ -589,6 +589,15 @@ public class MaintenanceStaffDAO {
 
             result = rows > 0;
 
+
+            if (result && status.equalsIgnoreCase("under maintenance")) {
+
+                int vehicleId = VehicleDAO.getIdOfVehicle(numberplate);
+
+
+
+            }
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -631,6 +640,38 @@ public class MaintenanceStaffDAO {
         return result;
     }
 
+    public static boolean scheduleMaintenanceJob(int vehicleId, int staffId, String description, String scheduledDate) {
+
+        boolean result = false;
+
+        String sql = "INSERT INTO maintenancejobs " +
+                   "(vehicleId, assignedStaffId, companyId, status, scheduledDate, type, description) " +
+                   "VALUES (?, ?, ?, ?, ?, ?, ?)";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, vehicleId);
+            ps.setInt(2, staffId);
+
+
+            ps.setInt(3, 1);
+
+            ps.setString(4, "pending");
+            ps.setString(5, scheduledDate);
+
+            ps.setString(6, "Other Services");
+            ps.setString(7, description);
+
+            int rows = ps.executeUpdate();
+            result = rows > 0;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return result;
+    }
 
     public static List<MaintenanceRecord> getRecentMaintenanceByStaff(int staffId) {
 

@@ -364,7 +364,7 @@ function shouldShowAssignDriver(booking) {
 
     let instruction = (booking.specialInstructions || "").toLowerCase();
 
-    return instruction.includes("self drive") && !(booking.driverName);
+    return !(instruction.includes("self drive")) && !(booking.driverName);
 
 }
 
@@ -454,14 +454,11 @@ function renderActiveDrivers(Alldrivers) {
 
             closeDriversModal();
 
-            if(document.getElementById("assignment")) {
-                document.getElementById("assignment").remove();
-            }
+            AllBookings = await LoadAllBookings();
+            filterBookingsByDate();
 
-            showNotification(
-                `Driver assigned successfully`,
-                "success"
-            );
+            showNotification("Driver Assigned Successfully", "success");
+
 
         };
 
@@ -675,7 +672,7 @@ async function AssignBooking(driverId) {
         const data = await response.json();
         console.log("Booking assigned:", data);
 
-        showNotification("Booking assigned successfully!", "success");
+
 
 
         return data;

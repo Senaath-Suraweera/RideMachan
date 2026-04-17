@@ -204,7 +204,7 @@ function renderMaintenanceStaff(maintenanceStaffs) {
                               ${maintenanceStaff.certifications.map(cert => `<span class="badge">${cert}</span>`).join('')}
                           </div>
                           <div class="staff-actions">
-                              <a href="maintenance-vehicle-assignment.html" style="text-decoration: none">
+                              <a onclick="reDirectAssignedVehiclePage(${maintenanceStaff.staffId},${maintenanceStaff.firstName},${maintenanceStaff.lastName})" style="text-decoration: none">
                                   <button class="action-btn primary" data-staff-id="${maintenanceStaff.staffId}">
                                           View Assign Vehicles
                                   </button> 
@@ -215,7 +215,13 @@ function renderMaintenanceStaff(maintenanceStaffs) {
 
         staffGrid.appendChild(staffCard);
 
-    })
+    });
+
+}
+
+function reDirectAssignedVehiclePage(staffId,firstName,lastName) {
+
+    window.location.href = `/views/rentalcompany/management/html/maintenance-vehicle-assignment.html?staffId=${staffId}&firstname=${firstName}&lastname=${lastName}`;
 
 }
 
@@ -278,31 +284,18 @@ function filterStaffByStaffStatus(status) {
     let filteredStaff = [];
 
     let selectedStatus = status.toLowerCase().trim();
-    AllMaintenaceStaff[i].status = AllMaintenaceStaff[i].status.toLowerCase().trim();
 
-    for(let i=0; i<AllMaintenaceStaff.length; i++) {
+    for (let i = 0; i < AllMaintenaceStaff.length; i++) {
 
-        //DEBUG 1
-        console.log("staff status:- ", AllMaintenaceStaff[i].status)
-        console.log("selected staff status:- ", status)
+        let staffStatus = (AllMaintenaceStaff[i].status || "").toLowerCase().trim();
 
-        let staffStatus =  AllMaintenaceStaff[i].status || "";
-
-        //DEBUG 2
-        console.log("Comparing:- ", staffStatus , "with ", status)
-        console.log("Match?:- ", staffStatus == selectedStatus)
-
-        if(staffStatus == status) {
+        if (staffStatus === selectedStatus) {
             filteredStaff.push(AllMaintenaceStaff[i]);
         }
 
     }
 
-    console.log("Filtered staff count:", filteredStaff.length);
-    console.log("About to render...");
     renderMaintenanceStaff(filteredStaff);
-    console.log("Render complete!");
-
 }
 
 
