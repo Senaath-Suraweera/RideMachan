@@ -1,5 +1,6 @@
 let selectedDate = null;
 
+
 document.addEventListener('DOMContentLoaded', async function () {
 
     console.log("JS loaded");
@@ -8,22 +9,20 @@ document.addEventListener('DOMContentLoaded', async function () {
 
 });
 
+/* ================= FETCH ================= */
+
 async function loadDriverData() {
 
     try {
 
-        // 🔥 STEP 6A CHANGE: added date filter to backend request
         if (!selectedDate) {
-            selectedDate = new Date().toISOString().split('T')[0]; // 🔥 STEP 6B CHANGE
+            selectedDate = new Date().toISOString().split('T')[0];
         }
 
-        const response = await fetch(
-            `/drivercalview?date=${selectedDate}`, // 🔥 STEP 6A CHANGE
-            {
-                method: 'GET',
-                credentials: 'same-origin'
-            }
-        );
+        const response = await fetch(`/drivercalview?date=${selectedDate}`, {
+            method: 'GET',
+            credentials: 'same-origin'
+        });
 
         if (response.status === 401) {
             alert('Please login first');
@@ -37,283 +36,217 @@ async function loadDriverData() {
         if (data && data.driver) {
             populateDriverInfo(data.driver);
 
-            console.log("BOOKINGS:", data.bookings);
-
             let bookings = data.bookings || [];
 
-            bookings.sort((a, b) => {
-                if (!a.bookingTime || !b.bookingTime) return 0;
-                return a.bookingTime.localeCompare(b.bookingTime);
-            });
+            console.log("BOOKINGS:", bookings);
 
             displayBookings(bookings);
-
         }
 
     } catch (err) {
         console.error("ERROR:", err);
     }
-
 }
+
+/* ================= DRIVER ================= */
 
 function populateDriverInfo(driver) {
 
-    const nameEl = document.getElementById('driverName');
-    const profileInitial = document.getElementById('profileInitial');
+    document.getElementById('driverName').textContent =
+        driver.fullName || driver.username || 'Driver';
 
-    if (nameEl) {
-        nameEl.textContent = driver.fullName || driver.username || 'Driver';
-    }
-
-    if (profileInitial) {
-        const name = driver.firstName || driver.username || 'D';
-        profileInitial.textContent = name.charAt(0).toUpperCase();
-    }
-
+    const name = driver.firstName || driver.username || 'D';
+    document.getElementById('profileInitial').textContent =
+        name.charAt(0).toUpperCase();
 }
 
-function mapBookingsToSlots(bookings) {
+/* ================= TIME HELPERS ================= */
 
-    let slots = document.querySelectorAll('.time-slot');
-
-    slots.forEach(slot => {
-
-        let content = slot.querySelector('.slot-content');
-
-        if (content) {
-
-            content.innerHTML = '<div class="no-booking">No booking scheduled</div>';
-
-        }
-
-    });
-
-    if (!bookings || bookings.length === 0) {
-        console.log("No bookings to map");
-        return;
-    }
-
-    bookings.forEach(booking => {
-
-        if (!booking.bookingTime) {
-            return;
-        }
-
-        let hour = parseInt(booking.bookingTime.split(':')[0]);
-
-        let slot = document.querySelector(`.time-slot[data-time="${hour}"]`);
-
-        if (slot) {
-
-            let content = slot.querySelector('.slot-content');
-
-            if (content) {
-
-                content.innerHTML = '';
-
-                content.innerHTML = createBookingCard(booking);
-
-            }
-
-        }
-
-    });
-
+function getBookingTimeString(booking) {
+    return booking.startTimeStr || null; // 🔥 YOUR FIELD
 }
+
+function getBookingHour(booking) {
+
+    const timeStr = getBookingTimeString(booking);
+
+    if (!timeStr) return null;
+
+    let hour = new Date(`1970-01-01T${timeStr}`).getHours();
+
+    return hour;
+}
+
+/* ================= MAIN RENDER ================= */
 
 function displayBookings(bookings) {
 
-    mapBookingsToSlots(bookings);
-    updateSummary(bookings);
-    initializeActionButtons();
+    // 🔥 RESET ALL SLOTS FIRST
+    document.querySelectorAll('.slot-content').forEach(c => {
+        c.innerHTML = '<div class="no-booking">No booking scheduled</div>';
+    });
 
+    if (!bookings || bookings.length === 0) {
+        updateSummary([]);
+        return;
+    }
+
+    console.log("Selected Date:", selectedDate);
+
+    // 🔥 FILTER BY SELECTED DATE
+    const filtered = bookings.filter(b => {
+        const bookingDate = b.tripStartDate?.split('T')[0];
+        console.log("Booking Date:", bookingDate);
+        return bookingDate === selectedDate;
+    });
+
+    console.log("Filtered:", filtered);
+
+    filtered.forEach(booking => {
+
+        const hour = getBookingHour(booking);
+
+        if (hour === null) {
+            console.log("❌ No time");
+            return;
+        }
+
+        // 🔥 HANDLE OUTSIDE RANGE (8–18)
+        let mappedHour = hour;
+        if (hour < 8) mappedHour = 8;
+        if (hour > 18) mappedHour = 18;
+
+        console.log(`Mapping ${hour} → ${mappedHour}`);
+
+        const slot = document.querySelector(`.time-slot[data-time="${mappedHour}"]`);
+
+        if (!slot) {
+            console.log("❌ No slot for:", mappedHour);
+            return;
+        }
+
+        const content = slot.querySelector('.slot-content');
+
+        content.innerHTML = createBookingCard(booking);
+    });
+
+    updateSummary(filtered);
 }
+
+/* ================= SUMMARY ================= */
 
 function updateSummary(bookings) {
 
-    const summaryItems = document.querySelectorAll('.summary-item');
+    const items = document.querySelectorAll('.summary-item');
 
-    if (summaryItems.length >= 3) {
+    if (items.length < 3) return;
 
-        const totalTrips = summaryItems[0].querySelector('.summary-value');
-        if (totalTrips) totalTrips.textContent = bookings.length;
+    items[0].querySelector('.summary-value').textContent = bookings.length;
 
-        if (bookings.length > 0) {
-
-            const times = bookings
-                .map(b => b.bookingTime ? parseInt(b.bookingTime.split(':')[0]) : null)
-                .filter(t => t !== null);
-
-            if (times.length > 0) {
-
-                const earliest = summaryItems[1].querySelector('.summary-value');
-                const latest = summaryItems[2].querySelector('.summary-value');
-
-                if (earliest) earliest.textContent = `${Math.min(...times)}:00`;
-                if (latest) latest.textContent = `${Math.max(...times)}:00`;
-            }
-
-        } else {
-
-            const earliest = summaryItems[1].querySelector('.summary-value');
-            const latest = summaryItems[2].querySelector('.summary-value');
-
-            if (earliest) earliest.textContent = '--';
-            if (latest) latest.textContent = '--';
-        }
+    if (bookings.length === 0) {
+        items[1].querySelector('.summary-value').textContent = '--';
+        items[2].querySelector('.summary-value').textContent = '--';
+        return;
     }
+
+    const times = bookings
+        .map(b => getBookingHour(b))
+        .filter(t => t !== null);
+
+    items[1].querySelector('.summary-value').textContent = `${Math.min(...times)}:00`;
+    items[2].querySelector('.summary-value').textContent = `${Math.max(...times)}:00`;
 }
 
-function initializeActionButtons() {
-
-    const summaryBtns = document.querySelectorAll('.summary-btn');
-
-    summaryBtns.forEach(btn => {
-
-        if (!btn.id && btn.textContent.includes('Contact Admin')) {
-
-            btn.addEventListener('click', () => {
-                showMessage('Contacting admin...');
-            });
-
-        }
-
-    });
-}
+/* ================= CARD ================= */
 
 function createBookingCard(booking) {
 
     return `
-        <div style="
-            width: 100%;
-            background: white;
-            border-radius: 10px;
-            padding: 10px;
-            box-shadow: 0 4px 20px rgba(58, 12, 163, 0.08);
-            border: 1px solid rgba(58, 12, 163, 0.1);
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-            font-family: Poppins, sans-serif;
-        ">
+        <div class="booking-card">
 
-            <div style="
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                margin-bottom: 8px;
-                padding-bottom: 6px;
-                border-bottom: 1px solid #f0f0f0;
-            ">
-
-                <div style="
-                    font-size: 14px;
-                    font-weight: 600;
-                    color: #2d3748;
-                ">
+            <div class="booking-top">
+                <div class="customer-name">
                     ${booking.customerName || 'Customer'}
                 </div>
 
-                <div style="
-                    font-size: 11px;
-                    padding: 3px 8px;
-                    border-radius: 20px;
-                    background: linear-gradient(135deg, #48bb78, #38a169);
-                    color: white;
-                    text-transform: uppercase;
-                    letter-spacing: 0.5px;
-                ">
-                    ACTIVE
+                <div class="status ${booking.status || 'active'}">
+                    ${booking.status || 'ACTIVE'}
+                </div>
+            </div>
+
+            <div class="booking-vehicle">
+                ${booking.vehicleModel || 'Vehicle'}
+            </div>
+
+            <div class="booking-route">
+                ${booking.pickupLocation || ''} → ${booking.dropLocation || ''}
+            </div>
+
+            <div class="booking-bottom">
+                <div class="time">
+                    ${booking.startTimeStr || ''}
                 </div>
 
-            </div>
-
-            <div style="
-                font-size: 13px;
-                font-weight: 500;
-                color: #4a5568;
-                margin-bottom: 6px;
-            ">
-                🚗 ${booking.vehicleModel || 'Vehicle'}
-            </div>
-
-            <div style="
-                font-size: 12px;
-                color: #718096;
-                margin-bottom: 8px;
-                line-height: 1.4;
-            ">
-                📍 ${booking.pickupLocation || ''} → ${booking.dropoffLocation || ''}
-            </div>
-
-            <div style="
-                display: flex;
-                justify-content: space-between;
-                font-size: 11px;
-                color: #a0aec0;
-            ">
-                <span>🕒 ${booking.bookingTime || ''}</span>
-                <span>Ride ID: ${booking.rideId || 'N/A'}</span>
+                <div class="ride-id">
+                    ${booking.rideId || ''}
+                </div>
             </div>
 
         </div>
     `;
 }
 
+/* ================= CALENDAR ================= */
+
 function initializeCalendar() {
 
     const today = new Date();
     selectedDate = today.toISOString().split('T')[0];
 
-    const monthYearElement = document.getElementById('currentMonthYear');
-
-    if (monthYearElement) {
-        const monthNames = [
-            'January','February','March','April','May','June',
-            'July','August','September','October','November','December'
-        ];
-
-        monthYearElement.textContent =
-            `${monthNames[today.getMonth()]} ${today.getFullYear()}`;
-    }
+    updateMonthLabel(today);
 
     generateCalendarDays(today.getFullYear(), today.getMonth());
 }
 
+function updateMonthLabel(date) {
+
+    const months = [
+        'January','February','March','April','May','June',
+        'July','August','September','October','November','December'
+    ];
+
+    document.getElementById('currentMonthYear').textContent =
+        `${months[date.getMonth()]} ${date.getFullYear()}`;
+}
+
 function generateCalendarDays(year, month) {
 
-    const calendarGrid = document.querySelector('.calendar-grid');
-    if (!calendarGrid) return;
+    const grid = document.querySelector('.calendar-grid');
 
-    let bodyDiv = calendarGrid.querySelector('.calendar-body');
-    if (bodyDiv) bodyDiv.remove();
+    let body = grid.querySelector('.calendar-body');
+    if (body) body.remove();
 
-    bodyDiv = document.createElement('div');
-    bodyDiv.className = 'calendar-body';
+    body = document.createElement('div');
+    body.className = 'calendar-body';
 
     const firstDay = new Date(year, month, 1).getDay();
-    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const days = new Date(year, month + 1, 0).getDate();
 
-    const today = new Date();
-
-    const prevMonthDays = new Date(year, month, 0).getDate();
-    for (let i = firstDay - 1; i >= 0; i--) {
-        const day = document.createElement('div');
-        day.className = 'calendar-day other-month';
-        day.textContent = prevMonthDays - i;
-        bodyDiv.appendChild(day);
+    for (let i = 0; i < firstDay; i++) {
+        const empty = document.createElement('div');
+        body.appendChild(empty);
     }
 
-    for (let d = 1; d <= daysInMonth; d++) {
+    for (let d = 1; d <= days; d++) {
 
-        const dayEl = document.createElement('div');
-        dayEl.className = 'calendar-day';
-        dayEl.textContent = d;
+        const day = document.createElement('div');
+        day.className = 'calendar-day';
+        day.textContent = d;
 
         const dateStr =
             `${year}-${String(month + 1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
 
-        dayEl.addEventListener('click', async function () {
+        day.addEventListener('click', async function () {
 
             document.querySelectorAll('.calendar-day')
                 .forEach(x => x.classList.remove('selected'));
@@ -322,41 +255,13 @@ function generateCalendarDays(year, month) {
 
             selectedDate = dateStr;
 
-            console.log("Selected Date:", selectedDate);
+            console.log("Selected:", selectedDate);
 
-            await loadDriverData(); // refresh bookings for selected date
-
+            await loadDriverData();
         });
 
-        bodyDiv.appendChild(dayEl);
+        body.appendChild(day);
     }
 
-    calendarGrid.appendChild(bodyDiv);
-}
-
-function loadDummyBookings() {
-
-    return [
-        {
-            bookingTime: "08:00",
-            customerName: "Kamal Perera",
-            vehicleModel: "Toyota Axio",
-            pickupLocation: "Colombo",
-            dropoffLocation: "Negombo"
-        },
-        {
-            bookingTime: "11:00",
-            customerName: "Nimal Silva",
-            vehicleModel: "Honda Fit",
-            pickupLocation: "Galle",
-            dropoffLocation: "Colombo"
-        },
-        {
-            bookingTime: "15:00",
-            customerName: "Saman Kumara",
-            vehicleModel: "Suzuki Alto",
-            pickupLocation: "Kandy",
-            dropoffLocation: "Matale"
-        }
-    ];
+    grid.appendChild(body);
 }

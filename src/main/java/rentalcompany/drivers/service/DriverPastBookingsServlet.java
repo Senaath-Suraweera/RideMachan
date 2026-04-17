@@ -42,7 +42,7 @@ public class DriverPastBookingsServlet extends HttpServlet {
 
         try {
             List<RentalCompanyBookings> bookings =
-                    DriverDAO.getPastBookings(driverId, dateRange, status, searchQuery);
+                    DriverDAO.getPastBookings(driverId);
 
             Map<String, Integer> stats =
                     DriverDAO.getPastBookingsStats(driverId);

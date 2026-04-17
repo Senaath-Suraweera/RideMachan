@@ -29,7 +29,10 @@ public class DisplayHomeStatisticsServlet extends HttpServlet {
             int companyId = (int) session.getAttribute("companyId");
 
             int activeDrivers = DriverDAO.getActiveDriversCount(companyId);
-            int activeBookings = RentalCompanyBookingsDAO.getActiveBookingsCount(companyId);
+            int confirmedBookingsCount = RentalCompanyBookingsDAO.getConfirmedBookingsCount(companyId);
+            int cancelledBookingsCount = RentalCompanyBookingsDAO.getCancelledBookingsCount(companyId);
+            int monthlyRevenue = RentalCompanyBookingsDAO.getMonthlyRevenue(companyId);
+            int canelledBookingsMonthlyRevenueLost = RentalCompanyBookingsDAO.getMonthlyCancelledRevenueLoss(companyId);
 
             resp.setContentType("application/json");
             resp.setCharacterEncoding("UTF-8");
@@ -37,7 +40,10 @@ public class DisplayHomeStatisticsServlet extends HttpServlet {
 
             String json = "{"
                         + "\"activeDrivers\":" + activeDrivers + ","
-                        + "\"activeBookings\":" + activeBookings
+                        + "\"ConfirmedBookings\":" + confirmedBookingsCount + ","
+                        + "\"CancelledBookings\":" + cancelledBookingsCount + ","
+                        + "\"MonthlyRevenue\":" + monthlyRevenue + ","
+                        + "\"MonthlyRevenueLostDueToCancelled\":" + canelledBookingsMonthlyRevenueLost
                         + "}";
 
             resp.getWriter().write(json);

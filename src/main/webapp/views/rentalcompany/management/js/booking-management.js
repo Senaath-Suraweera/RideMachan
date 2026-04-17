@@ -364,7 +364,7 @@ function shouldShowAssignDriver(booking) {
 
     let instruction = (booking.specialInstructions || "").toLowerCase();
 
-    return !(instruction.includes("self drive")) && !(booking.driverName);
+    return (booking.status.toLowerCase().includes("confirmed")) &&!(instruction.includes("self drive")) && !(booking.driverName);
 
 }
 

@@ -162,6 +162,11 @@ function renderMaintenanceStaff(maintenanceStaffs) {
     const staffGrid = document.getElementsByClassName("staff-grid")[0];
     staffGrid.innerHTML = "";
 
+    if (!maintenanceStaffs || maintenanceStaffs.length === 0) {
+        handleEmptyCase("No Maintenance Staff Found", "staff-grid");
+        return;
+    }
+
     let status;
 
     maintenanceStaffs.forEach(maintenanceStaff => {
@@ -278,26 +283,43 @@ function filterStaffByText(searchText) {
 //search Available,On Job,available staff
 function filterStaffByStaffStatus(status) {
 
-    const staffGrid = document.getElementsByClassName("staff-grid")[0];
-    staffGrid.innerHTML = "";
+    const selectedStatus = (status || "").toLowerCase();
 
-    let filteredStaff = [];
+    let availableStaff = [];
+    let onJobStaff = [];
+    let offlineStaff = [];
 
-    let selectedStatus = status.toLowerCase().trim();
 
     for (let i = 0; i < AllMaintenaceStaff.length; i++) {
 
-        let staffStatus = (AllMaintenaceStaff[i].status || "").toLowerCase().trim();
+        const staff = AllMaintenaceStaff[i];
+        const staffStatus = (staff.status || "").toLowerCase();
 
-        if (staffStatus === selectedStatus) {
-            filteredStaff.push(AllMaintenaceStaff[i]);
+        if (staffStatus.includes("available")) {
+            availableStaff.push(staff);
         }
-
+        else if (staffStatus.includes("on")) {
+            onJobStaff.push(staff);
+        }
+        else if (staffStatus.includes("offline")) {
+            offlineStaff.push(staff);
+        }
     }
 
-    renderMaintenanceStaff(filteredStaff);
-}
 
+    if (selectedStatus === "all") {
+        renderMaintenanceStaff(AllMaintenaceStaff);
+    }
+    else if (selectedStatus === "available") {
+        renderMaintenanceStaff(availableStaff);
+    }
+    else if (selectedStatus === "on_job") {
+        renderMaintenanceStaff(onJobStaff);
+    }
+    else if (selectedStatus === "offline") {
+        renderMaintenanceStaff(offlineStaff);
+    }
+}
 
 
 function openAddStaffModal() {
@@ -325,16 +347,40 @@ async function addMaintenanceStaff() {
     const addStaffForm = document.getElementById("addStaffForm");
 
 
+    const username = addStaffForm.username.value;
+    const firstname = addStaffForm.firstname.value;
+    const lastname = addStaffForm.lastname.value;
+    const contactNumber = addStaffForm.contactNumber.value;
+    const email = addStaffForm.email.value;
+    const specialization = addStaffForm.specialization.value;
+    const yearsOfExperience = addStaffForm.yearsOfExperience.value;
+    const password = addStaffForm.password.value;
+    const confirmPassword = addStaffForm.confirmPassword.value;
+
+    if (!validateField(username, { required: true, minLength: 3 }, "Username")) return;
+    if (!validateField(firstname, { required: true, type: "name" }, "First Name")) return;
+    if (!validateField(lastname, { required: true, type: "name" }, "Last Name")) return;
+    if (!validateField(contactNumber, { required: true, type: "mobile" }, "Mobile Number")) return;
+    if (!validateField(email, { required: true, type: "email" }, "Email")) return;
+    if (!validateField(specialization, { required: true, minLength: 3 }, "Specialization")) return;
+    if (!validateField(yearsOfExperience, { required: true, type: "experience" }, "Experience")) return;
+    if (!validateField(password, { required: true, type: "password" }, "Password")) return;
+
+    if (password !== confirmPassword) {
+        showNotification("Passwords do not match", "error");
+        return;
+    }
+
     const data = {
-        username: addStaffForm.username.value,
-        firstname: addStaffForm.firstname.value,
-        lastname: addStaffForm.lastname.value,
-        contactNumber: addStaffForm.contactNumber.value,
-        email: addStaffForm.email.value,
-        password: addStaffForm.password.value,
-        companyId: companyId,
-        specialization: addStaffForm.specialization.value,
-        yearsOfExperience: parseFloat(addStaffForm.yearsOfExperience.value)
+        username,
+        firstname,
+        lastname,
+        contactNumber,
+        email,
+        password,
+        companyId,
+        specialization,
+        yearsOfExperience: parseFloat(yearsOfExperience)
     };
 
     const response = await fetch("/maintenancestaff/signup", {
@@ -363,6 +409,72 @@ async function addMaintenanceStaff() {
         showNotification("Staff adding is Failrd", "error");
     }
 
+}
+
+function handleEmptyCase(message, containerId = "container") {
+
+    const container = document.getElementById(containerId);
+
+    if (!container) return;
+
+    container.innerHTML = "";
+
+    const emptyCard = document.createElement("div");
+
+    emptyCard.innerHTML = `
+        <h2 class="empty-title">${message}</h2>
+        <p class="empty-sub">Nothing to display right now</p>
+    `;
+
+
+    emptyCard.style.width = "100%";
+    emptyCard.style.maxWidth = "900px";
+    emptyCard.style.margin = "0 auto";
+    emptyCard.style.padding = "50px 25px";
+    emptyCard.style.borderRadius = "18px";
+    emptyCard.style.background = "linear-gradient(135deg, #ffffff, #f8f9ff)";
+    emptyCard.style.boxShadow = "0 10px 30px rgba(58, 12, 163, 0.15)";
+    emptyCard.style.border = "1px solid rgba(58, 12, 163, 0.1)";
+    emptyCard.style.textAlign = "center";
+    emptyCard.style.gridColumn = "1 / -1";
+
+    emptyCard.style.transition = "all 0.3s ease";
+    emptyCard.style.cursor = "default";
+
+
+    emptyCard.style.position = "relative";
+
+    const title = emptyCard.querySelector(".empty-title");
+
+    title.style.margin = "0";
+    title.style.fontSize = "22px";
+    title.style.fontWeight = "700";
+    title.style.background = "linear-gradient(90deg, #3a0ca3, #4361ee, #f72585)";
+    title.style.webkitBackgroundClip = "text";
+    title.style.webkitTextFillColor = "transparent";
+    title.style.backgroundClip = "text";
+    title.style.letterSpacing = "0.5px";
+
+
+    const sub = emptyCard.querySelector(".empty-sub");
+
+    sub.style.marginTop = "10px";
+    sub.style.fontSize = "14px";
+    sub.style.color = "#6c757d";
+    sub.style.opacity = "0.9";
+
+
+    emptyCard.onmouseover = () => {
+        emptyCard.style.transform = "translateY(-6px) scale(1.01)";
+        emptyCard.style.boxShadow = "0 18px 40px rgba(67, 97, 238, 0.25)";
+    };
+
+    emptyCard.onmouseout = () => {
+        emptyCard.style.transform = "translateY(0) scale(1)";
+        emptyCard.style.boxShadow = "0 10px 30px rgba(58, 12, 163, 0.15)";
+    };
+
+    container.appendChild(emptyCard);
 }
 
 
@@ -411,7 +523,7 @@ document.getElementById("addStaffForm").addEventListener("submit",async function
 });
 
 
-document.addEventListener("input", async function() {
+document.getElementById("staffSearch").addEventListener("input", async function() {
 
     let staffInput = document.getElementById("staffSearch");
     let inputValue = staffInput.value;
@@ -434,18 +546,102 @@ document.addEventListener("input", async function() {
 
 });
 
-document.addEventListener("change", async function() {
+document.getElementById("staffFilter").addEventListener("change", function () {
 
-    let statusFilter = document.getElementById("staffFilter");
-
-    let selectedStatus = statusFilter.value;
-
-    if(selectedStatus == "all") {
-        AllMaintenaceStaff = await loadAllMaintenanceStaff();
-        renderMaintenanceStaff(AllMaintenaceStaff);
-        return;
-    }
-
-    filterStaffByStaffStatus(selectedStatus);
+    filterStaffByStaffStatus(this.value);
 
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+const SriLankaValidation = {
+
+    mobile(value) {
+        value = (value ?? "").trim();
+        return /^07\d{8}$/.test(value) || /^\+947\d{8}$/.test(value);
+    },
+
+    name(value) {
+        value = (value ?? "").trim();
+        return /^[A-Za-z\s]{2,50}$/.test(value);
+    },
+
+    email(value) {
+        value = (value ?? "").trim();
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+    },
+
+    password(value) {
+        value = (value ?? "").trim();
+        return value.length >= 6 && value.length <= 20;
+    },
+
+    experience(value) {
+        const num = Number(value);
+        return !isNaN(num) && num >= 0 && num <= 60;
+    },
+
+    required(value) {
+        return (value ?? "").toString().trim().length > 0;
+    }
+};
+
+function validateField(value, rules, fieldName = "Field") {
+
+    value = (value ?? "").toString().trim();
+
+    if (rules.required && !SriLankaValidation.required(value)) {
+        showNotification(`${fieldName} is required`, "error");
+        return false;
+    }
+
+    if (rules.minLength && value.length < rules.minLength) {
+        showNotification(`${fieldName} must be at least ${rules.minLength} characters`, "error");
+        return false;
+    }
+
+    if (rules.maxLength && value.length > rules.maxLength) {
+        showNotification(`${fieldName} must be less than ${rules.maxLength} characters`, "error");
+        return false;
+    }
+
+    if (rules.type === "name" && !SriLankaValidation.name(value)) {
+        showNotification(`${fieldName} is invalid`, "error");
+        return false;
+    }
+
+    if (rules.type === "mobile" && !SriLankaValidation.mobile(value)) {
+        showNotification(`Invalid mobile number`, "error");
+        return false;
+    }
+
+    if (rules.type === "email" && !SriLankaValidation.email(value)) {
+        showNotification(`Invalid email`, "error");
+        return false;
+    }
+
+    if (rules.type === "password" && !SriLankaValidation.password(value)) {
+        showNotification(`Invalid password`, "error");
+        return false;
+    }
+
+    if (rules.type === "experience" && !SriLankaValidation.experience(value)) {
+        showNotification(`Invalid experience`, "error");
+        return false;
+    }
+
+    return true;
+}

@@ -467,7 +467,19 @@
   }
 }
 
+.add-driver-submit-button{
+  background: linear-gradient(135deg, #3a0ca3, #4361ee);
+  color: white;
+  box-shadow: 0 4px 15px rgba(58, 12, 163, 0.4);
+  margin-left: 790px;
+  margin-right: 20px;
+  margin-top: -70px;
+}
 
+.add-driver-submit-button:hover{
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(58, 12, 163, 0.6);
+}
 
 
 

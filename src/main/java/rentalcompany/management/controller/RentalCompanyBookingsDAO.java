@@ -147,11 +147,11 @@ public class RentalCompanyBookingsDAO {
         return RecentBookings;
     }
 
-    public static int getActiveBookingsCount(int companyId) {
+    public static int getConfirmedBookingsCount(int companyId) {
 
-        int activeDriverCount = 0;
+        int confirmedBookingsCount = 0;
 
-        String sql = "SELECT COUNT(*) FROM companybookings WHERE companyid = ? AND status = 'Active';";
+        String sql = "SELECT COUNT(*) FROM companybookings WHERE companyid = ? AND status = 'confirmed';";
 
         try(Connection con = DBConnection.getConnection();
             PreparedStatement ps = con.prepareStatement(sql)) {
@@ -161,7 +161,7 @@ public class RentalCompanyBookingsDAO {
             ResultSet rs = ps.executeQuery();
 
             if(rs.next()) {
-                activeDriverCount = rs.getInt(1);
+                confirmedBookingsCount = rs.getInt(1);
             }
 
         }catch(Exception e) {
@@ -169,9 +169,36 @@ public class RentalCompanyBookingsDAO {
         }
 
 
-        return activeDriverCount;
+        return confirmedBookingsCount;
 
     }
+
+    public static int getCancelledBookingsCount(int companyId) {
+
+        int cancelledBookingsCount = 0;
+
+        String sql = "SELECT COUNT(*) FROM companybookings WHERE companyid = ? AND status = 'cancelled';";
+
+        try(Connection con = DBConnection.getConnection();
+            PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setInt(1, companyId);
+
+            ResultSet rs = ps.executeQuery();
+
+            if(rs.next()) {
+                cancelledBookingsCount = rs.getInt(1);
+            }
+
+        }catch(Exception e) {
+            e.printStackTrace();
+        }
+
+
+        return cancelledBookingsCount;
+
+    }
+
 
 
     public static boolean assignDriverToBooking(int companyId, int driverId, int bookingId) {
@@ -266,4 +293,66 @@ public class RentalCompanyBookingsDAO {
 
         return list;
     }
+
+    public static int getMonthlyRevenue(int companyId) {
+
+        int revenue = 0;
+
+        String sql =
+                "SELECT SUM(total_amount) " +
+                        "FROM companybookings " +
+                        "WHERE companyid = ? " +
+                        "AND status = 'confirmed' " +
+                        "AND MONTH(trip_end_date) = MONTH(CURDATE()) " +
+                        "AND YEAR(trip_end_date) = YEAR(CURDATE())";
+
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setInt(1, companyId);
+
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                revenue = rs.getInt(1);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return revenue;
+    }
+
+    public static int getMonthlyCancelledRevenueLoss(int companyId) {
+
+        int loss = 0;
+
+        String sql =
+                "SELECT SUM(total_amount) " +
+                        "FROM companybookings " +
+                        "WHERE companyid = ? " +
+                        "AND status = 'cancelled' " +
+                        "AND MONTH(trip_start_date) = MONTH(CURDATE()) " +
+                        "AND YEAR(trip_start_date) = YEAR(CURDATE())";
+
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setInt(1, companyId);
+
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                loss = rs.getInt(1);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return loss;
+    }
+
+
 }
