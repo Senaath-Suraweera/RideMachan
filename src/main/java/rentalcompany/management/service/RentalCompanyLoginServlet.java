@@ -38,6 +38,8 @@ public class RentalCompanyLoginServlet extends HttpServlet {
                 HttpSession session = request.getSession();
                 session.setAttribute("rentalcompany", company);
                 session.setAttribute("companyId", company.getCompanyId());
+                session.setAttribute("actorType", "COMPANY");
+                session.setAttribute("actorId", company.getCompanyId());
                 response.getWriter().write("{\"status\":\"success\",\"message\":\"Login successful\"}");
             } else {
                 response.setStatus(401);

@@ -1,7 +1,5 @@
 @import url("common.css");
 
-
-
 /* Driver Management Specific Styles */
 
 .page-content {
@@ -16,14 +14,13 @@
   /*border: 1px solid red;*/
 }
 
-
 .page-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
   margin-bottom: 2rem;
 }
- 
+
 .page-title h2 {
   font-size: 2rem;
   font-weight: 600;
@@ -51,7 +48,7 @@
   align-items: center;
   gap: 0.5rem;
 }
- 
+
 .add-driver-btn:hover {
   transform: translateY(-2px);
   box-shadow: 0 8px 25px rgba(67, 97, 238, 0.3);
@@ -132,7 +129,6 @@
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
   gap: 1.5rem;
-  border: 1px solid green;
 }
 
 .driver-card {
@@ -329,7 +325,7 @@
   justify-content: center;
   background: rgba(0, 0, 0, 0.5);
   z-index: 1000;
-  border: 1px solid red;      /* just for debugging */
+  border: 1px solid red; /* just for debugging */
 }
 
 .modal-content {
@@ -467,7 +463,7 @@
   }
 }
 
-.add-driver-submit-button{
+.add-driver-submit-button {
   background: linear-gradient(135deg, #3a0ca3, #4361ee);
   color: white;
   box-shadow: 0 4px 15px rgba(58, 12, 163, 0.4);
@@ -476,19 +472,11 @@
   margin-top: -70px;
 }
 
-.add-driver-submit-button:hover{
+.add-driver-submit-button:hover {
   transform: translateY(-2px);
   box-shadow: 0 8px 25px rgba(58, 12, 163, 0.6);
 }
 
-
-
-
-
-
 /* message popup handling starting*/
-
-
-
 
 /* message popup handling ending*/

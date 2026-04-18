@@ -24,35 +24,41 @@ public class AddVehicleServlet extends HttpServlet {
             String brand = request.getParameter("vehiclebrand");
             String model = request.getParameter("vehiclemodel");
             String numberPlate = request.getParameter("numberplatenumber");
-            int tareWeight = Integer.parseInt(request.getParameter("tareweight"));
 
-            int pricePerDay = Integer.parseInt(request.getParameter("price_per_day"));
+            int tareWeight = parseIntSafe(request.getParameter("tareweight"), "Tare Weight");
+            int pricePerDay = parseIntSafe(request.getParameter("price_per_day"), "Price Per Day");
+
             String location = request.getParameter("location");
-
             String color = request.getParameter("color");
-            int passengers = Integer.parseInt(request.getParameter("numberofpassengers"));
-            int engineCapacity = Integer.parseInt(request.getParameter("enginecapacity"));
+
+            int passengers = parseIntSafe(request.getParameter("numberofpassengers"), "Number of Passengers");
+            int engineCapacity = parseIntSafe(request.getParameter("enginecapacity"), "Engine Capacity");
+
             String engineNumber = request.getParameter("enginenumber");
             String chasisNumber = request.getParameter("chasisnumber");
             String description = request.getParameter("description");
             String milage = calculateMileage(engineCapacity);
-            String feature = request.getParameter("feature");
 
-            String vehicleType = calculateVehicleType(passengers);
-            String fuelType = calculateFuelType(engineCapacity);
-            String transmission = calculateTransmission(engineCapacity);
-            String availabilityStatus = calculateAvailability();
-            int manufactureYear = calculateManufactureYear();
+            String features = request.getParameter("features");
+
+            // NEW: user-entered instead of derived
+            String vehicleType = validateRequired(request.getParameter("vehicle_type"), "Vehicle Type");
+            String fuelType = validateRequired(request.getParameter("fuel_type"), "Fuel Type");
+            String transmission = validateRequired(request.getParameter("transmission"), "Transmission");
+            int manufactureYear = parseManufactureYear(request.getParameter("manufacture_year"));
+
+            String availabilityStatus = "available";
 
             java.sql.Timestamp createdAt = getCurrentTimestamp();
             java.sql.Timestamp updatedAt = createdAt;
 
-
             Part docPart = request.getPart("registrationdocumentation");
             Part imagePart = request.getPart("vehicleimages");
 
-            InputStream docStream = docPart != null ? docPart.getInputStream() : null;
-            InputStream imgStream = imagePart != null ? imagePart.getInputStream() : null;
+            InputStream docStream = (docPart != null && docPart.getSize() > 0)
+                    ? docPart.getInputStream() : null;
+            InputStream imgStream = (imagePart != null && imagePart.getSize() > 0)
+                    ? imagePart.getInputStream() : null;
 
             String companyIdStr = request.getParameter("company_id");
             String providerIdStr = request.getParameter("provider_id");
@@ -65,10 +71,9 @@ public class AddVehicleServlet extends HttpServlet {
                     ? Integer.parseInt(providerIdStr)
                     : null;
 
-
-
             Vehicle v = new Vehicle(brand, model, numberPlate, tareWeight, color, passengers, engineCapacity,
-                    engineNumber, chasisNumber, docStream, imgStream, description, milage, companyId, providerId,pricePerDay, location);
+                    engineNumber, chasisNumber, docStream, imgStream, description, milage, companyId, providerId,
+                    pricePerDay, location);
 
             v.setVehicleType(vehicleType);
             v.setFuelType(fuelType);
@@ -77,47 +82,64 @@ public class AddVehicleServlet extends HttpServlet {
             v.setManufactureYear(manufactureYear);
             v.setCreatedAt(createdAt);
             v.setUpdatedAt(updatedAt);
-            v.setFeatures(feature);
+            v.setFeatures(features);
 
             boolean success = VehicleDAO.addVehicle(v);
 
             response.getWriter().write("{\"status\":\"" + (success ? "success" : "error") + "\"}");
+        } catch (IllegalArgumentException e) {
+            response.getWriter().write("{\"status\":\"error\",\"message\":\"" + escapeJson(e.getMessage()) + "\"}");
         } catch (Exception e) {
             e.printStackTrace();
-            response.getWriter().write("{\"status\":\"error\",\"message\":\"" + e.getMessage() + "\"}");
+            response.getWriter().write("{\"status\":\"error\",\"message\":\"" + escapeJson(e.getMessage()) + "\"}");
         }
     }
 
-
-
-    private String calculateVehicleType(int passengers) {
-        if (passengers <= 4) return "Car";
-        if (passengers <= 7) return "SUV";
-        return "Van";
-    }
-    private String calculateFuelType(int engineCapacity) {
-        if (engineCapacity < 1500) return "Petrol";
-        return "Diesel";
-    }
-
-    private String calculateTransmission(int engineCapacity) {
-        if (engineCapacity < 1500) return "Manual";
-        return "Automatic";
+    private int parseIntSafe(String value, String fieldName) {
+        if (value == null || value.trim().isEmpty()) {
+            throw new IllegalArgumentException(fieldName + " is required");
+        }
+        try {
+            return Integer.parseInt(value.trim());
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException(fieldName + " must be a valid number");
+        }
     }
 
-    private String calculateAvailability() {
-        return "available";
+    private int parseManufactureYear(String value) {
+        if (value == null || value.trim().isEmpty()) {
+            throw new IllegalArgumentException("Manufacture Year is required");
+        }
+        int year;
+        try {
+            year = Integer.parseInt(value.trim());
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Manufacture Year must be a valid number");
+        }
+        int currentYear = java.time.Year.now().getValue();
+        if (year < 1950 || year > currentYear) {
+            throw new IllegalArgumentException("Manufacture Year must be between 1950 and " + currentYear);
+        }
+        return year;
     }
 
-    private int calculateManufactureYear() {
-        return java.time.Year.now().getValue();
+    private String validateRequired(String value, String fieldName) {
+        if (value == null || value.trim().isEmpty()) {
+            throw new IllegalArgumentException(fieldName + " is required");
+        }
+        return value.trim();
+    }
+
+    private String escapeJson(String s) {
+        if (s == null) return "";
+        return s.replace("\\", "\\\\").replace("\"", "\\\"");
     }
 
     private java.sql.Timestamp getCurrentTimestamp() {
         return new java.sql.Timestamp(System.currentTimeMillis());
     }
-    private String calculateMileage(int engineCapacity) {
 
+    private String calculateMileage(int engineCapacity) {
         int min, max;
 
         if (engineCapacity < 1000) {

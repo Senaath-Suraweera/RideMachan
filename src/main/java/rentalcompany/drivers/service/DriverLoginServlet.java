@@ -48,6 +48,8 @@ public class DriverLoginServlet extends HttpServlet {
                 session.setAttribute("driverId", driver.getDriverId());
                 session.setAttribute("actorType", "DRIVER");
                 session.setAttribute("driver", driver);
+                session.setAttribute("actorId", driver.getDriverId());
+
                 System.out.println("Logged in as Driver with Id: " + session.getAttribute("driverId"));
                 response.getWriter().write("{\"status\":\"success\",\"message\":\"Login successful\"}");
             } else {

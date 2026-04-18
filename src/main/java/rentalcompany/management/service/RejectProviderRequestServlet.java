@@ -5,13 +5,13 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 import rentalcompany.management.controller.RentalCompanyDAO;
-import rentalcompany.companyvehicle.model.Vehicle;
 
 import java.io.IOException;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
-@WebServlet("/display/allrequest")
-public class ProviderRequestedVehiclesServlet extends HttpServlet {
+@WebServlet("/provider/reject")
+public class RejectProviderRequestServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
@@ -20,27 +20,36 @@ public class ProviderRequestedVehiclesServlet extends HttpServlet {
         resp.setContentType("application/json");
         resp.setCharacterEncoding("UTF-8");
 
+        Map<String, Object> result = new HashMap<>();
+        Gson gson = new Gson();
+
         try {
             HttpSession session = req.getSession(false);
 
             if (session == null || session.getAttribute("companyId") == null) {
                 resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                resp.getWriter().write("{\"error\":\"Not logged in\"}");
+                result.put("success", false);
+                result.put("error", "Not logged in");
+                resp.getWriter().write(gson.toJson(result));
                 return;
             }
 
             int companyId = (int) session.getAttribute("companyId");
+            int vehicleId = Integer.parseInt(req.getParameter("vehicleId"));
 
-            List<Vehicle> vehicles =
-                    RentalCompanyDAO.getPendingProviderRequestedVehicles(companyId);
+            boolean ok = RentalCompanyDAO.rejectProviderRequest(companyId, vehicleId);
 
-            Gson gson = new Gson();
-            resp.getWriter().write(gson.toJson(vehicles));
+            result.put("success", ok);
+            if (!ok) result.put("error", "Could not reject request");
+
+            resp.getWriter().write(gson.toJson(result));
 
         } catch (Exception e) {
             e.printStackTrace();
             resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            resp.getWriter().write("{\"error\":\"" + e.getMessage() + "\"}");
+            result.put("success", false);
+            result.put("error", e.getMessage());
+            resp.getWriter().write(gson.toJson(result));
         }
     }
 }

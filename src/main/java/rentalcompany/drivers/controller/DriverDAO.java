@@ -16,7 +16,7 @@ public class DriverDAO {
 
     public static boolean insertDriver(Driver driver) {
         String sql = "INSERT INTO Driver (username, firstname, lastname, email, mobilenumber, description, " +
-                "hashedpassword, salt, nicnumber, nic, driverslicense, company_id, Area, licenseexpirydate, licensenumber) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                "hashedpassword, salt, nicnumber, nic, driverslicence, company_id, Area, licenceexpirydate, licensenumber) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection con = DBConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
@@ -67,7 +67,7 @@ public class DriverDAO {
                 "    driver.Area, \n" +
                 "    driver.licensenumber, \n" +
                 "    driver.mobilenumber, \n" +
-                "    driver.licenseexpirydate, \n" +
+                "    driver.licenceexpirydate, \n" +
                 "    ROUND(AVG(ratings.rating_value)) AS rating_value \n" +
                 "FROM driver \n" +
                 "LEFT JOIN ratings \n" +
@@ -82,7 +82,7 @@ public class DriverDAO {
                 "driver.Area, " +
                 "driver.licensenumber, " +
                 "driver.mobilenumber, " +
-                "driver.licenseexpirydate";
+                "driver.licenceexpirydate";
 
 
         try(Connection con = DBConnection.getConnection();
@@ -104,7 +104,7 @@ public class DriverDAO {
                         rs.getString("Area"),
                         rs.getString("licensenumber"),
                         rs.getString("mobilenumber"),
-                        rs.getDate("licenseexpirydate")
+                        rs.getDate("licenceexpirydate")
 
                 );
 

@@ -304,5 +304,76 @@ public class RentalCompanyDAO {
         return list;
     }
 
+    public static boolean acceptProviderRequest(int companyId, int vehicleId) {
+
+        String updateRequestSql =
+                "UPDATE providerrentalrequests " +
+                        "SET status = 'approved', responded_at = NOW() " +
+                        "WHERE vehicle_id = ? AND company_id = ? AND status = 'pending'";
+
+        String updateVehicleSql =
+                "UPDATE vehicle SET company_id = ? WHERE vehicleid = ?";
+
+        Connection con = null;
+
+        try {
+            con = DBConnection.getConnection();
+            con.setAutoCommit(false);
+
+            // 1. Mark the provider request as approved
+            try (PreparedStatement ps1 = con.prepareStatement(updateRequestSql)) {
+                ps1.setInt(1, vehicleId);
+                ps1.setInt(2, companyId);
+
+                int rows = ps1.executeUpdate();
+
+                if (rows == 0) {
+                    // no matching pending request -> abort
+                    con.rollback();
+                    return false;
+                }
+            }
+
+            // 2. Assign the vehicle to the company
+            try (PreparedStatement ps2 = con.prepareStatement(updateVehicleSql)) {
+                ps2.setInt(1, companyId);
+                ps2.setInt(2, vehicleId);
+                ps2.executeUpdate();
+            }
+
+            con.commit();
+            return true;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            try { if (con != null) con.rollback(); } catch (Exception ignore) {}
+            return false;
+
+        } finally {
+            try { if (con != null) { con.setAutoCommit(true); con.close(); } } catch (Exception ignore) {}
+        }
+    }
+
+    public static boolean rejectProviderRequest(int companyId, int vehicleId) {
+
+        String sql =
+                "UPDATE providerrentalrequests " +
+                        "SET status = 'rejected', responded_at = NOW() " +
+                        "WHERE vehicle_id = ? AND company_id = ? AND status = 'pending'";
+
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setInt(1, vehicleId);
+            ps.setInt(2, companyId);
+
+            return ps.executeUpdate() > 0;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
 
 }

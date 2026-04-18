@@ -1,239 +1,247 @@
 // Global variables
 let allBookings = [];
 let currentFilters = {
-    dateRange: 'month',
-    status: 'all',
-    search: ''
+  dateRange: "month",
+  status: "all",
+  search: "",
 };
 
 // DOM Elements
-const sidebar = document.getElementById('sidebar');
-const sidebarToggle = document.getElementById('sidebarToggle');
-const loadingSpinner = document.getElementById('loadingSpinner');
-const bookingsList = document.getElementById('bookingsList');
-const bookingsContainer = document.getElementById('bookingsContainer');
-const emptyState = document.getElementById('emptyState');
-const bookingDetailsModal = document.getElementById('bookingDetailsModal');
-const closeModal = document.getElementById('closeModal');
-const searchInput = document.getElementById('searchInput');
-const dateRange = document.getElementById('dateRange');
-const statusFilter = document.getElementById('statusFilter');
-const resetFilters = document.getElementById('resetFilters');
+const sidebar = document.getElementById("sidebar");
+const sidebarToggle = document.getElementById("sidebarToggle");
+const loadingSpinner = document.getElementById("loadingSpinner");
+const bookingsList = document.getElementById("bookingsList");
+const bookingsContainer = document.getElementById("bookingsContainer");
+const emptyState = document.getElementById("emptyState");
+const bookingDetailsModal = document.getElementById("bookingDetailsModal");
+const closeModal = document.getElementById("closeModal");
+const searchInput = document.getElementById("searchInput");
+const dateRange = document.getElementById("dateRange");
+const statusFilter = document.getElementById("statusFilter");
+const resetFilters = document.getElementById("resetFilters");
 
 // Initialize on page load
-document.addEventListener('DOMContentLoaded', async function() {
-    setupEventListeners();
-    await loadBookings();
-    //await loadDriverData();
+document.addEventListener("DOMContentLoaded", async function () {
+  setupEventListeners();
+  await loadBookings();
+  //await loadDriverData();
 });
 
-
 async function loadDriverData() {
+  try {
+    const response = await fetch(`/driver/profile`, {
+      method: "GET",
+    });
 
-    try {
-
-
-
-        const response = await fetch(`/driver/profile`, {
-            method: 'GET'
-        });
-
-        if (response.status === 401) {
-            alert('Please login first');
-            window.location.href = '/views/landing/driverlogin.html';
-            return;
-        }
-
-        const data = await response.json();
-        console.log("DATA:", data);
-
-        if (data && data.driver) {
-
-            populateDriverInfo(data.driver);
-
-            //let bookings = data.bookings || [];
-
-            //console.log("BOOKINGS:", bookings);
-
-            //displayBookings(bookings);
-        }
-
-    } catch (err) {
-        console.error("ERROR:", err);
+    if (response.status === 401) {
+      alert("Please login first");
+      window.location.href = "/views/landing/driverlogin.html";
+      return;
     }
+
+    const data = await response.json();
+    console.log("DATA:", data);
+
+    if (data && data.driver) {
+      populateDriverInfo(data.driver);
+
+      //let bookings = data.bookings || [];
+
+      //console.log("BOOKINGS:", bookings);
+
+      //displayBookings(bookings);
+    }
+  } catch (err) {
+    console.error("ERROR:", err);
+  }
 }
 
 /* ================= DRIVER ================= */
 
 function populateDriverInfo(driver) {
+  document.getElementById("driverName").textContent =
+    driver.fullName || driver.username || "Driver";
 
-    document.getElementById('driverName').textContent =
-        driver.fullName || driver.username || 'Driver';
-
-    const name = driver.firstName || driver.username || 'D';
-    document.getElementById('profileInitial').textContent =
-        name.charAt(0).toUpperCase();
+  const name = driver.firstName || driver.username || "D";
+  document.getElementById("profileInitial").textContent = name
+    .charAt(0)
+    .toUpperCase();
 }
-
 
 // Setup all event listeners
 function setupEventListeners() {
-    // Sidebar toggle
-    if (sidebarToggle) {
-        sidebarToggle.addEventListener('click', () => {
-            sidebar.classList.toggle('active');
-        });
+  // Sidebar toggle
+  if (sidebarToggle) {
+    sidebarToggle.addEventListener("click", () => {
+      sidebar.classList.toggle("active");
+    });
+  }
+
+  // Close sidebar when clicking outside (mobile)
+  document.addEventListener("click", (e) => {
+    if (
+      window.innerWidth <= 992 &&
+      sidebar.classList.contains("active") &&
+      !sidebar.contains(e.target) &&
+      (!sidebarToggle || !sidebarToggle.contains(e.target))
+    ) {
+      sidebar.classList.remove("active");
     }
+  });
 
-    // Close sidebar when clicking outside (mobile)
-    document.addEventListener('click', (e) => {
-        if (window.innerWidth <= 992 &&
-            sidebar.classList.contains('active') &&
-            !sidebar.contains(e.target) &&
-            (!sidebarToggle || !sidebarToggle.contains(e.target))) {
-            sidebar.classList.remove('active');
-        }
-    });
+  // Filter event listeners
+  searchInput.addEventListener(
+    "input",
+    debounce(function () {
+      currentFilters.search = this.value;
+      loadBookings();
+    }, 500),
+  );
 
-    // Filter event listeners
-    searchInput.addEventListener('input', debounce(function() {
-        currentFilters.search = this.value;
-        loadBookings();
-    }, 500));
+  dateRange.addEventListener("change", function () {
+    currentFilters.dateRange = this.value;
+    loadBookings();
+  });
 
-    dateRange.addEventListener('change', function() {
-        currentFilters.dateRange = this.value;
-        loadBookings();
-    });
+  statusFilter.addEventListener("change", function () {
+    currentFilters.status = this.value;
+    loadBookings();
+  });
 
-    statusFilter.addEventListener('change', function() {
-        currentFilters.status = this.value;
-        loadBookings();
-    });
+  resetFilters.addEventListener("click", function () {
+    currentFilters = {
+      dateRange: "month",
+      status: "all",
+      search: "",
+    };
+    searchInput.value = "";
+    dateRange.value = "month";
+    statusFilter.value = "all";
+    loadBookings();
+  });
 
-    resetFilters.addEventListener('click', function() {
-        currentFilters = {
-            dateRange: 'month',
-            status: 'all',
-            search: ''
-        };
-        searchInput.value = '';
-        dateRange.value = 'month';
-        statusFilter.value = 'all';
-        loadBookings();
-    });
+  // Close modal handlers
+  if (closeModal) {
+    closeModal.addEventListener("click", closeBookingModal);
+  }
 
-    // Close modal handlers
-    if (closeModal) {
-        closeModal.addEventListener('click', closeBookingModal);
+  window.addEventListener("click", function (event) {
+    if (event.target === bookingDetailsModal) {
+      closeBookingModal();
     }
+  });
 
-    window.addEventListener('click', function(event) {
-        if (event.target === bookingDetailsModal) {
-            closeBookingModal();
-        }
-    });
-
-    // Logout functionality
-    document.querySelector('.logout').addEventListener('click', function() {
-        if (confirm('Are you sure you want to logout?')) {
-            this.innerHTML = '<i class="fas fa-spinner fa-spin"></i><span>Logging out...</span>';
-            setTimeout(() => {
-                window.location.href = '../driver/logout';
-            }, 1000);
-        }
-    });
+  // Logout functionality
+  document.querySelector(".logout").addEventListener("click", function () {
+    if (confirm("Are you sure you want to logout?")) {
+      this.innerHTML =
+        '<i class="fas fa-spinner fa-spin"></i><span>Logging out...</span>';
+      setTimeout(() => {
+        window.location.href = "http://localhost:8080/views/landing/index.html";
+      }, 1000);
+    }
+  });
 }
 
 // Load bookings from backend
 async function loadBookings() {
-    showLoading();
+  showLoading();
 
-    try {
-        const params = new URLSearchParams();
-        if (currentFilters.dateRange) params.append('dateRange', currentFilters.dateRange);
-        if (currentFilters.status) params.append('status', currentFilters.status);
-        if (currentFilters.search) params.append('search', currentFilters.search);
+  try {
+    const params = new URLSearchParams();
+    if (currentFilters.dateRange)
+      params.append("dateRange", currentFilters.dateRange);
+    if (currentFilters.status) params.append("status", currentFilters.status);
+    if (currentFilters.search) params.append("search", currentFilters.search);
 
-        const response = await fetch(`/driver/pastbookings?${params.toString()}`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            credentials: 'include'
-        });
+    const response = await fetch(`/driver/pastbookings?${params.toString()}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+    });
 
-        if (response.status === 401) {
-            alert('Please login first');
-            window.location.href = '/views/landing/driverlogin.html';
-            return;
-        }
-
-        if (!response.ok) {
-            throw new Error('Failed to fetch bookings');
-        }
-
-        const data = await response.json();
-
-        if (data.success) {
-            allBookings = data.bookings || [];
-
-            const stats = data.stats || { totalActive: 0, inProgress: 0, upcoming: 0 };
-            updateStats(stats);
-            renderBookings();
-        } else {
-            throw new Error(data.error || 'Unknown error');
-        }
-
-    } catch (error) {
-        console.error('Error loading bookings:', error);
-        alert('Failed to load bookings. Please try again.');
-        showEmptyState();
-    } finally {
-        hideLoading();
+    if (response.status === 401) {
+      alert("Please login first");
+      window.location.href = "/views/landing/driverlogin.html";
+      return;
     }
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch bookings");
+    }
+
+    const data = await response.json();
+
+    if (data.success) {
+      allBookings = data.bookings || [];
+
+      const stats = data.stats || {
+        totalActive: 0,
+        inProgress: 0,
+        upcoming: 0,
+      };
+      updateStats(stats);
+      renderBookings();
+    } else {
+      throw new Error(data.error || "Unknown error");
+    }
+  } catch (error) {
+    console.error("Error loading bookings:", error);
+    alert("Failed to load bookings. Please try again.");
+    showEmptyState();
+  } finally {
+    hideLoading();
+  }
 }
 
 // Update statistics
 function updateStats(stats) {
-    document.getElementById('completedCount').textContent = stats.totalCompleted || 0;
-    document.getElementById('cancelledCount').textContent = stats.totalCancelled || 0;
-    document.getElementById('revenueAmount').textContent = 'Rs. ' + (stats.totalRevenue || 0).toLocaleString();
-    document.getElementById('avgRating').textContent = (stats.avgRating || 0).toFixed(1);
+  document.getElementById("completedCount").textContent =
+    stats.totalCompleted || 0;
+  document.getElementById("cancelledCount").textContent =
+    stats.totalCancelled || 0;
+  document.getElementById("revenueAmount").textContent =
+    "Rs. " + (stats.totalRevenue || 0).toLocaleString();
+  document.getElementById("avgRating").textContent = (
+    stats.avgRating || 0
+  ).toFixed(1);
 }
 
 // Render bookings
 function renderBookings() {
-    if (allBookings.length === 0) {
-        showEmptyState();
-        return;
-    }
+  if (allBookings.length === 0) {
+    showEmptyState();
+    return;
+  }
 
-    bookingsList.innerHTML = '';
-    bookingsContainer.style.display = 'block';
-    emptyState.style.display = 'none';
+  bookingsList.innerHTML = "";
+  bookingsContainer.style.display = "block";
+  emptyState.style.display = "none";
 
-    allBookings.forEach(booking => {
-        const card = createBookingCard(booking);
-        bookingsList.appendChild(card);
-    });
+  allBookings.forEach((booking) => {
+    const card = createBookingCard(booking);
+    bookingsList.appendChild(card);
+  });
 
-    updateBookingsCount(allBookings.length);
+  updateBookingsCount(allBookings.length);
 }
 
 // Create booking card element
 function createBookingCard(booking) {
-    const card = document.createElement('div');
-    card.className = 'booking-card';
-    card.dataset.bookingId = booking.rideId;
+  const card = document.createElement("div");
+  card.className = "booking-card";
+  card.dataset.bookingId = booking.rideId;
 
-    const statusClass = booking.status.toLowerCase();
-    const statusText = booking.status.charAt(0).toUpperCase() + booking.status.slice(1);
+  const statusClass = booking.status.toLowerCase();
+  const statusText =
+    booking.status.charAt(0).toUpperCase() + booking.status.slice(1);
 
-    const formattedDate = formatDate(booking.bookingDate);
-    const formattedTime = formatTime(booking.startTime);
+  const formattedDate = formatDate(booking.bookingDate);
+  const formattedTime = formatTime(booking.startTime);
 
-    card.innerHTML = `
+  card.innerHTML = `
         <div class="booking-header">
             <div class="booking-id">
                 <i class="fas fa-hashtag"></i>
@@ -291,21 +299,21 @@ function createBookingCard(booking) {
         </div>
     `;
 
-    return card;
+  return card;
 }
 
 // View booking details
 function viewBookingDetails(rideId) {
-    const booking = allBookings.find(b => b.rideId === rideId);
-    if (!booking) return;
+  const booking = allBookings.find((b) => b.rideId === rideId);
+  if (!booking) return;
 
-    const modalContent = document.getElementById('modalBookingDetails');
-    const formattedDate = formatDate(booking.bookingDate);
-    const formattedTime = formatTime(booking.startTime);
-    const statusClass = booking.status.toLowerCase();
-    const statusColor = statusClass === 'completed' ? '#28a745' : '#dc3545';
+  const modalContent = document.getElementById("modalBookingDetails");
+  const formattedDate = formatDate(booking.bookingDate);
+  const formattedTime = formatTime(booking.startTime);
+  const statusClass = booking.status.toLowerCase();
+  const statusColor = statusClass === "completed" ? "#28a745" : "#dc3545";
 
-    modalContent.innerHTML = `
+  modalContent.innerHTML = `
         <div style="display: grid; gap: 20px;">
             <!-- Customer Information -->
             <div style="background: #f8f9fa; padding: 20px; border-radius: 8px;">
@@ -319,11 +327,11 @@ function viewBookingDetails(rideId) {
                     </div>
                     <div>
                         <div style="font-size: 12px; color: var(--text-light); margin-bottom: 4px;">Phone</div>
-                        <div style="font-weight: 600;">${booking.customerPhone || 'N/A'}</div>
+                        <div style="font-weight: 600;">${booking.customerPhone || "N/A"}</div>
                     </div>
                     <div>
                         <div style="font-size: 12px; color: var(--text-light); margin-bottom: 4px;">Email</div>
-                        <div style="font-weight: 600;">${booking.customerEmail || 'N/A'}</div>
+                        <div style="font-weight: 600;">${booking.customerEmail || "N/A"}</div>
                     </div>
                 </div>
             </div>
@@ -388,82 +396,87 @@ function viewBookingDetails(rideId) {
                                 <span style="font-weight: 500;">${booking.dropoffLocation}</span>
                             </div>
                         </div>
-                        ${booking.specialInstructions ? `
+                        ${
+                          booking.specialInstructions
+                            ? `
                         <div>
                             <div style="font-size: 12px; color: var(--text-light); margin-bottom: 4px;">Special Instructions</div>
                             <div style="font-weight: 500; font-size: 13px;">${booking.specialInstructions}</div>
                         </div>
-                        ` : ''}
+                        `
+                            : ""
+                        }
                     </div>
                 </div>
             </div>
         </div>
     `;
 
-    bookingDetailsModal.style.display = 'block';
+  bookingDetailsModal.style.display = "block";
 }
 
 // Close booking modal
 function closeBookingModal() {
-    bookingDetailsModal.style.display = 'none';
+  bookingDetailsModal.style.display = "none";
 }
 
 // Utility functions
 function showLoading() {
-    loadingSpinner.style.display = 'flex';
-    bookingsContainer.style.display = 'none';
-    emptyState.style.display = 'none';
+  loadingSpinner.style.display = "flex";
+  bookingsContainer.style.display = "none";
+  emptyState.style.display = "none";
 }
 
 function hideLoading() {
-    loadingSpinner.style.display = 'none';
+  loadingSpinner.style.display = "none";
 }
 
 function showEmptyState() {
-    bookingsContainer.style.display = 'none';
-    emptyState.style.display = 'block';
-    updateBookingsCount(0);
+  bookingsContainer.style.display = "none";
+  emptyState.style.display = "block";
+  updateBookingsCount(0);
 }
 
 function updateBookingsCount(count) {
-    document.getElementById('bookingsCount').textContent = `${count} total bookings`;
+  document.getElementById("bookingsCount").textContent =
+    `${count} total bookings`;
 }
 
 function formatDate(dateString) {
-    if (!dateString) return 'N/A';
-    const date = new Date(dateString);
-    const options = { year: 'numeric', month: 'short', day: 'numeric' };
-    return date.toLocaleDateString('en-US', options);
+  if (!dateString) return "N/A";
+  const date = new Date(dateString);
+  const options = { year: "numeric", month: "short", day: "numeric" };
+  return date.toLocaleDateString("en-US", options);
 }
 
 function formatTime(timeString) {
-    if (!timeString) return 'N/A';
+  if (!timeString) return "N/A";
 
-    if (timeString.length === 5) {
-        return formatTo12Hour(timeString);
-    } else if (timeString.length === 8) {
-        return formatTo12Hour(timeString.substring(0, 5));
-    }
+  if (timeString.length === 5) {
+    return formatTo12Hour(timeString);
+  } else if (timeString.length === 8) {
+    return formatTo12Hour(timeString.substring(0, 5));
+  }
 
-    return timeString;
+  return timeString;
 }
 
 function formatTo12Hour(time24) {
-    const [hours, minutes] = time24.split(':');
-    const hour = parseInt(hours);
-    const ampm = hour >= 12 ? 'PM' : 'AM';
-    const hour12 = hour % 12 || 12;
-    return `${hour12}:${minutes} ${ampm}`;
+  const [hours, minutes] = time24.split(":");
+  const hour = parseInt(hours);
+  const ampm = hour >= 12 ? "PM" : "AM";
+  const hour12 = hour % 12 || 12;
+  return `${hour12}:${minutes} ${ampm}`;
 }
 
 function debounce(func, wait) {
-    let timeout;
-    return function executedFunction(...args) {
-        const later = () => {
-            clearTimeout(timeout);
-            func(...args);
-        };
-        clearTimeout(timeout);
-        timeout = setTimeout(later, wait);
+  let timeout;
+  return function executedFunction(...args) {
+    const later = () => {
+      clearTimeout(timeout);
+      func(...args);
     };
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+  };
 }

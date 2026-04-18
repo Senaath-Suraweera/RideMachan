@@ -1,247 +1,588 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Driver Notifications - Ride Machan</title>
-    <link rel="stylesheet" href="../css/notification.css">
+    <link rel="stylesheet" href="../css/notification.css" />
     <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-</head>
-<body>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      /* Small additions that the main CSS doesn't cover */
+      .content-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+      }
+      .content-header .actions {
+        display: flex;
+        gap: 10px;
+      }
+      .btn-outline {
+        background: white;
+        border: 1px solid var(--border);
+        color: var(--text);
+        padding: 8px 16px;
+        border-radius: var(--radius-sm);
+        cursor: pointer;
+        font-family: inherit;
+        font-size: 13px;
+        font-weight: 500;
+        transition: var(--transition);
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .btn-outline:hover:not(:disabled) {
+        background: var(--primary);
+        color: white;
+        border-color: var(--primary);
+      }
+      .btn-outline:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+      .filter-tabs {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+      }
+      .filter-tab {
+        background: white;
+        border: 1px solid var(--border);
+        color: var(--text);
+        padding: 8px 16px;
+        border-radius: 20px;
+        cursor: pointer;
+        font-family: inherit;
+        font-size: 13px;
+        font-weight: 500;
+        transition: var(--transition);
+      }
+      .filter-tab:hover {
+        border-color: var(--primary-light);
+        color: var(--primary);
+      }
+      .filter-tab.active {
+        background: var(--primary);
+        color: white;
+        border-color: var(--primary);
+      }
+      .empty-state,
+      .loading-state,
+      .error-state {
+        text-align: center;
+        padding: 60px 20px;
+        color: var(--text-light);
+      }
+      .empty-state i,
+      .loading-state i,
+      .error-state i {
+        font-size: 48px;
+        margin-bottom: 15px;
+        opacity: 0.4;
+        display: block;
+      }
+      .error-state {
+        color: var(--danger);
+      }
+      .loading-state i {
+        animation: spin 1s linear infinite;
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+    </style>
+  </head>
+  <body>
     <div class="container">
-        <!-- =================== -->
-        <!-- Sidebar Navigation -->
-        <!-- =================== -->
-        <div class="sidebar" id="sidebar">
-            <div class="logo">
-                <img src="../logo.png" alt="Logo" class="logo-img">
-            </div>
-             
-            <div class="nav-menu">
-                <div class="nav-item">
-                    <i class="fas fa-house"></i>
-                    <a href="dashboard.html"><span> Home</span></a>
-                </div>
-                <div class="nav-item">
-                    <i class="fas fa-calendar-alt"></i>
-                    <a href="drivercalview.html"><span>Calendar</span></a>
-                </div>
-                <div class="nav-item" data-page="ongoing">
-                    <i class="fas fa-clock"></i>
-                    <a href="ongoing.html"><span>Ongoing Bookings</span></a>
+      <!-- =================== -->
+      <!-- Sidebar Navigation -->
+      <!-- =================== -->
+      <div class="sidebar" id="sidebar">
+        <div class="logo">
+          <img src="../logo.png" alt="Logo" class="logo-img" />
         </div>
-        <div class="nav-item" data-page="bookings">
-                    <i class="fas fa-history"></i>
-                    <a href="pastbooking.html"><span>Past Bookings</span></a>
+
+        <div class="nav-menu">
+          <div class="nav-item">
+            <i class="fas fa-house"></i>
+            <a href="dashboard.html"><span> Home</span></a>
+          </div>
+          <div class="nav-item">
+            <i class="fas fa-calendar-alt"></i>
+            <a href="drivercalview.html"><span>Calendar</span></a>
+          </div>
+          <div class="nav-item" data-page="ongoing">
+            <i class="fas fa-clock"></i>
+            <a href="ongoing.html"><span>Ongoing Bookings</span></a>
+          </div>
+          <div class="nav-item" data-page="bookings">
+            <i class="fas fa-history"></i>
+            <a href="pastbooking.html"><span>Past Bookings</span></a>
+          </div>
+          <div class="logout">
+            <i class="fas fa-sign-out-alt"></i>
+            <a href="#"><span>Logout</span></a>
+          </div>
         </div>
-                <div class="logout">
-                    <i class="fas fa-sign-out-alt"></i>
-                    <a href="#"><span>Logout</span></a>
-                </div>
+      </div>
+
+      <!-- =================== -->
+      <!-- Main Content -->
+      <!-- =================== -->
+      <div class="main-content">
+        <!-- Header Section -->
+        <div class="header">
+          <div class="header-left">
+            <button class="sidebar-toggle" id="sidebarToggle"></button>
+            <h1>Notifications</h1>
+          </div>
+          <div class="header-actions">
+            <!-- Notifications -->
+            <a href="notification.html"
+              ><div
+                class="notification"
+                id="bellNotification"
+                title="Notifications"
+              >
+                <i class="fas fa-bell"></i>
+                <div class="badge" id="bellBadge" style="display: none">0</div>
+              </div></a
+            >
+            <a href="messages.html"
+              ><div
+                class="notification"
+                id="messageNotification"
+                title="Messages"
+              >
+                <i class="fas fa-envelope"></i>
+                <div class="badge" id="messageBadge">5</div>
+              </div></a
+            >
+            <!-- User Profile -->
+            <div class="user-profile" id="userProfile">
+              <a href="profile.html"><div class="profile-img">K</div></a>
+              <div class="user-info">
+                <div class="user-name">Kamal</div>
+              </div>
             </div>
+          </div>
         </div>
-                 
-        <!-- =================== -->
-        <!-- Main Content -->
-        <!-- =================== -->
-        <div class="main-content">
-            <!-- Header Section -->
-            <div class="header">
-                <div class="header-left">
-                    <button class="sidebar-toggle" id="sidebarToggle">
-                    </button>
-                    <h1>Notifications</h1>
-                </div>
-                <div class="header-actions">
-                <!-- Notifications -->
-                <a href="notification.html"><div class="notification" id="bellNotification" title="Notifications">
-                    <i class="fas fa-bell"></i>
-                    <div class="badge" id="bellBadge">3</div></a>
-                </div>
-                <a href="messages.html"><div class="notification" id="messageNotification" title="Messages">
-                    <i class="fas fa-envelope"></i>
-                    <div class="badge" id="messageBadge">5</div></a>
-                </div>
-                <!-- User Profile -->
-                <div class="user-profile" id="userProfile">
-                    <a href="profile.html"><div class="profile-img">K</div></a>
-                    <div class="user-info">
-                        <div class="user-name">Kamal</div>
-                    </div>
-                </div>
+
+        <!-- Notifications Content -->
+        <div class="content">
+          <!-- Summary Cards -->
+          <div class="summary-cards">
+            <div class="summary-card pending">
+              <div class="summary-icon">
+                <i class="fas fa-clock"></i>
+              </div>
+              <div class="summary-info">
+                <h3 id="countUnread">0</h3>
+                <p>Unread</p>
+              </div>
             </div>
+            <div class="summary-card read">
+              <div class="summary-icon">
+                <i class="fas fa-check-circle"></i>
+              </div>
+              <div class="summary-info">
+                <h3 id="countRead">0</h3>
+                <p>Read</p>
+              </div>
             </div>
-
-            <!-- Notifications Content -->
-            <div class="content">
-                <!-- Summary Cards -->
-                <div class="summary-cards">
-                    <div class="summary-card pending">
-                        <div class="summary-icon">
-                            <i class="fas fa-clock"></i>
-                        </div>
-                        <div class="summary-info">
-                            <h3>6</h3>
-                            <p>Pending</p>
-                        </div>
-                    </div>
-                    <div class="summary-card read">
-                        <div class="summary-icon">
-                            <i class="fas fa-check-circle"></i>
-                        </div>
-                        <div class="summary-info">
-                            <h3>8</h3>
-                            <p>Read</p>
-                        </div>
-                    </div>
-                    <div class="summary-card confirmed">
-                        <div class="summary-icon">
-                            <i class="fas fa-shield-alt"></i>
-                        </div>
-                        <div class="summary-info">
-                            <h3>15</h3>
-                            <p>Confirmed</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Notifications List -->
-                <div class="notifications-list">
-                    <div class="notification-item new">
-                        <div class="notification-icon confirmed">
-                            <i class="fas fa-check-circle"></i>
-                        </div>
-                        <div class="notification-content">
-                            <h4>Trip Assignment - BMW X5</h4>
-                            <p>You have been assigned a new trip. Pickup: Colombo Fort to Kandy. Customer: Sarah Fernando | 4.8 ★ Rating</p>
-                        </div>
-                        <div class="notification-time">15 minutes ago</div>
-                        <div class="notification-actions">
-                            <button class="action-btn">
-                                <i class="fas fa-ellipsis-vertical"></i>
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="notification-item">
-                        <div class="notification-icon pending">
-                            <i class="fas fa-exclamation-triangle"></i>
-                        </div>
-                        <div class="notification-content">
-                            <h4>Vehicle Maintenance Due</h4>
-                            <p>Your assigned vehicle (License: ABC-1234) is due for maintenance. Please schedule service within 3 days.</p>
-                        </div>
-                        <div class="notification-time">45 minutes ago</div>
-                        <div class="notification-actions">
-                            <button class="action-btn">
-                                <i class="fas fa-ellipsis-vertical"></i>
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="notification-item">
-                        <div class="notification-icon info">
-                            <i class="fas fa-info-circle"></i>
-                        </div>
-                        <div class="notification-content">
-                            <h4>Trip Reminder</h4>
-                            <p>Your next trip starts in 1 hour. Make sure to be at the pickup location 10 minutes early. Location: Galle Face Green</p>
-                        </div>
-                        <div class="notification-time">1 hour ago</div>
-                        <div class="notification-actions">
-                            <button class="action-btn">
-                                <i class="fas fa-ellipsis-vertical"></i>
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="notification-item">
-                        <div class="notification-icon success">
-                            <i class="fas fa-money-bill-wave"></i>
-                        </div>
-                        <div class="notification-content">
-                            <h4>Payment Received</h4>
-                            <p>Payment of Rs. 2,500 has been credited to your account for trip completed on Jan 14, 2024. Trip ID: #RM12345</p>
-                        </div>
-                        <div class="notification-time">2 hours ago</div>
-                        <div class="notification-actions">
-                            <button class="action-btn">
-                                <i class="fas fa-ellipsis-vertical"></i>
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="notification-item">
-                        <div class="notification-icon info">
-                            <i class="fas fa-star"></i>
-                        </div>
-                        <div class="notification-content">
-                            <h4>New Customer Rating</h4>
-                            <p>You received a 5-star rating from John Silva for yesterday's trip. Great job maintaining excellent service!</p>
-                        </div>
-                        <div class="notification-time">3 hours ago</div>
-                        <div class="notification-actions">
-                            <button class="action-btn">
-                                <i class="fas fa-ellipsis-vertical"></i>
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="notification-item read">
-                        <div class="notification-icon pending">
-                            <i class="fas fa-clock"></i>
-                        </div>
-                        <div class="notification-content">
-                            <h4>Schedule Update</h4>
-                            <p>Your shift schedule has been updated. New working hours: 8:00 AM - 6:00 PM from Monday to Friday.</p>
-                        </div>
-                        <div class="notification-time">1 day ago</div>
-                        <div class="notification-actions">
-                            <button class="action-btn">
-                                <i class="fas fa-ellipsis-vertical"></i>
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="notification-item read">
-                        <div class="notification-icon warning">
-                            <i class="fas fa-exclamation-triangle"></i>
-                        </div>
-                        <div class="notification-content">
-                            <h4>Document Expiry Alert</h4>
-                            <p>Your driving license expires in 30 days. Please renew it and upload the new document to avoid service interruption.</p>
-                        </div>
-                        <div class="notification-time">2 days ago</div>
-                        <div class="notification-actions">
-                            <button class="action-btn">
-                                <i class="fas fa-ellipsis-vertical"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
+            <div class="summary-card confirmed">
+              <div class="summary-icon">
+                <i class="fas fa-shield-alt"></i>
+              </div>
+              <div class="summary-info">
+                <h3 id="countTotal">0</h3>
+                <p>Total</p>
+              </div>
             </div>
+          </div>
+
+          <!-- Action bar -->
+          <div class="content-header">
+            <div class="filter-tabs" id="filterTabs">
+              <button class="filter-tab active" data-filter="">All</button>
+              <button class="filter-tab" data-filter="BOOKING">Bookings</button>
+              <button class="filter-tab" data-filter="MAINTENANCE">
+                Maintenance
+              </button>
+              <button class="filter-tab" data-filter="TICKET">Tickets</button>
+              <button class="filter-tab" data-filter="REPORT">Reports</button>
+              <button class="filter-tab" data-filter="SYSTEM">System</button>
+              <button class="filter-tab" data-filter="GENERAL">General</button>
+            </div>
+            <div class="actions">
+              <button class="btn-outline" id="refreshBtn" title="Refresh">
+                <i class="fas fa-arrows-rotate"></i> Refresh
+              </button>
+              <button class="btn-outline" id="markAllReadBtn">
+                <i class="fas fa-check-double"></i> Mark all as read
+              </button>
+            </div>
+          </div>
+
+          <!-- Notifications List (populated by JS) -->
+          <div class="notifications-list" id="notificationsList">
+            <div class="loading-state">
+              <i class="fas fa-spinner"></i>
+              <p>Loading notifications...</p>
+            </div>
+          </div>
         </div>
+      </div>
     </div>
 
     <script>
-        // Sidebar toggle functionality
-        document.getElementById('sidebarToggle').addEventListener('click', function() {
-            const sidebar = document.getElementById('sidebar');
-            const mainContent = document.querySelector('.main-content');
-            sidebar.classList.toggle('collapsed');
-            mainContent.classList.toggle('expanded');
+      // ============================================================
+      //  Notification page — wired to /api/notifications
+      // ============================================================
+      (function () {
+        const API_BASE = "/api/notifications";
+        const POLL_INTERVAL_MS = 30000; // refresh every 30s
+        const PAGE_SIZE = 50;
+
+        // In-memory state
+        let allNotifications = [];
+        let currentFilter = "";
+        let pollTimer = null;
+
+        // ── DOM refs ──
+        const listEl = document.getElementById("notificationsList");
+        const bellBadgeEl = document.getElementById("bellBadge");
+        const countUnread = document.getElementById("countUnread");
+        const countRead = document.getElementById("countRead");
+        const countTotal = document.getElementById("countTotal");
+        const markAllBtn = document.getElementById("markAllReadBtn");
+        const refreshBtn = document.getElementById("refreshBtn");
+        const filterTabs = document.getElementById("filterTabs");
+
+        // ── Map backend type → CSS icon class + FontAwesome icon ──
+        // (CSS classes available: confirmed, pending, info, success, warning)
+        function iconForType(type, title) {
+          const t = (type || "").toUpperCase();
+          const titleLower = (title || "").toLowerCase();
+
+          // Special-case titles that imply a tone
+          if (
+            titleLower.includes("reject") ||
+            titleLower.includes("cancel") ||
+            titleLower.includes("suspend") ||
+            titleLower.includes("fail")
+          ) {
+            return { cls: "warning", icon: "fa-exclamation-triangle" };
+          }
+          if (
+            titleLower.includes("approv") ||
+            titleLower.includes("complet") ||
+            titleLower.includes("confirm") ||
+            titleLower.includes("reactiv") ||
+            titleLower.includes("welcome")
+          ) {
+            return { cls: "confirmed", icon: "fa-check-circle" };
+          }
+
+          switch (t) {
+            case "BOOKING":
+              return { cls: "confirmed", icon: "fa-car" };
+            case "MAINTENANCE":
+              return { cls: "warning", icon: "fa-wrench" };
+            case "TICKET":
+              return { cls: "info", icon: "fa-headset" };
+            case "REPORT":
+              return { cls: "warning", icon: "fa-flag" };
+            case "SYSTEM":
+              return { cls: "info", icon: "fa-circle-info" };
+            case "NEW_MESSAGE":
+              return { cls: "info", icon: "fa-envelope" };
+            case "GENERAL":
+              return { cls: "success", icon: "fa-star" };
+            default:
+              return { cls: "info", icon: "fa-bell" };
+          }
+        }
+
+        // ── Relative time formatter ──
+        function timeAgo(timestampStr) {
+          if (!timestampStr || timestampStr === "null") return "";
+          // Backend formats as java.sql.Timestamp.toString() → "2024-01-15 14:30:25.0"
+          // Normalise to ISO-ish for Date parsing
+          const iso = timestampStr.replace(" ", "T").split(".")[0];
+          const then = new Date(iso);
+          if (isNaN(then.getTime())) return timestampStr;
+
+          const diffSec = Math.floor((Date.now() - then.getTime()) / 1000);
+          if (diffSec < 60) return "Just now";
+          if (diffSec < 3600) return Math.floor(diffSec / 60) + " minutes ago";
+          if (diffSec < 86400) return Math.floor(diffSec / 3600) + " hours ago";
+          if (diffSec < 604800)
+            return Math.floor(diffSec / 86400) + " days ago";
+          return then.toLocaleDateString();
+        }
+
+        // ── Basic HTML escaping for safety ──
+        function escapeHtml(s) {
+          if (s == null) return "";
+          return String(s)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#39;");
+        }
+
+        // ── Build a single notification row ──
+        function renderItem(n) {
+          const { cls, icon } = iconForType(n.type, n.title);
+          const isUnread = !n.isRead;
+          const itemClass = "notification-item" + (isUnread ? " new" : " read");
+
+          return `
+                <div class="${itemClass}" data-id="${n.notificationId}"
+                     data-ref-type="${escapeHtml(n.referenceType)}"
+                     data-ref-id="${n.referenceId}">
+                    <div class="notification-icon ${cls}">
+                        <i class="fas ${icon}"></i>
+                    </div>
+                    <div class="notification-content">
+                        <h4>${escapeHtml(n.title)}</h4>
+                        <p>${escapeHtml(n.body)}</p>
+                    </div>
+                    <div class="notification-time">${escapeHtml(timeAgo(n.createdAt))}</div>
+                    <div class="notification-actions">
+                        <button class="action-btn" title="More">
+                            <i class="fas fa-ellipsis-vertical"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        // ── Render whole list respecting current filter ──
+        function renderList() {
+          const filtered = currentFilter
+            ? allNotifications.filter((n) => n.type === currentFilter)
+            : allNotifications;
+
+          if (filtered.length === 0) {
+            listEl.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-bell-slash"></i>
+                        <p>No notifications${currentFilter ? " in this category" : ""}.</p>
+                    </div>`;
+            return;
+          }
+          listEl.innerHTML = filtered.map(renderItem).join("");
+        }
+
+        // ── Update summary cards + bell badge ──
+        function updateCounts() {
+          const total = allNotifications.length;
+          const unread = allNotifications.filter((n) => !n.isRead).length;
+          const read = total - unread;
+
+          countTotal.textContent = total;
+          countUnread.textContent = unread;
+          countRead.textContent = read;
+
+          if (unread > 0) {
+            bellBadgeEl.textContent = unread > 99 ? "99+" : unread;
+            bellBadgeEl.style.display = "";
+          } else {
+            bellBadgeEl.style.display = "none";
+          }
+        }
+
+        // ── Fetch notifications from API ──
+        async function loadNotifications() {
+          try {
+            const res = await fetch(`${API_BASE}?limit=${PAGE_SIZE}&offset=0`, {
+              credentials: "same-origin",
+            });
+
+            if (res.status === 401) {
+              listEl.innerHTML = `
+                        <div class="error-state">
+                            <i class="fas fa-lock"></i>
+                            <p>You are not logged in. Please sign in to view notifications.</p>
+                        </div>`;
+              return;
+            }
+
+            const data = await res.json();
+            if (!data.ok) throw new Error(data.error || "Request failed");
+
+            allNotifications = Array.isArray(data.notifications)
+              ? data.notifications
+              : [];
+            updateCounts();
+            renderList();
+          } catch (err) {
+            console.error("Failed to load notifications:", err);
+            listEl.innerHTML = `
+                    <div class="error-state">
+                        <i class="fas fa-triangle-exclamation"></i>
+                        <p>Could not load notifications. Please try again.</p>
+                    </div>`;
+          }
+        }
+
+        // ── Mark a single notification as read ──
+        async function markAsRead(id) {
+          try {
+            const res = await fetch(
+              `${API_BASE}/read?id=${encodeURIComponent(id)}`,
+              { method: "POST", credentials: "same-origin" },
+            );
+            const data = await res.json();
+            if (data.ok) {
+              const n = allNotifications.find((x) => x.notificationId === id);
+              if (n) n.isRead = true;
+              updateCounts();
+            }
+          } catch (err) {
+            console.error("Failed to mark as read:", err);
+          }
+        }
+
+        // ── Mark all as read ──
+        async function markAllAsRead() {
+          markAllBtn.disabled = true;
+          try {
+            const res = await fetch(`${API_BASE}/readAll`, {
+              method: "POST",
+              credentials: "same-origin",
+            });
+            const data = await res.json();
+            if (data.ok) {
+              allNotifications.forEach((n) => (n.isRead = true));
+              updateCounts();
+              renderList();
+            }
+          } catch (err) {
+            console.error("Failed to mark all as read:", err);
+          } finally {
+            markAllBtn.disabled = false;
+          }
+        }
+
+        // ── Optional: follow the notification's reference to the right page ──
+        function followReference(refType, refId) {
+          if (!refType || !refId || refId === "0") return;
+          switch (refType) {
+            case "BOOKING":
+              // e.g. open the booking detail — adjust path to your app
+              // window.location.href = `booking.html?id=${refId}`;
+              break;
+            case "CONVERSATION":
+              // window.location.href = `messages.html?id=${refId}`;
+              break;
+            // Add more mappings as your pages settle.
+          }
+        }
+
+        // ── Event wiring ──
+
+        // Click on an item → mark read, optionally navigate
+        listEl.addEventListener("click", function (e) {
+          const item = e.target.closest(".notification-item");
+          if (!item) return;
+
+          const id = parseInt(item.dataset.id, 10);
+          const refType = item.dataset.refType;
+          const refId = item.dataset.refId;
+
+          // Visually mark read immediately
+          if (item.classList.contains("new")) {
+            item.classList.remove("new");
+            item.classList.add("read");
+            markAsRead(id);
+          }
+
+          // If the click wasn't on the kebab button, follow the reference
+          if (!e.target.closest(".action-btn")) {
+            followReference(refType, refId);
+          }
         });
 
-        // Mark notification as read when clicked
-        document.querySelectorAll('.notification-item').forEach(item => {
-            item.addEventListener('click', function() {
-                this.classList.add('read');
-                this.classList.remove('new');
-            });
+        markAllBtn.addEventListener("click", markAllAsRead);
+        refreshBtn.addEventListener("click", loadNotifications);
+
+        // Filter tabs
+        filterTabs.addEventListener("click", function (e) {
+          const tab = e.target.closest(".filter-tab");
+          if (!tab) return;
+          filterTabs
+            .querySelectorAll(".filter-tab")
+            .forEach((t) => t.classList.remove("active"));
+          tab.classList.add("active");
+          currentFilter = tab.dataset.filter || "";
+          renderList();
         });
+
+        // Sidebar toggle (kept from original)
+        document
+          .getElementById("sidebarToggle")
+          .addEventListener("click", function () {
+            const sidebar = document.getElementById("sidebar");
+            const mainContent = document.querySelector(".main-content");
+            sidebar.classList.toggle("collapsed");
+            mainContent.classList.toggle("expanded");
+          });
+
+        // Initial load + polling
+        loadNotifications();
+        pollTimer = setInterval(loadNotifications, POLL_INTERVAL_MS);
+
+        // Clean up when the tab is hidden, resume on focus
+        document.addEventListener("visibilitychange", function () {
+          if (document.hidden) {
+            clearInterval(pollTimer);
+            pollTimer = null;
+          } else if (!pollTimer) {
+            loadNotifications();
+            pollTimer = setInterval(loadNotifications, POLL_INTERVAL_MS);
+          }
+        });
+      })();
     </script>
-</body>
+    <script>
+      // Logout handler
+      document.addEventListener("DOMContentLoaded", function () {
+        var logoutBtn = document.querySelector(".logout");
+        if (logoutBtn) {
+          logoutBtn.addEventListener("click", async function (e) {
+            e.preventDefault();
+            if (!confirm("Are you sure you want to logout?")) return;
+            try {
+              await fetch("/driver/logout", {
+                method: "POST",
+                credentials: "include",
+              });
+            } catch (err) {
+              /* ignore */
+            }
+            window.location.href =
+              "http://localhost:8080/views/landing/index.html";
+          });
+        }
+      });
+    </script>
+  </body>
 </html>

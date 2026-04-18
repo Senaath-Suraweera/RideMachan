@@ -12,7 +12,7 @@ import java.io.IOException;
 import java.util.List;
 
 @WebServlet("/assignedvehicles")
-public class LoadAssignedVehicleswServlet extends HttpServlet {
+public class LoadAssignedVehiclesServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
