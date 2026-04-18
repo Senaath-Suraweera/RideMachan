@@ -21,10 +21,60 @@ const statusFilter = document.getElementById('statusFilter');
 const resetFilters = document.getElementById('resetFilters');
 
 // Initialize on page load
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', async function() {
     setupEventListeners();
-    loadBookings();
+    await loadBookings();
+    //await loadDriverData();
 });
+
+
+async function loadDriverData() {
+
+    try {
+
+
+
+        const response = await fetch(`/driver/profile`, {
+            method: 'GET'
+        });
+
+        if (response.status === 401) {
+            alert('Please login first');
+            window.location.href = '/views/landing/driverlogin.html';
+            return;
+        }
+
+        const data = await response.json();
+        console.log("DATA:", data);
+
+        if (data && data.driver) {
+
+            populateDriverInfo(data.driver);
+
+            //let bookings = data.bookings || [];
+
+            //console.log("BOOKINGS:", bookings);
+
+            //displayBookings(bookings);
+        }
+
+    } catch (err) {
+        console.error("ERROR:", err);
+    }
+}
+
+/* ================= DRIVER ================= */
+
+function populateDriverInfo(driver) {
+
+    document.getElementById('driverName').textContent =
+        driver.fullName || driver.username || 'Driver';
+
+    const name = driver.firstName || driver.username || 'D';
+    document.getElementById('profileInitial').textContent =
+        name.charAt(0).toUpperCase();
+}
+
 
 // Setup all event listeners
 function setupEventListeners() {

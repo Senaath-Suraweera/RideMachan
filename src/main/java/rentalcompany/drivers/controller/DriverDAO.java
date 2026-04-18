@@ -16,7 +16,7 @@ public class DriverDAO {
 
     public static boolean insertDriver(Driver driver) {
         String sql = "INSERT INTO Driver (username, firstname, lastname, email, mobilenumber, description, " +
-                "hashedpassword, salt, nicnumber, nic, driverslicence, company_id, Area, licenceexpirydate, licensenumber) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                "hashedpassword, salt, nicnumber, nic, driverslicense, company_id, Area, licenseexpirydate, licensenumber) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection con = DBConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
@@ -67,7 +67,7 @@ public class DriverDAO {
                 "    driver.Area, \n" +
                 "    driver.licensenumber, \n" +
                 "    driver.mobilenumber, \n" +
-                "    driver.licenceexpirydate, \n" +
+                "    driver.licenseexpirydate, \n" +
                 "    ROUND(AVG(ratings.rating_value)) AS rating_value \n" +
                 "FROM driver \n" +
                 "LEFT JOIN ratings \n" +
@@ -82,7 +82,7 @@ public class DriverDAO {
                 "driver.Area, " +
                 "driver.licensenumber, " +
                 "driver.mobilenumber, " +
-                "driver.licenceexpirydate";
+                "driver.licenseexpirydate";
 
 
         try(Connection con = DBConnection.getConnection();
@@ -104,7 +104,7 @@ public class DriverDAO {
                         rs.getString("Area"),
                         rs.getString("licensenumber"),
                         rs.getString("mobilenumber"),
-                        rs.getDate("licenceexpirydate")
+                        rs.getDate("licenseexpirydate")
 
                 );
 
@@ -305,9 +305,9 @@ public class DriverDAO {
 
         String sql =
                 "SELECT cb.trip_start_date, cb.trip_end_date, cb.start_time, cb.end_time " +
-                "FROM companybookings cb " +
-                "JOIN driver_booking_status dbs ON cb.booking_id = dbs.booking_id " +
-                "WHERE dbs.driverid = ?";
+                        "FROM companybookings cb " +
+                        "JOIN driver_booking_status dbs ON cb.booking_id = dbs.booking_id " +
+                        "WHERE dbs.driverid = ?";
 
         try (Connection con = DBConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
@@ -919,7 +919,7 @@ public class DriverDAO {
             // =========================
             String sql1 =
                     "SELECT * FROM companybookings " +
-                            "WHERE driverid = ? AND status = 'active'";
+                            "WHERE driverid = ? AND LOWER(status) = 'confirmed'";
 
             PreparedStatement ps1 = con.prepareStatement(sql1);
             ps1.setInt(1, driverId);
@@ -1451,76 +1451,44 @@ public class DriverDAO {
     // Past Bookings Methods
     // =====================================
 
-    public static List<RentalCompanyBookings> getPastBookings(int driverId, String dateRange, String status, String searchQuery) {
-
-        StringBuilder sql = new StringBuilder();
-        sql.append("SELECT ");
-        sql.append("cb.booking_id, cb.ride_id, cb.customer_name, cb.customer_phone, cb.customer_email, ");
-        sql.append("cb.pickup_location, cb.drop_location, cb.booked_Date, cb.start_time, ");
-        sql.append("cb.estimated_duration, cb.distance, cb.total_amount, ");
-        sql.append("cb.vehicle_model, cb.vehicle_plate, cb.special_instructions, ");
-        sql.append("cb.created_at, ");
-        sql.append("dbs.status AS driver_status, ");
-        sql.append("dbs.assigned_at, dbs.started_at, dbs.completed_at ");
-
-        sql.append("FROM driver_booking_status dbs ");
-        sql.append("INNER JOIN companybookings cb ON cb.booking_id = dbs.booking_id ");
-
-        sql.append("WHERE dbs.driverid = ? ");
-        sql.append("AND dbs.status IN ('completed','cancelled') ");
-
-
-        if (dateRange != null && !dateRange.equals("all")) {
-            switch (dateRange) {
-
-                case "today":
-                    sql.append("AND cb.trip_end_date >= CURDATE() ");
-                    sql.append("AND cb.trip_end_date < CURDATE() + INTERVAL 1 DAY ");
-                    break;
-
-                case "week":
-                    sql.append("AND cb.trip_end_date >= DATE_SUB(CURDATE(), INTERVAL 7 DAY) ");
-                    break;
-
-                case "month":
-                    sql.append("AND cb.trip_end_date >= DATE_SUB(CURDATE(), INTERVAL 1 MONTH) ");
-                    break;
-
-                case "year":
-                    sql.append("AND cb.trip_end_date >= DATE_SUB(CURDATE(), INTERVAL 1 YEAR) ");
-                    break;
-            }
-        }
-
-        if (status != null && !status.equals("all")) {
-            sql.append("AND dbs.status = ? ");
-        }
-
-        if (searchQuery != null && !searchQuery.trim().isEmpty()) {
-            sql.append("AND (cb.customer_name LIKE ? OR cb.ride_id LIKE ? OR CAST(cb.booking_id AS CHAR) LIKE ?) ");
-        }
-
-
-        sql.append("ORDER BY cb.trip_start_date DESC, cb.start_time DESC");
+    public static List<RentalCompanyBookings> getPastBookings(int driverId) {
 
         List<RentalCompanyBookings> bookings = new ArrayList<>();
 
+        String sql =
+                "SELECT " +
+                        "cb.booking_id, cb.ride_id, cb.customer_name, cb.customer_phone, cb.customer_email, " +
+                        "cb.pickup_location, cb.drop_location, cb.booked_Date, cb.start_time, " +
+                        "cb.estimated_duration, cb.distance, cb.total_amount, " +
+                        "cb.vehicle_model, cb.vehicle_plate, cb.special_instructions, " +
+                        "cb.created_at, " +
+                        "dbs.status AS driver_status, " +
+                        "dbs.assigned_at, dbs.started_at, dbs.completed_at " +
+                        "FROM driver_booking_status dbs " +
+                        "INNER JOIN companybookings cb ON cb.booking_id = dbs.booking_id " +
+                        "WHERE dbs.driverid = ? " +
+                        "AND dbs.status = 'completed' " +
+
+                        "UNION ALL " +
+
+                        "SELECT " +
+                        "cb.booking_id, cb.ride_id, cb.customer_name, cb.customer_phone, cb.customer_email, " +
+                        "cb.pickup_location, cb.drop_location, cb.booked_Date, cb.start_time, " +
+                        "cb.estimated_duration, cb.distance, cb.total_amount, " +
+                        "cb.vehicle_model, cb.vehicle_plate, cb.special_instructions, " +
+                        "cb.created_at, " +
+                        "'cancelled' AS driver_status, " +
+                        "NULL AS assigned_at, NULL AS started_at, NULL AS completed_at " +
+                        "FROM companybookings cb " +
+                        "WHERE cb.driverid = ? " +
+                        "AND cb.status = 'cancelled' " +
+                        "ORDER BY booked_Date DESC, start_time DESC";
+
         try (Connection con = DBConnection.getConnection();
-             PreparedStatement ps = con.prepareStatement(sql.toString())) {
+             PreparedStatement ps = con.prepareStatement(sql)) {
 
-            int index = 1;
-
-            ps.setInt(index++, driverId);
-
-            if (status != null && !status.equals("all")) {
-                ps.setString(index++, status);
-            }
-
-            if (searchQuery != null && !searchQuery.trim().isEmpty()) {
-                String pattern = "%" + searchQuery + "%";
-                ps.setString(index++, pattern);
-                ps.setString(index++, pattern);
-            }
+            ps.setInt(1, driverId);
+            ps.setInt(2, driverId);
 
             ResultSet rs = ps.executeQuery();
 
@@ -1528,9 +1496,6 @@ public class DriverDAO {
 
                 RentalCompanyBookings booking = new RentalCompanyBookings();
 
-                // ======================
-                // FROM companybookings
-                // ======================
                 booking.setBookingId(rs.getInt("booking_id"));
                 booking.setRideId(rs.getString("ride_id"));
 
@@ -1554,16 +1519,8 @@ public class DriverDAO {
                 booking.setSpecialInstructions(rs.getString("special_instructions"));
                 booking.setCreatedAt(rs.getTimestamp("created_at"));
 
-                // ======================
-                // FROM driver_booking_status
-                // ======================
                 booking.setDriverId(driverId);
                 booking.setStatus(rs.getString("driver_status"));
-
-                // optional lifecycle timestamps (if your model supports it)
-                // booking.setAssignedAt(rs.getTimestamp("assigned_at"));
-                // booking.setStartedAt(rs.getTimestamp("started_at"));
-                // booking.setCompletedAt(rs.getTimestamp("completed_at"));
 
                 bookings.add(booking);
             }

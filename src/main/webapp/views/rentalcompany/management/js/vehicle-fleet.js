@@ -97,7 +97,7 @@ function renderVehicleStatistics(stats) {
 async function loadVehicles(searchQuery = "") {
 
     const vehicleGrid = document.getElementById("vehicleGrid");
-    vehicleGrid.innerHTML = `<p>Loading vehicles...</p>`;
+    handleEmptyCase("Loading vehicles...", "vehicleGrid");
 
     try {
 
@@ -116,42 +116,11 @@ async function loadVehicles(searchQuery = "") {
         vehicleGrid.innerHTML = "";
 
         if (!vehicles || vehicles.length === 0) {
-            vehicleGrid.innerHTML = `<p>No vehicles registered yet.</p>`;
+            handleEmptyCase("No vehicles Found yet", "vehicleGrid");
             return;
         }
 
-        vehicles.forEach((v) => {
-
-            const vehicleId = v.vehicleId;
-            const imageUrl = `${BASE_URL}/vehicle/image?vehicleid=${vehicleId}`;
-
-            const card = document.createElement("div");
-            card.className = "vehicle-card";
-            card.innerHTML = `
-                        <div>
-                            <h3 class="label">${v.status}</h3>
-                        </div>
-                        <div class="vehicle-image">
-                              <img src="${imageUrl}" alt="${v.vehicleBrand} ${v.vehicleModel }" onerror="this.src='../assets/no-image.png'">
-                        </div>
-                        <div class="vehicle-info">
-                              <h3>${v.vehicleBrand} ${v.vehicleModel}</h3>
-                              <p><b>Plate:</b> ${v.numberPlateNumber}</p>
-                              <p><b>Color:</b> ${v.color}</p>
-                              <p><b>Engine:</b> ${v.engineCapacity} cc</p>
-                              <p><b>Passengers:</b> ${v.numberOfPassengers}</p>
-                              <p><b>Milage:</b> ${v.milage || "N/A"}</p>
-                              <div class="vehicle-actions">
-                                <button class="action-btn primary" onclick="openEditModal(${vehicleId})"><i class="fas fa-edit"></i> Update</button>
-                                <button class="action-btn secondary" onclick="removeVehicle(${vehicleId})"><i class="fas fa-trash"></i> Delete</button>
-                                <button class="redirect" onclick="redirectCalenderView(${vehicleId})">Calender View</button>
-                              </div>
-                        </div>
-                      `;
-
-            vehicleGrid.appendChild(card);
-
-        });
+        renderVehicles(vehicles);
 
     } catch (err) {
 
@@ -332,6 +301,187 @@ function redirectMaintenanceView(vehicleId) {
 
 }
 
+function renderVehicles(vehicles) {
+
+    const vehicleGrid = document.getElementById("vehicleGrid");
+    vehicleGrid.innerHTML = "";
+
+    if (!vehicles || vehicles.length === 0) {
+        handleEmptyCase("No vehicles Found yet", "vehicleGrid");
+        return;
+    }
+
+    for (let i = 0; i < vehicles.length; i++) {
+
+        const v = vehicles[i];
+
+        const vehicleId = v.vehicleId;
+        const imageUrl = `${BASE_URL}/vehicle/image?vehicleid=${vehicleId}`;
+
+        const card = document.createElement("div");
+        card.className = "vehicle-card";
+
+        card.innerHTML = `
+            <div>
+                <h3 class="label">${v.status}</h3>
+            </div>
+            <div class="vehicle-image">
+                  <img src="${imageUrl}" alt="${v.vehicleBrand} ${v.vehicleModel}" onerror="this.src='../assets/no-image.png'">
+            </div>
+            <div class="vehicle-info">
+                  <h3>${v.vehicleBrand} ${v.vehicleModel}</h3>
+                  <p><b>Plate:</b> ${v.numberPlateNumber}</p>
+                  <p><b>Color:</b> ${v.color}</p>
+                  <p><b>Engine:</b> ${v.engineCapacity} cc</p>
+                  <p><b>Passengers:</b> ${v.numberOfPassengers}</p>
+                  <p><b>Milage:</b> ${v.milage || "N/A"}</p>
+                  <div class="vehicle-actions">
+                    <button class="action-btn primary" onclick="openEditModal(${vehicleId})"><i class="fas fa-edit"></i> Update</button>
+                    <button class="action-btn secondary" onclick="removeVehicle(${vehicleId})"><i class="fas fa-trash"></i> Delete</button>
+                    <button class="redirect" onclick="redirectCalenderView(${vehicleId})">Calender View</button>
+                  </div>
+            </div>
+        `;
+
+        vehicleGrid.appendChild(card);
+
+    }
+
+}
+
+function filterVehiclesByText(searchText) {
+
+    let vehicleGrid = document.getElementById("vehicleGrid");
+
+    const input = searchText.toLowerCase().trim();
+
+    if (input === "") {
+        renderVehicles(allVehicles);
+        return;
+    }
+
+    const filteredVehicles = [];
+
+    for (let i = 0; i < allVehicles.length; i++) {
+
+        const v = allVehicles[i];
+
+        const model = (v.vehicleModel || "").toLowerCase();
+        const plate = (v.numberPlateNumber || "").toLowerCase();
+
+        if (model.includes(input) || plate.includes(input)) {
+            filteredVehicles.push(v);
+        }
+    }
+
+    renderVehicles(filteredVehicles);
+
+}
+
+function filterVehiclesByStatus(status) {
+
+    const filteredVehicles = [];
+
+    for (let i = 0; i < allVehicles.length; i++) {
+
+        const vehicleStatus = (allVehicles[i].status || "").toLowerCase();
+
+        if (status === "all") {
+            filteredVehicles.push(allVehicles[i]);
+        }
+        else if (status === "maintenance") {
+
+            if (vehicleStatus.includes("maintenance")) {
+                filteredVehicles.push(allVehicles[i]);
+            }
+
+        }
+        else if (status === "available") {
+
+            if (vehicleStatus.includes("available")) {
+                filteredVehicles.push(allVehicles[i]);
+            }
+
+        }
+        else if (status === "on-trip") {
+
+            if (vehicleStatus.includes("trip")) {
+                filteredVehicles.push(allVehicles[i]);
+            }
+
+        }
+    }
+
+    renderVehicles(filteredVehicles);
+
+}
+
+
+function handleEmptyCase(message, containerId = "container") {
+
+    const container = document.getElementById(containerId);
+
+    if (!container) return;
+
+    container.innerHTML = "";
+
+    const emptyCard = document.createElement("div");
+
+    emptyCard.innerHTML = `
+        <h2 class="empty-title">${message}</h2>
+        <p class="empty-sub">Nothing to display right now</p>
+    `;
+
+
+    emptyCard.style.width = "100%";
+    emptyCard.style.maxWidth = "900px";
+    emptyCard.style.margin = "0 auto";
+    emptyCard.style.padding = "50px 25px";
+    emptyCard.style.borderRadius = "18px";
+    emptyCard.style.background = "linear-gradient(135deg, #ffffff, #f8f9ff)";
+    emptyCard.style.boxShadow = "0 10px 30px rgba(58, 12, 163, 0.15)";
+    emptyCard.style.border = "1px solid rgba(58, 12, 163, 0.1)";
+    emptyCard.style.textAlign = "center";
+    emptyCard.style.gridColumn = "1 / -1";
+
+    emptyCard.style.transition = "all 0.3s ease";
+    emptyCard.style.cursor = "default";
+
+
+    emptyCard.style.position = "relative";
+
+    const title = emptyCard.querySelector(".empty-title");
+
+    title.style.margin = "0";
+    title.style.fontSize = "22px";
+    title.style.fontWeight = "700";
+    title.style.background = "linear-gradient(90deg, #3a0ca3, #4361ee, #f72585)";
+    title.style.webkitBackgroundClip = "text";
+    title.style.webkitTextFillColor = "transparent";
+    title.style.backgroundClip = "text";
+    title.style.letterSpacing = "0.5px";
+
+
+    const sub = emptyCard.querySelector(".empty-sub");
+
+    sub.style.marginTop = "10px";
+    sub.style.fontSize = "14px";
+    sub.style.color = "#6c757d";
+    sub.style.opacity = "0.9";
+
+
+    emptyCard.onmouseover = () => {
+        emptyCard.style.transform = "translateY(-6px) scale(1.01)";
+        emptyCard.style.boxShadow = "0 18px 40px rgba(67, 97, 238, 0.25)";
+    };
+
+    emptyCard.onmouseout = () => {
+        emptyCard.style.transform = "translateY(0) scale(1)";
+        emptyCard.style.boxShadow = "0 10px 30px rgba(58, 12, 163, 0.15)";
+    };
+
+    container.appendChild(emptyCard);
+}
 
 document.addEventListener("DOMContentLoaded", async () => {
 
@@ -352,6 +502,11 @@ document.addEventListener("DOMContentLoaded", async () => {
             renderVehicleStatistics(stats);
         }
 
+        document.getElementById("vehicleFilter").addEventListener("change", function () {
+
+            filterVehiclesByStatus(this.value);
+
+        });
 
     } catch (err) {
 
@@ -361,6 +516,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 });
 
+document.getElementById("vehicleSearch").addEventListener("input", function () {
+    filterVehiclesByText(this.value);
+});
+
 document.getElementById("addVehicleBtn").addEventListener("click", openAddModal);
 
 
@@ -368,8 +527,16 @@ document.getElementById("addVehicleBtn").addEventListener("click", openAddModal)
 document.getElementById("addVehicleForm").addEventListener("submit", async function (e) {
 
         e.preventDefault();
-        const formData = new FormData(this);
-        formData.append("company_id", companyId);
+
+        let numberPlate = document.getElementById("numberplatenumber").value;
+        let pricePerDay = document.getElementById("priceperday").value;
+
+        if (!validateSriLankaVehicleFields(numberPlate, pricePerDay)) {
+            return;
+        }
+
+    const formData = new FormData(this);
+    formData.append("company_id", companyId);
 
         try {
 
@@ -475,81 +642,6 @@ document.getElementById("closeEditVehicleModal").addEventListener("click", close
 
 
 
-//for search by model or plate number
-function filterVehiclessByText(searchText) {
-
-    const vehicleGrid = document.getElementById("vehicleGrid");
-    vehicleGrid.innerHTML = "";
-
-    let inputLower = searchText.toLowerCase();
-    let filteredVehicles = [];
-
-    for(let i=0; i<allVehicles.length; i++) {
-
-        //DEBUGGING
-        console.log("model name:- ", allVehicles[i].vehicleModel);
-        console.log("plate number:- ", allVehicles[i].numberPlateNumber);
-        console.log("Search text:- ", inputLower)
-
-        let modelName = allVehicles[i].vehicleModel || "";
-        let numberPlate = allVehicles[i].numberPlateNumber || "";
-
-
-        //DEBUGGING 2
-        console.log("Comparing:- ", modelName, "with ",inputLower)
-        console.log("Comparing:- ", numberPlate, "with ",inputLower)
-        console.log("Match?:- ", modelName.includes(inputLower))
-        console.log("Match?:- ", modelName.includes(inputLower))
-
-        if(modelName.includes(inputLower) || numberPlate.includes(inputLower)) {
-            filteredVehicles.push(allVehicles[i]);
-        }
-
-    }
-
-    console.log("Filtered vehicles count:", filteredVehicles.length);
-    console.log("About to render...");
-    renderBookings(filteredVehicles);
-    console.log("Render complete!");
-
-
-
-}
-
-//search pending,completed,active,cancelled bookings
-function filterBookingsByTripStatus(status) {
-
-    const bookingGrid = document.getElementById("bookingGrid");
-    bookingGrid.innerHTML = "";
-
-    let filteredBookings = [];
-
-    for(let i=0; i<AllBookings.length; i++) {
-
-        //DEBUG 1
-        console.log("Trip status:- ", AllBookings[i].status)
-        console.log("selected trip status:- ", status)
-
-        let tripStatus =  AllBookings[i].status || "";
-
-        //DEBUG 2
-        console.log("Comparing:- ", tripStatus , "with ", status)
-        console.log("Match?:- ", tripStatus == status)
-
-        if(tripStatus == status) {
-            filteredBookings.push(AllBookings[i]);
-        }
-
-    }
-
-    console.log("Filtered bookings count:", filteredBookings.length);
-    console.log("About to render...");
-    renderBookings(filteredBookings);
-    console.log("Render complete!");
-
-}
-
-
 
 
 
@@ -615,4 +707,26 @@ function showNotification(message, type = "info") {
 
 
 
+function validateSriLankaVehicleFields(numberPlate, pricePerDay) {
 
+    const plateRegex = /^([A-Z]{2,3}[- ]?[A-Z]{1,3}[- ]?\d{3,4}|\d{2}[- ]?\d{3,4})$/i;
+
+    if (!plateRegex.test(numberPlate.trim())) {
+        showNotification("Invalid Sri Lankan number plate format!", "error");
+        return false;
+    }
+
+    const price = Number(pricePerDay);
+
+    if (isNaN(price) || price <= 0) {
+        showNotification("Invalid price per day!", "error");
+        return false;
+    }
+
+    if (price < 500 || price > 500000) {
+        showNotification("Price must be between Rs.500 and Rs.500,000", "error");
+        return false;
+    }
+
+    return true;
+}

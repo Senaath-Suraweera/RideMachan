@@ -6,6 +6,8 @@ import rentalcompany.companyvehicle.model.Vehicle;
 import rentalcompany.maintenance.model.MaintenanceStaff;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class RentalCompanyDAO {
 
@@ -216,5 +218,91 @@ public class RentalCompanyDAO {
 
         return false;
     }
+
+    public static List<Vehicle> getAssignedVehiclesByStaffId(int staffId) {
+
+        List<Vehicle> list = new ArrayList<>();
+
+        String sql = """
+                        SELECT v.vehicleid, v.vehiclebrand, v.vehiclemodel,
+                               v.price_per_day, v.location, v.fuel_type,
+                               v.vehicle_type, v.availability_status
+                        FROM maintenance_vehicle_assignment mva
+                        JOIN vehicle v ON mva.vehicleid = v.vehicleid
+                        WHERE mva.maintenanceid = ?
+                    """;
+
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setInt(1, staffId);
+
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+
+                Vehicle v = new Vehicle();
+
+                v.setVehicleId(rs.getInt("vehicleid"));
+                v.setVehicleBrand(rs.getString("vehiclebrand"));
+                v.setVehicleModel(rs.getString("vehiclemodel"));
+                v.setPricePerDay((int) rs.getDouble("price_per_day"));
+                v.setLocation(rs.getString("location"));
+                v.setFuelType(rs.getString("fuel_type"));
+                v.setVehicleType(rs.getString("vehicle_type"));
+                v.setAvailabilityStatus(rs.getString("availability_status"));
+
+                list.add(v);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return list;
+    }
+
+    public static List<Vehicle> getPendingProviderRequestedVehicles(int companyId) {
+
+        List<Vehicle> list = new ArrayList<>();
+
+        String sql =
+                "SELECT v.vehicleid, v.vehiclebrand, v.vehiclemodel, v.numberplatenumber, " +
+                        "v.price_per_day, v.location, v.vehicle_type, v.fuel_type, v.availability_status " +
+                        "FROM providerrentalrequests r " +
+                        "INNER JOIN vehicle v ON r.vehicle_id = v.vehicleid " +
+                        "WHERE r.company_id = ? AND r.status = 'pending'";
+
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setInt(1, companyId);
+
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+
+                Vehicle v = new Vehicle();
+
+                v.setVehicleId(rs.getInt("vehicleid"));
+                v.setVehicleBrand(rs.getString("vehiclebrand"));
+                v.setVehicleModel(rs.getString("vehiclemodel"));
+                v.setNumberPlateNumber(rs.getString("numberplatenumber"));
+                v.setPricePerDay((int) rs.getDouble("price_per_day"));
+                v.setLocation(rs.getString("location"));
+                v.setVehicleType(rs.getString("vehicle_type"));
+                v.setFuelType(rs.getString("fuel_type"));
+                v.setAvailabilityStatus(rs.getString("availability_status"));
+
+                list.add(v);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return list;
+    }
+
 
 }

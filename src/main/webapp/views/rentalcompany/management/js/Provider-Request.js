@@ -33,13 +33,13 @@ async function checkLogin() {
 
 }
 
-let maintenaceStaff;
+let AllVehicles;
 
-async function loadAssignedVehiclesByStaffId(staffId) {
+async function loadAllRequestVehicles() {
 
     try {
 
-        const response = await fetch(`/display/assigned/vehicles/bystaffId?staffId=${staffId}`, {
+        const response = await fetch(`/display/allrequest`, {
             method: "POST"
         });
 
@@ -113,15 +113,12 @@ function renderVehicles(vehicles) {
                 <div class="features">
                     <span class="feature-tag">${vehicle.fuelType}</span>
                     <span class="feature-tag">${vehicle.vehicleType}</span>
-                    <span class="feature-tag" style="${vehicle.availabilityStatus?.toLowerCase().includes('maintenance') ? 'background:#dc3545; color:#fff;': ''}">
-                        ${vehicle.availabilityStatus}
-                    </span>
                 </div>
             </div>
 
             <div class="vehicle-actions">
                 <button class="assign-btn" onclick="assignVehicle(${vehicle.vehicleId})">
-                    <i class="fas fa-tools"></i> Assign
+                    <i class="fas fa-tools"></i> Accept
                 </button>
             </div>
         `;
@@ -131,40 +128,6 @@ function renderVehicles(vehicles) {
 }
 
 
-function getStaffIdFromURL() {
-
-    let params = new URLSearchParams(window.location.search);
-    return params.get("staffId");
-
-}
-
-function getFullNameFromURL(){
-
-    let params = new URLSearchParams(window.location.search);
-    let firstname = params.get("firstname");
-    let lastname = params.get("lastname");
-
-    let fullname = firstname + " " + lastname;
-
-    return fullname;
-
-}
-
-function getVehicle(staffId) {
-
-    for (let i = 0; i < AllVehicles.length; i++) {
-
-        if (AllVehicles[i].vehicleId == vehicleId) {
-
-            return AllVehicles[i];
-
-        }
-
-    }
-
-    return null;
-
-}
 
 
 document.addEventListener("DOMContentLoaded", async function() {
@@ -177,20 +140,13 @@ document.addEventListener("DOMContentLoaded", async function() {
             return;    // stop here if not logged in
         }
 
-        let staffId = getStaffIdFromURL();
-
-        if (!staffId) {
-            console.error("staffId not found in URL");
-            return;
-        }
 
 
-        let vehicles = await loadAssignedVehiclesByStaffId(staffId);
+        AllVehicles = await loadAllRequestVehicles();
 
-        console.log("Loaded vehicles:", vehicles);
+        console.log("Loaded vehicles:", AllVehicles);
 
-
-        renderVehicles(vehicles);
+        renderVehicles(AllVehicles);
 
     } catch (err) {
 
