@@ -157,7 +157,7 @@ public class DriverDAO {
                 driver.getLicenseNumber() == null &&
                 driver.getNicNumber() == null &&
                 driver.getDescription() == null &&
-                driver.getProfilePicture() == null) {
+                driver.getProfilePicture() == null ){
 
             return false;
         }
@@ -245,7 +245,6 @@ public class DriverDAO {
             if (driver.getProfilePicture() != null) {
                 ps.setString(paramIndex++, driver.getProfilePicture());
             }
-
             ps.setInt(paramIndex, driver.getDriverId());
 
             return ps.executeUpdate() > 0;
@@ -808,7 +807,7 @@ public class DriverDAO {
     public static int createIssue(Issue issue) {
         String sql = "INSERT INTO Issue (driver_id, category, location, description, " +
                 "booking_id, plate_number, photo_path, is_driveable, status) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection con = DBConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -821,6 +820,7 @@ public class DriverDAO {
             ps.setString(6, issue.getPlateNumber());
             ps.setString(7, issue.getPhotoPath());
 
+
             if (issue.getIsDriveable() != null) {
                 ps.setBoolean(8, issue.getIsDriveable());
             } else {
@@ -828,6 +828,7 @@ public class DriverDAO {
             }
 
             ps.setString(9, issue.getStatus() != null ? issue.getStatus() : "pending");
+
 
             if (ps.executeUpdate() > 0) {
                 try (ResultSet keys = ps.getGeneratedKeys()) {
@@ -1011,6 +1012,9 @@ public class DriverDAO {
                     break;
                 case "month":
                     sql.append("AND booked_Date >= DATE_SUB(CURDATE(), INTERVAL 1 MONTH) ");
+                    break;
+                case "quarter":
+                    sql.append("AND booked_Date >= DATE_SUB(CURDATE(), INTERVAL 3 MONTH) ");
                     break;
                 case "year":
                     sql.append("AND booked_Date >= DATE_SUB(CURDATE(), INTERVAL 1 YEAR) ");

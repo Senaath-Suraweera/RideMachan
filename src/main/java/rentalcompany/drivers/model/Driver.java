@@ -25,12 +25,12 @@ public class Driver {
     private String shiftTime;
     private String reportingManager;
     private String profilePicture; // Base64 encoded image or URL
-    private String availability; // NEW: For calendar availability status
+    private String availability; // NEW: For calendar availability statu
 
     // Constructor for registration
     public Driver(String username, String firstName, String lastName, String email,
                   String mobileNumber, String description, String password,
-                  String nicNumber, byte[] nicPdf, byte[] driversLicence, int companyId) {
+                  String nicNumber, byte[] nicPdf, byte[] driversLicence, int companyId ) {
         this.username = username;
         this.firstName = firstName;
         this.lastName = lastName;

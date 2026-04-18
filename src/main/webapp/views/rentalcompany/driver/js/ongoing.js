@@ -1,526 +1,199 @@
-// Global variables
-let allBookings = [];
-let currentFilter = 'all';
-let currentBookingDetails = null;
+let bookings = [], filter = "all", current = null;
+const $ = (s) => document.querySelector(s), $$ = (s) => document.querySelectorAll(s);
 
-// Initialize page on load
-document.addEventListener('DOMContentLoaded', function() {
-    initializePage();
+document.addEventListener("DOMContentLoaded", () => {
+    $("#sidebarToggle")?.addEventListener("click", () => $("#sidebar")?.classList.toggle("active"));
+
+    $$(".filter-btn:not(.vehicle-issues-btn)").forEach(b => b.addEventListener("click", () => {
+        $$(".filter-btn:not(.vehicle-issues-btn)").forEach(x => x.classList.remove("active"));
+        b.classList.add("active"); filter = b.dataset.filter; applyFilter();
+    }));
+
+    $("#sortBookings")?.addEventListener("change", e => sortGrid(e.target.value));
+
+    $$(".tab-btn").forEach(b => b.addEventListener("click", () => {
+        $$(".tab-btn").forEach(x => x.classList.remove("active"));
+        $$(".tab-content").forEach(x => x.classList.remove("active"));
+        b.classList.add("active"); $("#" + b.dataset.tab)?.classList.add("active");
+    }));
+
+    $(".logout")?.addEventListener("click", function () {
+        if (!confirm("Are you sure you want to logout?")) return;
+        this.innerHTML = '<i class="fas fa-spinner fa-spin"></i><span>Logging out...</span>';
+        setTimeout(() => (location.href = "../driver/logout"), 800);
+    });
+
+    window.addEventListener("click", e => (e.target === $("#bookingDetailsModal")) && closeModal());
+
+    $("#bookingsGrid")?.addEventListener("click", (e) => {
+        const btn = e.target.closest("button[data-act]");
+        if (!btn) return;
+        const id = btn.dataset.id;
+        if (btn.dataset.act === "details") showBookingDetails(id);
+        if (btn.dataset.act === "start") updateStatus(id, "in-progress", btn);
+        if (btn.dataset.act === "complete") updateStatus(id, "completed", btn);
+    });
+
+    loadBookings();
 });
 
-// Initialize all page functionality
-function initializePage() {
-    setupEventListeners();
-    loadBookings();
-}
-
-// Setup all event listeners
-function setupEventListeners() {
-    // Sidebar toggle
-    document.getElementById('sidebarToggle').addEventListener('click', function() {
-        document.getElementById('sidebar').classList.toggle('active');
-    });
-
-    // Filter buttons
-    document.querySelectorAll('.filter-btn:not(.vehicle-issues-btn)').forEach(btn => {
-        btn.addEventListener('click', function() {
-            document.querySelectorAll('.filter-btn:not(.vehicle-issues-btn)').forEach(b => b.classList.remove('active'));
-            this.classList.add('active');
-            currentFilter = this.dataset.filter;
-            filterBookings();
-        });
-    });
-
-    // Sort dropdown
-    document.getElementById('sortBookings').addEventListener('change', function() {
-        sortBookings(this.value);
-    });
-
-    // Tab switching in modal
-    document.querySelectorAll('.tab-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const tab = this.dataset.tab;
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-            this.classList.add('active');
-            document.getElementById(tab).classList.add('active');
-        });
-    });
-
-    // Logout functionality
-    document.querySelector('.logout').addEventListener('click', function() {
-        if (confirm('Are you sure you want to logout?')) {
-            this.innerHTML = '<i class="fas fa-spinner fa-spin"></i><span>Logging out...</span>';
-            setTimeout(() => {
-                window.location.href = '../driver/logout';
-            }, 1000);
-        }
-    });
-
-    // Close modal on outside click
-    window.addEventListener('click', function(event) {
-        const modal = document.getElementById('bookingDetailsModal');
-        if (event.target === modal) {
-            closeModal();
-        }
-    });
-}
-
-// Load bookings from backend
 async function loadBookings() {
-    const loadingSpinner = document.getElementById('loadingSpinner');
-    const emptyState = document.getElementById('emptyState');
-    const bookingsGrid = document.getElementById('bookingsGrid');
-
-    // Show loading
-    loadingSpinner.style.display = 'block';
-    emptyState.style.display = 'none';
-    bookingsGrid.style.display = 'none';
+    $("#loadingSpinner").style.display = "block";
+    $("#emptyState").style.display = "none";
+    $("#bookingsGrid").style.display = "none";
 
     try {
-        const response = await fetch('/ongoing', {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            credentials: 'include'
-        });
-
-        if (response.status === 401) {
-            // Not authenticated, redirect to login
-            alert('Please login first');
-            window.location.href = '/views/landing/driverlogin.html';
-            return;
-        }
-
-        if (!response.ok) {
-            console.log("HTTP status:", response.status, response.statusText);
-            const text = await response.text(); // read raw body
-            console.log("Response body:", text);
-            throw new Error('Failed to fetch bookings');
-        }
-
-
-        const data = await response.json();
-        console.log(data)
-
-        if (data.success) {
-            allBookings = data.bookings || [];
-
-
-            const stats = data.stats || { totalActive: 0, inProgress: 0, upcoming: 0 };
-            updateStats(stats);
-            renderBookings();
-        } else {
-            throw new Error(data.error || 'Unknown error');
-        }
-
-    } catch (error) {
-        console.error('Error loading bookings:', error);
-        alert('Failed to load bookings. Please try again.');
-        showEmptyState();
+        const r = await fetch("/ongoing", { credentials: "include" });
+        if (r.status === 401) return (location.href = "/views/landing/driverlogin.html");
+        const d = await r.json();
+        if (!d.success) throw new Error(d.message || d.error || "Failed");
+        bookings = (d.bookings || []).map(b => ({ ...b, status: String(b.status || "").trim().toLowerCase() }));
+        render();
+    } catch (e) {
+        console.error(e); alert("Failed to load bookings");
+        showEmpty();
     } finally {
-        loadingSpinner.style.display = 'none';
+        $("#loadingSpinner").style.display = "none";
     }
 }
 
-// Update statistics
-function updateStats(stats) {
-    document.getElementById('totalActive').textContent = stats.totalActive || 0;
-    document.getElementById('inProgressCount').textContent = stats.inProgress || 0;
-    document.getElementById('upcomingCount').textContent = stats.upcoming || 0;
+function render() {
+    if (!bookings.length) return showEmpty();
+    $("#bookingsGrid").innerHTML = bookings.map(cardHtml).join("");
+    $("#bookingsGrid").style.display = "grid";
+    $("#emptyState").style.display = "none";
+    const inProg = bookings.filter(b => b.status === "in-progress").length;
+    const up = bookings.filter(b => b.status === "upcoming").length;
+    $("#totalActive").textContent = bookings.length;
+    $("#inProgressCount").textContent = inProg;
+    $("#upcomingCount").textContent = up;
+    applyFilter();
 }
 
-// Render bookings on the page
-function renderBookings() {
-    const bookingsGrid = document.getElementById('bookingsGrid');
-    const emptyState = document.getElementById('emptyState');
+function cardHtml(b) {
+    const st = b.status || "upcoming";
+    const badge = st === "in-progress"
+        ? '<div class="status-badge in-progress"><i class="fas fa-road"></i> In Progress</div>'
+        : '<div class="status-badge upcoming"><i class="fas fa-clock"></i> Upcoming</div>';
 
-    if (allBookings.length === 0) {
-        showEmptyState();
-        return;
-    }
+    const action = st === "upcoming"
+        ? btnHtml("start", b.rideId, "Start Ride", "fa-play")
+        : st === "in-progress"
+            ? btnHtml("complete", b.rideId, "Complete Ride", "fa-check")
+            : "";
 
-    bookingsGrid.innerHTML = '';
-    bookingsGrid.style.display = 'grid';
-    emptyState.style.display = 'none';
-
-    allBookings.forEach(booking => {
-        const card = createBookingCard(booking);
-        bookingsGrid.appendChild(card);
-    });
-
-    // Apply current filter
-    filterBookings();
+    return `
+  <div class="booking-card ${esc(st)}" data-status="${esc(st)}" data-time="${esc(b.bookingTime||"")}" data-fare="${Number(b.totalAmount||0)}">
+    <div class="booking-header"><div class="booking-id">#${esc(b.rideId||"N/A")}</div>${badge}</div>
+    <div class="booking-time"><div class="date">${esc(fmtDate(b.bookingDate))}</div><div class="time">${esc(fmtTime(b.bookingTime))}</div></div>
+    <div class="booking-route">
+      <div class="route-item pickup"><i class="fas fa-map-marker-alt"></i><span>${esc(b.pickupLocation||"N/A")}</span></div>
+      <div class="route-divider"><i class="fas fa-arrow-down"></i></div>
+      <div class="route-item dropoff"><i class="fas fa-map-marker-alt"></i><span>${esc(b.dropoffLocation||"N/A")}</span></div>
+    </div>
+    <div class="booking-info">
+      <div class="info-item"><i class="fas fa-user"></i><span>${esc(b.customerName||"N/A")}</span></div>
+      <div class="info-item"><i class="fas fa-car"></i><span>${esc((b.vehicleModel||"N/A")+" - "+(b.vehiclePlate||"N/A"))}</span></div>
+      <div class="info-item"><i class="fas fa-clock"></i><span>${Number(b.estimatedDuration||0)} mins</span></div>
+      <div class="info-item"><i class="fas fa-dollar-sign"></i><span>LKR ${Number(b.totalAmount||0).toFixed(2)}</span></div>
+    </div>
+    <div class="booking-actions">
+      ${btnHtml("details", b.rideId, "Details", "fa-info-circle", "btn-outline")}
+      ${action}
+    </div>
+  </div>`;
 }
 
-// Create a booking card element
-function createBookingCard(booking) {
-    const card = document.createElement('div');
-    card.className = `booking-card ${booking.status}`;
-    card.dataset.status = booking.status;
-    card.dataset.time = booking.bookingTime;
-    card.dataset.fare = booking.totalAmount;
-
-    // Format date
-    const bookingDate = new Date(booking.bookingDate);
-    const formattedDate = formatDate(bookingDate);
-
-    // Format time
-    const formattedTime = formatTime(booking.bookingTime);
-
-    // Status badge
-    const statusBadge = getStatusBadge(booking.status);
-
-    card.innerHTML = `
-        <div class="booking-header">
-            <div class="booking-id">#${booking.rideId}</div>
-            ${statusBadge}
-        </div>
-        <div class="booking-time">
-            <div class="date">${formattedDate}</div>
-            <div class="time">${formattedTime}</div>
-        </div>
-        <div class="booking-route">
-            <div class="route-item pickup">
-                <i class="fas fa-map-marker-alt"></i>
-                <span>${booking.pickupLocation}</span>
-            </div>
-            <div class="route-divider">
-                <i class="fas fa-arrow-down"></i>
-            </div>
-            <div class="route-item dropoff">
-                <i class="fas fa-map-marker-alt"></i>
-                <span>${booking.dropoffLocation}</span>
-            </div>
-        </div>
-        <div class="booking-info">
-            <div class="info-item">
-                <i class="fas fa-user"></i>
-                <span>${booking.customerName}</span>
-            </div>
-            <div class="info-item">
-                <i class="fas fa-car"></i>
-                <span>${booking.vehicleModel} - ${booking.vehiclePlate}</span>
-            </div>
-            <div class="info-item">
-                <i class="fas fa-clock"></i>
-                <span>${booking.estimatedDuration} mins</span>
-            </div>
-            <div class="info-item">
-                <i class="fas fa-dollar-sign"></i>
-                <span>LKR ${booking.totalAmount.toFixed(2)}</span>
-            </div>
-        </div>
-        <div class="booking-actions">
-            <button class="btn btn-outline" onclick="showBookingDetails('${booking.rideId}')">
-                <i class="fas fa-info-circle"></i>
-                Details
-            </button>
-            ${getActionButton(booking)}
-        </div>
-    `;
-
-    return card;
+function btnHtml(act, id, txt, icon, cls="btn-primary") {
+    return `<button class="btn ${cls}" type="button" data-act="${act}" data-id="${esc(id||"")}"><i class="fas ${icon}"></i>${txt}</button>`;
 }
 
-// Get status badge HTML
-function getStatusBadge(status) {
-    const badges = {
-        'in-progress': '<div class="status-badge in-progress"><i class="fas fa-road"></i> In Progress</div>',
-        'upcoming': '<div class="status-badge upcoming"><i class="fas fa-clock"></i> Upcoming</div>',
-        'confirmed': '<div class="status-badge confirmed"><i class="fas fa-check"></i> Confirmed</div>'
-    };
-    return badges[status] || badges['upcoming'];
+function applyFilter() {
+    $$(".booking-card").forEach(c => c.style.display = (filter === "all" || c.dataset.status === filter) ? "block" : "none");
 }
 
-// Get action button based on status
-function getActionButton(booking) {
-    if (booking.status === 'upcoming') {
-        return `<button class="btn btn-primary" onclick="startRide('${booking.rideId}')">
-                    <i class="fas fa-play"></i> Start Ride
-                </button>`;
-    } else if (booking.status === 'in-progress') {
-        return `<button class="btn btn-primary" onclick="completeRide('${booking.rideId}')">
-                    <i class="fas fa-check"></i> Complete Ride
-                </button>`;
-    }
-    return '';
+function sortGrid(v) {
+    const g = $("#bookingsGrid"); if (!g) return;
+    const cards = [...g.children];
+    cards.sort((a,b) => v==="time-asc" ? a.dataset.time.localeCompare(b.dataset.time)
+        : v==="time-desc" ? b.dataset.time.localeCompare(a.dataset.time)
+            : v==="fare" ? (+b.dataset.fare)-(+a.dataset.fare)
+                : v==="status" ? a.dataset.status.localeCompare(b.dataset.status) : 0);
+    cards.forEach(x => g.appendChild(x));
 }
 
-// Format date
-function formatDate(date) {
-    const today = new Date();
-    const tomorrow = new Date(today);
-    tomorrow.setDate(tomorrow.getDate() + 1);
+function showBookingDetails(id) {
+    const b = bookings.find(x => x.rideId === id); if (!b) return;
+    current = b;
 
-    if (date.toDateString() === today.toDateString()) {
-        return 'Today';
-    } else if (date.toDateString() === tomorrow.toDateString()) {
-        return 'Tomorrow';
-    } else {
-        const options = { month: 'short', day: 'numeric' };
-        return date.toLocaleDateString('en-US', options);
-    }
+    $("#modal-booking-id").textContent = "#" + (b.rideId || "N/A");
+    const st = b.status || "upcoming";
+    const ms = $("#modal-status"); ms.className = "status-badge " + st; ms.textContent = st.replace("-", " ").toUpperCase();
+    $("#modal-datetime").textContent = `${fmtDate(b.bookingDate)} - ${fmtTime(b.bookingTime)}`;
+    $("#modal-duration").textContent = (b.estimatedDuration||0) + " minutes";
+    $("#modal-fare").textContent = "LKR " + Number(b.totalAmount||0).toFixed(2);
+    $("#modal-distance").textContent = (b.distance||0) + " km";
+
+    $("#modal-customer-name").textContent = b.customerName || "N/A";
+    $("#modal-customer-initial").textContent = (b.customerName||"?").trim().charAt(0).toUpperCase();
+    $("#modal-customer-phone").textContent = b.customerPhone || "N/A";
+    $("#modal-customer-email").textContent = b.customerEmail || "N/A";
+
+    $("#modal-pickup").textContent = b.pickupLocation || "N/A";
+    $("#modal-dropoff").textContent = b.dropoffLocation || "N/A";
+    $("#modal-vehicle-model").textContent = b.vehicleModel || "N/A";
+    $("#modal-vehicle-plate").textContent = "License: " + (b.vehiclePlate || "N/A");
+
+    const ins = (b.specialInstructions||"").trim();
+    $("#modal-instructions").innerHTML = ins
+        ? ins.split("\n").filter(Boolean).map(t=>`<div class="instruction-item"><i class="fas fa-info-circle"></i><span>${esc(t)}</span></div>`).join("")
+        : `<p style="color: var(--text-light);">No special instructions</p>`;
+
+    const p = $("#primaryActionBtn");
+    if (st === "upcoming") { p.innerHTML = '<i class="fas fa-play"></i> Start Ride'; p.onclick = () => updateStatus(b.rideId,"in-progress"); }
+    else if (st === "in-progress") { p.innerHTML = '<i class="fas fa-check"></i> Complete Ride'; p.onclick = () => updateStatus(b.rideId,"completed"); }
+    else { p.innerHTML = '<i class="fas fa-check"></i> Close'; p.onclick = closeModal; }
+
+    $("#bookingDetailsModal").classList.add("show");
 }
 
-// Format time
-function formatTime(timeString) {
-    if (!timeString) return 'N/A';
+function closeModal(){ $("#bookingDetailsModal").classList.remove("show"); current=null; }
+function contactCustomer(){ const p=current?.customerPhone; p ? (location.href=`tel:${p}`) : alert("Customer phone number not available"); }
+function primaryAction(){ if(!current) return; current.status==="upcoming"?updateStatus(current.rideId,"in-progress"):updateStatus(current.rideId,"completed"); }
+function navigateToIssueReporting(){ location.href="issuereporting.html"; }
 
-    // Handle different time formats
-    if (timeString.length === 5) {
-        // Already in HH:MM format
-        return formatTo12Hour(timeString);
-    } else if (timeString.length === 8) {
-        // HH:MM:SS format
-        return formatTo12Hour(timeString.substring(0, 5));
-    }
-
-    return timeString;
-}
-
-// Convert 24-hour time to 12-hour format
-function formatTo12Hour(time24) {
-    const [hours, minutes] = time24.split(':');
-    const hour = parseInt(hours);
-    const ampm = hour >= 12 ? 'PM' : 'AM';
-    const hour12 = hour % 12 || 12;
-    return `${hour12}:${minutes} ${ampm}`;
-}
-
-// Filter bookings based on selected filter
-function filterBookings() {
-    const cards = document.querySelectorAll('.booking-card');
-
-    cards.forEach(card => {
-        if (currentFilter === 'all' || card.dataset.status === currentFilter) {
-            card.style.display = 'block';
-        } else {
-            card.style.display = 'none';
-        }
-    });
-}
-
-// Sort bookings
-function sortBookings(sortBy) {
-    const grid = document.getElementById('bookingsGrid');
-    const cards = Array.from(grid.children);
-
-    cards.sort((a, b) => {
-        if (sortBy === 'time-asc') {
-            return a.dataset.time.localeCompare(b.dataset.time);
-        } else if (sortBy === 'time-desc') {
-            return b.dataset.time.localeCompare(a.dataset.time);
-        } else if (sortBy === 'fare') {
-            return parseFloat(b.dataset.fare) - parseFloat(a.dataset.fare);
-        } else if (sortBy === 'status') {
-            return a.dataset.status.localeCompare(b.dataset.status);
-        }
-        return 0;
-    });
-
-    cards.forEach(card => grid.appendChild(card));
-}
-
-// Show booking details in modal
-function showBookingDetails(rideId) {
-    const booking = allBookings.find(b => b.rideId === rideId);
-    if (!booking) return;
-
-    currentBookingDetails = booking;
-
-    // Update modal content
-    document.getElementById('modal-booking-id').textContent = '#' + booking.rideId;
-    document.getElementById('modal-status').innerHTML = getStatusBadge(booking.status).replace('status-badge', 'status-badge');
-    document.getElementById('modal-datetime').textContent = `${formatDate(new Date(booking.bookingDate))} - ${formatTime(booking.bookingTime)}`;
-    document.getElementById('modal-duration').textContent = booking.estimatedDuration + ' minutes';
-    document.getElementById('modal-fare').textContent = 'LKR ' + booking.totalAmount.toFixed(2);
-    document.getElementById('modal-distance').textContent = booking.distance + ' km';
-
-    // Customer details
-    document.getElementById('modal-customer-name').textContent = booking.customerName;
-    document.getElementById('modal-customer-initial').textContent = booking.customerName.charAt(0).toUpperCase();
-    document.getElementById('modal-customer-phone').textContent = booking.customerPhone || 'N/A';
-    document.getElementById('modal-customer-email').textContent = booking.customerEmail || 'N/A';
-
-    // Route details
-    document.getElementById('modal-pickup').textContent = booking.pickupLocation;
-    document.getElementById('modal-dropoff').textContent = booking.dropoffLocation;
-
-    // Vehicle details
-    document.getElementById('modal-vehicle-model').textContent = booking.vehicleModel;
-    document.getElementById('modal-vehicle-plate').textContent = 'License: ' + booking.vehiclePlate;
-
-    // Special instructions
-    const instructionsContainer = document.getElementById('modal-instructions');
-    if (booking.specialInstructions && booking.specialInstructions.trim() !== '') {
-        const instructions = booking.specialInstructions.split('\n');
-        instructionsContainer.innerHTML = instructions.map(inst => `
-            <div class="instruction-item">
-                <i class="fas fa-info-circle"></i>
-                <span>${inst}</span>
-            </div>
-        `).join('');
-    } else {
-        instructionsContainer.innerHTML = '<p style="color: var(--text-light);">No special instructions</p>';
-    }
-
-    // Update primary action button
-    const primaryBtn = document.getElementById('primaryActionBtn');
-    if (booking.status === 'upcoming') {
-        primaryBtn.innerHTML = '<i class="fas fa-play"></i> Start Ride';
-        primaryBtn.onclick = () => startRideFromModal(booking.rideId);
-    } else if (booking.status === 'in-progress') {
-        primaryBtn.innerHTML = '<i class="fas fa-check"></i> Complete Ride';
-        primaryBtn.onclick = () => completeRideFromModal(booking.rideId);
-    }
-
-    // Show modal
-    document.getElementById('bookingDetailsModal').classList.add('show');
-}
-
-// Close modal
-function closeModal() {
-    document.getElementById('bookingDetailsModal').classList.remove('show');
-    currentBookingDetails = null;
-}
-
-// Start ride
-async function startRide(rideId) {
-    if (!confirm('Are you sure you want to start this ride?')) return;
-
-    const btn = event.target;
-    const originalContent = btn.innerHTML;
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Starting...';
-    btn.disabled = true;
+async function updateStatus(rideId, status, btn) {
+    if (!confirm(`Are you sure you want to set status to "${status}"?`)) return;
+    const old = btn?.innerHTML; if (btn){ btn.disabled=true; btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> Please wait...'; }
 
     try {
-        const response = await fetch('/ongoing', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            credentials: 'include',
-            body: `action=updateStatus&rideId=${rideId}&status=in-progress`
-        });
+        const body = new URLSearchParams({ rideId, status });
+        const r = await fetch("/ongoing", { method:"POST", credentials:"include",
+            headers:{ "Content-Type":"application/x-www-form-urlencoded" }, body: body.toString() });
 
-        const data = await response.json();
-
-        if (data.success) {
-            btn.innerHTML = '<i class="fas fa-check"></i> Started';
-            btn.className = 'btn btn-primary';
-
-            setTimeout(() => {
-                loadBookings(); // Reload bookings
-            }, 1500);
-        } else {
-            throw new Error(data.error || 'Failed to start ride');
-        }
-
-    } catch (error) {
-        console.error('Error starting ride:', error);
-        alert('Failed to start ride: ' + error.message);
-        btn.innerHTML = originalContent;
-        btn.disabled = false;
+        if (r.status === 401) return (location.href="/views/landing/driverlogin.html");
+        const d = await r.json();
+        if (!d.success) throw new Error(d.message || d.error || "Update failed");
+        closeModal(); await loadBookings();
+    } catch(e){
+        console.error(e); alert("Failed: " + e.message);
+        if(btn){ btn.disabled=false; btn.innerHTML=old; }
     }
 }
 
-// Start ride from modal
-async function startRideFromModal(rideId) {
-    closeModal();
-    await startRide(rideId);
+function showEmpty(){ $("#emptyState").style.display="block"; $("#bookingsGrid").style.display="none"; $("#totalActive").textContent=0; $("#inProgressCount").textContent=0; $("#upcomingCount").textContent=0; }
+function fmtTime(t){ if(!t) return "N/A"; t=String(t); return t.length===8?to12(t.slice(0,5)):t.length===5?to12(t):t; }
+function to12(x){ let[h,m]=x.split(":"); h=+h; return `${h%12||12}:${m} ${h>=12?"PM":"AM"}`; }
+function fmtDate(d){ if(!d) return "N/A"; const dt = (String(d).length===10)?new Date(d+"T00:00:00"):new Date(d); if(isNaN(dt)) return "N/A";
+    const t=new Date(), tm=new Date(); tm.setDate(t.getDate()+1);
+    if(dt.toDateString()===t.toDateString()) return "Today";
+    if(dt.toDateString()===tm.toDateString()) return "Tomorrow";
+    return dt.toLocaleDateString("en-US",{month:"short",day:"numeric"});
 }
+function esc(v){ return String(v??"").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;"); }
 
-// Complete ride
-async function completeRide(rideId) {
-    if (!confirm('Are you sure you want to complete this ride?')) return;
-
-    const btn = event.target;
-    const originalContent = btn.innerHTML;
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Completing...';
-    btn.disabled = true;
-
-    try {
-        const response = await fetch('/ongoing', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            credentials: 'include',
-            body: `action=updateStatus&rideId=${rideId}&status=completed`
-        });
-
-        const data = await response.json();
-
-        if (data.success) {
-            btn.innerHTML = '<i class="fas fa-check"></i> Completed';
-            btn.style.backgroundColor = '#28a745';
-
-            setTimeout(() => {
-                const card = btn.closest('.booking-card');
-                card.style.transform = 'translateX(-100%)';
-                card.style.opacity = '0';
-
-                setTimeout(() => {
-                    loadBookings(); // Reload bookings
-                }, 300);
-            }, 1500);
-        } else {
-            throw new Error(data.error || 'Failed to complete ride');
-        }
-
-    } catch (error) {
-        console.error('Error completing ride:', error);
-        alert('Failed to complete ride: ' + error.message);
-        btn.innerHTML = originalContent;
-        btn.disabled = false;
-    }
-}
-
-// Complete ride from modal
-async function completeRideFromModal(rideId) {
-    closeModal();
-    await completeRide(rideId);
-}
-
-// Contact customer
-function contactCustomer() {
-    if (!currentBookingDetails) return;
-
-    const phone = currentBookingDetails.customerPhone;
-    if (phone) {
-        window.location.href = `tel:${phone}`;
-    } else {
-        alert('Customer phone number not available');
-    }
-}
-
-// Primary action (called from modal)
-function primaryAction() {
-    if (!currentBookingDetails) return;
-
-    if (currentBookingDetails.status === 'upcoming') {
-        startRideFromModal(currentBookingDetails.rideId);
-    } else if (currentBookingDetails.status === 'in-progress') {
-        completeRideFromModal(currentBookingDetails.rideId);
-    }
-}
-
-// Navigate to issue reporting
-function navigateToIssueReporting() {
-    const btn = event.target.closest('.vehicle-issues-btn');
-    const originalContent = btn.innerHTML;
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
-    btn.disabled = true;
-
-    setTimeout(() => {
-        window.location.href =  'issuereporting.html';
-    }, 1000);
-}
-
-// Show empty state
-function showEmptyState() {
-    document.getElementById('emptyState').style.display = 'block';
-    document.getElementById('bookingsGrid').style.display = 'none';
-}
+// for inline calls in HTML modal/buttons
+window.closeModal = closeModal;
+window.contactCustomer = contactCustomer;
+window.primaryAction = primaryAction;
+window.navigateToIssueReporting = navigateToIssueReporting;

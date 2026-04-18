@@ -136,6 +136,7 @@ public class Issue {
         this.updatedAt = updatedAt;
     }
 
+
     // Utility method for formatted issue ID
     public String getFormattedIssueId() {
         return String.format("#RPT%03d", issueId);

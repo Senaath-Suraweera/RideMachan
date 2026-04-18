@@ -126,7 +126,7 @@ function updateDashboard(data) {
             const monthlyIncomeElement = document.querySelector('.stat-card:nth-child(1) .stat-value');
             if (monthlyIncomeElement) {
                 const income = data.stats.monthlyIncome || 0;
-                monthlyIncomeElement.textContent = '$' + formatNumber(income);
+                monthlyIncomeElement.textContent = 'Rs' + formatNumber(income);
                 console.log('Updated monthly income:', income);
             }
 
@@ -226,7 +226,7 @@ function updateBarChart(selector, data) {
                 bars[index].setAttribute('data-value', value);
 
                 // Add tooltip
-                bars[index].title = `Value: ${value}`;
+                bars[index].title = `Value: Rs{value}`;
             }
         });
 
@@ -258,7 +258,7 @@ function updateBookingSummary(summary) {
         if (pieChart) {
             const degrees = (percentage / 100) * 360;
             pieChart.style.background = `conic-gradient(
-                var(--primary) 0deg ${degrees}deg, 
+                var(--primary) 0deg Rs{degrees}deg, 
                 #e3f2fd ${degrees}deg 360deg
             )`;
         }

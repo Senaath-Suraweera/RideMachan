@@ -27,7 +27,7 @@ public class DriverOngoingServlet extends HttpServlet {
         PrintWriter out = response.getWriter();
 
         String value = "not null";
-        HttpSession session = request.getSession();
+        HttpSession session = request.getSession(false);
         if (session == null || session.getAttribute("driverId") == null) {
             if(session == null) {
                 value = "null";
@@ -57,6 +57,8 @@ public class DriverOngoingServlet extends HttpServlet {
                         .append("\"bookingDate\":\"").append(b.getBookingDate()).append("\",")
                         .append("\"bookingTime\":\"").append(b.getBookingTime()).append("\",")
                         .append("\"status\":\"").append(escape(b.getStatus())).append("\",")
+                        .append("\"customerPhone\":\"").append(escape(b.getCustomerPhone())).append("\",")
+                        .append("\"customerEmail\":\"").append(escape(b.getCustomerEmail())).append("\",")
 
                         // add these (real values if you have them; otherwise defaults)
                         .append("\"totalAmount\":").append(b.getTotalAmount()).append(",")
