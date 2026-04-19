@@ -337,7 +337,7 @@ document.addEventListener("DOMContentLoaded", async function() {
 
 });
 
-document.addEventListener("input", async function() {
+document.getElementById("input-search").addEventListener("input", async function() {
 
     let driverInput = document.getElementsByClassName("search-input")[0];
     let inputValue = driverInput.value.trim();
@@ -373,7 +373,19 @@ document.getElementById("addDriverform").addEventListener("submit",async functio
 
 })
 
+document.getElementById("select-filter").addEventListener("change", function(e) {
 
+    const selectedValue = e.target.value;
+
+    console.log("Selected filter:", selectedValue);
+
+    if (selectedValue === "all") {
+        renderdrivers(AllDrivers);
+    } else {
+        filterDriversByDriverStatus(selectedValue);
+    }
+
+});
 
 
 
@@ -516,13 +528,13 @@ function validate(value, rules, fieldName = "Field") {
         return false;
     }
 
-    // MAX LENGTH
+
     if (rules.maxLength && value.length > rules.maxLength) {
         showNotification(`${fieldName} must be less than ${rules.maxLength} characters`, "error");
         return false;
     }
 
-    // PATTERN CHECK
+
     if (rules.pattern && !rules.pattern.test(value)) {
         showNotification(rules.message || `Invalid ${fieldName}`, "error");
         return false;

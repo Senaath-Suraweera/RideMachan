@@ -202,7 +202,6 @@ function renderMaintenanceStaff(maintenanceStaffs) {
                           <div class="staff-details">
                               <div class="detail-item"><i class="fas fa-phone detail-icon"></i><span>+ ${maintenanceStaff.contactNumber}</span></div>
                               <div class="detail-item"><i class="fas fa-calendar detail-icon"></i><span>Years of Experience: ${maintenanceStaff.yearsOfExperience}</span></div>
-                              <div class="detail-item"><i class="fas fa-car detail-icon"></i><span>Assigned Vehicles: ${maintenanceStaff.assignedVehicles.length}</span></div>
                               <div class="detail-item"><i class="fas fa-wrench detail-icon"></i><span>${maintenanceStaff.specialization}</span></div>  
                           </div>
                           <div class="staff-badges">
