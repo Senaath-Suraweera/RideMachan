@@ -499,20 +499,18 @@ function filterDriversByDriverStatus(status) {
 
 
 
-// ===============================
-// GENERIC VALIDATION FUNCTION
-// ===============================
+
 function validate(value, rules, fieldName = "Field") {
 
     value = (value ?? "").toString().trim();
 
-    // REQUIRED CHECK
+
     if (rules.required && value === "") {
         showNotification(`${fieldName} is required`, "error");
         return false;
     }
 
-    // MIN LENGTH
+
     if (rules.minLength && value.length < rules.minLength) {
         showNotification(`${fieldName} must be at least ${rules.minLength} characters`, "error");
         return false;
