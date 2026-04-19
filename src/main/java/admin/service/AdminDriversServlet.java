@@ -18,7 +18,7 @@ import java.io.PrintWriter;
 import java.sql.*;
 
 @WebServlet("/api/admin/drivers/*")
-@MultipartConfig(maxFileSize = 5 * 1024 * 1024) // 5MB max
+@MultipartConfig(maxFileSize = 5 * 1024 * 1024)
 public class AdminDriversServlet extends HttpServlet {
 
     @Override
@@ -27,7 +27,7 @@ public class AdminDriversServlet extends HttpServlet {
         resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
     }
 
-    /* ======================= GET ======================= */
+
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {

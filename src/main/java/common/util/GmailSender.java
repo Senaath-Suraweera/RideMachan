@@ -8,9 +8,7 @@ import java.util.Base64;
 
 public class GmailSender {
 
-    // ---------------------------------------------------------------------------------
-    // Existing OTP method (UNCHANGED) - kept exactly to avoid breaking your current flow
-    // ---------------------------------------------------------------------------------
+
     public static void sendEmail(String recipient, String subject, String code) {
         String smtpServer = "smtp.gmail.com";
         int port = 465;
@@ -80,9 +78,7 @@ public class GmailSender {
         sendHtmlEmailInternal(recipient, subject, htmlBody, senderEmail, senderPassword, smtpServer, port);
     }
 
-    // ------------------------------------------------------------------
-    // NEW: Convenience method for request status notifications
-    // ------------------------------------------------------------------
+
     public static void sendRentalCompanyRequestStatusEmail(
             String recipient,
             String companyName,

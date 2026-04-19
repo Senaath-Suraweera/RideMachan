@@ -35,7 +35,6 @@ public class CompanyEarningsServlet extends HttpServlet {
         resp.setContentType("application/json");
         resp.setCharacterEncoding("UTF-8");
 
-        // Optional CORS (enable if frontend runs on a different port/domain)
         resp.setHeader("Access-Control-Allow-Origin", "*");
         resp.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
         resp.setHeader("Access-Control-Allow-Headers", "Content-Type");
@@ -433,7 +432,7 @@ public class CompanyEarningsServlet extends HttpServlet {
                 double companyFee = fare * COMPANY_FEE_RATE;
                 double net = fare - platformFee - companyFee;
 
-                // optional "VH001" style code
+
                 String vehicleCode = "VH" + String.format("%03d", vehicleId);
 
                 sb.append("{")

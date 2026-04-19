@@ -22,7 +22,7 @@ public class AdminRejectRentalCompanyRequestServlet extends HttpServlet {
         return sb.toString();
     }
 
-    // optional JSON body: {"reason":"..."}
+
     private String extractReason(String body) {
         if (body == null) return null;
         body = body.trim();
@@ -80,7 +80,6 @@ public class AdminRejectRentalCompanyRequestServlet extends HttpServlet {
 
         try (Connection con = DBConnection.getConnection()) {
 
-            // fetch email/name for notification (can fetch before update)
             try (PreparedStatement psSel = con.prepareStatement(selectReq)) {
                 psSel.setInt(1, requestId);
                 try (ResultSet rs = psSel.executeQuery()) {

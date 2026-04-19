@@ -1,19 +1,12 @@
 @import url("common.css");
 
-
-
-
 /* Booking Management Specific Styles */
 
-.page-content{
+.page-content {
   padding-left: 20px;
   padding-right: 20px;
   padding-top: 20px;
-  
 }
-
-
-
 
 .bookings-grid {
   display: grid;
@@ -26,7 +19,7 @@
   width: 95%;
   background: white;
   border-radius: 16px;
-  
+
   padding: 24px;
   box-shadow: 0 4px 20px rgba(58, 12, 163, 0.08);
   border: 1px solid rgba(58, 12, 163, 0.1);
@@ -130,7 +123,7 @@
 }
 
 .payment-status {
-  font-size: 12px; 
+  font-size: 12px;
   font-weight: 500;
 }
 
@@ -191,7 +184,7 @@
   font-size: 15px;
 }
 
-.type{
+.type {
   width: 175px;
   border-radius: 8px;
   padding: 4px 8px;
@@ -459,4 +452,50 @@
     flex: 1;
     justify-content: center;
   }
+}
+
+/* Driver Cards - MATCH BOOKING THEME */
+
+.driver-card {
+  background: white;
+  border-radius: 16px;
+  padding: 18px;
+  border: 1px solid rgba(58, 12, 163, 0.1);
+  box-shadow: 0 4px 20px rgba(58, 12, 163, 0.08);
+  transition: all 0.3s ease;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.driver-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 32px rgba(58, 12, 163, 0.15);
+}
+
+/* top section */
+.driver-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  color: #2d3748;
+  font-size: 15px;
+}
+
+.driver-header i {
+  color: #3a0ca3;
+}
+
+/* sub text */
+.driver-sub {
+  font-size: 12px;
+  color: #718096;
+  margin-top: 6px;
+}
+
+/* button section */
+.driver-actions {
+  margin-top: 12px;
 }

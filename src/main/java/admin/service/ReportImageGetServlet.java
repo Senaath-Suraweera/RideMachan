@@ -20,7 +20,7 @@ public class ReportImageGetServlet extends HttpServlet {
                 return;
             }
 
-            resp.setContentType("image/jpeg"); // change later if you store filetype
+            resp.setContentType("image/jpeg");
             resp.getOutputStream().write(bytes);
 
         } catch (Exception e) {

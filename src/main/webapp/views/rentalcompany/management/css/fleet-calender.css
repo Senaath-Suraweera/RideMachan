@@ -1,14 +1,11 @@
 @import url(common.css);
 
- 
-
-.page-header{
-   padding-left: 20px;
-   padding-bottom: 30px; 
-   padding-top: 20px;
-   /*border: 1px solid blue;*/
+.page-header {
+  padding-left: 20px;
+  padding-bottom: 30px;
+  padding-top: 20px;
+  /*border: 1px solid blue;*/
 }
-
 
 .btn-primary,
 .btn-secondary {
@@ -26,7 +23,6 @@
 }
 
 .btn-primary {
-  
   background: linear-gradient(135deg, #3a0ca3, #4361ee);
   color: white;
   box-shadow: 0 4px 15px rgba(58, 12, 163, 0.4);
@@ -37,7 +33,7 @@
   right: 20px;
   top: 200px;
 }
- 
+
 .btn-primary:hover {
   transform: translateY(-2px);
   box-shadow: 0 8px 25px rgba(58, 12, 163, 0.6);
@@ -273,13 +269,21 @@
 }
 
 .schedule-item.booking {
-  background: linear-gradient(135deg, rgba(58, 12, 163, 0.1) 0%, rgba(67, 97, 238, 0.1) 100%);
+  background: linear-gradient(
+    135deg,
+    rgba(58, 12, 163, 0.1) 0%,
+    rgba(67, 97, 238, 0.1) 100%
+  );
   border-left-color: #3a0ca3;
   border: 1px solid rgba(58, 12, 163, 0.2);
 }
 
 .schedule-item.maintenance {
-  background: linear-gradient(135deg, rgba(255, 152, 0, 0.1) 0%, rgba(255, 193, 7, 0.1) 100%);
+  background: linear-gradient(
+    135deg,
+    rgba(255, 152, 0, 0.1) 0%,
+    rgba(255, 193, 7, 0.1) 100%
+  );
   border-left-color: #ff9800;
   border: 1px solid rgba(255, 152, 0, 0.2);
 }
@@ -461,60 +465,27 @@
   }
 }
 
-
-
-
-
-
- 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 @keyframes slideInRight {
-    from { transform: translateX(100%); opacity: 0; }
-    to { transform: translateX(0); opacity: 1; }
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
 }
 
 @keyframes slideOutRight {
-    from { transform: translateX(0); opacity: 1; }
-    to { transform: translateX(100%); opacity: 0; }
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(100%);
+    opacity: 0;
+  }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 /* =========================
    MODAL BACKDROP pop up render maintenance staff
@@ -525,7 +496,7 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0,0,0,0.6);
+  background: rgba(0, 0, 0, 0.6);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -545,8 +516,14 @@
 }
 
 @keyframes popIn {
-  from { transform: scale(0.9); opacity: 0; }
-  to { transform: scale(1); opacity: 1; }
+  from {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
 /* header */
@@ -584,7 +561,7 @@
 
 .staff-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
 }
 
 /* tags */
@@ -596,4 +573,49 @@
   margin: 2px;
   background: #dbeafe;
   color: #1e3a8a;
+}
+
+/* Date Selection Container */
+.date-selection {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Label */
+.date-selection label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #2d3748;
+}
+
+/* Date Input Styling */
+.date-selection input[type="date"] {
+  padding: 10px 14px;
+  border: 2px solid #e2e8f0;
+  border-radius: 10px;
+  background: white;
+  font-family: "Poppins", sans-serif;
+  font-size: 14px;
+  color: #2d3748;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+/* Hover effect */
+.date-selection input[type="date"]:hover {
+  border-color: #4361ee;
+}
+
+/* Focus effect */
+.date-selection input[type="date"]:focus {
+  outline: none;
+  border-color: #3a0ca3;
+  box-shadow: 0 0 0 3px rgba(58, 12, 163, 0.15);
+}
+
+/* Calendar icon styling (for Chrome) */
+.date-selection input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(30%) sepia(90%) saturate(500%) hue-rotate(220deg);
+  cursor: pointer;
 }

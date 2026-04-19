@@ -87,9 +87,7 @@ public class VehicleProviderDashboardServlet extends HttpServlet {
         }
     }
 
-    // =========================
-    // AUTH / PROVIDER ID RESOLVE (UNCHANGED)
-    // =========================
+
     private Integer resolveProviderId(HttpServletRequest req) {
         HttpSession session = req.getSession(false);
         if (session != null) {
@@ -116,10 +114,7 @@ public class VehicleProviderDashboardServlet extends HttpServlet {
         resp.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
     }
 
-    // =========================
-    // 1) SUMMARY
-    // FIX: Vehicle table name -> Vehicle (capital V)
-    // =========================
+
     private String getSummary(Connection con, int providerId) throws SQLException {
 
         String totalsSql =
@@ -211,10 +206,7 @@ public class VehicleProviderDashboardServlet extends HttpServlet {
         return 0.0;
     }
 
-    // =========================
-    // 2) MONTHLY INCOME
-    // FIX: Vehicle table name -> Vehicle
-    // =========================
+
     private String getMonthlyIncome(Connection con, int providerId, int months) throws SQLException {
         if (months <= 0) months = 12;
         if (months > 24) months = 24;
@@ -261,10 +253,7 @@ public class VehicleProviderDashboardServlet extends HttpServlet {
         return sb.toString();
     }
 
-    // =========================
-    // 3) SESSIONS BY LOCATION
-    // FIX: Vehicle table name -> Vehicle
-    // =========================
+
     private String getSessionsByLocation(Connection con, int providerId, int limit) throws SQLException {
         if (limit <= 0) limit = 8;
 
@@ -315,11 +304,7 @@ public class VehicleProviderDashboardServlet extends HttpServlet {
         return sb.toString();
     }
 
-    // =========================
-    // 4) VEHICLES UNDER MAINTENANCE
-    // Uses Vehicle.availability_status directly — simpler than joining CalendarEvents.
-    // Accepts any common spelling: 'maintenance', 'under_maintenance', 'under maintenance'.
-    // =========================
+
     private String getVehiclesUnderMaintenance(Connection con, int providerId, int limit) throws SQLException {
         if (limit <= 0) limit = 6;
 
@@ -363,10 +348,7 @@ public class VehicleProviderDashboardServlet extends HttpServlet {
         return sb.toString();
     }
 
-    // =========================
-    // 5) AVAILABLE VEHICLES
-    // FIX: Vehicle table name -> Vehicle
-    // =========================
+
     private String getAvailableVehicles(Connection con, int providerId, int limit) throws SQLException {
         if (limit <= 0) limit = 6;
 
@@ -408,9 +390,7 @@ public class VehicleProviderDashboardServlet extends HttpServlet {
         return sb.toString();
     }
 
-    // =========================
-    // helpers
-    // =========================
+
     private static String monthShort(int m) {
         String[] arr = {"Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"};
         if (m < 1 || m > 12) return "NA";

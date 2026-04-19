@@ -39,8 +39,7 @@ public class AdminEarningsServlet extends HttpServlet {
         String path = req.getPathInfo(); // /summary, /monthly, /recent-bookings
         PrintWriter out = resp.getWriter();
 
-        // (Optional) simple admin session check - adjust attribute name if yours differs
-        // If you don't want auth here, you can remove this block.
+
         HttpSession session = req.getSession(false);
         if (session == null || session.getAttribute("actorId") == null) {
             resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
@@ -121,7 +120,7 @@ public class AdminEarningsServlet extends HttpServlet {
                 + "}";
     }
 
-    private static double previousiousSafe(double v) { return v; } // keeps compile simple
+    private static double previousiousSafe(double v) { return v; }
 
     // -------------------- MONTHLY / QUARTERLY CHART --------------------
     private String getMonthly(Connection con, String period) throws SQLException {
@@ -204,7 +203,7 @@ public class AdminEarningsServlet extends HttpServlet {
     private String getQuarterly(Connection con, int year) throws SQLException {
         double[] q = new double[4];
 
-        // MySQL YEAR() used (matches your existing code style)
+
         String sql =
                 "SELECT trip_start_date, total_amount, payment_status, status " +
                         "FROM companybookings " +

@@ -16,7 +16,7 @@ import java.time.LocalDate;
 @WebServlet("/api/admin/dashboard/*")
 public class AdminDashboardServlet extends HttpServlet {
 
-    // Keep consistent with AdminEarningsServlet
+
     private static final double PLATFORM_FEE_RATE = 0.05;
 
     @Override
@@ -32,12 +32,10 @@ public class AdminDashboardServlet extends HttpServlet {
         resp.setCharacterEncoding("UTF-8");
         setCors(resp);
 
-        String path = req.getPathInfo(); // /stats, /top-customers, /top-renters, /company-locations
+        String path = req.getPathInfo();
         PrintWriter out = resp.getWriter();
 
-        // Optional: session check (same idea as your AdminEarningsServlet)
-        // If your frontend opens dashboard only after login, keep this.
-        // If you want Postman to work without login, comment this block out.
+
         HttpSession session = req.getSession(false);
         if (session == null || session.getAttribute("actorId") == null) {
             resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
@@ -88,14 +86,7 @@ public class AdminDashboardServlet extends HttpServlet {
         }
     }
 
-    /* =========================================================
-       STATS (cards)
-       - thisMonthIncome (platform fee)
-       - monthChangePct (vs previous month)
-       - newRentalRequests (pending registrations)
-       - supportTickets (Open + In Progress)
-       - reports (Pending)
-    ========================================================= */
+
     private String getStats(Connection con) throws SQLException {
 
         LocalDate now = LocalDate.now();
@@ -124,10 +115,7 @@ public class AdminDashboardServlet extends HttpServlet {
                 + "}";
     }
 
-    /* =========================================================
-       TOP CUSTOMERS (highest paying)
-       Source: companybookings (PAID or completed)
-    ========================================================= */
+
     private String getTopCustomers(Connection con, int limit) throws SQLException {
         if (limit <= 0) limit = 3;
 
@@ -167,10 +155,7 @@ public class AdminDashboardServlet extends HttpServlet {
         return sb.toString();
     }
 
-    /* =========================================================
-       TOP RENTERS (highest earning rental companies)
-       Source: companybookings (PAID or completed)
-    ========================================================= */
+
     private String getTopRenters(Connection con, int limit) throws SQLException {
         if (limit <= 0) limit = 3;
 
@@ -210,13 +195,7 @@ public class AdminDashboardServlet extends HttpServlet {
         return sb.toString();
     }
 
-    /* =========================================================
-       MAP DATA (Sri Lanka)
-       Since RentalCompany has street + city in your schema,
-       we return:
-       - list of companies with city/street
-       - count by city
-    ========================================================= */
+
     private String getCompanyLocations(Connection con) throws SQLException {
 
         String sqlList =
@@ -273,7 +252,7 @@ public class AdminDashboardServlet extends HttpServlet {
         return sb.toString();
     }
 
-    /* ===================== DB HELPERS ===================== */
+
 
     private double sumPlatformBetween(Connection con, LocalDate start, LocalDate end) throws SQLException {
         String sql =

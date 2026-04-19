@@ -1,14 +1,11 @@
 @import url(common.css);
 
-
-.page-header{
+.page-header {
   padding-top: 10px;
   padding-left: 20px;
   padding-bottom: 20px;
   /*border: 1px solid blue;*/
-} 
-
-
+}
 
 /* Profile Page Specific Styles */
 .profile-container {
@@ -81,7 +78,6 @@
   font-size: 3rem;
   margin-bottom: 1rem;
 }
-
 
 .update-picture-btn {
   background: transparent;
@@ -184,83 +180,6 @@
   box-shadow: 0 4px 20px rgba(58, 12, 163, 0.3);
 }
 
-/* Notifications Section */
-.notifications-section {
-  margin-top: 2rem;
-  margin-left: 20px;
-  margin-right: 20px;
-  /*border: 10px solid #ff0000;*/
-}
-
-.notification-settings {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-}
-
-.notification-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1rem;
-  background: #f9fafb;
-  border-radius: 8px;
-  border: 1px solid #e5e7eb;
-}
-
-.notification-info h4 {
-  color: #1f2937;
-  font-size: 1rem;
-  font-weight: 500;
-  margin-bottom: 0.25rem;
-}
-
-.notification-info p {
-  color: #6b7280;
-  font-size: 0.875rem;
-}
-
-/* Toggle Switch Styles */
-.toggle-switch {
-  position: relative;
-}
-
-.toggle-switch input[type="checkbox"] {
-  display: none;
-}
-
-.toggle-label {
-  display: block;
-  width: 50px;
-  height: 28px;
-  background: #d1d5db;
-  border-radius: 14px;
-  cursor: pointer;
-  position: relative;
-  transition: all 0.3s ease;
-}
-
-.toggle-label::after {
-  content: "";
-  position: absolute;
-  top: 2px;
-  left: 2px;
-  width: 24px;
-  height: 24px;
-  background: white;
-  border-radius: 50%;
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.toggle-switch input[type="checkbox"]:checked + .toggle-label {
-  background: linear-gradient(135deg, #3a0ca3, #4361ee);
-}
-
-.toggle-switch input[type="checkbox"]:checked + .toggle-label::after {
-  transform: translateX(22px);
-}
-
 /* Responsive Design */
 @media (max-width: 768px) {
   .profile-container {
@@ -274,16 +193,6 @@
 
   .profile-card {
     padding: 1.5rem;
-  }
-
-  .notification-item {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 1rem;
-  }
-
-  .toggle-switch {
-    align-self: flex-end;
   }
 }
 
@@ -313,4 +222,3 @@
     transform: rotate(360deg);
   }
 }
- 

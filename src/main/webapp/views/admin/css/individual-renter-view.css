@@ -1,9 +1,3 @@
-/* =========================================================
-   Individual Renter View - updated and fixed
-   Matches current HTML/JS structure
-   ========================================================= */
-
-/* === Page Header === */
 .page-header {
   margin-bottom: 30px;
   animation: fadeIn 0.5s ease;

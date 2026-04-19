@@ -1,95 +1,75 @@
 async function checkLogin() {
+  try {
+    const response = await fetch("/checklogin");
+    const data = await response.json();
 
-    try {
+    if (!data.loggedIn) {
+      const modal = document.getElementById("loginModal");
+      modal.style.display = "flex";
 
-        const response = await fetch("/checklogin");
-        const data = await response.json();
+      document.getElementById("loginOkBtn").onclick = () => {
+        window.location.href = "/companylogin";
+      };
 
-        if (!data.loggedIn) {
-
-            const modal = document.getElementById("loginModal");
-            modal.style.display = "flex";
-
-
-            document.getElementById("loginOkBtn").onclick = () => {
-
-                window.location.href = "/companylogin";
-
-            };
-
-            return false;
-
-        }
-
-        console.log("User is logged in.");
-        return true;
-
-    } catch (err) {
-
-        console.error("Error checking login:", err);
-        return false;
-
+      return false;
     }
 
+    console.log("User is logged in.");
+    return true;
+  } catch (err) {
+    console.error("Error checking login:", err);
+    return false;
+  }
 }
 
 let maintenaceStaff;
 
 async function loadAssignedVehiclesByStaffId(staffId) {
+  try {
+    const response = await fetch(
+      `/display/assigned/vehicles/bystaffId?staffId=${staffId}`,
+      {
+        method: "POST",
+      },
+    );
 
-    try {
-
-        const response = await fetch(`/display/assigned/vehicles/bystaffId?staffId=${staffId}`, {
-            method: "POST"
-        });
-
-        if(!response.ok){
-            throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-
-        let data = await response.json();
-
-        console.log(data);
-
-
-        return data;
-
-    }catch(err) {
-
-        console.log(err);
-
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
     }
 
+    let data = await response.json();
+
+    console.log(data);
+
+    return data;
+  } catch (err) {
+    console.log(err);
+  }
 }
 
 function renderVehicles(vehicles) {
+  let container = document.getElementById("container");
 
-    let container = document.getElementById("container");
+  if (!container) {
+    return;
+  }
 
-    if (!container) {
-        return;
-    }
+  container.innerHTML = "";
 
-    container.innerHTML = "";
+  if (!vehicles || vehicles.length === 0) {
+    handleEmptyCase("No vehicles assigned", "container");
+    return;
+  }
 
-    if (!vehicles || vehicles.length === 0) {
+  let imageUrl;
 
-        handleEmptyCase("No vehicles assigned", "container");
-        return;
+  vehicles.forEach((vehicle) => {
+    const card = document.createElement("div");
+    card.className = "vehicle-card";
 
-    }
+    imageUrl = `/company/vehicle/image?vehicleid=${vehicle.vehicleId}`;
 
-
-    let imageUrl;
-
-    vehicles.forEach(vehicle => {
-
-        const card = document.createElement("div");
-        card.className = "vehicle-card";
-
-        imageUrl = `/company/vehicle/image?vehicleid=${vehicle.vehicleId}`;
-
-        card.innerHTML = `
+    card.innerHTML = `
             <div class="vehicle-image">
                 <img
                     src="${imageUrl}"
@@ -113,245 +93,190 @@ function renderVehicles(vehicles) {
                 <div class="features">
                     <span class="feature-tag">${vehicle.fuelType}</span>
                     <span class="feature-tag">${vehicle.vehicleType}</span>
-                    <span class="feature-tag" style="${vehicle.availabilityStatus?.toLowerCase().includes('maintenance') ? 'background:#dc3545; color:#fff;': ''}">
+                    <span class="feature-tag" style="${vehicle.availabilityStatus?.toLowerCase().includes("maintenance") ? "background:#dc3545; color:#fff;" : ""}">
                         ${vehicle.availabilityStatus}
                     </span>
                 </div>
             </div>
 
             <div class="vehicle-actions">
-                <button class="assign-btn" onclick="assignVehicle(${vehicle.vehicleId})">
-                    <i class="fas fa-tools"></i> Assign
-                </button>
             </div>
         `;
 
-        container.appendChild(card);
-    });
+    container.appendChild(card);
+  });
 }
-
 
 function getStaffIdFromURL() {
-
-    let params = new URLSearchParams(window.location.search);
-    return params.get("staffId");
-
+  let params = new URLSearchParams(window.location.search);
+  return params.get("staffId");
 }
 
-function getFullNameFromURL(){
+function getFullNameFromURL() {
+  let params = new URLSearchParams(window.location.search);
+  let firstname = params.get("firstname");
+  let lastname = params.get("lastname");
 
-    let params = new URLSearchParams(window.location.search);
-    let firstname = params.get("firstname");
-    let lastname = params.get("lastname");
+  let fullname = firstname + " " + lastname;
 
-    let fullname = firstname + " " + lastname;
-
-    return fullname;
-
+  return fullname;
 }
 
 function getVehicle(staffId) {
-
-    for (let i = 0; i < AllVehicles.length; i++) {
-
-        if (AllVehicles[i].vehicleId == vehicleId) {
-
-            return AllVehicles[i];
-
-        }
-
+  for (let i = 0; i < AllVehicles.length; i++) {
+    if (AllVehicles[i].vehicleId == vehicleId) {
+      return AllVehicles[i];
     }
+  }
 
-    return null;
-
+  return null;
 }
 
+document.addEventListener("DOMContentLoaded", async function () {
+  try {
+    const loggedIn = await checkLogin();
 
-document.addEventListener("DOMContentLoaded", async function() {
-
-    try {
-
-        const loggedIn = await checkLogin();
-
-        if (!loggedIn) {
-            return;    // stop here if not logged in
-        }
-
-        let staffId = getStaffIdFromURL();
-
-        if (!staffId) {
-            console.error("staffId not found in URL");
-            return;
-        }
-
-
-        let vehicles = await loadAssignedVehiclesByStaffId(staffId);
-
-        console.log("Loaded vehicles:", vehicles);
-
-
-        renderVehicles(vehicles);
-
-    } catch (err) {
-
-        console.error("Error during initialization:", err);
-
+    if (!loggedIn) {
+      return; // stop here if not logged in
     }
 
+    let staffId = getStaffIdFromURL();
+
+    if (!staffId) {
+      console.error("staffId not found in URL");
+      return;
+    }
+
+    let vehicles = await loadAssignedVehiclesByStaffId(staffId);
+
+    console.log("Loaded vehicles:", vehicles);
+
+    renderVehicles(vehicles);
+  } catch (err) {
+    console.error("Error during initialization:", err);
+  }
 });
 
-
-
-
-
-
-
-
-
-
-
-
 function handleEmptyCase(message, containerId = "container") {
+  const container = document.getElementById(containerId);
 
-    const container = document.getElementById(containerId);
+  if (!container) return;
 
-    if (!container) return;
+  container.innerHTML = "";
 
-    container.innerHTML = "";
+  const emptyCard = document.createElement("div");
 
-    const emptyCard = document.createElement("div");
-
-    emptyCard.innerHTML = `
+  emptyCard.innerHTML = `
         <h2 class="empty-title">${message}</h2>
         <p class="empty-sub">Nothing to display right now</p>
     `;
 
+  emptyCard.style.width = "100%";
+  emptyCard.style.maxWidth = "900px";
+  emptyCard.style.margin = "0 auto";
+  emptyCard.style.padding = "50px 25px";
+  emptyCard.style.borderRadius = "18px";
+  emptyCard.style.background = "linear-gradient(135deg, #ffffff, #f8f9ff)";
+  emptyCard.style.boxShadow = "0 10px 30px rgba(58, 12, 163, 0.15)";
+  emptyCard.style.border = "1px solid rgba(58, 12, 163, 0.1)";
+  emptyCard.style.textAlign = "center";
+  emptyCard.style.gridColumn = "1 / -1";
 
-    emptyCard.style.width = "100%";
-    emptyCard.style.maxWidth = "900px";
-    emptyCard.style.margin = "0 auto";
-    emptyCard.style.padding = "50px 25px";
-    emptyCard.style.borderRadius = "18px";
-    emptyCard.style.background = "linear-gradient(135deg, #ffffff, #f8f9ff)";
+  emptyCard.style.transition = "all 0.3s ease";
+  emptyCard.style.cursor = "default";
+
+  emptyCard.style.position = "relative";
+  emptyCard.style.top = "80px";
+
+  const title = emptyCard.querySelector(".empty-title");
+
+  title.style.margin = "0";
+  title.style.fontSize = "22px";
+  title.style.fontWeight = "700";
+  title.style.background = "linear-gradient(90deg, #3a0ca3, #4361ee, #f72585)";
+  title.style.webkitBackgroundClip = "text";
+  title.style.webkitTextFillColor = "transparent";
+  title.style.backgroundClip = "text";
+  title.style.letterSpacing = "0.5px";
+
+  const sub = emptyCard.querySelector(".empty-sub");
+
+  sub.style.marginTop = "10px";
+  sub.style.fontSize = "14px";
+  sub.style.color = "#6c757d";
+  sub.style.opacity = "0.9";
+
+  emptyCard.onmouseover = () => {
+    emptyCard.style.transform = "translateY(-6px) scale(1.01)";
+    emptyCard.style.boxShadow = "0 18px 40px rgba(67, 97, 238, 0.25)";
+  };
+
+  emptyCard.onmouseout = () => {
+    emptyCard.style.transform = "translateY(0) scale(1)";
     emptyCard.style.boxShadow = "0 10px 30px rgba(58, 12, 163, 0.15)";
-    emptyCard.style.border = "1px solid rgba(58, 12, 163, 0.1)";
-    emptyCard.style.textAlign = "center";
-    emptyCard.style.gridColumn = "1 / -1";
+  };
 
-    emptyCard.style.transition = "all 0.3s ease";
-    emptyCard.style.cursor = "default";
-
-
-    emptyCard.style.position = "relative";
-    emptyCard.style.top = "80px";
-
-    const title = emptyCard.querySelector(".empty-title");
-
-    title.style.margin = "0";
-    title.style.fontSize = "22px";
-    title.style.fontWeight = "700";
-    title.style.background = "linear-gradient(90deg, #3a0ca3, #4361ee, #f72585)";
-    title.style.webkitBackgroundClip = "text";
-    title.style.webkitTextFillColor = "transparent";
-    title.style.backgroundClip = "text";
-    title.style.letterSpacing = "0.5px";
-
-
-    const sub = emptyCard.querySelector(".empty-sub");
-
-    sub.style.marginTop = "10px";
-    sub.style.fontSize = "14px";
-    sub.style.color = "#6c757d";
-    sub.style.opacity = "0.9";
-
-
-    emptyCard.onmouseover = () => {
-        emptyCard.style.transform = "translateY(-6px) scale(1.01)";
-        emptyCard.style.boxShadow = "0 18px 40px rgba(67, 97, 238, 0.25)";
-    };
-
-    emptyCard.onmouseout = () => {
-        emptyCard.style.transform = "translateY(0) scale(1)";
-        emptyCard.style.boxShadow = "0 10px 30px rgba(58, 12, 163, 0.15)";
-    };
-
-    container.appendChild(emptyCard);
+  container.appendChild(emptyCard);
 }
 
-
-
-
-
-
-
 const vehicles = [
-    {
-        vehicleId: 1,
-        vehicleBrand: "Toyota",
-        vehicleModel: "Axio",
-        pricePerDay: 12000,
-        vehicleType: "Car",
-        fuelType: "Petrol",
-        availabilityStatus: "available",
-        location: "Colombo"
-    },
-    {
-        vehicleId: 2,
-        vehicleBrand: "Suzuki",
-        vehicleModel: "Wagon R",
-        pricePerDay: 8500,
-        vehicleType: "Car",
-        fuelType: "Petrol",
-        availabilityStatus: "available",
-        location: "Kandy"
-    },
-    {
-        vehicleId: 3,
-        vehicleBrand: "Toyota",
-        vehicleModel: "Hiace",
-        pricePerDay: 18000,
-        vehicleType: "Van",
-        fuelType: "Diesel",
-        availabilityStatus: "maintenance",
-        location: "Galle"
-    }
+  {
+    vehicleId: 1,
+    vehicleBrand: "Toyota",
+    vehicleModel: "Axio",
+    pricePerDay: 12000,
+    vehicleType: "Car",
+    fuelType: "Petrol",
+    availabilityStatus: "available",
+    location: "Colombo",
+  },
+  {
+    vehicleId: 2,
+    vehicleBrand: "Suzuki",
+    vehicleModel: "Wagon R",
+    pricePerDay: 8500,
+    vehicleType: "Car",
+    fuelType: "Petrol",
+    availabilityStatus: "available",
+    location: "Kandy",
+  },
+  {
+    vehicleId: 3,
+    vehicleBrand: "Toyota",
+    vehicleModel: "Hiace",
+    pricePerDay: 18000,
+    vehicleType: "Van",
+    fuelType: "Diesel",
+    availabilityStatus: "maintenance",
+    location: "Galle",
+  },
 ];
 
-
-
-
-
-
-
-
-
-
-
 function displayVehicles(vehicles) {
-    const container = document.getElementById("searchResults");
+  const container = document.getElementById("searchResults");
 
-    if (!container) {
-        console.error("searchResults container not found");
-        return;
-    }
+  if (!container) {
+    console.error("searchResults container not found");
+    return;
+  }
 
-    container.innerHTML = ""; // Clear previous content
+  container.innerHTML = ""; // Clear previous content
 
-    if (vehicles.length === 0) {
-        container.innerHTML = `
+  if (vehicles.length === 0) {
+    container.innerHTML = `
             <p style="text-align: center; color: var(--text-light); padding: 40px;">
                 No vehicles found matching your criteria.
             </p>
         `;
-        return;
-    }
+    return;
+  }
 
-    vehicles.forEach(vehicle => {
-        const vehicleCard = document.createElement("div");
-        vehicleCard.className = "vehicle-card";
-        vehicleCard.onclick = () => viewVehicle(vehicle.vehicleId);
+  vehicles.forEach((vehicle) => {
+    const vehicleCard = document.createElement("div");
+    vehicleCard.className = "vehicle-card";
+    vehicleCard.onclick = () => viewVehicle(vehicle.vehicleId);
 
-        vehicleCard.innerHTML = `
+    vehicleCard.innerHTML = `
             <div class="vehicle-image">
                 <i class="fas fa-car"></i>
             </div>
@@ -393,7 +318,7 @@ function displayVehicles(vehicles) {
                 <div class="features">
                     <span class="feature-tag">${vehicle.fuelType || "Fuel"}</span>
                     <span class="feature-tag">${vehicle.vehicleType || "Vehicle"}</span>
-                    ${vehicle.availabilityStatus === 'available' ? '<span class="feature-tag">Available</span>' : ''}
+                    ${vehicle.availabilityStatus === "available" ? '<span class="feature-tag">Available</span>' : ""}
                 </div>
             </div>
 
@@ -405,6 +330,6 @@ function displayVehicles(vehicles) {
             </div>
         `;
 
-        container.appendChild(vehicleCard);
-    });
+    container.appendChild(vehicleCard);
+  });
 }

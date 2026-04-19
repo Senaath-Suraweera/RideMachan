@@ -22,7 +22,6 @@ public class AdminDeleteServlet extends HttpServlet {
         resp.setCharacterEncoding("UTF-8");
 
         try {
-            // Read request body
             String body = req.getReader().lines().reduce("", (acc, line) -> acc + line);
             System.out.println("Delete request body: " + body);
 

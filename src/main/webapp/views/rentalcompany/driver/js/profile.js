@@ -396,7 +396,7 @@ async function saveProfile(
 
   try {
     // ===== SEND UPDATE REQUEST =====
-    const response = await fetch("driver/profile", {
+    const response = await fetch("/driver/profile", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

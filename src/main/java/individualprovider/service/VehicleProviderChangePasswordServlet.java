@@ -75,8 +75,6 @@ public class VehicleProviderChangePasswordServlet extends HttpServlet {
             VehicleProvider provider = VehicleProviderDAO.loginProvider(email.trim(), currentPassword);
 
             if (provider == null) {
-                // loginProvider returns null for bad email OR bad password,
-                // so we give a generic message to avoid user-enumeration.
                 sendError(response, HttpServletResponse.SC_UNAUTHORIZED,
                         "Email or current password is incorrect");
                 return;

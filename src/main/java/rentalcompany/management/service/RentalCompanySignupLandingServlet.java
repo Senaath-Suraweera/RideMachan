@@ -12,16 +12,12 @@ import jakarta.servlet.http.Part;
 import java.io.File;
 import java.io.IOException;
 
-/**
- * UPDATED: No longer saves directly to DB.
- * Stores form data in session → user verifies OTP → SaveRentalCompanyToDBServlet
- * saves to RentalCompanyRegistrationRequest table (status = PENDING).
- */
-@WebServlet(name = "RentalCompanySignupServlet", urlPatterns = {"/rentalcompany/signup"})
+@WebServlet(name = "RentalCompanyLandingSignupServlet", urlPatterns = {"/rentcompany/signup"})
 @MultipartConfig
 public class RentalCompanySignupLandingServlet extends HttpServlet {
 
     private static final String UPLOAD_DIR = "src/company_documents";
+
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)

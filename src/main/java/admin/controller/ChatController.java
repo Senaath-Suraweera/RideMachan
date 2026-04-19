@@ -7,17 +7,7 @@ import common.util.DBConnection;
 import java.sql.*;
 import java.util.*;
 
-/**
- * ChatController – updated for RideMachan multi-actor messaging.
- *
- * KEY CHANGES from original:
- *   1. canMessage(fromType, toType) – checks the MessagingPermission table.
- *   2. getAllowedTargetTypes(actorType) – returns the list of types this actor can message.
- *   3. resolveActorName(type, id) – fetches human-readable name from the correct table.
- *   4. listUsersOfType(type) – returns {id, name} pairs for the "New Conversation" modal.
- *   5. createNotification() – inserts into Notification table when a message is sent.
- *   6. listConversations() now includes the OTHER participant's name for DIRECT chats.
- */
+
 public class ChatController {
 
     private static Connection con;
@@ -26,7 +16,6 @@ public class ChatController {
     // Permission helpers
     // ──────────────────────────────────────────────────────────
 
-    /** Check if fromType is allowed to message toType. */
     public static boolean canMessage(String fromType, String toType) {
         try {
             con = DBConnection.getConnection();
@@ -42,7 +31,6 @@ public class ChatController {
         }
     }
 
-    /** Return all actor types this actor is allowed to message. */
     public static List<String> getAllowedTargetTypes(String actorType) {
         List<String> types = new ArrayList<>();
         try {
@@ -59,11 +47,7 @@ public class ChatController {
         return types;
     }
 
-    // ──────────────────────────────────────────────────────────
-    // Actor name resolution
-    // ──────────────────────────────────────────────────────────
 
-    /** Resolve a human-friendly display name for any actor. */
     public static String resolveActorName(String actorType, int actorId) {
         try {
             con = DBConnection.getConnection();
@@ -103,7 +87,6 @@ public class ChatController {
         return actorType + " #" + actorId;
     }
 
-    /** List all users of a given type (for "New Conversation" modal dropdown). */
     public static List<Map<String, Object>> listUsersOfType(String actorType) {
         List<Map<String, Object>> list = new ArrayList<>();
         try {
@@ -145,11 +128,6 @@ public class ChatController {
         return list;
     }
 
-    // ──────────────────────────────────────────────────────────
-    // Conversation CRUD  (mostly unchanged; title enrichment added)
-    // ──────────────────────────────────────────────────────────
-
-    /** Create a direct (1-to-1) conversation. Returns -1 on failure, -2 if not permitted. */
     public static int createDirectConversation(String aType, int aId, String bType, int bId) {
         // ── PERMISSION CHECK ──
         if (!canMessage(aType, bType)) return -2;
@@ -218,10 +196,7 @@ public class ChatController {
         }
     }
 
-    /**
-     * List conversations with enriched titles.
-     * For DIRECT chats the title is resolved to the OTHER participant's name.
-     */
+
     public static List<Map<String, Object>> listConversations(String actorType, int actorId) {
         List<Map<String, Object>> list = new ArrayList<>();
         try {
@@ -273,7 +248,6 @@ public class ChatController {
         return list;
     }
 
-    /** Resolve the other participant's display name in a DIRECT conversation. */
     private static String resolveOtherParticipantName(int convId, String myType, int myId) {
         Map<String, Object> other = getOtherParticipant(convId, myType, myId);
         if (other == null) return "Unknown";
@@ -303,9 +277,6 @@ public class ChatController {
         return null;
     }
 
-    // ──────────────────────────────────────────────────────────
-    // Message CRUD
-    // ──────────────────────────────────────────────────────────
 
     public static ChatMessage saveMessage(int convId, String senderType, int senderId, String content) {
         try {
