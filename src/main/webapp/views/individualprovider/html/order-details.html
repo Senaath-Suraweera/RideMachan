@@ -1,21 +1,32 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Order Details - RideMachan</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
     <link rel="stylesheet" href="../css/styles.css" />
-    <link rel="stylesheet" href="../css/sidebar.css" />
     <link rel="stylesheet" href="../css/order-details.css" />
+    <link rel="stylesheet" href="../css/sidebar.css" />
   </head>
-  <body>
+  <body class="has-sidebar">
     <div class="container">
       <div class="main-content">
-        <!-- Page Header -->
         <div class="page-header">
           <div class="header-left">
-            <button class="btn btn-secondary back-btn" onclick="goBack()">
-              ← Back to Bookings
+            <button
+              class="btn btn-secondary back-btn"
+              id="backBtn"
+              onclick="goBack()"
+            >
+              <i class="fas fa-arrow-left"></i> Back
             </button>
             <div class="page-title">
               <h1 id="orderTitle">Booking Details</h1>
@@ -27,471 +38,839 @@
           </div>
           <div class="header-actions">
             <button class="btn btn-secondary" onclick="printOrder()">
-              Print
-            </button>
-            <button class="btn btn-primary" onclick="updateOrderStatus()">
-              Update Status
+              <i class="fas fa-print"></i> Print
             </button>
           </div>
         </div>
 
-        <!-- Order Progress Timeline -->
         <div class="progress-timeline">
-          <div class="progress-step completed" data-step="accepted">
-            <div class="step-icon">✓</div>
+          <div class="progress-step pending" data-step="accepted">
+            <div class="step-icon"><i class="fas fa-circle-check"></i></div>
             <div class="step-content">
               <div class="step-title">Booking Accepted</div>
-              <div class="step-time" id="acceptedTime">Today 10:30 AM</div>
+              <div class="step-time" id="acceptedTime">—</div>
             </div>
           </div>
-          <div class="progress-step completed" data-step="paid">
-            <div class="step-icon">✓</div>
+          <div class="progress-step pending" data-step="paid">
+            <div class="step-icon"><i class="fas fa-credit-card"></i></div>
             <div class="step-content">
               <div class="step-title">Payment Confirmed</div>
-              <div class="step-time" id="paidTime">Today 10:32 AM</div>
+              <div class="step-time" id="paidTime">—</div>
             </div>
           </div>
-          <div class="progress-step active" data-step="pickup">
-            <div class="step-icon"></div>
+          <div class="progress-step pending" data-step="pickup">
+            <div class="step-icon"><i class="fas fa-key"></i></div>
             <div class="step-content">
               <div class="step-title">Ready for Pickup</div>
-              <div class="step-time" id="pickupTime">In Progress</div>
+              <div class="step-time" id="pickupTime">—</div>
             </div>
           </div>
           <div class="progress-step pending" data-step="dropoff">
-            <div class="step-icon"></div>
+            <div class="step-icon"><i class="fas fa-flag-checkered"></i></div>
             <div class="step-content">
               <div class="step-title">Drop-off</div>
-              <div class="step-time" id="dropoffTime">Pending</div>
+              <div class="step-time" id="dropoffTime">—</div>
             </div>
           </div>
         </div>
 
-        <!-- Main Content Grid -->
         <div class="order-content-grid">
-          <!-- Left Column -->
           <div class="order-main-content">
-            <!-- Customer & Vehicle Information -->
             <div class="info-cards-grid">
-              <!-- Customer Information Card -->
               <div class="card customer-card">
                 <div class="card-header">
-                  <h3>Customer Information</h3>
+                  <h3>
+                    <i
+                      class="fas fa-user"
+                      style="
+                        margin-right: 7px;
+                        color: var(--primary-light);
+                        font-size: 13px;
+                      "
+                    ></i>
+                    Customer Information
+                  </h3>
                   <button
                     class="btn btn-sm btn-secondary"
                     onclick="contactCustomer()"
                   >
-                    Contact
+                    <i class="fas fa-phone"></i> Contact
                   </button>
                 </div>
                 <div class="customer-details">
                   <div class="customer-avatar">
-                    <div class="avatar-circle" id="customerAvatar">JS</div>
+                    <div class="avatar-circle" id="customerAvatar">?</div>
                     <div class="status-indicator online"></div>
                   </div>
                   <div class="customer-info">
-                    <h4 id="customerName">John Smith</h4>
+                    <h4 id="customerName">—</h4>
                     <div class="customer-meta">
                       <div class="detail-item">
-                        <span class="label">Email:</span>
-                        <span class="value" id="customerEmail"
-                          >john.smith@email.com</span
-                        >
+                        <span class="label">Email</span>
+                        <span class="value" id="customerEmail">—</span>
                       </div>
                       <div class="detail-item">
-                        <span class="label">Phone:</span>
-                        <span class="value" id="customerPhone"
-                          >+94 77 123 4567</span
-                        >
+                        <span class="label">Phone</span>
+                        <span class="value" id="customerPhone">—</span>
                       </div>
                       <div class="detail-item">
-                        <span class="label">License:</span>
-                        <span class="value" id="customerLicense">B1234567</span>
-                      </div>
-                      <div class="detail-item">
-                        <span class="label">Rating:</span>
-                        <div class="customer-rating">
-                          <span class="stars">★★★★★</span>
-                          <span class="rating-text">4.8 (23 rides)</span>
-                        </div>
+                        <span class="label">License</span>
+                        <span class="value" id="customerLicense">—</span>
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
 
-              <!-- Vehicle Information Card -->
               <div class="card vehicle-card">
                 <div class="card-header">
-                  <h3>Vehicle Information</h3>
+                  <h3>
+                    <i
+                      class="fas fa-car-side"
+                      style="
+                        margin-right: 7px;
+                        color: var(--primary-light);
+                        font-size: 13px;
+                      "
+                    ></i>
+                    Vehicle Information
+                  </h3>
                   <button
                     class="btn btn-sm btn-secondary"
                     onclick="viewVehicleDetails()"
                   >
-                    Details
+                    <i class="fas fa-circle-info"></i> Details
                   </button>
                 </div>
                 <div class="vehicle-details">
-                  <div class="vehicle-image">
+                  <div class="vehicle-image" id="vehicleImageWrap">
+                    <span class="vehicle-icon"
+                      ><i class="fas fa-car-side"></i
+                    ></span>
                     <div class="image-placeholder">Vehicle Photo</div>
-                    <div class="vehicle-status-badge available">Available</div>
                   </div>
                   <div class="vehicle-info">
-                    <h4 id="vehicleName">Toyota Camry 2023</h4>
+                    <h4 id="vehicleName">—</h4>
                     <div class="vehicle-meta">
                       <div class="detail-item">
-                        <span class="label">License Plate:</span>
-                        <span class="value" id="vehiclePlate">CAB-1234</span>
+                        <span class="label">Plate</span>
+                        <span class="value" id="vehiclePlate">—</span>
                       </div>
                       <div class="detail-item">
-                        <span class="label">Type:</span>
-                        <span class="value" id="vehicleType">Sedan</span>
+                        <span class="label">Type</span>
+                        <span class="value" id="vehicleType">—</span>
                       </div>
                       <div class="detail-item">
-                        <span class="label">Color:</span>
-                        <span class="value" id="vehicleColor">Silver</span>
+                        <span class="label">Color</span>
+                        <span class="value" id="vehicleColor">—</span>
                       </div>
                       <div class="detail-item">
-                        <span class="label">Odometer:</span>
-                        <span class="value" id="vehicleOdometer"
-                          >45,230 km</span
-                        >
+                        <span class="label">Odometer</span>
+                        <span class="value" id="vehicleOdometer">—</span>
                       </div>
-                    </div>
-                    <div class="vehicle-features">
-                      <span class="feature">AC</span>
-                      <span class="feature">Automatic</span>
-                      <span class="feature">GPS</span>
-                      <span class="feature">Bluetooth</span>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
 
-            <!-- Booking Details Card -->
             <div class="card booking-details-card">
               <div class="card-header">
-                <h3>Booking Details</h3>
+                <h3>
+                  <i
+                    class="fas fa-calendar-days"
+                    style="
+                      margin-right: 7px;
+                      color: var(--primary-light);
+                      font-size: 13px;
+                    "
+                  ></i>
+                  Booking Details
+                </h3>
                 <div class="booking-duration">
-                  <span class="duration-badge" id="bookingDuration"
-                    >3 Days</span
-                  >
+                  <span class="duration-badge" id="bookingDuration">—</span>
                 </div>
               </div>
               <div class="booking-info-grid">
                 <div class="booking-info-item">
-                  <div class="info-icon"></div>
+                  <div class="info-icon">
+                    <i
+                      class="fas fa-circle-arrow-right"
+                      style="color: var(--primary-light)"
+                    ></i>
+                  </div>
                   <div class="info-content">
-                    <div class="info-label">Pickup Date & Time</div>
-                    <div class="info-value" id="pickupDateTime">
-                      Dec 15, 2024 at 10:00 AM
-                    </div>
+                    <div class="info-label">Pickup Date &amp; Time</div>
+                    <div class="info-value" id="pickupDateTime">—</div>
                   </div>
                 </div>
                 <div class="booking-info-item">
-                  <div class="info-icon">📍</div>
+                  <div class="info-icon">
+                    <i class="fas fa-location-dot" style="color: #d97706"></i>
+                  </div>
                   <div class="info-content">
                     <div class="info-label">Pickup Location</div>
-                    <div class="info-value" id="pickupLocation">
-                      Bandaranaike International Airport
-                    </div>
+                    <div class="info-value" id="pickupLocation">—</div>
                   </div>
                 </div>
                 <div class="booking-info-item">
-                  <div class="info-icon"></div>
+                  <div class="info-icon">
+                    <i
+                      class="fas fa-circle-arrow-left"
+                      style="color: #059669"
+                    ></i>
+                  </div>
                   <div class="info-content">
-                    <div class="info-label">Return Date & Time</div>
-                    <div class="info-value" id="returnDateTime">
-                      Dec 18, 2024 at 6:00 PM
-                    </div>
+                    <div class="info-label">Return Date &amp; Time</div>
+                    <div class="info-value" id="returnDateTime">—</div>
                   </div>
                 </div>
                 <div class="booking-info-item">
-                  <div class="info-icon">📍</div>
+                  <div class="info-icon">
+                    <i class="fas fa-flag-checkered" style="color: #db2777"></i>
+                  </div>
                   <div class="info-content">
                     <div class="info-label">Return Location</div>
-                    <div class="info-value" id="returnLocation">
-                      Bandaranaike International Airport
-                    </div>
+                    <div class="info-value" id="returnLocation">—</div>
                   </div>
                 </div>
               </div>
 
-              <!-- Driver Information (if applicable) -->
-              <div class="driver-section" id="driverSection">
-                <h4>👨‍💼 Assigned Driver</h4>
+              <div
+                class="driver-section"
+                id="driverSection"
+                style="display: none"
+              >
+                <h4>
+                  <i
+                    class="fas fa-user-tie"
+                    style="
+                      margin-right: 8px;
+                      color: var(--primary-light);
+                      font-size: 13px;
+                    "
+                  ></i
+                  >Assigned Driver
+                </h4>
                 <div class="driver-info">
                   <div class="driver-avatar">
-                    <div class="avatar-circle">MJ</div>
-                    <div class="status-indicator online"></div>
+                    <div
+                      class="avatar-circle"
+                      style="width: 46px; height: 46px; font-size: 14px"
+                      id="driverAvatar"
+                    >
+                      DR
+                    </div>
                   </div>
                   <div class="driver-details">
-                    <div class="driver-name" id="driverName">
-                      Michael Johnson
-                    </div>
-                    <div class="driver-meta">
-                      <span class="driver-license">License: D7890123</span>
-                      <span class="driver-rating">★ 4.9 (156 trips)</span>
-                    </div>
+                    <div class="driver-name" id="driverName">—</div>
+                    <div class="driver-license">License: —</div>
                     <div class="driver-contact">
-                      <span>📞 +94 71 234 5678</span>
+                      <span><i class="fas fa-phone"></i> —</span>
                     </div>
                   </div>
-                  <button
-                    class="btn btn-sm btn-secondary"
-                    onclick="contactDriver()"
-                  >
-                    Message
-                  </button>
-                </div>
-              </div>
-
-              <!-- Special Instructions -->
-              <div class="special-instructions" id="specialInstructions">
-                <h4>Special Instructions</h4>
-                <div class="instructions-content">
-                  Please ensure the vehicle is cleaned and fueled. Customer
-                  requested baby seat installation.
                 </div>
               </div>
             </div>
 
-            <!-- Payment & Pricing Card -->
             <div class="card payment-card">
               <div class="card-header">
-                <h3>Payment & Pricing</h3>
-                <div class="payment-status">
-                  <span class="status-badge status-completed">Paid</span>
-                </div>
+                <h3>
+                  <i
+                    class="fas fa-receipt"
+                    style="
+                      margin-right: 7px;
+                      color: var(--primary-light);
+                      font-size: 13px;
+                    "
+                  ></i>
+                  Payment Summary
+                </h3>
+                <span
+                  class="order-status status-pending"
+                  id="paymentStatusBadge"
+                  >—</span
+                >
               </div>
               <div class="pricing-breakdown">
                 <div class="pricing-item">
-                  <span class="pricing-label"
-                    >Base Rate (3 days @ Rs 5,000/day)</span
-                  >
-                  <span class="pricing-value">Rs 15,000</span>
+                  <span class="pricing-label">Daily Rate</span>
+                  <span class="pricing-value" id="dailyRate">—</span>
                 </div>
                 <div class="pricing-item">
-                  <span class="pricing-label"
-                    >Driver Service (3 days @ Rs 2,000/day)</span
-                  >
-                  <span class="pricing-value">Rs 6,000</span>
+                  <span class="pricing-label">Duration</span>
+                  <span class="pricing-value" id="paymentDuration">—</span>
                 </div>
                 <div class="pricing-item">
-                  <span class="pricing-label">Insurance</span>
-                  <span class="pricing-value">Rs 1,500</span>
-                </div>
-                <div class="pricing-item">
-                  <span class="pricing-label">Additional Services</span>
-                  <span class="pricing-value">Rs 500</span>
-                </div>
-                <div class="pricing-divider"></div>
-                <div class="pricing-item subtotal">
-                  <span class="pricing-label">Subtotal</span>
-                  <span class="pricing-value">Rs 23,000</span>
-                </div>
-                <div class="pricing-item">
-                  <span class="pricing-label">Platform Fee (4%)</span>
-                  <span class="pricing-value negative">-Rs 920</span>
-                </div>
-                <div class="pricing-item">
-                  <span class="pricing-label">Company Commission (8%)</span>
-                  <span class="pricing-value negative">-Rs 1,840</span>
+                  <span class="pricing-label">Base Amount</span>
+                  <span class="pricing-value" id="baseAmount">—</span>
                 </div>
                 <div class="pricing-divider"></div>
                 <div class="pricing-item total">
-                  <span class="pricing-label">Your Earnings</span>
-                  <span class="pricing-value">Rs 20,240</span>
+                  <span class="pricing-label">Total Amount</span>
+                  <span class="pricing-value" id="totalAmount">—</span>
                 </div>
               </div>
               <div class="payment-method">
                 <div class="payment-info">
-                  <span class="payment-label">Payment Method:</span>
-                  <span class="payment-value">Visa ending in 4567</span>
-                </div>
-                <div class="payment-info">
-                  <span class="payment-label">Transaction ID:</span>
-                  <span class="payment-value">TXN-20241215-001</span>
+                  <span class="payment-label">Payment Status</span>
+                  <span class="payment-value" id="paymentStatusText">—</span>
                 </div>
               </div>
             </div>
           </div>
 
-          <!-- Right Sidebar -->
           <div class="order-sidebar">
-            <!-- Quick Actions Card -->
             <div class="card quick-actions-card">
               <div class="card-header">
-                <h3>Quick Actions</h3>
+                <h3>
+                  <i
+                    class="fas fa-bolt"
+                    style="
+                      margin-right: 7px;
+                      color: var(--primary-light);
+                      font-size: 13px;
+                    "
+                  ></i>
+                  Quick Actions
+                </h3>
               </div>
               <div class="action-buttons">
-                <button class="action-btn complete" onclick="markAsCompleted()">
-                  <span class="btn-icon"></span>
-                  <span class="btn-text">Mark as Completed</span>
-                </button>
-                <button class="action-btn contact" onclick="contactCustomer()">
-                  <span class="btn-icon"></span>
-                  <span class="btn-text">Call Customer</span>
-                </button>
                 <button class="action-btn message" onclick="sendMessage()">
-                  <span class="btn-icon"></span>
+                  <span class="btn-icon"
+                    ><i class="fas fa-comment-dots"></i
+                  ></span>
                   <span class="btn-text">Send Message</span>
-                </button>
-                <button class="action-btn emergency" onclick="reportIssue()">
-                  <span class="btn-icon"></span>
-                  <span class="btn-text">Report Issue</span>
                 </button>
               </div>
             </div>
 
-            <!-- Order Timeline Card -->
             <div class="card timeline-card">
               <div class="card-header">
-                <h3>Order Timeline</h3>
+                <h3>
+                  <i
+                    class="fas fa-timeline"
+                    style="
+                      margin-right: 7px;
+                      color: var(--primary-light);
+                      font-size: 13px;
+                    "
+                  ></i>
+                  Order Timeline
+                </h3>
               </div>
-              <div class="timeline-list">
-                <div class="timeline-item">
-                  <div class="timeline-dot completed"></div>
-                  <div class="timeline-content">
-                    <div class="timeline-title">Booking Confirmed</div>
-                    <div class="timeline-time">Today 10:30 AM</div>
-                    <div class="timeline-description">
-                      Booking request accepted by vehicle owner
-                    </div>
-                  </div>
-                </div>
-                <div class="timeline-item">
-                  <div class="timeline-dot completed"></div>
-                  <div class="timeline-content">
-                    <div class="timeline-title">Payment Processed</div>
-                    <div class="timeline-time">Today 10:32 AM</div>
-                    <div class="timeline-description">
-                      Rs 23,000 payment confirmed
-                    </div>
-                  </div>
-                </div>
-                <div class="timeline-item active">
-                  <div class="timeline-dot active"></div>
-                  <div class="timeline-content">
-                    <div class="timeline-title">Vehicle Prepared</div>
-                    <div class="timeline-time">Today 11:15 AM</div>
-                    <div class="timeline-description">
-                      Vehicle inspection completed, ready for pickup
-                    </div>
-                  </div>
-                </div>
+              <div class="timeline-list" id="orderTimeline">
                 <div class="timeline-item">
                   <div class="timeline-dot pending"></div>
                   <div class="timeline-content">
-                    <div class="timeline-title">Customer Pickup</div>
-                    <div class="timeline-time">Scheduled for 2:00 PM</div>
-                    <div class="timeline-description">
-                      Customer to collect vehicle
-                    </div>
+                    <div class="timeline-title">Awaiting data…</div>
+                    <div class="timeline-time">—</div>
                   </div>
                 </div>
               </div>
             </div>
 
-            <!-- Documents Card -->
             <div class="card documents-card">
               <div class="card-header">
-                <h3>Documents</h3>
+                <h3>
+                  <i
+                    class="fas fa-folder-open"
+                    style="
+                      margin-right: 7px;
+                      color: var(--primary-light);
+                      font-size: 13px;
+                    "
+                  ></i>
+                  Documents
+                </h3>
               </div>
-              <div class="documents-list">
+              <div class="documents-list" id="documentsList">
                 <div class="document-item">
-                  <div class="doc-icon"></div>
-                  <div class="doc-info">
-                    <div class="doc-name">Rental Agreement</div>
-                    <div class="doc-size">245 KB</div>
+                  <div class="doc-icon">
+                    <i
+                      class="fas fa-file-lines"
+                      style="color: var(--primary-light); font-size: 18px"
+                    ></i>
                   </div>
-                  <button
-                    class="btn btn-sm btn-secondary"
-                    onclick="downloadDocument('rental-agreement')"
-                  >
-                    ⬇️
-                  </button>
-                </div>
-                <div class="document-item">
-                  <div class="doc-icon"></div>
                   <div class="doc-info">
-                    <div class="doc-name">Customer License</div>
-                    <div class="doc-size">1.2 MB</div>
+                    <div class="doc-name">Loading documents…</div>
+                    <div class="doc-size">Please wait</div>
                   </div>
-                  <button
-                    class="btn btn-sm btn-secondary"
-                    onclick="downloadDocument('customer-license')"
-                  >
-                    ⬇️
-                  </button>
-                </div>
-                <div class="document-item">
-                  <div class="doc-icon"></div>
-                  <div class="doc-info">
-                    <div class="doc-name">Insurance Policy</div>
-                    <div class="doc-size">856 KB</div>
-                  </div>
-                  <button
-                    class="btn btn-sm btn-secondary"
-                    onclick="downloadDocument('insurance')"
-                  >
-                    ⬇️
-                  </button>
                 </div>
               </div>
             </div>
           </div>
         </div>
       </div>
+
+      <div class="modal-overlay" id="statusUpdateModal">
+        <div class="modal">
+          <div class="modal-header">
+            <h2>Update Order Status</h2>
+            <button class="modal-close" onclick="closeStatusModal()">
+              <i class="fas fa-xmark"></i>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div class="form-group" style="margin-bottom: 16px">
+              <label class="form-label">New Status</label>
+              <select class="form-select" id="newStatus">
+                <option value="accepted">Accepted</option>
+                <option value="pickup-ready">Ready for Pickup</option>
+                <option value="in-progress">In Progress</option>
+                <option value="completed">Completed</option>
+                <option value="cancelled">Cancelled</option>
+              </select>
+            </div>
+            <div class="form-group" style="margin-bottom: 16px">
+              <label class="form-label">Notes (Optional)</label>
+              <textarea
+                class="form-control"
+                rows="3"
+                placeholder="Add any notes about the status update…"
+                style="resize: vertical; padding: 10px 12px"
+              ></textarea>
+            </div>
+            <div class="form-group">
+              <label class="checkbox-label">
+                <input type="checkbox" id="notifyCustomer" checked />
+                Notify customer via SMS and email
+              </label>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              onclick="closeStatusModal()"
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              class="btn btn-primary"
+              onclick="confirmStatusUpdate()"
+            >
+              <i class="fas fa-check"></i> Update Status
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Vehicle details modal -->
+      <div class="modal-overlay" id="vehicleDetailsModal">
+        <div class="modal vehicle-details-modal">
+          <div class="modal-header">
+            <h2>Vehicle Details</h2>
+            <button class="modal-close" onclick="closeVehicleModal()">
+              <i class="fas fa-xmark"></i>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div class="vehicle-modal-grid">
+              <div class="vehicle-modal-image-wrap" id="vehicleModalImageWrap">
+                <span class="vehicle-icon"
+                  ><i class="fas fa-car-side"></i
+                ></span>
+                <div class="image-placeholder">Vehicle Photo</div>
+              </div>
+
+              <div class="vehicle-modal-info">
+                <h3 id="modalVehicleName">—</h3>
+                <div class="vehicle-modal-meta">
+                  <div class="detail-item">
+                    <span class="label">Brand</span>
+                    <span class="value" id="modalVehicleBrand">—</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="label">Model</span>
+                    <span class="value" id="modalVehicleModel">—</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="label">Plate</span>
+                    <span class="value" id="modalVehiclePlate">—</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="label">Type</span>
+                    <span class="value" id="modalVehicleType">—</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="label">Color</span>
+                    <span class="value" id="modalVehicleColor">—</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="label">Fuel</span>
+                    <span class="value" id="modalVehicleFuel">—</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="label">Transmission</span>
+                    <span class="value" id="modalVehicleTransmission">—</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="label">Year</span>
+                    <span class="value" id="modalVehicleYear">—</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="label">Location</span>
+                    <span class="value" id="modalVehicleLocation">—</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="label">Price/Day</span>
+                    <span class="value" id="modalVehiclePrice">—</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="label">Odometer</span>
+                    <span class="value" id="modalVehicleOdometer">—</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="vehicle-modal-section">
+              <h4>Description</h4>
+              <p id="modalVehicleDescription">—</p>
+            </div>
+
+            <div class="vehicle-modal-section">
+              <h4>Features</h4>
+              <p id="modalVehicleFeatures">—</p>
+            </div>
+
+            <div class="vehicle-modal-section">
+              <h4>Legal Documentation</h4>
+              <div class="documents-list compact" id="vehicleModalDocuments">
+                <div class="document-item">
+                  <div class="doc-icon">
+                    <i class="fas fa-file-lines"></i>
+                  </div>
+                  <div class="doc-info">
+                    <div class="doc-name">No document loaded</div>
+                    <div class="doc-size">—</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              onclick="closeVehicleModal()"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <!-- Status Update Modal -->
-    <div class="modal-overlay" id="statusUpdateModal">
-      <div class="modal">
+    <!-- Submit Report Modal -->
+    <div class="modal-overlay" id="submitReportModal">
+      <div class="modal report-modal">
         <div class="modal-header">
-          <h2>Update Order Status</h2>
-          <button class="modal-close" onclick="closeStatusModal()">×</button>
+          <h2>
+            <i
+              class="fas fa-flag"
+              style="color: var(--danger); margin-right: 8px; font-size: 16px"
+            ></i
+            >Submit Report
+          </h2>
+          <button class="modal-close" onclick="closeReportModal()">
+            <i class="fas fa-xmark"></i>
+          </button>
         </div>
         <div class="modal-body">
-          <div class="form-group">
-            <label class="form-label">New Status</label>
-            <select class="form-select" id="newStatus">
-              <option value="pickup-ready">Ready for Pickup</option>
-              <option value="in-progress">In Progress</option>
-              <option value="completed">Completed</option>
-              <option value="cancelled">Cancelled</option>
+          <div
+            class="report-booking-ref"
+            id="reportBookingRef"
+            style="
+              background: rgba(67, 97, 238, 0.06);
+              border: 1px solid rgba(67, 97, 238, 0.15);
+              border-radius: var(--radius-sm);
+              padding: 10px 14px;
+              font-size: 13px;
+              color: var(--primary);
+              font-weight: 500;
+              margin-bottom: 18px;
+              display: flex;
+              align-items: center;
+              gap: 8px;
+            "
+          >
+            <i class="fas fa-bookmark" style="font-size: 13px"></i>
+            <span id="reportRefText">Booking Reference: —</span>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 14px">
+            <label
+              class="form-label"
+              style="
+                font-size: 12px;
+                font-weight: 600;
+                color: var(--text-light);
+                text-transform: uppercase;
+                letter-spacing: 0.4px;
+                display: block;
+                margin-bottom: 6px;
+              "
+              >Report Category
+              <span style="color: var(--danger)">*</span></label
+            >
+            <select
+              class="form-select"
+              id="reportCategory"
+              style="
+                width: 100%;
+                height: 42px;
+                padding: 0 12px;
+                border-radius: var(--radius-sm);
+                border: 1px solid var(--border);
+                font-family: &quot;Poppins&quot;, sans-serif;
+                font-size: 13px;
+                color: var(--text);
+                outline: none;
+                appearance: none;
+                background: #fff;
+              "
+            >
+              <option value="">— Select a category —</option>
+              <option value="vehicle">Vehicle Issue</option>
+              <option value="behavior">Driver / Customer Behavior</option>
+              <option value="payment">Payment Dispute</option>
+              <option value="safety">Safety Concern</option>
+              <option value="app">App / Platform Issue</option>
             </select>
           </div>
-          <div class="form-group">
-            <label class="form-label">Notes (Optional)</label>
+
+          <div class="form-group" style="margin-bottom: 14px">
+            <label
+              class="form-label"
+              style="
+                font-size: 12px;
+                font-weight: 600;
+                color: var(--text-light);
+                text-transform: uppercase;
+                letter-spacing: 0.4px;
+                display: block;
+                margin-bottom: 6px;
+              "
+              >Subject <span style="color: var(--danger)">*</span></label
+            >
+            <input
+              type="text"
+              class="form-control"
+              id="reportSubject"
+              placeholder="Brief title of your report"
+              style="
+                width: 100%;
+                height: 42px;
+                padding: 0 12px;
+                border-radius: var(--radius-sm);
+                border: 1px solid var(--border);
+                font-family: &quot;Poppins&quot;, sans-serif;
+                font-size: 13px;
+                color: var(--text);
+                outline: none;
+              "
+            />
+          </div>
+
+          <div class="form-group" style="margin-bottom: 14px">
+            <label
+              class="form-label"
+              style="
+                font-size: 12px;
+                font-weight: 600;
+                color: var(--text-light);
+                text-transform: uppercase;
+                letter-spacing: 0.4px;
+                display: block;
+                margin-bottom: 6px;
+              "
+              >Reported Party <span style="color: var(--danger)">*</span></label
+            >
+            <select
+              class="form-select"
+              id="reportedRole"
+              style="
+                width: 100%;
+                height: 42px;
+                padding: 0 12px;
+                border-radius: var(--radius-sm);
+                border: 1px solid var(--border);
+                font-family: &quot;Poppins&quot;, sans-serif;
+                font-size: 13px;
+                color: var(--text);
+                outline: none;
+                appearance: none;
+                background: #fff;
+              "
+            >
+              <option value="">— Who are you reporting? —</option>
+              <option value="CUSTOMER">Customer</option>
+              <option value="DRIVER">Driver</option>
+              <option value="COMPANY">Company</option>
+            </select>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 14px">
+            <label
+              class="form-label"
+              style="
+                font-size: 12px;
+                font-weight: 600;
+                color: var(--text-light);
+                text-transform: uppercase;
+                letter-spacing: 0.4px;
+                display: block;
+                margin-bottom: 6px;
+              "
+              >Priority</label
+            >
+            <div style="display: flex; gap: 8px; flex-wrap: wrap">
+              <label class="priority-option" data-value="Low">
+                <input
+                  type="radio"
+                  name="reportPriority"
+                  value="Low"
+                  checked
+                  style="display: none"
+                />
+                <span class="priority-pill low">Low</span>
+              </label>
+              <label class="priority-option" data-value="Medium">
+                <input
+                  type="radio"
+                  name="reportPriority"
+                  value="Medium"
+                  style="display: none"
+                />
+                <span class="priority-pill medium">Medium</span>
+              </label>
+              <label class="priority-option" data-value="High">
+                <input
+                  type="radio"
+                  name="reportPriority"
+                  value="High"
+                  style="display: none"
+                />
+                <span class="priority-pill high">High</span>
+              </label>
+              <label class="priority-option" data-value="Urgent">
+                <input
+                  type="radio"
+                  name="reportPriority"
+                  value="Urgent"
+                  style="display: none"
+                />
+                <span class="priority-pill urgent">Urgent</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 4px">
+            <label
+              class="form-label"
+              style="
+                font-size: 12px;
+                font-weight: 600;
+                color: var(--text-light);
+                text-transform: uppercase;
+                letter-spacing: 0.4px;
+                display: block;
+                margin-bottom: 6px;
+              "
+              >Description <span style="color: var(--danger)">*</span></label
+            >
             <textarea
               class="form-control"
-              rows="3"
-              placeholder="Add any notes about the status update..."
+              id="reportDescription"
+              rows="4"
+              placeholder="Describe the issue in detail…"
+              style="
+                width: 100%;
+                padding: 10px 12px;
+                border-radius: var(--radius-sm);
+                border: 1px solid var(--border);
+                font-family: &quot;Poppins&quot;, sans-serif;
+                font-size: 13px;
+                color: var(--text);
+                outline: none;
+                resize: vertical;
+                line-height: 1.6;
+              "
             ></textarea>
+
+            <div class="form-group report-attachment-group">
+              <label class="form-label report-label">
+                Attach Images
+                <span class="report-optional">(Optional)</span>
+              </label>
+
+              <div class="report-upload-box">
+                <label for="reportImages" class="report-upload-label">
+                  <i class="fas fa-image"></i>
+                  <span>Choose up to 5 images</span>
+                  <small>PNG, JPG, JPEG, WEBP</small>
+                </label>
+
+                <input
+                  type="file"
+                  id="reportImages"
+                  accept="image/png,image/jpeg,image/jpg,image/webp"
+                  multiple
+                  hidden
+                />
+              </div>
+
+              <div class="report-attachment-help">
+                Add photos related to the issue. Maximum 5 images, 5MB each.
+              </div>
+
+              <div
+                class="report-image-preview-list"
+                id="reportImagePreviewList"
+              ></div>
+            </div>
           </div>
-          <div class="form-group">
-            <label class="checkbox-label">
-              <input type="checkbox" id="notifyCustomer" checked />
-              Notify customer via SMS and email
-            </label>
+
+          <div
+            id="reportError"
+            style="
+              display: none;
+              margin-top: 12px;
+              padding: 10px 14px;
+              background: rgba(247, 37, 133, 0.08);
+              border: 1px solid rgba(247, 37, 133, 0.2);
+              border-radius: var(--radius-sm);
+              color: #be185d;
+              font-size: 13px;
+              font-weight: 500;
+            "
+          >
+            <i
+              class="fas fa-circle-exclamation"
+              style="margin-right: 6px; font-size: 13px"
+            ></i>
+            <span id="reportErrorText"
+              >Please fill in all required fields.</span
+            >
           </div>
         </div>
         <div class="modal-footer">
           <button
             type="button"
             class="btn btn-secondary"
-            onclick="closeStatusModal()"
+            onclick="closeReportModal()"
           >
             Cancel
           </button>
           <button
             type="button"
-            class="btn btn-primary"
-            onclick="confirmStatusUpdate()"
+            class="btn btn-danger-submit"
+            onclick="submitReport()"
           >
-            Update Status
+            <i class="fas fa-flag"></i> Submit Report
           </button>
         </div>
       </div>

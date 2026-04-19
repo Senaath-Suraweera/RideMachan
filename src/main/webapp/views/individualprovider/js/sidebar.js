@@ -203,13 +203,29 @@ class SidebarManager {
   }
 }
 
-// Utility Functions
 function handleLogout() {
-  if (confirm("Are you sure you want to logout?")) {
-    localStorage.clear();
-    sessionStorage.clear();
-    window.location.href = "login.html";
-  }
+  if (!confirm("Are you sure you want to logout?")) return;
+
+  fetch("/provider/logout", {
+    method: "GET",
+    credentials: "include",
+  })
+    .then((res) => res.json())
+    .then((data) => {
+      if (data.status === "success") {
+        // clear client-side data
+        localStorage.clear();
+        sessionStorage.clear();
+
+        window.location.href = "/views/landing/index.html";
+      } else {
+        alert(data.message || "Logout failed");
+      }
+    })
+    .catch((err) => {
+      console.error("Logout error:", err);
+      alert("Something went wrong during logout");
+    });
 }
 
 // Initialize sidebar when DOM is loaded

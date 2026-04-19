@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -7,361 +7,418 @@
     <link rel="stylesheet" href="../css/styles.css" />
     <link rel="stylesheet" href="../css/sidebar.css" />
     <link rel="stylesheet" href="../css/apply-rental-company.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
   </head>
   <body>
     <div class="container">
       <div class="main-content">
         <div class="page-header">
-          <h1>Apply for Rental Company</h1>
+          <h1>
+            <i class="fas fa-building"></i>
+            Apply for Rental Company
+          </h1>
+          <p class="page-subtitle">
+            Browse and apply to partner with verified rental companies
+          </p>
         </div>
 
         <!-- Search and Filter Section -->
         <div class="search-filter-section">
           <div class="filter-row">
             <div class="form-group">
-              <label class="form-label">Company Name</label>
-              <input
-                type="text"
-                class="form-control"
-                placeholder="Enter company name"
-                id="companyNameFilter"
-              />
+              <label class="form-label">
+                <i
+                  class="fas fa-building"
+                  style="color: var(--primary-light)"
+                ></i>
+                Company Name
+              </label>
+              <div class="input-icon-wrap">
+                <i class="fas fa-search input-icon"></i>
+                <input
+                  type="text"
+                  class="form-control"
+                  placeholder="Search by company name..."
+                  id="companyNameFilter"
+                />
+              </div>
             </div>
             <div class="form-group">
-              <label class="form-label">Location</label>
-              <input
-                type="text"
-                class="form-control"
-                placeholder="Enter location"
-                id="locationFilter"
-              />
+              <label class="form-label">
+                <i
+                  class="fas fa-map-marker-alt"
+                  style="color: var(--primary-light)"
+                ></i>
+                Location
+              </label>
+              <div class="input-icon-wrap">
+                <i class="fas fa-location-dot input-icon"></i>
+                <input
+                  type="text"
+                  class="form-control"
+                  placeholder="Filter by city or area..."
+                  id="locationFilter"
+                />
+              </div>
             </div>
             <div class="form-group">
-              <label class="form-label">Rating Filter</label>
+              <label class="form-label">
+                <i class="fas fa-star" style="color: var(--primary-light)"></i>
+                Minimum Rating
+              </label>
               <select class="form-select" id="ratingFilter">
-                <option>All ratings</option>
-                <option>5 Stars</option>
-                <option>4+ Stars</option>
-                <option>3+ Stars</option>
-                <option>2+ Stars</option>
+                <option value="0">All ratings</option>
+                <option value="5">5 Stars only</option>
+                <option value="4">4+ Stars</option>
+                <option value="3">3+ Stars</option>
+                <option value="2">2+ Stars</option>
               </select>
             </div>
           </div>
           <div class="filter-options">
             <label class="checkbox-label">
-              <input type="checkbox" id="withDriverFilter" /> With driver
+              <input type="checkbox" id="withDriverFilter" />
+              <i class="fas fa-user-tie"></i> With driver
+            </label>
+            <label class="checkbox-label">
+              <input type="checkbox" id="availableFilter" />
+              <i class="fas fa-circle-check"></i> Accepting applications
             </label>
           </div>
           <div class="search-actions">
             <button class="btn btn-primary" onclick="searchCompanies()">
-              🔍 Search
+              <i class="fas fa-magnifying-glass"></i> Search
             </button>
-            <select class="form-select sort-select" id="sortSelect">
-              <option>Sort by Rating</option>
-              <option>Sort by Name (A-Z)</option>
-              <option>Sort by Name (Z-A)</option>
-              <option>Sort by Location</option>
-              <option>Sort by Reviews</option>
-            </select>
+            <div class="sort-wrap">
+              <i class="fas fa-sort sort-icon"></i>
+              <select class="form-select sort-select" id="sortSelect">
+                <option>Sort by Rating</option>
+                <option>Sort by Name (A-Z)</option>
+                <option>Sort by Name (Z-A)</option>
+                <option>Sort by Location</option>
+                <option>Sort by Reviews</option>
+              </select>
+            </div>
           </div>
         </div>
 
         <!-- Companies List -->
-        <div class="companies-container">
-          <!-- Company Card 1 -->
-          <div class="company-card" data-rating="4" data-location="colombo">
-            <div class="company-header">
-              <div class="company-logo">
-                <div class="logo-placeholder">Logo</div>
-              </div>
-              <div class="company-main-info">
-                <h3 class="company-name">Premium Car Rentals</h3>
-                <div class="company-rating">
-                  <div class="stars">
-                    <span class="star filled">★</span>
-                    <span class="star filled">★</span>
-                    <span class="star filled">★</span>
-                    <span class="star filled">★</span>
-                    <span class="star empty">★</span>
-                  </div>
-                  <span class="rating-text">No of reviews: 156</span>
-                </div>
-                <div class="company-location">📍 Colombo</div>
-              </div>
-              <div class="company-actions">
-                <button
-                  class="btn btn-primary apply-btn"
-                  onclick="openApplicationModal('Premium Car Rentals')"
-                >
-                  Apply Now
-                </button>
-              </div>
-            </div>
-            <div class="company-description">
-              <p>
-                Leading car rental service with premium vehicles and excellent
-                customer support. We provide 24/7 service.
-              </p>
-            </div>
-            <div class="company-details">
-              <div class="detail-item">
-                <strong>Drivers:</strong>
-                <span class="driver-count">2</span>
-                <span class="driver-note"
-                  >(Applies/shows dropdown of all the available vehicles)</span
-                >
-              </div>
-              <div class="business-license">
-                <strong>Business License Number:</strong> BL-2024001234
-              </div>
+        <div class="companies-container"></div>
+
+        <!-- Pagination -->
+        <div class="pagination-section" id="paginationSection">
+          <div class="pagination-info" id="paginationInfo">
+            <i class="fas fa-list-ul"></i>
+            <span id="paginationInfoText">Showing 0 of 0 companies</span>
+          </div>
+          <div class="pagination-controls" id="paginationControls">
+            <button
+              class="pagination-btn"
+              id="prevPageBtn"
+              aria-label="Previous page"
+            >
+              <i class="fas fa-chevron-left"></i>
+              <span>Prev</span>
+            </button>
+            <div class="pagination-pages" id="paginationPages"></div>
+            <button
+              class="pagination-btn"
+              id="nextPageBtn"
+              aria-label="Next page"
+            >
+              <span>Next</span>
+              <i class="fas fa-chevron-right"></i>
+            </button>
+          </div>
+          <div class="pagination-size">
+            <label for="pageSizeSelect">Per page</label>
+            <select class="form-select" id="pageSizeSelect">
+              <option value="5">5</option>
+              <option value="10" selected>10</option>
+              <option value="20">20</option>
+              <option value="50">50</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== COMPANY DETAIL MODAL ==================== -->
+    <div class="company-detail-overlay" id="companyDetailOverlay">
+      <div class="company-detail-card">
+        <div class="company-detail-header">
+          <div class="detail-header-info">
+            <div class="detail-company-avatar" id="detailAvatar">RC</div>
+            <div>
+              <h2 id="detailCompanyName">Company Details</h2>
+              <span class="detail-verified-badge">
+                <i class="fas fa-shield-halved"></i> Verified Partner
+              </span>
             </div>
           </div>
+          <button
+            class="company-detail-close"
+            onclick="closeCompanyDetailModal()"
+            aria-label="Close"
+          >
+            <i class="fas fa-xmark"></i>
+          </button>
+        </div>
 
-          <!-- Company Card 2 -->
-          <div class="company-card" data-rating="4" data-location="kandy">
-            <div class="company-header">
-              <div class="company-logo">
-                <div class="logo-placeholder">Logo</div>
-              </div>
-              <div class="company-main-info">
-                <h3 class="company-name">Elite Vehicle Solutions</h3>
-                <div class="company-rating">
-                  <div class="stars">
-                    <span class="star filled">★</span>
-                    <span class="star filled">★</span>
-                    <span class="star filled">★</span>
-                    <span class="star filled">★</span>
-                    <span class="star empty">★</span>
-                  </div>
-                  <span class="rating-text">No of reviews: 89</span>
-                </div>
-                <div class="company-location">📍 Kandy</div>
-              </div>
-              <div class="company-actions">
-                <button
-                  class="btn btn-primary apply-btn"
-                  onclick="openApplicationModal('Elite Vehicle Solutions')"
-                >
-                  Apply Now
-                </button>
-              </div>
-            </div>
-            <div class="company-description">
-              <p>
-                Specialized in luxury and sports cars. Professional service with
-                competitive rates and flexible terms.
-              </p>
-            </div>
-            <div class="company-details">
-              <div class="detail-item">
-                <strong>Drivers:</strong>
-                <span class="driver-count">1</span>
-                <span class="driver-note"
-                  >(Applies/shows dropdown of all the available vehicles)</span
-                >
-              </div>
-              <div class="business-license">
-                <strong>Business License Number:</strong> BL-2024005678
-              </div>
-            </div>
-          </div>
+        <!-- Tab Navigation -->
+        <div class="detail-tabs">
+          <button class="detail-tab active" data-tab="overview">
+            <i class="fas fa-circle-info"></i> Overview
+          </button>
+          <button class="detail-tab" data-tab="contact">
+            <i class="fas fa-address-card"></i> Contact
+          </button>
+          <button class="detail-tab" data-tab="legal">
+            <i class="fas fa-file-contract"></i> Legal & Docs
+          </button>
+          <button class="detail-tab" data-tab="stats">
+            <i class="fas fa-chart-bar"></i> Statistics
+          </button>
+        </div>
 
-          <!-- Company Card 3 -->
-          <div class="company-card" data-rating="4" data-location="galle">
-            <div class="company-header">
-              <div class="company-logo">
-                <div class="logo-placeholder">Logo</div>
-              </div>
-              <div class="company-main-info">
-                <h3 class="company-name">City Drive Rentals</h3>
-                <div class="company-rating">
-                  <div class="stars">
-                    <span class="star filled">★</span>
-                    <span class="star filled">★</span>
-                    <span class="star filled">★</span>
-                    <span class="star filled">★</span>
-                    <span class="star empty">★</span>
-                  </div>
-                  <span class="rating-text">No of reviews: 203</span>
-                </div>
-                <div class="company-location">📍 Galle</div>
-              </div>
-              <div class="company-actions">
-                <button
-                  class="btn btn-primary apply-btn"
-                  onclick="openApplicationModal('City Drive Rentals')"
-                >
-                  Apply Now
-                </button>
-              </div>
-            </div>
-            <div class="company-description">
-              <p>
-                Budget-friendly options with reliable vehicles. Perfect for city
-                tours and daily commuting needs.
+        <div class="company-detail-body">
+          <!-- Content loaded dynamically per tab -->
+          <div id="detailTabContent" class="detail-tab-content">
+            <div style="text-align: center; padding: 60px 0">
+              <i
+                class="fas fa-circle-notch fa-spin"
+                style="font-size: 32px; color: var(--primary-light)"
+              ></i>
+              <p style="margin-top: 12px; color: var(--text-light)">
+                Loading company details...
               </p>
-            </div>
-            <div class="company-details">
-              <div class="detail-item">
-                <strong>Drivers:</strong>
-                <span class="driver-count">3</span>
-                <span class="driver-note"
-                  >(Applies/shows dropdown of all the available vehicles)</span
-                >
-              </div>
-              <div class="business-license">
-                <strong>Business License Number:</strong> BL-2024009012
-              </div>
             </div>
           </div>
         </div>
 
-        <!-- Load More Button -->
-        <div class="load-more-section">
-          <button class="btn btn-secondary" onclick="loadMoreCompanies()">
-            Load More Companies
+        <div class="company-detail-footer">
+          <button class="btn btn-secondary" onclick="closeCompanyDetailModal()">
+            <i class="fas fa-arrow-left"></i> Back to List
+          </button>
+          <button class="btn btn-primary" id="detailApplyBtn">
+            <i class="fas fa-paper-plane"></i> Apply Now
           </button>
         </div>
       </div>
     </div>
 
-    <!-- Application Modal -->
+    <!-- ==================== DOCUMENT VIEWER MODAL ==================== -->
+    <div class="doc-viewer-overlay" id="docViewerOverlay">
+      <div class="doc-viewer-card">
+        <div class="doc-viewer-header">
+          <h3 id="docViewerTitle">
+            <i class="fas fa-file-image"></i> Document Viewer
+          </h3>
+          <button class="modal-close-btn" onclick="closeDocViewer()">
+            <i class="fas fa-xmark"></i>
+          </button>
+        </div>
+        <div class="doc-viewer-body" id="docViewerBody">
+          <!-- Image rendered here -->
+        </div>
+        <div class="doc-viewer-footer">
+          <span class="doc-viewer-note">
+            <i class="fas fa-lock"></i> Confidential — for review purposes only
+          </span>
+          <button class="btn btn-secondary" onclick="closeDocViewer()">
+            <i class="fas fa-xmark"></i> Close
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== APPLICATION MODAL ==================== -->
     <div class="modal-overlay" id="applicationModal">
       <div class="modal">
         <div class="modal-header">
-          <h2>Apply to <span id="modalCompanyName">Company</span></h2>
-          <button class="modal-close" onclick="closeApplicationModal()">
-            ×
+          <div class="modal-header-info">
+            <div class="modal-company-icon">
+              <i class="fas fa-building"></i>
+            </div>
+            <div>
+              <h2>Apply to <span id="modalCompanyName">Company</span></h2>
+              <p class="modal-subtitle">Complete the application form below</p>
+            </div>
+          </div>
+          <button
+            class="modal-close-btn"
+            onclick="closeApplicationModal()"
+            aria-label="Close"
+          >
+            <i class="fas fa-xmark"></i>
           </button>
         </div>
+
+        <div class="modal-progress">
+          <div class="progress-step active" data-step="1">
+            <span class="step-num">1</span>
+            <span class="step-label">Your Info</span>
+          </div>
+          <div class="progress-line"></div>
+          <div class="progress-step" data-step="2">
+            <span class="step-num">2</span>
+            <span class="step-label">Vehicle</span>
+          </div>
+          <div class="progress-line"></div>
+          <div class="progress-step" data-step="3">
+            <span class="step-num">3</span>
+            <span class="step-label">Details</span>
+          </div>
+        </div>
+
         <div class="modal-body">
           <form id="applicationForm">
-            <div class="form-section">
-              <h3>Personal Information</h3>
-              <div class="form-row">
-                <div class="form-group">
-                  <label class="form-label">Full Name</label>
-                  <input
-                    type="text"
-                    class="form-control"
-                    placeholder="Enter your full name"
-                    required
-                  />
+            <!-- STEP 1: Personal Info -->
+            <div class="form-section" id="step1">
+              <div class="form-section-header">
+                <div class="section-icon">
+                  <i class="fas fa-user-circle"></i>
                 </div>
-                <div class="form-group">
-                  <label class="form-label">Email Address</label>
-                  <input
-                    type="email"
-                    class="form-control"
-                    placeholder="Enter your email"
-                    required
-                  />
+                <div>
+                  <h3>Personal Information</h3>
+                  <p>Your profile details (auto-filled from your account)</p>
                 </div>
               </div>
-              <div class="form-row">
+              <div class="form-row readonly-row">
                 <div class="form-group">
-                  <label class="form-label">Phone Number</label>
-                  <input
-                    type="tel"
-                    class="form-control"
-                    placeholder="Enter your phone number"
-                    required
-                  />
+                  <label><i class="fas fa-user"></i> Provider Name</label>
+                  <div class="readonly-field">
+                    <input
+                      id="providerName"
+                      name="providerName"
+                      type="text"
+                      readonly
+                    />
+                    <i class="fas fa-lock readonly-lock"></i>
+                  </div>
                 </div>
                 <div class="form-group">
-                  <label class="form-label">License Number</label>
-                  <input
-                    type="text"
-                    class="form-control"
-                    placeholder="Enter your license number"
-                    required
-                  />
+                  <label><i class="fas fa-envelope"></i> Email Address</label>
+                  <div class="readonly-field">
+                    <input
+                      id="providerEmail"
+                      name="providerEmail"
+                      type="email"
+                      readonly
+                    />
+                    <i class="fas fa-lock readonly-lock"></i>
+                  </div>
                 </div>
+                <div class="form-group">
+                  <label><i class="fas fa-phone"></i> Phone Number</label>
+                  <div class="readonly-field">
+                    <input
+                      id="providerPhone"
+                      name="providerPhone"
+                      type="text"
+                      readonly
+                    />
+                    <i class="fas fa-lock readonly-lock"></i>
+                  </div>
+                </div>
+                <input id="providerIdDisplay" type="hidden" />
               </div>
             </div>
 
-            <div class="form-section">
-              <h3>Vehicle Information</h3>
-              <div class="form-group">
-                <label class="form-label">Select Vehicles to Register</label>
-                <div class="vehicle-selection">
-                  <label class="vehicle-option">
-                    <input
-                      type="checkbox"
-                      name="vehicles"
-                      value="toyota-camry"
-                    />
-                    <div class="vehicle-info">
-                      <div class="vehicle-name">Toyota Camry 2023</div>
-                      <div class="vehicle-details">
-                        Rs 5,000/day • Automatic • AC
-                      </div>
-                    </div>
-                  </label>
-                  <label class="vehicle-option">
-                    <input
-                      type="checkbox"
-                      name="vehicles"
-                      value="honda-civic"
-                    />
-                    <div class="vehicle-info">
-                      <div class="vehicle-name">Honda Civic 2022</div>
-                      <div class="vehicle-details">
-                        Rs 4,500/day • Manual • AC
-                      </div>
-                    </div>
-                  </label>
-                  <label class="vehicle-option">
-                    <input type="checkbox" name="vehicles" value="bmw-x3" />
-                    <div class="vehicle-info">
-                      <div class="vehicle-name">BMW X3 2023</div>
-                      <div class="vehicle-details">
-                        Rs 8,500/day • Automatic • Luxury
-                      </div>
-                    </div>
-                  </label>
+            <!-- STEP 2: Vehicle -->
+            <div class="form-section" id="step2">
+              <div class="form-section-header">
+                <div class="section-icon"><i class="fas fa-car"></i></div>
+                <div>
+                  <h3>Vehicle Selection</h3>
+                  <p>Choose one vehicle to register with this company</p>
                 </div>
+              </div>
+              <div class="form-group">
+                <div
+                  class="vehicle-selection"
+                  id="vehicleSelectionContainer"
+                ></div>
               </div>
             </div>
 
-            <div class="form-section">
-              <h3>Additional Information</h3>
+            <!-- STEP 3: Additional -->
+            <div class="form-section" id="step3">
+              <div class="form-section-header">
+                <div class="section-icon">
+                  <i class="fas fa-clipboard-list"></i>
+                </div>
+                <div>
+                  <h3>Additional Information</h3>
+                  <p>Help the company learn more about you</p>
+                </div>
+              </div>
               <div class="form-group">
-                <label class="form-label">Years of Experience</label>
-                <select class="form-select" required>
-                  <option value="">Select experience</option>
-                  <option value="1-2">1-2 years</option>
-                  <option value="3-5">3-5 years</option>
+                <label class="form-label">
+                  <i class="fas fa-briefcase"></i> Years of Experience
+                  <span class="required-mark">*</span>
+                </label>
+                <select
+                  class="form-select"
+                  name="experience"
+                  id="experience"
+                  required
+                >
+                  <option value="">Select your experience level</option>
+                  <option value="1-2">1–2 years</option>
+                  <option value="3-5">3–5 years</option>
                   <option value="5+">5+ years</option>
                 </select>
               </div>
               <div class="form-group">
-                <label class="form-label">Message (Optional)</label>
+                <label class="form-label">
+                  <i class="fas fa-comment-dots"></i> Message to Company
+                  <span class="optional-tag">Optional</span>
+                </label>
                 <textarea
                   class="form-control"
+                  name="message"
+                  id="message"
                   rows="4"
-                  placeholder="Tell us why you want to join this company..."
+                  placeholder="Tell the company why you'd like to partner with them, your strengths, and what you bring to the table..."
                 ></textarea>
               </div>
-              <div class="form-group">
-                <label class="checkbox-label">
-                  <input type="checkbox" required />
-                  I agree to the terms and conditions
+              <div class="form-group terms-group">
+                <label class="checkbox-label terms-label">
+                  <input type="checkbox" name="terms" id="terms" required />
+                  <span class="checkbox-custom"></span>
+                  <span
+                    >I agree to the
+                    <a href="#" class="terms-link">terms and conditions</a> and
+                    confirm all information provided is accurate</span
+                  >
                 </label>
               </div>
             </div>
           </form>
         </div>
+
         <div class="modal-footer">
           <button
             type="button"
             class="btn btn-secondary"
             onclick="closeApplicationModal()"
           >
-            Cancel
+            <i class="fas fa-times"></i> Cancel
           </button>
-          <button type="submit" form="applicationForm" class="btn btn-primary">
-            Submit Application
+          <button
+            type="submit"
+            form="applicationForm"
+            class="btn btn-primary submit-btn"
+          >
+            <i class="fas fa-paper-plane"></i> Submit Application
           </button>
         </div>
       </div>

@@ -1,0 +1,343 @@
+/* =========================================================
+   Provider Profile — Theme-aligned (matches main.css + home.css reference)
+   ========================================================= */
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.page-header h1 {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--dark, #1a1a2e);
+  margin: 0;
+  position: relative;
+  padding-bottom: 10px;
+}
+
+.page-header h1::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 40px;
+  height: 3px;
+  background: linear-gradient(
+    90deg,
+    var(--primary, #3a0ca3),
+    var(--primary-light, #4361ee)
+  );
+  border-radius: 10px;
+}
+
+.header-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.card {
+  background: #fff;
+  border-radius: var(--radius, 10px);
+  padding: 24px;
+  box-shadow: var(--shadow-sm, 0 4px 6px -1px rgba(0, 0, 0, 0.1));
+  border: 1px solid rgba(0, 0, 0, 0.03);
+}
+
+.card + .card {
+  margin-top: 24px;
+}
+
+.card-header h2 {
+  margin: 0 0 6px 0;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--dark, #1a1a2e);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.card-header h2 i {
+  color: var(--primary-light, #4361ee);
+  font-size: 18px;
+}
+
+.card-header p {
+  margin: 0 0 18px 0;
+  color: var(--text-light, #718096);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(240px, 1fr));
+  gap: 16px;
+}
+
+.form-group label {
+  display: block;
+  font-size: 12px;
+  color: var(--text-light, #718096);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  margin-bottom: 6px;
+}
+
+.input {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid var(--border, #e9ecef);
+  border-radius: var(--radius-sm, 6px);
+  outline: none;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--dark, #1a1a2e);
+  background: #f8fafc;
+  transition: all 0.2s ease;
+}
+
+.input:focus {
+  background: #fff;
+  border-color: var(--primary-light, #4361ee);
+  box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.15);
+}
+
+/* Readonly email styling — looks locked, not broken */
+.input-readonly,
+.input[readonly] {
+  background: #eef0f4;
+  color: #6b7280;
+  cursor: not-allowed;
+  border-color: #e2e6ec;
+}
+
+.input-readonly:focus,
+.input[readonly]:focus {
+  background: #eef0f4;
+  border-color: #e2e6ec;
+  box-shadow: none;
+}
+
+.field-hint {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 6px;
+  font-size: 11px;
+  color: #9aa0a6;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+}
+
+.field-hint i {
+  font-size: 10px;
+}
+
+.divider {
+  height: 1px;
+  background: var(--border, #e9ecef);
+  margin: 18px 0;
+}
+
+.status-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.muted {
+  font-size: 12px;
+  color: #6b7280;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.strong {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--dark, #1a1a2e);
+}
+
+.toast {
+  margin-top: 16px;
+  padding: 12px 14px;
+  border-radius: var(--radius-sm, 6px);
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.toast.success {
+  background: rgba(16, 185, 129, 0.15);
+  color: #059669;
+  border: 1px solid rgba(16, 185, 129, 0.22);
+}
+
+.toast.error {
+  background: rgba(247, 37, 133, 0.12);
+  color: #db2777;
+  border: 1px solid rgba(247, 37, 133, 0.22);
+}
+
+/* =========================================================
+   Password Card
+   ========================================================= */
+.password-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.password-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: linear-gradient(
+    180deg,
+    var(--primary, #3a0ca3),
+    var(--primary-light, #4361ee)
+  );
+}
+
+.password-spacer {
+  /* Empty cell in the grid so "Current Password" sits alone on its row */
+}
+
+.password-wrapper {
+  position: relative;
+}
+
+.password-wrapper .input {
+  padding-right: 44px;
+}
+
+.toggle-password {
+  position: absolute;
+  top: 50%;
+  right: 8px;
+  transform: translateY(-50%);
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: transparent;
+  color: var(--text-light, #718096);
+  cursor: pointer;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.toggle-password:hover {
+  background: rgba(67, 97, 238, 0.08);
+  color: var(--primary, #3a0ca3);
+}
+
+.toggle-password i {
+  font-size: 14px;
+}
+
+/* Strength meter */
+.strength-meter {
+  margin-top: 8px;
+  display: none;
+}
+
+.strength-meter.active {
+  display: block;
+}
+
+.strength-bar {
+  height: 6px;
+  background: #eef0f4;
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 6px;
+}
+
+.strength-bar span {
+  display: block;
+  height: 100%;
+  width: 0%;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+  background: #e5e7eb;
+}
+
+.strength-bar.weak span {
+  width: 33%;
+  background: linear-gradient(90deg, #f72585, #db2777);
+}
+
+.strength-bar.medium span {
+  width: 66%;
+  background: linear-gradient(90deg, #f8961e, #fbbf24);
+}
+
+.strength-bar.strong span {
+  width: 100%;
+  background: linear-gradient(90deg, #10b981, #34d399);
+}
+
+.strength-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-light, #718096);
+  letter-spacing: 0.2px;
+}
+
+.strength-bar.weak + .strength-label {
+  color: #db2777;
+}
+.strength-bar.medium + .strength-label {
+  color: #d97706;
+}
+.strength-bar.strong + .strength-label {
+  color: #059669;
+}
+
+.match-hint {
+  display: block;
+  margin-top: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  min-height: 14px;
+}
+
+.match-hint.ok {
+  color: #059669;
+}
+
+.match-hint.bad {
+  color: #db2777;
+}
+
+.password-actions {
+  margin-top: 20px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.password-actions .btn i {
+  margin-right: 8px;
+}
+
+@media (max-width: 900px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .password-spacer {
+    display: none;
+  }
+}
