@@ -86,15 +86,12 @@
 
     imageIds.forEach((imgId) => {
       const url = `/report/image/get?imageId=${imgId}`;
-      const card = document.createElement("a");
-      card.href = url;
-      card.target = "_blank";
-      card.rel = "noopener";
-      card.className = "img-card";
+      const card = document.createElement("div");
+      card.className = "image-card";
       card.innerHTML = `
-        <div class="img-icn">🖼️</div>
-        <div class="img-name">Evidence #${escapeHTML(imgId)}</div>
-      `;
+      <img src="${url}" alt="Evidence #${escapeHTML(imgId)}" class="evidence-img" loading="lazy" />
+      <div class="image-name">Evidence #${escapeHTML(imgId)}</div>
+    `;
       grid.appendChild(card);
     });
   }
@@ -121,12 +118,12 @@
       setBadge(
         $("#priorityBadge"),
         r.priority,
-        `badge pri-${String(r.priority || "Low").toLowerCase()}`
+        `badge pri-${String(r.priority || "Low").toLowerCase()}`,
       );
       setBadge(
         $("#statusBadge"),
         r.status,
-        `badge st-${String(r.status || "Pending").toLowerCase()}`
+        `badge st-${String(r.status || "Pending").toLowerCase()}`,
       );
 
       // set dropdown values from DB values

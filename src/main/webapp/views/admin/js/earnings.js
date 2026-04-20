@@ -1,7 +1,7 @@
 // Earnings JavaScript (ADMIN API integrated)
 
 // --- CONFIG ---
-const API_BASE = "/api/admin/earnings"; // adjust context path if needed
+const API_BASE = "/api/admin/earnings";
 
 document.addEventListener("DOMContentLoaded", function () {
   initializeChartControls();

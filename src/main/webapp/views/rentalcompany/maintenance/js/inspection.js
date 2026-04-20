@@ -414,6 +414,16 @@ function handleSubmitButton() {
     currentvehicle.status = selectedStatus;
 
     renderVehicle(currentvehicle);
+    if (
+      selectedStatus &&
+      selectedStatus.toLowerCase() === "under maintenance"
+    ) {
+      setTimeout(() => {
+        window.location.href = `maintenance-calender.html?numberplate=${encodeURIComponent(numberplate)}`;
+      }, 1200); // small delay so the success toast is visible before the redirect
+
+      return;
+    }
 
     document
       .querySelectorAll(".checklist-item")

@@ -1,7 +1,4 @@
-// apply-rental-company.js — Professional refactor with tabbed detail view + doc viewer
-
 const BASE_URL = "http://localhost:8080";
-// const BASE_URL = "http://localhost:8080/RideMachan";
 
 const VEHICLES_API = `${BASE_URL}/api/vehicles`;
 const PROVIDER_REQ_API = `${BASE_URL}/api/provider/rental-requests`;
@@ -80,9 +77,6 @@ async function loadMyRequests() {
   myRequests = data.requests || [];
 }
 
-// ─────────────────────────────────────────
-// Render Company Cards
-// ─────────────────────────────────────────
 function hasAnyPendingForCompany(companyId) {
   return myRequests.some(
     (r) =>

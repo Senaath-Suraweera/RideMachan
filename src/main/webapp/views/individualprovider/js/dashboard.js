@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", function () {
-  const providerId = sessionStorage.getItem("providerId"); // used for dashboard/profile endpoints
+  const providerId = sessionStorage.getItem("providerId");
   const baseUrl = "http://localhost:8080/api/provider/dashboard";
 
   loadSummary(baseUrl, providerId);

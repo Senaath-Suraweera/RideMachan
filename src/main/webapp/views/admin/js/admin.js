@@ -466,6 +466,7 @@ class AdminsManager {
           <h3 class="admin-name">${this.escape(admin.username)}</h3>
           <p class="admin-permission">${this.escape(admin.email)}</p>
           <p>${this.escape(admin.phoneNumber)}</p>
+          <p>${this.escape(admin.nic)}</p>
         </div>
       </div>
       <div class="admin-actions">
@@ -593,6 +594,7 @@ class AdminsManager {
       email: data.email.trim(),
       phoneNumber: data.phone.trim(),
       password: data.password.trim(),
+      nic: data.nic.trim(),
     };
 
     try {
@@ -617,6 +619,27 @@ class AdminsManager {
     } catch (err) {
       console.error("Email check failed:", err);
       this.toast("Could not verify email availability", "error");
+      return;
+    }
+
+    try {
+      const nicCheck = await fetch("/admin/nic/verify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ nic: payload.nic }),
+      });
+      const nicResult = await nicCheck.json();
+
+      if (!nicResult.exists) {
+        const nicField = form.querySelector('[name="nic"]');
+        const nicGroup = nicField?.closest(".form-group");
+        this.setFieldError(nicGroup, nicField, "Invalid NIC format");
+        this.toast("Invalid NIC format", "error");
+        return;
+      }
+    } catch (err) {
+      console.error("NIC check failed:", err);
+      this.toast("Could not verify NIC format", "error");
       return;
     }
 

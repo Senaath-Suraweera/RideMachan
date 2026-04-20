@@ -1,4 +1,3 @@
-// driver-view.js — Full driver detail view with all DB fields, image uploads, read-only enforcement
 (function () {
   if (document.querySelector(".sidebar"))
     document.body.classList.add("with-sidebar");

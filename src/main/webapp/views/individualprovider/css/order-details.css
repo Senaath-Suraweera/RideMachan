@@ -1,9 +1,3 @@
-/* =========================================================
-   Provider — Order Details CSS
-   Matches admin order-details.css theme precisely
-   ========================================================= */
-
-/* === Page Header === */
 .page-header {
   display: flex;
   justify-content: space-between;

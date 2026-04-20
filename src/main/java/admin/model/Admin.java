@@ -7,6 +7,15 @@ public class Admin {
     private String hashedPassword;
     private String salt;
     private String phoneNumber;
+    private String nic;
+
+    public String getNic() {
+        return nic;
+    }
+
+    public void setNic(String nic) {
+        this.nic = nic;
+    }
 
     public Admin() {
     }

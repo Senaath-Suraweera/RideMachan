@@ -15,7 +15,7 @@ public class AdminController {
     private static Statement stmt = null;
     private static ResultSet rs = null;
 
-    public static boolean insertData(String username, String email, String password, String phoneNumber) {
+    public static boolean insertData(String username, String email, String password, String phoneNumber, String nic) {
 
         boolean isSuccess = false;
         try{
@@ -26,17 +26,19 @@ public class AdminController {
             System.out.println("email: " + email);
             System.out.println("password: " + password);
             System.out.println("PhoneNumber: " + phoneNumber);
+            System.out.println("NIC: " + nic);
 
             String salt = PasswordServices.generateSalt();
             String hashedPassword = PasswordServices.hashPassword(password, salt);
 
-            String sql = "INSERT INTO Admin (username, email, phonenumber, hashedpassword, salt) VALUES (?, ?, ?, ?, ?)";
+            String sql = "INSERT INTO Admin (username, email, phonenumber, hashedpassword, salt, nic) VALUES (?, ?, ?, ?, ?, ?)";
             try (PreparedStatement pstmt = con.prepareStatement(sql)) {
                 pstmt.setString(1, username);
                 pstmt.setString(2, email);
                 pstmt.setString(3, phoneNumber);
                 pstmt.setString(4, hashedPassword);
                 pstmt.setString(5, salt);
+                pstmt.setString(6, nic);
 
                 int rows = pstmt.executeUpdate();
                 if (rows > 0) {
@@ -76,7 +78,7 @@ public class AdminController {
 
     public static List<Admin> getAllAdmins() {
         List<Admin> admins = new ArrayList<>();
-        String sql = "SELECT adminid, username, email, phonenumber FROM Admin";
+        String sql = "SELECT adminid, username, email, phonenumber, nic FROM Admin";
 
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
@@ -88,6 +90,7 @@ public class AdminController {
                 admin.setUsername(rs.getString("username"));
                 admin.setEmail(rs.getString("email"));
                 admin.setPhoneNumber(rs.getString("phonenumber"));
+                admin.setNic(rs.getString("nic"));
                 admins.add(admin);
             }
         } catch (Exception e) {
@@ -211,6 +214,19 @@ public class AdminController {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        return false;
+    }
+
+    public static boolean validateNic(String nic) {
+
+        if(nic.length() == 10 && (nic.endsWith("V") || nic.endsWith("X"))) {
+            return true;
+        }
+
+        if(nic.length() == 12) {
+            return true;
+        }
+
         return false;
     }
 

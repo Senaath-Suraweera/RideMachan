@@ -1,11 +1,3 @@
-/* =========================================================
-   My Vehicles — Dashboard-aligned theme
-   Mirrors dashboard.css patterns (stats, cards, headers, modals)
-   ========================================================= */
-
-/* =========================
-   Page Header (mirrors dashboard)
-   ========================= */
 .page-header {
   display: flex;
   justify-content: space-between;

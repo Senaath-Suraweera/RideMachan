@@ -1,9 +1,3 @@
-// =========================================================
-// RideMachan – Messaging & Notification System (Frontend)
-// =========================================================
-// DEBUG VERSION — console logs added to trace session flow
-// =========================================================
-
 const ACTOR_LABELS = {
   ADMIN: "Admin",
   COMPANY: "Rental Company",

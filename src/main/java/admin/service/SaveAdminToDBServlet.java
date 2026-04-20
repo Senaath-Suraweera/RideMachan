@@ -23,6 +23,8 @@ public class SaveAdminToDBServlet extends HttpServlet {
         // Check if verified (it's a Boolean, not String)
         Boolean verified = (Boolean) httpSession.getAttribute("verified");
 
+        String NIC = "123871277436";
+
         if (verified == null || !verified) {
             response.setContentType("application/json");
             response.getWriter().write("{\"status\":\"error\",\"message\":\"Email not verified\"}");
@@ -35,7 +37,7 @@ public class SaveAdminToDBServlet extends HttpServlet {
         String username = (String) httpSession.getAttribute("username");
         String phoneNumber = (String) httpSession.getAttribute("phoneNumber");
 
-        boolean isTrue = AdminController.insertData(username, email, password, phoneNumber);
+        boolean isTrue = AdminController.insertData(username, email, password, phoneNumber , NIC);
 
         if (isTrue) {
             // Set verified in database

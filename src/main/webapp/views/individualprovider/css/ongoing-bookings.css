@@ -1,9 +1,3 @@
-/* =========================================================
-   Provider — Ongoing Bookings CSS
-   Matches admin theme (styles.css + ongoing-bookings.css pattern)
-   ========================================================= */
-
-/* === Page Header === */
 .page-header {
   margin-bottom: 6px;
   animation: fadeIn 0.4s ease;

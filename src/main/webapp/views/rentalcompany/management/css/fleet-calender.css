@@ -488,7 +488,7 @@
 }
 
 /* =========================
-   MODAL BACKDROP pop up render maintenance staff
+   MODAL BACKDROP - Assign Maintenance Staff Popup
 ========================= */
 .modal-overlay {
   position: fixed;
@@ -496,75 +496,241 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.6);
+  background: rgba(15, 23, 42, 0.65);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 9999;
-}
-
-/* modal box */
-.modal-box {
-  width: 80%;
-  max-width: 900px;
-  background: white;
-  border-radius: 12px;
+  animation: fadeIn 0.25s ease;
   padding: 20px;
-  max-height: 80vh;
-  overflow-y: auto;
-  animation: popIn 0.2s ease;
 }
 
-@keyframes popIn {
+@keyframes fadeIn {
   from {
-    transform: scale(0.9);
     opacity: 0;
   }
   to {
-    transform: scale(1);
     opacity: 1;
   }
 }
 
-/* header */
+/* modal box */
+.modal-box {
+  width: 100%;
+  max-width: 960px;
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 0;
+  max-height: 85vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow:
+    0 25px 60px rgba(58, 12, 163, 0.25),
+    0 10px 25px rgba(0, 0, 0, 0.15);
+  animation: popIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes popIn {
+  from {
+    transform: scale(0.92) translateY(10px);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
+}
+
+/* modal header - gradient strip */
 .modal-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 16px;
+  padding: 22px 28px;
+  background: linear-gradient(135deg, #3a0ca3 0%, #4361ee 100%);
+  border-radius: 20px 20px 0 0;
+  margin-bottom: 0;
+  flex-shrink: 0;
+}
+
+.modal-header h2 {
+  color: #ffffff;
+  font-size: 20px;
+  font-weight: 600;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  letter-spacing: 0.2px;
+}
+
+.modal-header h2::before {
+  content: "\f0ad";
+  font-family: "Font Awesome 6 Free";
+  font-weight: 900;
+  font-size: 18px;
+  opacity: 0.9;
 }
 
 .close-btn {
   border: none;
-  background: #ef4444;
+  background: rgba(255, 255, 255, 0.18);
   color: white;
-  padding: 6px 10px;
-  border-radius: 6px;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border-radius: 50%;
   cursor: pointer;
+  font-size: 20px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
 }
 
-/* staff grid */
+.close-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: rotate(90deg);
+}
+
+/* staff grid wrapper - scrollable body */
 .staff-container {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 18px;
+  padding: 24px 28px 28px;
+  overflow-y: auto;
+  background: #f8fafc;
+}
+
+/* custom scrollbar for the modal body */
+.staff-container::-webkit-scrollbar {
+  width: 8px;
+}
+
+.staff-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.staff-container::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+.staff-container::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* empty state */
+.staff-container > p {
+  grid-column: 1 / -1;
+  text-align: center;
+  color: #64748b;
+  padding: 40px 20px;
+  font-size: 15px;
 }
 
 /* staff card */
 .staff-card {
-  background: #f9fafb;
-  border-radius: 12px;
-  padding: 14px;
+  position: relative;
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 20px;
   border: 1px solid #e5e7eb;
-  transition: 0.2s;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  transition: all 0.25s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
 }
 
 .staff-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgba(58, 12, 163, 0.12);
+  border-color: rgba(67, 97, 238, 0.3);
 }
 
-/* tags */
+.staff-card h3 {
+  margin: 0 0 4px 0;
+  color: #1e293b;
+  font-size: 16px;
+  font-weight: 600;
+  padding-right: 80px; /* space for status badge */
+}
+
+.staff-card p {
+  margin: 0;
+  color: #475569;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.staff-card p b {
+  color: #334155;
+  font-weight: 600;
+  margin-right: 4px;
+}
+
+/* status badge in top-right of card */
+.staff-status {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  padding: 4px 10px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+
+.staff-status.available {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.staff-status.busy {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.staff-status.unknown,
+.staff-status.unavailable {
+  background: #f1f5f9;
+  color: #64748b;
+}
+
+/* assign button inside card */
+.assign-staff-btn {
+  margin-top: 10px;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #3a0ca3, #4361ee);
+  color: #ffffff;
+  font-family: "Poppins", sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  box-shadow: 0 2px 8px rgba(58, 12, 163, 0.25);
+}
+
+.assign-staff-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(58, 12, 163, 0.4);
+}
+
+.assign-staff-btn:active {
+  transform: translateY(0);
+}
+
+/* tags (kept for backward compatibility) */
 .tag {
   display: inline-block;
   padding: 4px 8px;
@@ -573,6 +739,29 @@
   margin: 2px;
   background: #dbeafe;
   color: #1e3a8a;
+}
+
+/* responsive modal */
+@media (max-width: 600px) {
+  .modal-box {
+    max-height: 92vh;
+    border-radius: 16px;
+  }
+
+  .modal-header {
+    padding: 18px 20px;
+    border-radius: 16px 16px 0 0;
+  }
+
+  .modal-header h2 {
+    font-size: 17px;
+  }
+
+  .staff-container {
+    grid-template-columns: 1fr;
+    padding: 18px 20px 20px;
+    gap: 14px;
+  }
 }
 
 /* Date Selection Container */

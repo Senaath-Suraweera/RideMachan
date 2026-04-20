@@ -189,6 +189,7 @@
                     name="email"
                     required
                     placeholder="you@example.com"
+                    readonly
                   />
                 </div>
               </div>
@@ -206,7 +207,12 @@
                 </div>
                 <div class="form-group">
                   <label class="form-label">Customer Type *</label>
-                  <select class="form-select" name="customerType" required>
+                  <select
+                    class="form-select"
+                    name="customerType"
+                    required
+                    disabled
+                  >
                     <option value="">Select type</option>
                     <option value="LOCAL">Local</option>
                     <option value="FOREIGN">Foreign</option>
@@ -224,7 +230,7 @@
                 </div>
                 <div class="form-group">
                   <label class="form-label">Verified</label>
-                  <select class="form-select" name="verified">
+                  <select class="form-select" name="verified" disabled>
                     <option value="false">Not Verified</option>
                     <option value="true">Verified</option>
                   </select>

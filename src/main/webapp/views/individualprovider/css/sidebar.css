@@ -1,8 +1,5 @@
-/* Theme-bridged Sidebar — matches manager's home.css look & feel */
-
-/* Use manager variables if available */
 :root {
-  --sidebar-width: 260px; /* keep consistent with home.css */
+  --sidebar-width: 260px;
 }
 
 /* Sidebar container */
@@ -25,7 +22,6 @@
   );
 }
 
-/* Collapsed state for small screens (kept from your original) */
 .sidebar.collapsed {
   transform: translateX(-280px);
 }
@@ -75,8 +71,6 @@
   margin: 4px 0;
 }
 
-/* STYLE BRIDGE:
-   Make .nav-link look like manager's .nav-item in home.css */
 .nav-link {
   display: flex;
   align-items: center;
@@ -137,7 +131,6 @@
   justify-content: center;
 }
 
-/* Logout — style to match manager's .logout block */
 .sidebar-footer {
   position: sticky;
   bottom: 0;
@@ -169,7 +162,6 @@
   color: #fff;
 }
 
-/* Mobile toggle & overlay (unchanged behavior) */
 .sidebar-toggle {
   display: none;
   position: fixed;

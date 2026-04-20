@@ -1,6 +1,3 @@
-/* Rental Companies Page Styles - Matched to Customer Theme */
-
-/* === Page Header === */
 .page-header {
   display: flex;
   flex-direction: row;
@@ -484,11 +481,14 @@ textarea.form-control {
 
 .modal-content {
   width: min(900px, 100%);
+  max-height: 90vh;
   background: #fff;
   border-radius: 18px;
   box-shadow: 0 30px 70px rgba(15, 23, 42, 0.2);
   overflow: hidden;
   animation: fadeInUp 0.25s ease;
+  display: flex;
+  flex-direction: column;
 }
 
 .modal-header {
@@ -502,6 +502,7 @@ textarea.form-control {
     rgba(67, 97, 238, 0.08)
   );
   border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  flex-shrink: 0;
 }
 
 .modal-header h3 {
@@ -528,8 +529,19 @@ textarea.form-control {
   color: var(--danger, #f72585);
 }
 
+#registerCompanyForm {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
 .modal-body {
   padding: 24px;
+  overflow-y: auto;
+  flex: 1 1 auto;
+  min-height: 0;
 }
 
 .modal-footer {
@@ -538,6 +550,7 @@ textarea.form-control {
   gap: 12px;
   padding: 18px 24px 24px;
   border-top: 1px solid rgba(0, 0, 0, 0.05);
+  flex-shrink: 0;
 }
 
 .form-row {

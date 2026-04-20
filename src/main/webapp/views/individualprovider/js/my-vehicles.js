@@ -1,8 +1,6 @@
 // my-vehicles.js — Dashboard-themed version with Details modal & Document viewer
 
 const BASE_URL = "http://localhost:8080";
-// If you have context path:
-// const BASE_URL = "http://localhost:8080/RideMachan";
 
 const API_BASE = `${BASE_URL}/api/vehicles`;
 
@@ -50,7 +48,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   });
 
-  // 5) Close modals by clicking the dark overlay
   document.querySelectorAll(".modal-overlay").forEach((overlay) => {
     overlay.addEventListener("click", (e) => {
       if (e.target === overlay) {

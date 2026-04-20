@@ -28,31 +28,45 @@ public class DirectAdminSignupServlet extends HttpServlet {
         String email = null;
         String password = null;
         String phoneNumber = null;
+        String NIC = null;
 
         try {
             if (ct != null && ct.toLowerCase().startsWith("application/json")) {
+                System.out.println("jsondata");
                 try (var reader = request.getReader()) {
                     JsonObject json = JsonParser.parseReader(reader).getAsJsonObject();
                     username = json.has("username") ? json.get("username").getAsString().trim() : null;
                     email = json.has("email") ? json.get("email").getAsString().trim() : null;
                     password = json.has("password") ? json.get("password").getAsString() : null;
                     phoneNumber = json.has("phoneNumber") ? json.get("phoneNumber").getAsString().trim() : null;
+                    NIC = json.has("nic") ? json.get("nic").getAsString().trim() : null;
+                    System.out.println(username);
+                    System.out.println(email);
+                    System.out.println(password);
+                    System.out.println(phoneNumber);
+                    System.out.println(NIC);
                 }
             } else {
                 username = request.getParameter("username");
                 email = request.getParameter("email");
                 password = request.getParameter("password");
                 phoneNumber = request.getParameter("phoneNumber");
+                NIC = request.getParameter("nic");
+
+                System.out.println("nic from form data: " + NIC);
 
                 if (username != null) username = username.trim();
                 if (email != null) email = email.trim();
                 if (phoneNumber != null) phoneNumber = phoneNumber.trim();
+                if (NIC != null) NIC = NIC.trim();
             }
 
             if (username == null || username.isEmpty() ||
                     email == null || email.isEmpty() ||
                     password == null || password.trim().isEmpty() ||
-                    phoneNumber == null || phoneNumber.isEmpty()) {
+                    phoneNumber == null || phoneNumber.isEmpty() ||
+                    NIC == null || NIC.isEmpty()) {
+
 
                 response.getWriter().write("""
                     {"status":"error","message":"All fields are required"}
@@ -60,7 +74,7 @@ public class DirectAdminSignupServlet extends HttpServlet {
                 return;
             }
 
-            boolean inserted = AdminController.insertData(username, email, password, phoneNumber);
+            boolean inserted = AdminController.insertData(username, email, password, phoneNumber , NIC);
 
             if (inserted) {
                 // Mark as verified immediately since OTP is removed

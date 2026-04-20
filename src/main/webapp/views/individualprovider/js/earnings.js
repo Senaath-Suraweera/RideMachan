@@ -5,7 +5,7 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 // ---------- API base ----------
-const API_ROOT = `${window.location.origin}`; // adjust if your context path differs
+const API_ROOT = `${window.location.origin}`;
 const EARNINGS_API = `${API_ROOT}/api/provider/earnings`;
 
 // Only show 5 recent bookings on the earnings page

@@ -612,15 +612,22 @@
     // Build JSON payload for the PUT endpoint
     const payload = {};
     payload.username = (formData.get("username") || "").toString().trim();
-    payload.email = (formData.get("email") || "").toString().trim();
-    payload.phone = (formData.get("mobileNumber") || "").toString().trim();
-    payload.customerType = (formData.get("customerType") || "")
+
+    payload.email = (formData.get("email") || currentCustomer.email || "")
       .toString()
-      .trim()
-      .toUpperCase();
+      .trim();
+
+    payload.phone = (formData.get("mobileNumber") || "").toString().trim();
+
+    // Customer type is DISABLED — not in FormData. Pull from currentCustomer.
+    payload.customerType = String(
+      currentCustomer.customerType || "",
+    ).toUpperCase();
+
     payload.status = (formData.get("status") || "active").toString().trim();
-    payload.verified =
-      (formData.get("verified") || "").toString().trim() === "true";
+
+    // Verified is DISABLED — not in FormData. Pull from currentCustomer.
+    payload.verified = Boolean(currentCustomer.verified);
 
     payload.firstName = (formData.get("firstname") || "").toString().trim();
     payload.lastName = (formData.get("lastname") || "").toString().trim();
@@ -630,21 +637,16 @@
     payload.country = (formData.get("country") || "").toString().trim();
 
     if (payload.customerType === "LOCAL") {
-      payload.nicNumber = (formData.get("nicNumber") || "").toString().trim();
-      payload.driversLicenseNumber = (
-        formData.get("driversLicenseNumber") || ""
-      )
-        .toString()
-        .trim();
+      // These are readonly — use currentCustomer as source of truth
+      payload.nicNumber = String(currentCustomer.nic || "").trim();
+      payload.driversLicenseNumber = String(
+        currentCustomer.license || "",
+      ).trim();
     } else if (payload.customerType === "FOREIGN") {
-      payload.passportNumber = (formData.get("passportNumber") || "")
-        .toString()
-        .trim();
-      payload.internationalDriversLicenseNumber = (
-        formData.get("internationalDriversLicenseNumber") || ""
-      )
-        .toString()
-        .trim();
+      payload.passportNumber = String(currentCustomer.nic || "").trim();
+      payload.internationalDriversLicenseNumber = String(
+        currentCustomer.license || "",
+      ).trim();
     }
 
     const submitBtn = document.getElementById("editSubmitBtn");

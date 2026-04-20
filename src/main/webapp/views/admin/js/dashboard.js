@@ -1,5 +1,4 @@
 // Dashboard JavaScript - Admin Dashboard
-// Header functionality matches Provider Dashboard exactly
 
 class Dashboard {
   constructor() {
@@ -354,10 +353,6 @@ class Dashboard {
     return res.json().catch(() => ({}));
   }
 
-  /* ==========================================================
-     DASHBOARD DATA (unchanged from original admin dashboard)
-     ========================================================== */
-
   async loadDashboardData() {
     try {
       await Promise.all([
@@ -549,8 +544,7 @@ class Dashboard {
           <div class="item-detail">${detail}</div>
         </div>
         <div class="item-rating">
-          <span class="star">⭐</span>
-          <span>${rating}</span>
+          <span class="star"><i class="fa-solid fa-star"></i></span>
         </div>
       `;
 
