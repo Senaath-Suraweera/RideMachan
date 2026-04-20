@@ -1,11 +1,6 @@
-/* =============================================================================
- * staffprofile.js — fixed version
- *   - Proper event wiring (no stacked listeners, no accidental modal opens)
- *   - Full edit-profile modal with every editable field
- *   - Change-password flow with current-password verification
- * ============================================================================= */
 
-// ---------- Login guard --------------------------------------------------------
+
+
 async function checkLogin() {
   try {
     const response = await fetch("/check/login/maintenance");
@@ -28,7 +23,7 @@ async function checkLogin() {
   }
 }
 
-// ---------- Profile load / populate -------------------------------------------
+
 let profileData;
 
 async function LoadProfile() {
@@ -47,7 +42,7 @@ async function LoadProfile() {
 function populateProfile(data) {
   if (!data) return;
 
-  // Greeting heading — prefer username, fall back to full name
+
   const greetingEl = document.getElementById("staffGreeting");
   if (greetingEl) {
     const username = (data.username || "").trim();
@@ -69,7 +64,7 @@ function populateProfile(data) {
 
   document.getElementById("employeeId").innerText = data.staffId || "";
 
-  // Additional fields now populated on the profile page
+
   const usernameEl = document.getElementById("staffUsername");
   const specEl = document.getElementById("staffSpecialization");
   const yearsEl = document.getElementById("staffYearsOfExperience");
@@ -87,7 +82,7 @@ function populateProfile(data) {
       (data.status === "available" ? "ok" : "busy");
   }
 
-  // Avatar initials
+
   const avatar = document.querySelector(".profile-avatar");
   if (avatar) {
     const initials =
@@ -96,7 +91,7 @@ function populateProfile(data) {
   }
 }
 
-// ---------- Update profile ----------------------------------------------------
+
 async function UpdateProfile() {
   const username = document.getElementById("usernameInput").value;
   const firstname = document.getElementById("firstNameInput").value;
@@ -156,7 +151,7 @@ async function UpdateProfile() {
   }
 }
 
-// ---------- Change password ---------------------------------------------------
+
 async function changePassword() {
   const currentPass = document.getElementById("currentPasswordInput").value;
   const newPass = document.getElementById("newPasswordInput").value;
@@ -216,7 +211,7 @@ async function changePassword() {
   }
 }
 
-// ---------- Notifications ------------------------------------------------------
+
 function showNotification(message, type = "info") {
   const notification = document.createElement("div");
   notification.textContent = message;
@@ -247,7 +242,7 @@ function showNotification(message, type = "info") {
   }, 3000);
 }
 
-// ---------- Edit-profile modal ------------------------------------------------
+
 function openStaffProfileEditModel(data) {
   const existing = document.getElementById("editModal");
   if (existing) existing.remove();
@@ -324,7 +319,7 @@ function openStaffProfileEditModel(data) {
 
   document.body.appendChild(modal);
 
-  // Close handlers (bound here — not nested in other handlers)
+
   document
     .getElementById("closeEditProfileBtn")
     .addEventListener("click", closeStaffProfileEditModel);
@@ -336,7 +331,7 @@ function openStaffProfileEditModel(data) {
     if (e.target === modal) closeStaffProfileEditModel();
   });
 
-  // Save handler
+
   document
     .getElementById("update-Profile-POPUP-btn")
     .addEventListener("click", async () => {
@@ -354,7 +349,7 @@ function closeStaffProfileEditModel() {
   if (m) m.remove();
 }
 
-// ---------- Change-password modal ---------------------------------------------
+
 function openPasswordEditModel() {
   const existing = document.getElementById("editPasswordModal");
   if (existing) existing.remove();
@@ -420,7 +415,7 @@ function closePasswordEditModel() {
   if (m) m.remove();
 }
 
-// ---------- Init --------------------------------------------------------------
+
 document.addEventListener("DOMContentLoaded", async function () {
   try {
     const loggedIn = await checkLogin();
@@ -429,7 +424,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     profileData = await LoadProfile();
     populateProfile(profileData);
 
-    // IMPORTANT: bind ONCE, on the actual buttons — not nested inside each other.
+
     const editProfileBtn = document.getElementById("update-Profile-UI-btn");
     const editPasswordBtn = document.getElementById("update-Password-UI-btn");
 
@@ -451,7 +446,7 @@ document.addEventListener("DOMContentLoaded", async function () {
   }
 });
 
-// ---------- Validation --------------------------------------------------------
+
 function validate(value, rules, fieldName = "Field") {
   value = (value ?? "").toString().trim();
 

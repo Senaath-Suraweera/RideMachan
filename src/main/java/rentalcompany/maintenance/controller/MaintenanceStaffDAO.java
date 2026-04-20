@@ -139,7 +139,7 @@ public class MaintenanceStaffDAO {
 
                 MaintenanceStaff s = new MaintenanceStaff();
 
-                // staff fields
+
                 s.setStaffId(rs.getInt("maintenanceid"));
                 s.setUsername(rs.getString("username"));
                 s.setFirstname(rs.getString("firstname"));

@@ -160,13 +160,13 @@ function filterVehicleByNumberPlate(numberplate) {
   let selectedVehicle = null;
 
   for (let i = 0; i < assignedVehicles.length; i++) {
-    //DEBUG 1
+
     console.log("Vehicle:- ", assignedVehicles[i].numberplate);
     console.log("selected assigned vehicle:- ", numberplate);
 
     let VehicleNumberPlate = assignedVehicles[i].numberplate || "";
 
-    //DEBUG 2
+
     console.log("Comparing:- ", VehicleNumberPlate, "with ", numberplate);
     console.log("Match?:- ", VehicleNumberPlate == numberplate);
 

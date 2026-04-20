@@ -41,8 +41,7 @@ public class DisplayVehicleMaintenanceLogsServlet extends HttpServlet {
 
         int staffId = (int) session.getAttribute("staff_id");
 
-        // The JS sends vehicleId as the number plate value (from the dropdown),
-        // so we resolve the vehicle by its numberplatenumber.
+
         String vehiclePlate = req.getParameter("vehicleId");
 
         if (vehiclePlate == null || vehiclePlate.trim().isEmpty()) {
@@ -51,8 +50,7 @@ public class DisplayVehicleMaintenanceLogsServlet extends HttpServlet {
             return;
         }
 
-        // Join CalendarEvents -> Vehicle so we can filter by number plate
-        // and also pull plate / brand / model for the response.
+
         String sql =
                 "SELECT ce.eventid, " +
                         "       ce.service_type, " +
@@ -99,11 +97,10 @@ public class DisplayVehicleMaintenanceLogsServlet extends HttpServlet {
                     String brand              = safe(rs.getString("vehiclebrand"));
                     String model              = safe(rs.getString("vehiclemodel"));
 
-                    // Completed rows always display as "Completed" in the UI.
+
                     String uiStatus = "Completed";
 
-                    // No created_at / updated_at columns in the DB, so
-                    // we use scheduled_date as the completion reference.
+
                     String completedDate = scheduledDate;
 
                     json.append("{")

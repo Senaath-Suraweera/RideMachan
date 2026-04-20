@@ -121,7 +121,7 @@ function showNotification(message, type = "info") {
 
     notification.textContent = message;
 
-    // basic styling
+
     notification.style.position = "fixed";
     notification.style.top = "20px";
     notification.style.right = "20px";
@@ -133,7 +133,7 @@ function showNotification(message, type = "info") {
     notification.style.boxShadow = "0 4px 12px rgba(0,0,0,0.2)";
     notification.style.transition = "0.3s ease";
 
-    // color based on type
+
     if (type === "success") {
         notification.style.background = "#28a745";
     } else if (type === "error") {
@@ -146,7 +146,7 @@ function showNotification(message, type = "info") {
 
     document.body.appendChild(notification);
 
-    // auto remove after 3 seconds
+
     setTimeout(() => {
 
         notification.style.opacity = "0";
@@ -177,59 +177,6 @@ function populateProfile(data) {
 
 }
 
-function handleProfilePictureUpload() {
-
-    const uploadBtn = document.querySelector(".update-picture-btn");
-    const avatar = document.querySelector(".profile-avatar");
-
-    if (!uploadBtn || !avatar) {
-
-        console.warn("Profile picture elements not found");
-        return;
-
-    }
-
-
-    const fileInput = document.createElement("input");
-    fileInput.type = "file";
-    fileInput.accept = "image/*";
-    fileInput.style.display = "none";
-
-    document.body.appendChild(fileInput);
-
-
-    uploadBtn.addEventListener("click", () => {
-
-        fileInput.click();
-
-    });
-
-
-    fileInput.addEventListener("change", () => {
-
-        const file = fileInput.files[0];
-        if (!file) return;
-
-
-        const reader = new FileReader();
-
-        reader.onload = function (e) {
-
-            avatar.innerHTML = `
-                <img src="${e.target.result}" 
-                     style="width:100%; height:100%; object-fit:cover; border-radius:50%;" />
-            `;
-        };
-
-        reader.readAsDataURL(file);
-
-        console.log("Selected profile picture:", file);
-
-    });
-
-}
-
-
 
 document.addEventListener("DOMContentLoaded", async function() {
 
@@ -245,7 +192,7 @@ document.addEventListener("DOMContentLoaded", async function() {
 
         populateProfile(profileData);
 
-        handleProfilePictureUpload();
+
 
 
     } catch (err) {

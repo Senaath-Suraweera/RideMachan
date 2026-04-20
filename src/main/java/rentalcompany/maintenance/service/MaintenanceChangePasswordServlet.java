@@ -55,7 +55,7 @@ public class MaintenanceChangePasswordServlet extends HttpServlet {
             return;
         }
 
-        // ---- Fetch current hash/salt ----
+
         String selectSql = "SELECT hashedpassword, salt FROM maintenancestaff WHERE maintenanceid = ?";
         String updateSql = "UPDATE maintenancestaff SET hashedpassword = ?, salt = ? WHERE maintenanceid = ?";
 
