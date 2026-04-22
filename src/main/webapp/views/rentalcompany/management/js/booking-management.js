@@ -97,7 +97,7 @@ function showNotification(message, type = "info") {
 
     notification.textContent = message;
 
-    // basic styling
+
     notification.style.position = "fixed";
     notification.style.top = "20px";
     notification.style.right = "20px";
@@ -228,7 +228,7 @@ function addHeading(text) {
 }
 
 
-//for differentiate Current and Past Bookings
+
 function filterBookingsByDate() {
 
     const bookingGrid = document.getElementById("bookingGrid");
@@ -266,7 +266,7 @@ function filterBookingsByDate() {
 
 }
 
-//for search by booking id
+
 function filterBookingByBookingId(bookingId) {
 
     const bookingGrid = document.getElementById("bookingGrid");
@@ -287,7 +287,7 @@ function filterBookingByBookingId(bookingId) {
 
 }
 
-//for search by customer name or vehicleBrand or vehicleModel
+
 function filterBookingsByText(searchText) {
 
     const bookingGrid = document.getElementById("bookingGrid");
@@ -298,7 +298,7 @@ function filterBookingsByText(searchText) {
 
     for(let i=0; i<AllBookings.length; i++) {
 
-        //DEBUGGING 1
+
         console.log("Customer name:- ", AllBookings[i].customerName)
         console.log("Search text:- ", inputLower)
 
@@ -308,7 +308,7 @@ function filterBookingsByText(searchText) {
         let vehicleModel = AllBookings[i].vehicleModel || "";
         let vehicleLower = (vehicleBrand + " " + vehicleModel).toLowerCase().trim();
 
-        //DEBUGGING 2
+
         console.log("Comparing:- ", customerLower, "with ",inputLower)
         console.log("Match?:- ", customerLower.includes(inputLower))
 
@@ -327,7 +327,7 @@ function filterBookingsByText(searchText) {
 
 }
 
-//search pending,completed,active,cancelled bookings
+
 function filterBookingsByTripStatus(status) {
 
     const bookingGrid = document.getElementById("bookingGrid");
@@ -337,13 +337,13 @@ function filterBookingsByTripStatus(status) {
 
     for(let i=0; i<AllBookings.length; i++) {
 
-        //DEBUG 1
+
         console.log("Trip status:- ", AllBookings[i].status)
         console.log("selected trip status:- ", status)
 
         let tripStatus =  AllBookings[i].status.toLowerCase() || "";
 
-        //DEBUG 2
+
         console.log("Comparing:- ", tripStatus , "with ", status.toLowerCase())
         console.log("Match?:- ", tripStatus == status.toLowerCase())
 
@@ -573,7 +573,7 @@ document.addEventListener("DOMContentLoaded", async function() {
         const loggedIn = await checkLogin();
 
         if (!loggedIn) {
-            return;    // stop here if not logged in
+            return;
         }
 
         AllBookings = await LoadAllBookings();

@@ -27,7 +27,7 @@ public class AssignBookingsServlet extends HttpServlet {
 
             if(session == null || session.getAttribute("companyId") == null) {
                 String requestedPage = req.getRequestURI();
-                resp.sendRedirect(req.getContextPath() + "companylogin.html?redirect=" + requestedPage);
+                resp.sendRedirect(req.getContextPath() + "/companylogin.html?redirect=" + requestedPage);
                 return;
             }
 
@@ -35,8 +35,7 @@ public class AssignBookingsServlet extends HttpServlet {
 
             int driverId = Integer.parseInt(req.getParameter("driverId"));
             int bookingId = Integer.parseInt(req.getParameter("bookingId"));
-            //String pickupLocation = req.getParameter("pickupLocation");
-            //String dropoffLocation = req.getParameter("dropoffLocation");
+
 
             System.out.println("companyId=" + companyId + ", bookingId=" + bookingId);
 
@@ -52,7 +51,7 @@ public class AssignBookingsServlet extends HttpServlet {
 
         }catch(Exception e) {
 
-            e.printStackTrace(); // check server logs
+            e.printStackTrace();
             resp.getWriter().write("{\"error\":\""+e.getMessage()+"\"}");
 
         }

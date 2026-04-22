@@ -14,7 +14,7 @@ import java.util.List;
 public class MaintenanceStaffDAO {
 
     public boolean addStaff(MaintenanceStaff staff) {
-        String sql = "INSERT INTO maintenancestaff (username, firstname, lastname, email, hashedpassword, salt, mobilenumber, company_id,specialization,yearsOfExperience) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO maintenancestaff (username, firstname, lastname, email, hashedpassword, salt, mobilenumber, company_id,specialization,yearsOfExperience,nicnumber) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (Connection con = DBConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setString(1, staff.getUsername());
@@ -27,6 +27,7 @@ public class MaintenanceStaffDAO {
             ps.setInt(8, staff.getCompanyId());
             ps.setString(9, staff.getSpecialization());
             ps.setFloat(10, staff.getYearsOfExperience());
+            ps.setString(11, staff.getNicNumber());
             ps.executeUpdate();
             return true;
         } catch (SQLException e) {
@@ -38,7 +39,7 @@ public class MaintenanceStaffDAO {
     public static List<MaintenanceStaff> getCompanyStaffsByCompanyId(int companyId) {
         List<MaintenanceStaff> staffs = new ArrayList<>();
 
-        String sql = "SELECT maintenanceid,username,firstname,lastname,mobilenumber,email,specialization,status,yearsOfExperience,company_id FROM maintenanceStaff WHERE company_id = ?";
+        String sql = "SELECT * FROM maintenanceStaff WHERE company_id = ?";
         try (Connection con = DBConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
 
@@ -61,6 +62,7 @@ public class MaintenanceStaffDAO {
                 s.setSpecialization(rs.getString("specialization"));
                 s.setStatus(rs.getString("status"));
                 s.setYearsOfExperience(rs.getFloat("yearsOfExperience"));
+                s.setNicNumber(rs.getString("nicnumber"));
 
                 staffs.add(s);
 

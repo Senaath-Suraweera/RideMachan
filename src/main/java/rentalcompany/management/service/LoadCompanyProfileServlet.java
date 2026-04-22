@@ -46,7 +46,7 @@ public class LoadCompanyProfileServlet extends HttpServlet{
 
         } catch (Exception e) {
 
-            e.printStackTrace(); // check server logs
+            e.printStackTrace();
             resp.getWriter().write("{\"error\":\"" + e.getMessage() + "\"}");
 
         }

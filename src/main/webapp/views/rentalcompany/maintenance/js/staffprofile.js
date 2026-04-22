@@ -512,7 +512,7 @@ const rules = {
   },
 };
 
-// ---------- Helpers -----------------------------------------------------------
+
 function escapeAttr(s) {
   if (s == null) return "";
   return String(s)

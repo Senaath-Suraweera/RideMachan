@@ -185,7 +185,7 @@ document.addEventListener("DOMContentLoaded", async function() {
         const loggedIn = await checkLogin();
 
         if (!loggedIn) {
-            return;    // stop here if not logged in
+            return;
         }
 
         profileData = await LoadProfile();

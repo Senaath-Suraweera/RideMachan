@@ -186,12 +186,6 @@ function renderdrivers(drivers) {
     
                                     
         
-    
-                                   <!--<div class="driver-actions">  
-                                       <button class="action-btn primary" data-driver-id="${driver.driverId}" onclick="openAssignBookingModel('${driver.driverId}')">
-                                           Assign Booking
-                                       </button>
-                                   </div>-->
                                 `;
 
         driversGrid.appendChild(driverCard);
@@ -322,7 +316,7 @@ document.addEventListener("DOMContentLoaded", async function() {
         const loggedIn = await checkLogin();
 
         if (!loggedIn) {
-            return;    // stop here if not logged in
+            return;
         }
 
         AllDrivers = await LoadAllDrivers();
@@ -456,7 +450,7 @@ function filterDriversByText(searchText) {
 
 }
 
-//search available,on-trip,offline drivers
+
 function filterDriversByDriverStatus(status) {
 
     const driverGrid = document.getElementsByClassName("drivers-grid")[0];
@@ -472,13 +466,13 @@ function filterDriversByDriverStatus(status) {
         let driverStatus =
             (AllDrivers[i].status || "").toLowerCase().trim();
 
-        //DEBUG 1
+
         console.log("driver status:- ", AllDrivers[i].status)
         console.log("selected driver status:- ", selectedStatus)
 
 
 
-        //DEBUG 2
+
         console.log("Comparing:- ", AllDrivers[i].status , "with ", selectedStatus)
         console.log("Match?:- ", AllDrivers[i].status == selectedStatus)
 

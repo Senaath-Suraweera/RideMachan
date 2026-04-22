@@ -41,6 +41,7 @@ public class MaintenanceStaffSignupServlet extends HttpServlet {
             String username = json.get("username").getAsString();
             String firstname = json.get("firstname").getAsString();
             String lastname = json.get("lastname").getAsString();
+            String nic = json.get("nicnumber").getAsString();
             String email = json.get("email").getAsString();
             String password = json.get("password").getAsString();
             String contactNumber = json.get("contactNumber").getAsString();
@@ -54,6 +55,8 @@ public class MaintenanceStaffSignupServlet extends HttpServlet {
 
             MaintenanceStaff staff = new MaintenanceStaff(username, firstname, lastname, email,
                     hashed, salt, contactNumber, companyId, specialization, yearsOfExperience);
+
+            staff.setNicNumber(nic);
 
             MaintenanceStaffDAO dao = new MaintenanceStaffDAO();
             boolean added = dao.addStaff(staff);

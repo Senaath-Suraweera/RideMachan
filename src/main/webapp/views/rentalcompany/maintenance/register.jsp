@@ -16,7 +16,7 @@
 </html>
 
 /*
-2. Basic Building Blocks
+2.
 Start & End
 ^   // start of string
 $   // end of string

@@ -71,7 +71,7 @@ function showNotification(message, type = "info") {
 
     notification.textContent = message;
 
-    // basic styling
+
     notification.style.position = "fixed";
     notification.style.top = "20px";
     notification.style.right = "20px";
@@ -83,7 +83,7 @@ function showNotification(message, type = "info") {
     notification.style.boxShadow = "0 4px 12px rgba(0,0,0,0.2)";
     notification.style.transition = "0.3s ease";
 
-    // color based on type
+
     if (type === "success") {
         notification.style.background = "#28a745";
     } else if (type === "error") {
@@ -96,7 +96,7 @@ function showNotification(message, type = "info") {
 
     document.body.appendChild(notification);
 
-    // auto remove after 3 seconds
+
     setTimeout(() => {
 
         notification.style.opacity = "0";
@@ -203,6 +203,7 @@ function renderMaintenanceStaff(maintenanceStaffs) {
                               <div class="detail-item"><i class="fas fa-phone detail-icon"></i><span>+ ${maintenanceStaff.contactNumber}</span></div>
                               <div class="detail-item"><i class="fas fa-calendar detail-icon"></i><span>Years of Experience: ${maintenanceStaff.yearsOfExperience}</span></div>
                               <div class="detail-item"><i class="fas fa-wrench detail-icon"></i><span>${maintenanceStaff.specialization}</span></div>  
+                              <div class="detail-item"><i class="fas fa-wrench detail-icon"></i><span>${maintenanceStaff.nicNumber}</span></div>    
                           </div>
                           <div class="staff-badges">
                               ${maintenanceStaff.certifications.map(cert => `<span class="badge">${cert}</span>`).join('')}
@@ -250,7 +251,7 @@ function filterStaffByStaffId(staffId) {
 
 }
 
-// Search staff by name or specialization
+
 function filterStaffByText(searchText) {
 
     const staffGrid = document.getElementsByClassName("staff-grid")[0];
@@ -279,7 +280,7 @@ function filterStaffByText(searchText) {
 
 }
 
-//search Available,On Job,available staff
+
 function filterStaffByStaffStatus(status) {
 
     const selectedStatus = (status || "").toLowerCase();
@@ -349,6 +350,7 @@ async function addMaintenanceStaff() {
     const username = addStaffForm.username.value;
     const firstname = addStaffForm.firstname.value;
     const lastname = addStaffForm.lastname.value;
+    const nicnumber = addStaffForm.NIC.value;
     const contactNumber = addStaffForm.contactNumber.value;
     const email = addStaffForm.email.value;
     const specialization = addStaffForm.specialization.value;
@@ -358,6 +360,7 @@ async function addMaintenanceStaff() {
 
     if (!validateField(username, { required: true, minLength: 3 }, "Username")) return;
     if (!validateField(firstname, { required: true, type: "name" }, "First Name")) return;
+    if (!validate(nicnumber, rules.nic, "NIC")) return false;
     if (!validateField(lastname, { required: true, type: "name" }, "Last Name")) return;
     if (!validateField(contactNumber, { required: true, type: "mobile" }, "Mobile Number")) return;
     if (!validateField(email, { required: true, type: "email" }, "Email")) return;
@@ -374,6 +377,7 @@ async function addMaintenanceStaff() {
         username,
         firstname,
         lastname,
+        nicnumber,
         contactNumber,
         email,
         password,
@@ -484,7 +488,7 @@ document.addEventListener("DOMContentLoaded", async function() {
         const loggedIn = await checkLogin();
 
         if (!loggedIn) {
-            return;    // stop here if not logged in
+            return;
         }
 
         AllMaintenaceStaff = await loadAllMaintenanceStaff();
@@ -644,3 +648,43 @@ function validateField(value, rules, fieldName = "Field") {
 
     return true;
 }
+
+
+
+
+
+function validate(value, rules, fieldName = "Field") {
+    value = (value ?? "").toString().trim();
+
+    if (rules.required && value === "") {
+        showNotification(`${fieldName} is required`, "error");
+        return false;
+    }
+    if (rules.minLength && value.length < rules.minLength) {
+        showNotification(
+            `${fieldName} must be at least ${rules.minLength} characters`,
+            "error",
+        );
+        return false;
+    }
+    if (rules.maxLength && value.length > rules.maxLength) {
+        showNotification(
+            `${fieldName} must be less than ${rules.maxLength} characters`,
+            "error",
+        );
+        return false;
+    }
+    if (rules.pattern && !rules.pattern.test(value)) {
+        showNotification(rules.message || `Invalid ${fieldName}`, "error");
+        return false;
+    }
+    return true;
+}
+
+const rules = {
+    nic: {
+        required: true,
+        minLength: 5,
+        maxLength: 12,
+    },
+};
