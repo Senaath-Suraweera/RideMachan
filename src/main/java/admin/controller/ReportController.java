@@ -57,7 +57,7 @@ public class ReportController {
 
             StringBuilder sql = new StringBuilder(
                     "SELECT report_id, subject, category, reported_role, created_at, status, priority " +
-                            "FROM Report WHERE 1=1"
+                            "FROM report WHERE 1=1"
             );
 
             List<Object> params = new ArrayList<>();
@@ -114,7 +114,7 @@ public class ReportController {
         try {
             con = DBConnection.getConnection();
 
-            PreparedStatement ps = con.prepareStatement("SELECT * FROM Report WHERE report_id=?");
+            PreparedStatement ps = con.prepareStatement("SELECT * FROM report WHERE report_id=?");
             ps.setInt(1, reportId);
 
             ResultSet rs = ps.executeQuery();
@@ -149,7 +149,7 @@ public class ReportController {
         try {
             con = DBConnection.getConnection();
             PreparedStatement ps = con.prepareStatement(
-                    "UPDATE Report SET status=?, priority=? WHERE report_id=?"
+                    "UPDATE report SET status=?, priority=? WHERE report_id=?"
             );
             ps.setString(1, status);
             ps.setString(2, priority);
@@ -167,7 +167,7 @@ public class ReportController {
         try {
             con = DBConnection.getConnection();
             PreparedStatement ps = con.prepareStatement(
-                    "INSERT INTO ReportImage(report_id, image_data) VALUES(?, ?)",
+                    "INSERT INTO reportimage(report_id, image_data) VALUES(?, ?)",
                     Statement.RETURN_GENERATED_KEYS
             );
             ps.setInt(1, reportId);
@@ -188,7 +188,7 @@ public class ReportController {
         try {
             con = DBConnection.getConnection();
             PreparedStatement ps = con.prepareStatement(
-                    "SELECT image_data FROM ReportImage WHERE image_id=?"
+                    "SELECT image_data FROM reportimage WHERE image_id=?"
             );
             ps.setInt(1, imageId);
             ResultSet rs = ps.executeQuery();
@@ -203,7 +203,7 @@ public class ReportController {
         try {
             con = DBConnection.getConnection();
             PreparedStatement ps = con.prepareStatement(
-                    "DELETE FROM ReportImage WHERE image_id=?"
+                    "DELETE FROM reportimage WHERE image_id=?"
             );
             ps.setInt(1, imageId);
             return ps.executeUpdate() > 0;
@@ -218,7 +218,7 @@ public class ReportController {
         try {
             con = DBConnection.getConnection();
             PreparedStatement ps = con.prepareStatement(
-                    "SELECT image_id FROM ReportImage WHERE report_id=? ORDER BY created_at DESC"
+                    "SELECT image_id FROM reportimage WHERE report_id=? ORDER BY created_at DESC"
             );
             ps.setInt(1, reportId);
             ResultSet rs = ps.executeQuery();
@@ -233,7 +233,7 @@ public class ReportController {
         try {
             con = DBConnection.getConnection();
             PreparedStatement ps = con.prepareStatement(
-                    "DELETE FROM Report WHERE report_id=?"
+                    "DELETE FROM report WHERE report_id=?"
             );
             ps.setInt(1, reportId);
             return ps.executeUpdate() > 0;
@@ -260,7 +260,7 @@ public class ReportController {
                 SUM(CASE WHEN status = 'Pending' THEN 1 ELSE 0 END) AS pending,
                 SUM(CASE WHEN status = 'Resolved' THEN 1 ELSE 0 END) AS resolved,
                 SUM(CASE WHEN priority = 'High' OR priority = 'Urgent' THEN 1 ELSE 0 END) AS highPriority
-            FROM Report
+            FROM report
         """;
 
             PreparedStatement ps = con.prepareStatement(sql);
@@ -286,7 +286,7 @@ public class ReportController {
         try {
             con = DBConnection.getConnection();
 
-            String sql = "INSERT INTO Report " +
+            String sql = "INSERT INTO report " +
                     "(category, status, priority, subject, description, " +
                     " reported_role, reported_id, reporter_role, reporter_id, " +
                     " reporter_name, reporter_email, reporter_phone) " +

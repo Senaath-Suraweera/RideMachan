@@ -123,7 +123,7 @@ public class VehicleProviderDashboardServlet extends HttpServlet {
                         "  COALESCE(SUM(CASE WHEN cb.payment_status='PAID' OR LOWER(cb.status)='completed' THEN cb.total_amount ELSE 0 END),0) AS totalIncome, " +
                         "  COALESCE(SUM(CASE WHEN cb.payment_status IN ('PENDING','UNPAID') THEN cb.total_amount ELSE 0 END),0) AS pendingPayout " +
                         "FROM companybookings cb " +
-                        "JOIN Vehicle v ON v.vehicleid = cb.vehicleid " +
+                        "JOIN vehicle v ON v.vehicleid = cb.vehicleid " +
                         "WHERE v.provider_id = ?";
 
         int totalBookings = 0;
@@ -146,7 +146,7 @@ public class VehicleProviderDashboardServlet extends HttpServlet {
                         "  SUM(CASE WHEN LOWER(cb.status) IN ('accepted','confirmed','ongoing','completed') THEN 1 ELSE 0 END) AS acceptedCount, " +
                         "  COUNT(*) AS totalCount " +
                         "FROM companybookings cb " +
-                        "JOIN Vehicle v ON v.vehicleid = cb.vehicleid " +
+                        "JOIN vehicle v ON v.vehicleid = cb.vehicleid " +
                         "WHERE v.provider_id = ?";
 
         int acceptedCount = 0;
@@ -190,7 +190,7 @@ public class VehicleProviderDashboardServlet extends HttpServlet {
         String sql =
                 "SELECT COALESCE(SUM(CASE WHEN cb.payment_status='PAID' OR LOWER(cb.status)='completed' THEN cb.total_amount ELSE 0 END),0) AS income " +
                         "FROM companybookings cb " +
-                        "JOIN Vehicle v ON v.vehicleid = cb.vehicleid " +
+                        "JOIN vehicle v ON v.vehicleid = cb.vehicleid " +
                         "WHERE v.provider_id = ? " +
                         "AND COALESCE(cb.booked_Date, cb.trip_start_date) >= ? " +
                         "AND COALESCE(cb.booked_Date, cb.trip_start_date) < ?";
@@ -217,7 +217,7 @@ public class VehicleProviderDashboardServlet extends HttpServlet {
                         "  MONTH(COALESCE(cb.booked_Date, cb.trip_start_date)) AS mm, " +
                         "  COALESCE(SUM(CASE WHEN cb.payment_status='PAID' OR LOWER(cb.status)='completed' THEN cb.total_amount ELSE 0 END),0) AS income " +
                         "FROM companybookings cb " +
-                        "JOIN Vehicle v ON v.vehicleid = cb.vehicleid " +
+                        "JOIN vehicle v ON v.vehicleid = cb.vehicleid " +
                         "WHERE v.provider_id = ? " +
                         "  AND COALESCE(cb.booked_Date, cb.trip_start_date) >= (CURDATE() - INTERVAL ? MONTH) " +
                         "GROUP BY yy, mm " +
@@ -260,7 +260,7 @@ public class VehicleProviderDashboardServlet extends HttpServlet {
         String sql =
                 "SELECT v.location AS location, COUNT(cb.booking_id) AS sessions " +
                         "FROM companybookings cb " +
-                        "JOIN Vehicle v ON v.vehicleid = cb.vehicleid " +
+                        "JOIN vehicle v ON v.vehicleid = cb.vehicleid " +
                         "WHERE v.provider_id = ? " +
                         "GROUP BY v.location " +
                         "ORDER BY sessions DESC " +
@@ -269,7 +269,7 @@ public class VehicleProviderDashboardServlet extends HttpServlet {
         String totalSql =
                 "SELECT COUNT(cb.booking_id) AS totalSessions " +
                         "FROM companybookings cb " +
-                        "JOIN Vehicle v ON v.vehicleid = cb.vehicleid " +
+                        "JOIN vehicle v ON v.vehicleid = cb.vehicleid " +
                         "WHERE v.provider_id = ?";
 
         int totalSessions = 0;
@@ -310,7 +310,7 @@ public class VehicleProviderDashboardServlet extends HttpServlet {
 
         String sql =
                 "SELECT vehicleid, vehiclebrand, vehiclemodel, numberplatenumber, availability_status, location " +
-                        "FROM Vehicle " +
+                        "FROM vehicle " +
                         "WHERE provider_id = ? " +
                         "  AND LOWER(REPLACE(REPLACE(availability_status,'_',' '),'-',' ')) " +
                         "      IN ('maintenance','under maintenance','in maintenance','servicing') " +
@@ -354,7 +354,7 @@ public class VehicleProviderDashboardServlet extends HttpServlet {
 
         String sql =
                 "SELECT vehicleid, vehiclebrand, vehiclemodel, numberplatenumber, location, price_per_day, availability_status " +
-                        "FROM Vehicle " +
+                        "FROM vehicle " +
                         "WHERE provider_id = ? " +
                         "  AND (availability_status IS NULL OR LOWER(availability_status)='available') " +
                         "ORDER BY vehicleid DESC " +

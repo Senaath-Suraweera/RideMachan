@@ -38,7 +38,7 @@ public class MaintenanceStaffDAO {
     public static List<MaintenanceStaff> getCompanyStaffsByCompanyId(int companyId) {
         List<MaintenanceStaff> staffs = new ArrayList<>();
 
-        String sql = "SELECT maintenanceid,username,firstname,lastname,mobilenumber,email,specialization,status,yearsOfExperience,company_id FROM maintenanceStaff WHERE company_id = ?";
+        String sql = "SELECT maintenanceid,username,firstname,lastname,mobilenumber,email,specialization,status,yearsOfExperience,company_id FROM maintenancestaff WHERE company_id = ?";
         try (Connection con = DBConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
 
@@ -78,7 +78,7 @@ public class MaintenanceStaffDAO {
 
 
     public MaintenanceStaff getStaffByEmail(String email) {
-        String sql = "SELECT * FROM maintenanceStaff WHERE email = ?";
+        String sql = "SELECT * FROM maintenancestaff WHERE email = ?";
         try (Connection con = DBConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setString(1, email);
@@ -169,7 +169,7 @@ public class MaintenanceStaffDAO {
 
     public static int getTotalStaffCount(int companyId) {
 
-        String sql = "SELECT COUNT(*) FROM maintenanceStaff WHERE company_id = ?";
+        String sql = "SELECT COUNT(*) FROM maintenancestaff WHERE company_id = ?";
 
         try (Connection con = DBConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
@@ -266,7 +266,7 @@ public class MaintenanceStaffDAO {
 
     public static int getAvailableStaffCount(int companyId) {
 
-        String sql = "SELECT COUNT(*) FROM maintenanceStaff WHERE company_id = ? AND status = 'available'";
+        String sql = "SELECT COUNT(*) FROM maintenancestaff WHERE company_id = ? AND status = 'available'";
 
         try (Connection con = DBConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
@@ -287,7 +287,7 @@ public class MaintenanceStaffDAO {
 
     public static int getOnJobStaffCount(int companyId) {
 
-        String sql = "SELECT COUNT(*) FROM maintenanceStaff WHERE company_id = ? AND status = 'on Job'";
+        String sql = "SELECT COUNT(*) FROM maintenancestaff WHERE company_id = ? AND status = 'on Job'";
 
         try (Connection con = DBConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {

@@ -218,7 +218,7 @@ public class VehicleServlet extends HttpServlet {
                 "SELECT vehicleid, vehiclebrand, vehiclemodel, numberplatenumber, tareweight, color, numberofpassengers, " +
                         "enginecapacity, enginenumber, chasisnumber, description, milage, company_id, provider_id, price_per_day, " +
                         "location, features, vehicle_type, fuel_type, availability_status, manufacture_year, transmission, created_at, updated_at " +
-                        "FROM Vehicle WHERE 1=1 "
+                        "FROM vehicle WHERE 1=1 "
         );
 
         List<Object> params = new ArrayList<>();
@@ -264,7 +264,7 @@ public class VehicleServlet extends HttpServlet {
                 "SELECT vehicleid, vehiclebrand, vehiclemodel, numberplatenumber, tareweight, color, numberofpassengers, " +
                         "enginecapacity, enginenumber, chasisnumber, description, milage, company_id, provider_id, price_per_day, " +
                         "location, features, vehicle_type, fuel_type, availability_status, manufacture_year, transmission, created_at, updated_at " +
-                        "FROM Vehicle WHERE vehicleid = ?";
+                        "FROM vehicle WHERE vehicleid = ?";
 
         Map<String, Object> row = null;
         try (PreparedStatement ps = con.prepareStatement(sql)) {
@@ -301,7 +301,7 @@ public class VehicleServlet extends HttpServlet {
         }
 
         String sql =
-                "INSERT INTO Vehicle (" +
+                "INSERT INTO vehicle (" +
                         "vehiclebrand, vehiclemodel, numberplatenumber, tareweight, color, numberofpassengers, " +
                         "enginecapacity, enginenumber, chasisnumber, registrationdocumentation, vehicleimages, description, milage, " +
                         "company_id, provider_id, price_per_day, location, features, vehicle_type, fuel_type, availability_status, " +
@@ -360,7 +360,7 @@ public class VehicleServlet extends HttpServlet {
     private String updateVehicle(Connection con, HttpServletRequest req, int id) throws Exception {
 
         // Check exists + get existing blobs
-        String checkSql = "SELECT registrationdocumentation, vehicleimages FROM Vehicle WHERE vehicleid = ?";
+        String checkSql = "SELECT registrationdocumentation, vehicleimages FROM vehicle WHERE vehicleid = ?";
         Blob existingDoc;
         Blob existingImg;
 
@@ -383,7 +383,7 @@ public class VehicleServlet extends HttpServlet {
         }
 
         String sql =
-                "UPDATE Vehicle SET " +
+                "UPDATE vehicle SET " +
                         "vehiclebrand=?, vehiclemodel=?, numberplatenumber=?, tareweight=?, color=?, numberofpassengers=?, " +
                         "enginecapacity=?, enginenumber=?, chasisnumber=?, description=?, milage=?, " +
                         "company_id=?, provider_id=?, price_per_day=?, location=?, features=?, vehicle_type=?, fuel_type=?, " +
@@ -445,7 +445,7 @@ public class VehicleServlet extends HttpServlet {
     }
 
     private BigDecimal getCurrentPrice(Connection con, int id) throws SQLException {
-        try (PreparedStatement ps = con.prepareStatement("SELECT price_per_day FROM Vehicle WHERE vehicleid=?")) {
+        try (PreparedStatement ps = con.prepareStatement("SELECT price_per_day FROM vehicle WHERE vehicleid=?")) {
             ps.setInt(1, id);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) return rs.getBigDecimal("price_per_day");
@@ -460,7 +460,7 @@ public class VehicleServlet extends HttpServlet {
         if (status == null) return "{\"error\":\"availability_status is required\"}";
 
         try (PreparedStatement ps = con.prepareStatement(
-                "UPDATE Vehicle SET availability_status=? WHERE vehicleid=?")) {
+                "UPDATE vehicle SET availability_status=? WHERE vehicleid=?")) {
             ps.setString(1, status);
             ps.setInt(2, id);
             boolean ok = ps.executeUpdate() > 0;
@@ -470,7 +470,7 @@ public class VehicleServlet extends HttpServlet {
 
     // -------------------- DELETE --------------------
     private boolean deleteVehicle(Connection con, int id) throws SQLException {
-        try (PreparedStatement ps = con.prepareStatement("DELETE FROM Vehicle WHERE vehicleid=?")) {
+        try (PreparedStatement ps = con.prepareStatement("DELETE FROM vehicle WHERE vehicleid=?")) {
             ps.setInt(1, id);
             return ps.executeUpdate() > 0;
         }
@@ -480,7 +480,7 @@ public class VehicleServlet extends HttpServlet {
     private void streamBlob(Connection con, int vehicleId, String column, String contentType, HttpServletResponse resp)
             throws SQLException, IOException {
 
-        String sql = "SELECT " + column + " FROM Vehicle WHERE vehicleid = ?";
+        String sql = "SELECT " + column + " FROM vehicle WHERE vehicleid = ?";
         try (PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setInt(1, vehicleId);
             try (ResultSet rs = ps.executeQuery()) {

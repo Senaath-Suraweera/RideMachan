@@ -81,14 +81,14 @@ public class AdminMaintenanceStaffServlet extends HttpServlet {
                         .append("ms.maintenanceid, ms.username, ms.firstname, ms.lastname, ms.email, ms.mobilenumber, ")
                         .append("ms.company_id, ms.specialization, ms.status, ms.yearsOfExperience, ")
                         .append("rc.companyname, ")
-                        .append("(SELECT COUNT(*) FROM CalendarEvents ce ")
+                        .append("(SELECT COUNT(*) FROM calendarevents ce ")
                         .append(" WHERE ce.maintenance_id = ms.maintenanceid AND ce.status = 'completed') AS completedJobs, ")
-                        .append("(SELECT COUNT(*) FROM CalendarEvents ce ")
+                        .append("(SELECT COUNT(*) FROM calendarevents ce ")
                         .append(" WHERE ce.maintenance_id = ms.maintenanceid AND ce.status IN ('scheduled','in-progress')) AS activeJobs, ")
                         .append("(SELECT COUNT(*) FROM maintenance_vehicle_assignment mva ")
                         .append(" WHERE mva.maintenanceid = ms.maintenanceid AND LOWER(COALESCE(mva.status,'assigned')) = 'assigned') AS assignedVehicleCount ")
-                        .append("FROM MaintenanceStaff ms ")
-                        .append("JOIN RentalCompany rc ON rc.companyid = ms.company_id ")
+                        .append("FROM maintenancestaff ms ")
+                        .append("JOIN rentalcompany rc ON rc.companyid = ms.company_id ")
                         .append("WHERE 1=1 ");
 
                 if (!companyIdParam.isEmpty()) {
@@ -179,12 +179,12 @@ public class AdminMaintenanceStaffServlet extends HttpServlet {
                             "ms.maintenanceid, ms.username, ms.firstname, ms.lastname, ms.email, ms.mobilenumber, " +
                             "ms.company_id, ms.specialization, ms.status, ms.yearsOfExperience, " +
                             "rc.companyname, " +
-                            "(SELECT COUNT(*) FROM CalendarEvents ce WHERE ce.maintenance_id = ms.maintenanceid AND ce.status = 'completed') AS completedJobs, " +
-                            "(SELECT COUNT(*) FROM CalendarEvents ce WHERE ce.maintenance_id = ms.maintenanceid AND ce.status IN ('scheduled','in-progress')) AS activeJobs, " +
-                            "(SELECT COUNT(*) FROM CalendarEvents ce WHERE ce.maintenance_id = ms.maintenanceid) AS totalJobs, " +
+                            "(SELECT COUNT(*) FROM calendarevents ce WHERE ce.maintenance_id = ms.maintenanceid AND ce.status = 'completed') AS completedJobs, " +
+                            "(SELECT COUNT(*) FROM calendarevents ce WHERE ce.maintenance_id = ms.maintenanceid AND ce.status IN ('scheduled','in-progress')) AS activeJobs, " +
+                            "(SELECT COUNT(*) FROM calendarevents ce WHERE ce.maintenance_id = ms.maintenanceid) AS totalJobs, " +
                             "(SELECT COUNT(*) FROM maintenance_vehicle_assignment mva WHERE mva.maintenanceid = ms.maintenanceid AND LOWER(COALESCE(mva.status,'assigned')) = 'assigned') AS assignedVehicleCount " +
-                            "FROM MaintenanceStaff ms " +
-                            "JOIN RentalCompany rc ON rc.companyid = ms.company_id " +
+                            "FROM maintenancestaff ms " +
+                            "JOIN rentalcompany rc ON rc.companyid = ms.company_id " +
                             "WHERE ms.maintenanceid = ?";
 
             try (PreparedStatement ps = con.prepareStatement(sql)) {
@@ -290,7 +290,7 @@ public class AdminMaintenanceStaffServlet extends HttpServlet {
             if (status.isEmpty()) status = "available";
 
             try (PreparedStatement ps = con.prepareStatement(
-                    "SELECT companyid FROM RentalCompany WHERE companyid=?"
+                    "SELECT companyid FROM rentalcompany WHERE companyid=?"
             )) {
                 ps.setInt(1, companyId);
                 try (ResultSet rs = ps.executeQuery()) {
@@ -302,17 +302,17 @@ public class AdminMaintenanceStaffServlet extends HttpServlet {
                 }
             }
 
-            if (exists(con, "SELECT 1 FROM MaintenanceStaff WHERE LOWER(username)=LOWER(?)", username)) {
+            if (exists(con, "SELECT 1 FROM maintenancestaff WHERE LOWER(username)=LOWER(?)", username)) {
                 resp.setStatus(400);
                 resp.getWriter().print("{\"success\":false,\"message\":\"Username already exists\"}");
                 return;
             }
-            if (exists(con, "SELECT 1 FROM MaintenanceStaff WHERE LOWER(email)=LOWER(?)", email)) {
+            if (exists(con, "SELECT 1 FROM maintenancestaff WHERE LOWER(email)=LOWER(?)", email)) {
                 resp.setStatus(400);
                 resp.getWriter().print("{\"success\":false,\"message\":\"Email already exists\"}");
                 return;
             }
-            if (!phone.isEmpty() && exists(con, "SELECT 1 FROM MaintenanceStaff WHERE mobilenumber=?", phone)) {
+            if (!phone.isEmpty() && exists(con, "SELECT 1 FROM maintenancestaff WHERE mobilenumber=?", phone)) {
                 resp.setStatus(400);
                 resp.getWriter().print("{\"success\":false,\"message\":\"Phone number already exists\"}");
                 return;
@@ -322,7 +322,7 @@ public class AdminMaintenanceStaffServlet extends HttpServlet {
             String hashedPassword = PasswordServices.hashPassword(password, salt);
 
             String sql =
-                    "INSERT INTO MaintenanceStaff " +
+                    "INSERT INTO maintenancestaff " +
                             "(username, firstname, lastname, email, mobilenumber, hashedpassword, salt, company_id, specialization, status, yearsOfExperience) " +
                             "VALUES (?,?,?,?,?,?,?,?,?,?,?)";
 
@@ -401,7 +401,7 @@ public class AdminMaintenanceStaffServlet extends HttpServlet {
             }
 
             if (!username.isEmpty() && exists(con,
-                    "SELECT 1 FROM MaintenanceStaff WHERE LOWER(username)=LOWER(?) AND maintenanceid <> ?",
+                    "SELECT 1 FROM maintenancestaff WHERE LOWER(username)=LOWER(?) AND maintenanceid <> ?",
                     username, id)) {
                 resp.setStatus(400);
                 resp.getWriter().print("{\"success\":false,\"message\":\"Username already exists\"}");
@@ -409,7 +409,7 @@ public class AdminMaintenanceStaffServlet extends HttpServlet {
             }
 
             if (exists(con,
-                    "SELECT 1 FROM MaintenanceStaff WHERE LOWER(email)=LOWER(?) AND maintenanceid <> ?",
+                    "SELECT 1 FROM maintenancestaff WHERE LOWER(email)=LOWER(?) AND maintenanceid <> ?",
                     email, id)) {
                 resp.setStatus(400);
                 resp.getWriter().print("{\"success\":false,\"message\":\"Email already exists\"}");
@@ -417,7 +417,7 @@ public class AdminMaintenanceStaffServlet extends HttpServlet {
             }
 
             if (!phone.isEmpty() && exists(con,
-                    "SELECT 1 FROM MaintenanceStaff WHERE mobilenumber=? AND maintenanceid <> ?",
+                    "SELECT 1 FROM maintenancestaff WHERE mobilenumber=? AND maintenanceid <> ?",
                     phone, id)) {
                 resp.setStatus(400);
                 resp.getWriter().print("{\"success\":false,\"message\":\"Phone number already exists\"}");
@@ -425,7 +425,7 @@ public class AdminMaintenanceStaffServlet extends HttpServlet {
             }
 
             StringBuilder sql = new StringBuilder();
-            sql.append("UPDATE MaintenanceStaff SET ")
+            sql.append("UPDATE maintenancestaff SET ")
                     .append("firstname=?, lastname=?, email=?, mobilenumber=?, specialization=?, status=?, yearsOfExperience=? ");
 
             boolean updateUsername = !username.isEmpty();
@@ -495,7 +495,7 @@ public class AdminMaintenanceStaffServlet extends HttpServlet {
                 return;
             }
 
-            try (PreparedStatement ps = con.prepareStatement("DELETE FROM MaintenanceStaff WHERE maintenanceid=?")) {
+            try (PreparedStatement ps = con.prepareStatement("DELETE FROM maintenancestaff WHERE maintenanceid=?")) {
                 ps.setInt(1, id);
                 int rows = ps.executeUpdate();
 
@@ -611,8 +611,8 @@ public class AdminMaintenanceStaffServlet extends HttpServlet {
                         "v.vehicleid, v.vehiclebrand, v.vehiclemodel, v.numberplatenumber, v.vehicle_type, v.availability_status, " +
                         "mva.status, mva.priority, mva.description, mva.assigned_date " +
                         "FROM maintenance_vehicle_assignment mva " +
-                        "JOIN Vehicle v ON v.vehicleid = mva.vehicleid " +
-                        "LEFT JOIN VehicleProvider vp ON vp.providerid = v.provider_id " +
+                        "JOIN vehicle v ON v.vehicleid = mva.vehicleid " +
+                        "LEFT JOIN vehicleprovider vp ON vp.providerid = v.provider_id " +
                         "WHERE mva.maintenanceid = ? " +
                         "AND LOWER(COALESCE(mva.status,'assigned')) = 'assigned' " +
                         "AND (v.company_id = ? OR vp.company_id = ?) " +
@@ -656,8 +656,8 @@ public class AdminMaintenanceStaffServlet extends HttpServlet {
         String sql =
                 "SELECT " +
                         "v.vehicleid, v.vehiclebrand, v.vehiclemodel, v.numberplatenumber, v.vehicle_type, v.availability_status " +
-                        "FROM Vehicle v " +
-                        "LEFT JOIN VehicleProvider vp ON vp.providerid = v.provider_id " +
+                        "FROM vehicle v " +
+                        "LEFT JOIN vehicleprovider vp ON vp.providerid = v.provider_id " +
                         "WHERE (v.company_id = ? OR vp.company_id = ?) " +
                         "AND NOT EXISTS ( " +
                         "   SELECT 1 FROM maintenance_vehicle_assignment mva " +
@@ -697,16 +697,16 @@ public class AdminMaintenanceStaffServlet extends HttpServlet {
     }
 
     private String getJobHistoryJson(Connection con, int maintenanceId, int companyId) throws SQLException {
-        // Pull from CalendarEvents (service schedule) for job history
+        // Pull from calendarevents (service schedule) for job history
         String sql =
                 "SELECT " +
                         "ce.eventid AS jobId, ce.vehicle_id AS vehicleId, ce.status, " +
                         "ce.service_type AS serviceType, ce.scheduled_date AS scheduledDate, " +
                         "ce.scheduled_time AS scheduledTime, ce.service_bay AS serviceBay, " +
                         "v.vehiclebrand, v.vehiclemodel, v.numberplatenumber " +
-                        "FROM CalendarEvents ce " +
-                        "JOIN Vehicle v ON v.vehicleid = ce.vehicle_id " +
-                        "LEFT JOIN VehicleProvider vp ON vp.providerid = v.provider_id " +
+                        "FROM calendarevents ce " +
+                        "JOIN vehicle v ON v.vehicleid = ce.vehicle_id " +
+                        "LEFT JOIN vehicleprovider vp ON vp.providerid = v.provider_id " +
                         "WHERE ce.maintenance_id = ? " +
                         "AND (v.company_id = ? OR vp.company_id = ?) " +
                         "ORDER BY ce.scheduled_date DESC, ce.scheduled_time DESC";
@@ -747,7 +747,7 @@ public class AdminMaintenanceStaffServlet extends HttpServlet {
 
     private Integer getStaffCompanyId(Connection con, int maintenanceId) throws SQLException {
         try (PreparedStatement ps = con.prepareStatement(
-                "SELECT company_id FROM MaintenanceStaff WHERE maintenanceid=?"
+                "SELECT company_id FROM maintenancestaff WHERE maintenanceid=?"
         )) {
             ps.setInt(1, maintenanceId);
             try (ResultSet rs = ps.executeQuery()) {
@@ -760,8 +760,8 @@ public class AdminMaintenanceStaffServlet extends HttpServlet {
     private boolean vehicleBelongsToCompany(Connection con, int vehicleId, int companyId) throws SQLException {
         String sql =
                 "SELECT v.vehicleid " +
-                        "FROM Vehicle v " +
-                        "LEFT JOIN VehicleProvider vp ON vp.providerid = v.provider_id " +
+                        "FROM vehicle v " +
+                        "LEFT JOIN vehicleprovider vp ON vp.providerid = v.provider_id " +
                         "WHERE v.vehicleid = ? AND (v.company_id = ? OR vp.company_id = ?)";
 
         try (PreparedStatement ps = con.prepareStatement(sql)) {

@@ -109,7 +109,7 @@ public class CustomerChangePasswordServlet extends HttpServlet {
                 String newSalt = PasswordServices.generateSalt();
                 String newHash = PasswordServices.hashPassword(newPassword, newSalt);
 
-                String sql = "UPDATE Customer SET hashedpassword=?, salt=? WHERE email=?";
+                String sql = "UPDATE customer SET hashedpassword=?, salt=? WHERE email=?";
                 try (PreparedStatement ps = conn.prepareStatement(sql)) {
                     ps.setString(1, newHash);
                     ps.setString(2, newSalt);

@@ -12,7 +12,7 @@ public class CustomerSupportTicketController {
     // ---------- CREATE ----------
     // Returns new ticket_id, or -1 on failure
     public static int createTicket(int customerId, String subject, String description, String priority) {
-        String sql = "INSERT INTO SupportTicket(actor_type, actor_id, subject, description, status, priority) " +
+        String sql = "INSERT INTO supportticket(actor_type, actor_id, subject, description, status, priority) " +
                 "VALUES('CUSTOMER', ?, ?, ?, 'Open', ?)";
 
         try (Connection con = DBConnection.getConnection();
@@ -41,7 +41,7 @@ public class CustomerSupportTicketController {
         List<SupportTicket> list = new ArrayList<>();
 
         String sql = "SELECT ticket_id, subject, description, status, priority, created_at, updated_at " +
-                "FROM SupportTicket " +
+                "FROM supportticket " +
                 "WHERE actor_type='CUSTOMER' AND actor_id=? " +
                 "ORDER BY created_at DESC";
 
@@ -75,7 +75,7 @@ public class CustomerSupportTicketController {
 
     // ---------- GET ONE (with ownership check) ----------
     public static SupportTicket getMyTicket(int customerId, int ticketId) {
-        String sql = "SELECT * FROM SupportTicket WHERE ticket_id=? AND actor_type='CUSTOMER' AND actor_id=?";
+        String sql = "SELECT * FROM supportticket WHERE ticket_id=? AND actor_type='CUSTOMER' AND actor_id=?";
 
         try (Connection con = DBConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {

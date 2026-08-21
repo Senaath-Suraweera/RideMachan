@@ -61,7 +61,7 @@ public class ProviderProfileServlet extends HttpServlet {
 
         String sql = "SELECT providerid, username, email, company_id, firstname, lastname, phonenumber, " +
                 "housenumber, street, city, zipcode " +
-                "FROM VehicleProvider WHERE providerid = ?";
+                "FROM vehicleprovider WHERE providerid = ?";
 
         try (Connection con = DBConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
@@ -122,7 +122,7 @@ public class ProviderProfileServlet extends HttpServlet {
         String city = body.has("city") ? body.get("city").getAsString() : null;
         String zipCode = body.has("zipCode") ? body.get("zipCode").getAsString() : null;
 
-        String sql = "UPDATE VehicleProvider SET username=?, email=?, firstname=?, lastname=?, phonenumber=?, " +
+        String sql = "UPDATE vehicleprovider SET username=?, email=?, firstname=?, lastname=?, phonenumber=?, " +
                 "housenumber=?, street=?, city=?, zipcode=? WHERE providerid=?";
 
         try (Connection con = DBConnection.getConnection();

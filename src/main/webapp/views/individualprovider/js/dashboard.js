@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", function () {
   const providerId = sessionStorage.getItem("providerId");
-  const baseUrl = "http://localhost:8080/api/provider/dashboard";
+  const baseUrl = "/api/provider/dashboard";
 
   loadSummary(baseUrl, providerId);
   loadMonthlyIncome(baseUrl, providerId);
@@ -114,7 +114,7 @@ function wireHeaderActions(providerId) {
   async function refreshNotificationCount() {
     try {
       const data = await apiGet(
-        "http://localhost:8080/api/notifications/count",
+        "/api/notifications/count",
       );
       const count = Number(data.count || 0);
 
@@ -186,14 +186,14 @@ function wireHeaderActions(providerId) {
 
   async function markNotificationRead(notificationId) {
     await apiPost(
-      `http://localhost:8080/api/notifications/read?id=${encodeURIComponent(notificationId)}`,
+      `/api/notifications/read?id=${encodeURIComponent(notificationId)}`,
     );
   }
 
   async function refreshNotifications() {
     try {
       const data = await apiGet(
-        "http://localhost:8080/api/notifications?limit=10&offset=0",
+        "/api/notifications?limit=10&offset=0",
       );
 
       const items = data.notifications || [];
@@ -291,7 +291,7 @@ function wireHeaderActions(providerId) {
   if (markAllSeenBtn) {
     markAllSeenBtn.addEventListener("click", async () => {
       try {
-        await apiPost("http://localhost:8080/api/notifications/readAll");
+        await apiPost("/api/notifications/readAll");
         await refreshNotificationCount();
         await refreshNotifications();
       } catch (e) {
@@ -319,7 +319,7 @@ function loadProviderInfo(providerId) {
   const profileInitialEl = document.getElementById("profileInitial");
 
   if (providerId) {
-    const url = `http://localhost:8080/api/provider/profile?providerId=${encodeURIComponent(providerId)}`;
+    const url = `/api/provider/profile?providerId=${encodeURIComponent(providerId)}`;
     fetch(url, { credentials: "include" })
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => {

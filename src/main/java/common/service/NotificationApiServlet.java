@@ -83,10 +83,10 @@ public class NotificationApiServlet extends HttpServlet {
             try (Connection con = DBConnection.getConnection()) {
                 String sql;
                 if (typeFilter != null && !typeFilter.isEmpty()) {
-                    sql = "SELECT * FROM Notification WHERE recipient_type=? AND recipient_id=? AND type=? "
+                    sql = "SELECT * FROM notification WHERE recipient_type=? AND recipient_id=? AND type=? "
                             + "ORDER BY created_at DESC LIMIT ? OFFSET ?";
                 } else {
-                    sql = "SELECT * FROM Notification WHERE recipient_type=? AND recipient_id=? "
+                    sql = "SELECT * FROM notification WHERE recipient_type=? AND recipient_id=? "
                             + "ORDER BY created_at DESC LIMIT ? OFFSET ?";
                 }
 
@@ -131,7 +131,7 @@ public class NotificationApiServlet extends HttpServlet {
         if ("/count".equals(path)) {
             try (Connection con = DBConnection.getConnection();
                  PreparedStatement ps = con.prepareStatement(
-                         "SELECT COUNT(*) FROM Notification WHERE recipient_type=? AND recipient_id=? AND is_read=FALSE")) {
+                         "SELECT COUNT(*) FROM notification WHERE recipient_type=? AND recipient_id=? AND is_read=FALSE")) {
                 ps.setString(1, actorType);
                 ps.setInt(2, actorId);
                 ResultSet rs = ps.executeQuery();
@@ -173,7 +173,7 @@ public class NotificationApiServlet extends HttpServlet {
             }
             try (Connection con = DBConnection.getConnection();
                  PreparedStatement ps = con.prepareStatement(
-                         "UPDATE Notification SET is_read=TRUE WHERE notification_id=? AND recipient_type=? AND recipient_id=?")) {
+                         "UPDATE notification SET is_read=TRUE WHERE notification_id=? AND recipient_type=? AND recipient_id=?")) {
                 ps.setInt(1, notifId);
                 ps.setString(2, actorType);
                 ps.setInt(3, actorId);
@@ -190,7 +190,7 @@ public class NotificationApiServlet extends HttpServlet {
         if ("/readAll".equals(path)) {
             try (Connection con = DBConnection.getConnection();
                  PreparedStatement ps = con.prepareStatement(
-                         "UPDATE Notification SET is_read=TRUE WHERE recipient_type=? AND recipient_id=? AND is_read=FALSE")) {
+                         "UPDATE notification SET is_read=TRUE WHERE recipient_type=? AND recipient_id=? AND is_read=FALSE")) {
                 ps.setString(1, actorType);
                 ps.setInt(2, actorId);
                 ps.executeUpdate();

@@ -41,11 +41,11 @@
 //
 //        // Support tickets: count open/in-progress
 //        String ticketsSql =
-//                "SELECT COUNT(*) AS c FROM SupportTicket WHERE status IN ('Open','In Progress')";
+//                "SELECT COUNT(*) AS c FROM supportticket WHERE status IN ('Open','In Progress')";
 //
 //        // Reports: total reports
 //        String reportsSql =
-//                "SELECT COUNT(*) AS c FROM Report";
+//                "SELECT COUNT(*) AS c FROM report";
 //
 //        try (Connection con = DBConnection.getConnection()) {
 //            s.totalIncome = queryDouble(con, incomeSql, "total");
@@ -100,7 +100,7 @@
 //        String sql =
 //                "SELECT CONCAT(c.firstname, ' ', c.lastname) AS name, COUNT(*) AS rides " +
 //                        "FROM companybookings b " +
-//                        "JOIN Customer c ON c.customerid = b.customerid " +
+//                        "JOIN customer c ON c.customerid = b.customerid " +
 //                        "GROUP BY b.customerid, name " +
 //                        "ORDER BY rides DESC " +
 //                        "LIMIT ?";
@@ -132,7 +132,7 @@
 //                "SELECT rc.companyname AS name, COUNT(*) AS rides, " +
 //                        "       (SELECT AVG(r.rating_value) FROM ratings r WHERE r.companyid = b.companyid) AS rating " +
 //                        "FROM companybookings b " +
-//                        "JOIN RentalCompany rc ON rc.companyid = b.companyid " +
+//                        "JOIN rentalcompany rc ON rc.companyid = b.companyid " +
 //                        "GROUP BY b.companyid, name " +
 //                        "ORDER BY rides DESC " +
 //                        "LIMIT ?";

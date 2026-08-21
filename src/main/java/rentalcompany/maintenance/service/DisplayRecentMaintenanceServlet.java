@@ -42,7 +42,7 @@ public class DisplayRecentMaintenanceServlet extends HttpServlet {
 
         int staffId = (int) session.getAttribute("staff_id");
 
-        // Join CalendarEvents -> Vehicle so we can display the number plate
+        // Join calendarevents -> Vehicle so we can display the number plate
         String sql =
                 "SELECT ce.eventid, " +
                         "       ce.service_type, " +
@@ -52,8 +52,8 @@ public class DisplayRecentMaintenanceServlet extends HttpServlet {
                         "       v.numberplatenumber, " +
                         "       v.vehiclebrand, " +
                         "       v.vehiclemodel " +
-                        "  FROM CalendarEvents ce " +
-                        "  LEFT JOIN Vehicle v ON v.vehicleid = ce.vehicle_id " +
+                        "  FROM calendarevents ce " +
+                        "  LEFT JOIN vehicle v ON v.vehicleid = ce.vehicle_id " +
                         " WHERE ce.maintenance_id = ? " +
                         "   AND ce.status = 'completed' " +
                         "   AND ce.scheduled_date < CURDATE() " +

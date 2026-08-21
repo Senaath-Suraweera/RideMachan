@@ -50,13 +50,13 @@ public class AdminApproveRentalCompanyRequestServlet extends HttpServlet {
             con = DBConnection.getConnection();
             con.setAutoCommit(false);
 
-            String select = "SELECT * FROM RentalCompanyRegistrationRequest WHERE request_id=? AND status='PENDING' FOR UPDATE";
+            String select = "SELECT * FROM rentalcompanyregistrationrequest WHERE request_id=? AND status='PENDING' FOR UPDATE";
 
-            String insertCompany = "INSERT INTO RentalCompany " +
+            String insertCompany = "INSERT INTO rentalcompany " +
                     "(companyname, companyemail, phone, registrationnumber, taxid, street, city, certificatepath, taxdocumentpath, description, terms, hashedpassword, salt) " +
                     "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
-            String updateReq = "UPDATE RentalCompanyRegistrationRequest " +
+            String updateReq = "UPDATE rentalcompanyregistrationrequest " +
                     "SET status='APPROVED', reviewed_at=NOW(), reviewed_by_adminid=?, approved_companyid=? " +
                     "WHERE request_id=?";
 

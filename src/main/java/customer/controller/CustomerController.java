@@ -81,7 +81,7 @@ public class CustomerController {
     }
 
     public static boolean emailExists(String email) {
-        String sql = "SELECT COUNT(*) FROM Customer WHERE email = ?";
+        String sql = "SELECT COUNT(*) FROM customer WHERE email = ?";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, email);

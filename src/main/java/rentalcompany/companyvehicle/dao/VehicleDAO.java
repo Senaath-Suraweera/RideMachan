@@ -11,7 +11,7 @@ import java.util.List;
 public class VehicleDAO {
 
     public static boolean addVehicle(Vehicle v) {
-        String sql = "INSERT INTO Vehicle (vehiclebrand, vehiclemodel, numberplatenumber, tareweight, color, " +
+        String sql = "INSERT INTO vehicle (vehiclebrand, vehiclemodel, numberplatenumber, tareweight, color, " +
                 "numberofpassengers, enginecapacity, enginenumber, chasisnumber, registrationdocumentation, " +
                 "vehicleimages, description, milage, company_id, provider_id,price_per_day,location,features, " +
                 "vehicle_type, fuel_type, availability_status, manufacture_year, transmission, created_at, updated_at)" +
@@ -73,7 +73,7 @@ public class VehicleDAO {
 
     private static List<Vehicle> listVehicles(String column, int id) {
         List<Vehicle> list = new ArrayList<>();
-        String sql = "SELECT * FROM Vehicle WHERE " + column + " = ?";
+        String sql = "SELECT * FROM vehicle WHERE " + column + " = ?";
         try (Connection con = DBConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
 
@@ -97,7 +97,7 @@ public class VehicleDAO {
      */
     public static boolean updateVehicle(Vehicle v) {
         StringBuilder sql = new StringBuilder(
-                "UPDATE Vehicle SET vehiclebrand=?, vehiclemodel=?, numberplatenumber=?, tareweight=?, color=?, " +
+                "UPDATE vehicle SET vehiclebrand=?, vehiclemodel=?, numberplatenumber=?, tareweight=?, color=?, " +
                         "numberofpassengers=?, enginecapacity=?, enginenumber=?, chasisnumber=?, description=?, milage=?, " +
                         "price_per_day=?, location=?, features=?, vehicle_type=?, fuel_type=?, transmission=?"
         );
@@ -148,7 +148,7 @@ public class VehicleDAO {
     }
 
     public static boolean deleteVehicle(int vehicleId) {
-        String sql = "DELETE FROM Vehicle WHERE vehicleid=?";
+        String sql = "DELETE FROM vehicle WHERE vehicleid=?";
         try (Connection con = DBConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setInt(1, vehicleId);
@@ -161,7 +161,7 @@ public class VehicleDAO {
 
     public static List<Vehicle> getVehicleById(int vehicleId) {
         List<Vehicle> list = new ArrayList<>();
-        String sql = "SELECT * FROM Vehicle WHERE vehicleid = ?";
+        String sql = "SELECT * FROM vehicle WHERE vehicleid = ?";
         try (Connection con = DBConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
 

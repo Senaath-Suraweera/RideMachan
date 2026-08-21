@@ -1,6 +1,6 @@
 // my-vehicles.js — Dashboard-themed version with Details modal & Document viewer
 
-const BASE_URL = "http://localhost:8080";
+const BASE_URL = "";
 
 const API_BASE = `${BASE_URL}/api/vehicles`;
 

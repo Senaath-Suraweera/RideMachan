@@ -25,7 +25,7 @@ public class CustomerGetCompaniesServlet extends HttpServlet {
 
         String query = """
             SELECT companyid, companyname
-            FROM RentalCompany
+            FROM rentalcompany
             ORDER BY companyname
         """;
 

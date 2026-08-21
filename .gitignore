@@ -36,3 +36,11 @@ build/
 
 ### Mac OS ###
 .DS_Store
+.!*!*
+
+### Database dumps — contain real user data (NIC/licence images). Never commit. ###
+*_dump.sql
+ridemachan_dump.sql
+
+### Local secrets ###
+.env

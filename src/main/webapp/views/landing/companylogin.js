@@ -9,7 +9,7 @@ loginForm.addEventListener("submit", async (e) => {
 
   try {
     const response = await fetch(
-      "http://localhost:8080/rentalcompanies/login",
+      "/rentalcompanies/login",
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },

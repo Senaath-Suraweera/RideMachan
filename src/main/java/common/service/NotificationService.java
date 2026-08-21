@@ -53,7 +53,7 @@ public class NotificationService {
                               String referenceType, int referenceId) {
         try (Connection con = DBConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(
-                     "INSERT INTO Notification(recipient_type, recipient_id, type, title, body, reference_type, reference_id) " +
+                     "INSERT INTO notification(recipient_type, recipient_id, type, title, body, reference_type, reference_id) " +
                              "VALUES(?,?,?,?,?,?,?)")) {
             ps.setString(1, recipientType.toUpperCase());
             ps.setInt(2, recipientId);
@@ -94,7 +94,7 @@ public class NotificationService {
         if (recipients == null || recipients.isEmpty()) return;
         try (Connection con = DBConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(
-                     "INSERT INTO Notification(recipient_type, recipient_id, type, title, body, reference_type, reference_id) " +
+                     "INSERT INTO notification(recipient_type, recipient_id, type, title, body, reference_type, reference_id) " +
                              "VALUES(?,?,?,?,?,?,?)")) {
             for (Recipient r : recipients) {
                 ps.setString(1, r.type.toUpperCase());
@@ -121,7 +121,7 @@ public class NotificationService {
         List<Recipient> admins = new ArrayList<>();
         try (Connection con = DBConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(
-                     "SELECT adminid FROM Admin WHERE active=1")) {
+                     "SELECT adminid FROM admin WHERE active=1")) {
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 admins.add(new Recipient("ADMIN", rs.getInt("adminid")));
@@ -143,21 +143,21 @@ public class NotificationService {
         try (Connection con = DBConnection.getConnection()) {
             // Drivers
             try (PreparedStatement ps = con.prepareStatement(
-                    "SELECT driverid FROM Driver WHERE company_id=? AND active=1")) {
+                    "SELECT driverid FROM driver WHERE company_id=? AND active=1")) {
                 ps.setInt(1, companyId);
                 ResultSet rs = ps.executeQuery();
                 while (rs.next()) staff.add(new Recipient("DRIVER", rs.getInt(1)));
             }
             // Maintenance staff
             try (PreparedStatement ps = con.prepareStatement(
-                    "SELECT maintenanceid FROM MaintenanceStaff WHERE company_id=?")) {
+                    "SELECT maintenanceid FROM maintenancestaff WHERE company_id=?")) {
                 ps.setInt(1, companyId);
                 ResultSet rs = ps.executeQuery();
                 while (rs.next()) staff.add(new Recipient("MAINTENANCE", rs.getInt(1)));
             }
             // Providers
             try (PreparedStatement ps = con.prepareStatement(
-                    "SELECT providerid FROM VehicleProvider WHERE company_id=? AND status='active'")) {
+                    "SELECT providerid FROM vehicleprovider WHERE company_id=? AND status='active'")) {
                 ps.setInt(1, companyId);
                 ResultSet rs = ps.executeQuery();
                 while (rs.next()) staff.add(new Recipient("PROVIDER", rs.getInt(1)));

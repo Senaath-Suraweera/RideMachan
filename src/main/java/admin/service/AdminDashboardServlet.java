@@ -200,12 +200,12 @@ public class AdminDashboardServlet extends HttpServlet {
 
         String sqlList =
                 "SELECT companyid, companyname, street, city " +
-                        "FROM RentalCompany " +
+                        "FROM rentalcompany " +
                         "ORDER BY companyname ASC";
 
         String sqlCityCounts =
                 "SELECT city, COUNT(*) AS companyCount " +
-                        "FROM RentalCompany " +
+                        "FROM rentalcompany " +
                         "GROUP BY city " +
                         "ORDER BY companyCount DESC";
 
@@ -271,7 +271,7 @@ public class AdminDashboardServlet extends HttpServlet {
     }
 
     private int countPendingRentalCompanyRequests(Connection con) throws SQLException {
-        String sql = "SELECT COUNT(*) AS c FROM RentalCompanyRegistrationRequest WHERE status='PENDING'";
+        String sql = "SELECT COUNT(*) AS c FROM rentalcompanyregistrationrequest WHERE status='PENDING'";
         try (PreparedStatement ps = con.prepareStatement(sql)) {
             ResultSet rs = ps.executeQuery();
             rs.next();
@@ -280,7 +280,7 @@ public class AdminDashboardServlet extends HttpServlet {
     }
 
     private int countSupportTicketsOpenOrInProgress(Connection con) throws SQLException {
-        String sql = "SELECT COUNT(*) AS c FROM SupportTicket WHERE status IN ('Open','In Progress')";
+        String sql = "SELECT COUNT(*) AS c FROM supportticket WHERE status IN ('Open','In Progress')";
         try (PreparedStatement ps = con.prepareStatement(sql)) {
             ResultSet rs = ps.executeQuery();
             rs.next();
@@ -343,7 +343,7 @@ public class AdminDashboardServlet extends HttpServlet {
 
 
     private int countPendingReports(Connection con) throws SQLException {
-        String sql = "SELECT COUNT(*) AS c FROM Report WHERE status='Pending'";
+        String sql = "SELECT COUNT(*) AS c FROM report WHERE status='Pending'";
         try (PreparedStatement ps = con.prepareStatement(sql)) {
             ResultSet rs = ps.executeQuery();
             rs.next();

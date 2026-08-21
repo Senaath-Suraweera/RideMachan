@@ -17,7 +17,7 @@ public class CustomerDAO {
 
     // ============= INSERT =============
     public int insertCustomer(Customer c) throws SQLException {
-        String sql = "INSERT INTO Customer (username, firstname, lastname, email, mobilenumber, hashedpassword, salt, "
+        String sql = "INSERT INTO customer (username, firstname, lastname, email, mobilenumber, hashedpassword, salt, "
                 + "customer_type, street, city, zip_code, country, nic_number, nic_image, "
                 + "drivers_license_number, drivers_license_image, passport_number, international_drivers_license_number) "
                 + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
@@ -76,7 +76,7 @@ public class CustomerDAO {
 
     // ============= GET BY EMAIL =============
     public Customer getCustomerByEmail(String email) throws SQLException {
-        String sql = "SELECT * FROM Customer WHERE email = ?";
+        String sql = "SELECT * FROM customer WHERE email = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, email);
             try (ResultSet rs = ps.executeQuery()) {
@@ -90,7 +90,7 @@ public class CustomerDAO {
 
     // ============= GET BY ID =============
     public Customer getCustomerById(int id) throws SQLException {
-        String sql = "SELECT * FROM Customer WHERE customerid = ?";
+        String sql = "SELECT * FROM customer WHERE customerid = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, id);
             try (ResultSet rs = ps.executeQuery()) {
@@ -104,7 +104,7 @@ public class CustomerDAO {
 
     // ============= UPDATE =============
     public boolean updateCustomer(Customer c) throws SQLException {
-        String sql = "UPDATE Customer SET firstname=?, lastname=?, mobilenumber=?, street=?, city=?, zip_code=?, country=?, "
+        String sql = "UPDATE customer SET firstname=?, lastname=?, mobilenumber=?, street=?, city=?, zip_code=?, country=?, "
                 + "nic_number=?, nic_image=?, drivers_license_number=?, drivers_license_image=?, "
                 + "passport_number=?, international_drivers_license_number=? "
                 + "WHERE customerid=?";
@@ -134,7 +134,7 @@ public class CustomerDAO {
 
     // ============= DELETE =============
     public boolean deleteCustomer(int id) throws SQLException {
-        String sql = "DELETE FROM Customer WHERE customerid = ?";
+        String sql = "DELETE FROM customer WHERE customerid = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, id);
             return ps.executeUpdate() > 0;
@@ -144,7 +144,7 @@ public class CustomerDAO {
     // ============= LIST ALL =============
     public List<Customer> getAllCustomers() throws SQLException {
         List<Customer> list = new ArrayList<>();
-        String sql = "SELECT * FROM Customer";
+        String sql = "SELECT * FROM customer";
         try (Statement st = connection.createStatement();
              ResultSet rs = st.executeQuery(sql)) {
             while (rs.next()) {
@@ -184,7 +184,7 @@ public class CustomerDAO {
     public static boolean setVerified(String email)
     {
         try (Connection conn = DBConnection.getConnection()) {
-            String sql = "UPDATE Customer SET verified=? WHERE email=?";
+            String sql = "UPDATE customer SET verified=? WHERE email=?";
             PreparedStatement ps = conn.prepareStatement(sql);
             ps.setString(1, "1");
             ps.setString(2, email);
@@ -199,7 +199,7 @@ public class CustomerDAO {
     public static boolean setActive(String email)
     {
         try (Connection conn = DBConnection.getConnection()) {
-            String sql = "UPDATE Customer SET active=? WHERE email=?";
+            String sql = "UPDATE customer SET active=? WHERE email=?";
             PreparedStatement ps = conn.prepareStatement(sql);
             ps.setString(1, "1");
             ps.setString(2, email);
@@ -214,7 +214,7 @@ public class CustomerDAO {
     public static boolean setInactive(String email)
     {
         try (Connection conn = DBConnection.getConnection()) {
-            String sql = "UPDATE Customer SET active=? WHERE email=?";
+            String sql = "UPDATE customer SET active=? WHERE email=?";
             PreparedStatement ps = conn.prepareStatement(sql);
             ps.setString(1, "0");
             ps.setString(2, email);

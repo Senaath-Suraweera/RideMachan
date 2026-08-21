@@ -78,9 +78,9 @@ public class AdminDriversServlet extends HttpServlet {
                             "COUNT(r.rating_id) AS reviews, " +
                             "COALESCE(d.totalrides, 0) AS totalRides, " +
                             "COALESCE(d.totalkm, 0) AS totalKm, " +
-                            "(SELECT COUNT(*) FROM DriverProfileImage pi WHERE pi.driver_id = d.driverid) AS hasProfileImage " +
-                            "FROM Driver d " +
-                            "JOIN RentalCompany rc ON rc.companyid=d.company_id " +
+                            "(SELECT COUNT(*) FROM driverprofileimage pi WHERE pi.driver_id = d.driverid) AS hasProfileImage " +
+                            "FROM driver d " +
+                            "JOIN rentalcompany rc ON rc.companyid=d.company_id " +
                             "LEFT JOIN ratings r ON r.actor_type='DRIVER' AND r.actor_id=d.driverid " +
                             "WHERE LOWER(CONCAT(d.firstname,' ',d.lastname)) LIKE ? " +
                             "AND (LOWER(COALESCE(d.licensenumber,'')) LIKE ? OR LOWER(d.nicnumber) LIKE ?) " +
@@ -189,11 +189,11 @@ public class AdminDriversServlet extends HttpServlet {
                         "rc.companyname, " +
                         "COALESCE(AVG(r.rating_value),0) AS rating, " +
                         "COUNT(r.rating_id) AS reviews, " +
-                        "(SELECT COUNT(*) FROM DriverProfileImage pi WHERE pi.driver_id = d.driverid) AS hasProfileImage, " +
+                        "(SELECT COUNT(*) FROM driverprofileimage pi WHERE pi.driver_id = d.driverid) AS hasProfileImage, " +
                         "(CASE WHEN d.nic IS NOT NULL AND LENGTH(d.nic) > 1 THEN 1 ELSE 0 END) AS hasNicImage, " +
                         "(CASE WHEN d.driverslicence IS NOT NULL AND LENGTH(d.driverslicence) > 1 THEN 1 ELSE 0 END) AS hasLicenseImage " +
-                        "FROM Driver d " +
-                        "JOIN RentalCompany rc ON rc.companyid=d.company_id " +
+                        "FROM driver d " +
+                        "JOIN rentalcompany rc ON rc.companyid=d.company_id " +
                         "LEFT JOIN ratings r ON r.actor_type='DRIVER' AND r.actor_id=d.driverid " +
                         "WHERE d.driverid=? " +
                         "GROUP BY d.driverid";
@@ -321,7 +321,7 @@ public class AdminDriversServlet extends HttpServlet {
         String last  = name.contains(" ") ? name.split(" ", 2)[1] : "";
 
         String sql =
-                "UPDATE Driver SET " +
+                "UPDATE driver SET " +
                         "firstname=?, lastname=?, mobilenumber=?, Area=?, assignedarea=?, " +
                         "homeaddress=?, status=?, availability=?, description=?, " +
                         "shifttime=?, reportingmanager=?, licenceexpirydate=?, " +
@@ -400,7 +400,7 @@ public class AdminDriversServlet extends HttpServlet {
 
             // Update driver text fields
             String updateSql =
-                    "UPDATE Driver SET " +
+                    "UPDATE driver SET " +
                             "firstname=?, lastname=?, mobilenumber=?, Area=?, assignedarea=?, " +
                             "homeaddress=?, status=?, availability=?, description=?, " +
                             "shifttime=?, reportingmanager=?, licenceexpirydate=?, " +
@@ -436,7 +436,7 @@ public class AdminDriversServlet extends HttpServlet {
                 byte[] imageBytes = profilePart.getInputStream().readAllBytes();
 
                 String upsertSql =
-                        "INSERT INTO DriverProfileImage (driver_id, image_data, mime_type) " +
+                        "INSERT INTO driverprofileimage (driver_id, image_data, mime_type) " +
                                 "VALUES (?, ?, ?) " +
                                 "ON DUPLICATE KEY UPDATE image_data=VALUES(image_data), mime_type=VALUES(mime_type), updated_at=CURRENT_TIMESTAMP";
                 ps = con.prepareStatement(upsertSql);
@@ -451,7 +451,7 @@ public class AdminDriversServlet extends HttpServlet {
             Part nicPart = getPartSafe(req, "nicImage");
             if (nicPart != null && nicPart.getSize() > 0) {
                 byte[] nicBytes = nicPart.getInputStream().readAllBytes();
-                ps = con.prepareStatement("UPDATE Driver SET nic=? WHERE driverid=?");
+                ps = con.prepareStatement("UPDATE driver SET nic=? WHERE driverid=?");
                 ps.setBytes(1, nicBytes);
                 ps.setInt(2, id);
                 ps.executeUpdate();
@@ -462,7 +462,7 @@ public class AdminDriversServlet extends HttpServlet {
             Part licensePart = getPartSafe(req, "licenseImage");
             if (licensePart != null && licensePart.getSize() > 0) {
                 byte[] licenseBytes = licensePart.getInputStream().readAllBytes();
-                ps = con.prepareStatement("UPDATE Driver SET driverslicence=? WHERE driverid=?");
+                ps = con.prepareStatement("UPDATE driver SET driverslicence=? WHERE driverid=?");
                 ps.setBytes(1, licenseBytes);
                 ps.setInt(2, id);
                 ps.executeUpdate();
@@ -518,7 +518,7 @@ public class AdminDriversServlet extends HttpServlet {
         }
 
         boolean ban = "ban".equalsIgnoreCase(parts[2]);
-        String sql = "UPDATE Driver SET banned=?, active=? WHERE driverid=?";
+        String sql = "UPDATE driver SET banned=?, active=? WHERE driverid=?";
 
         Connection con = null;
         PreparedStatement ps = null;
@@ -618,7 +618,7 @@ public class AdminDriversServlet extends HttpServlet {
             con.setAutoCommit(false);
 
             String insertSql =
-                    "INSERT INTO Driver " +
+                    "INSERT INTO driver " +
                             "(username, firstname, lastname, email, mobilenumber, description, " +
                             "hashedpassword, salt, nicnumber, nic, driverslicence, company_id, " +
                             "status, Area, licenceexpirydate, licensenumber, homeaddress, " +
@@ -670,7 +670,7 @@ public class AdminDriversServlet extends HttpServlet {
                 byte[] imageBytes = profilePart.getInputStream().readAllBytes();
 
                 String upsertSql =
-                        "INSERT INTO DriverProfileImage (driver_id, image_data, mime_type) " +
+                        "INSERT INTO driverprofileimage (driver_id, image_data, mime_type) " +
                                 "VALUES (?, ?, ?) " +
                                 "ON DUPLICATE KEY UPDATE image_data=VALUES(image_data), mime_type=VALUES(mime_type), updated_at=CURRENT_TIMESTAMP";
                 ps = con.prepareStatement(upsertSql);
@@ -721,7 +721,7 @@ public class AdminDriversServlet extends HttpServlet {
 
         try {
             con = DBConnection.getConnection();
-            ps = con.prepareStatement("SELECT image_data, mime_type FROM DriverProfileImage WHERE driver_id=?");
+            ps = con.prepareStatement("SELECT image_data, mime_type FROM driverprofileimage WHERE driver_id=?");
             ps.setInt(1, driverId);
             rs = ps.executeQuery();
             if (!rs.next()) { resp.setStatus(404); return; }
@@ -752,7 +752,7 @@ public class AdminDriversServlet extends HttpServlet {
 
         try {
             con = DBConnection.getConnection();
-            ps = con.prepareStatement("SELECT `" + column + "` FROM Driver WHERE driverid=?");
+            ps = con.prepareStatement("SELECT `" + column + "` FROM driver WHERE driverid=?");
             ps.setInt(1, driverId);
             rs = ps.executeQuery();
             if (!rs.next()) { resp.setStatus(404); return; }

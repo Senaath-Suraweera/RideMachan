@@ -242,8 +242,8 @@ public class ProviderRentalRequestsServlet extends HttpServlet {
         else if (cols.contains("business_license_number"))   rcSelect.add("rc.business_license_number AS businesslicensenumber");
 
         // Real counts via subqueries (always safe — tables exist in your schema)
-        rcSelect.add("(SELECT COUNT(*) FROM Driver d WHERE d.company_id = rc." + idCol + ") AS driver_count");
-        rcSelect.add("(SELECT COUNT(*) FROM Vehicle v WHERE v.company_id = rc." + idCol + ") AS vehicle_count");
+        rcSelect.add("(SELECT COUNT(*) FROM driver d WHERE d.company_id = rc." + idCol + ") AS driver_count");
+        rcSelect.add("(SELECT COUNT(*) FROM vehicle v WHERE v.company_id = rc." + idCol + ") AS vehicle_count");
 
         // Real average rating — only if ratings table exists and has a companyid column
         if (hasRatings) {
@@ -264,7 +264,7 @@ public class ProviderRentalRequestsServlet extends HttpServlet {
             rcSelect.add("0 AS review_count");
         }
 
-        StringBuilder sql = new StringBuilder("SELECT " + String.join(", ", rcSelect) + " FROM RentalCompany rc");
+        StringBuilder sql = new StringBuilder("SELECT " + String.join(", ", rcSelect) + " FROM rentalcompany rc");
         if (cols.contains("status")) {
             sql.append(" WHERE rc.status IN ('active','approved','Active','Approved')");
         }
@@ -333,7 +333,7 @@ public class ProviderRentalRequestsServlet extends HttpServlet {
         if (cols.contains("businesslicensenumber"))        select.add("businesslicensenumber");
         else if (cols.contains("business_license_number")) select.add("business_license_number AS businesslicensenumber");
 
-        String sql = "SELECT " + String.join(", ", select) + " FROM RentalCompany WHERE " + idCol + " = ? LIMIT 1";
+        String sql = "SELECT " + String.join(", ", select) + " FROM rentalcompany WHERE " + idCol + " = ? LIMIT 1";
 
         Map<String, Object> company = new LinkedHashMap<>();
         try (PreparedStatement ps = con.prepareStatement(sql)) {
@@ -355,7 +355,7 @@ public class ProviderRentalRequestsServlet extends HttpServlet {
                     company.put("businesslicensenumber", safeGet(rs, "businesslicensenumber"));
 
                     // Real driver count
-                    try (PreparedStatement ps2 = con.prepareStatement("SELECT COUNT(*) FROM Driver WHERE company_id = ?")) {
+                    try (PreparedStatement ps2 = con.prepareStatement("SELECT COUNT(*) FROM driver WHERE company_id = ?")) {
                         ps2.setInt(1, companyId);
                         try (ResultSet rs2 = ps2.executeQuery()) {
                             company.put("drivers", rs2.next() ? rs2.getInt(1) : 0);
@@ -363,7 +363,7 @@ public class ProviderRentalRequestsServlet extends HttpServlet {
                     }
 
                     // Real vehicle count
-                    try (PreparedStatement ps2 = con.prepareStatement("SELECT COUNT(*) FROM Vehicle WHERE company_id = ?")) {
+                    try (PreparedStatement ps2 = con.prepareStatement("SELECT COUNT(*) FROM vehicle WHERE company_id = ?")) {
                         ps2.setInt(1, companyId);
                         try (ResultSet rs2 = ps2.executeQuery()) {
                             company.put("vehicles", rs2.next() ? rs2.getInt(1) : 0);
@@ -410,10 +410,10 @@ public class ProviderRentalRequestsServlet extends HttpServlet {
     private String listEligibleVehicles(Connection con, int providerId) throws SQLException {
         String sql =
                 "SELECT v.vehicleid, v.vehiclebrand, v.vehiclemodel, v.numberplatenumber, v.location, v.price_per_day " +
-                        "FROM Vehicle v " +
+                        "FROM vehicle v " +
                         "WHERE v.provider_id = ? AND (v.company_id IS NULL OR v.company_id = 0) " +
                         "AND v.vehicleid NOT IN ( " +
-                        "  SELECT pr.vehicle_id FROM ProviderRentalRequests pr " +
+                        "  SELECT pr.vehicle_id FROM providerrentalrequests pr " +
                         "  WHERE pr.provider_id = ? AND pr.status = 'pending' " +
                         ") " +
                         "ORDER BY v.vehicleid DESC";
@@ -465,8 +465,8 @@ public class ProviderRentalRequestsServlet extends HttpServlet {
 
         String sql =
                 "SELECT " + String.join(", ", select) + " " +
-                        "FROM ProviderRentalRequests pr " +
-                        "LEFT JOIN RentalCompany rc ON rc." + companyIdCol + " = pr.company_id " +
+                        "FROM providerrentalrequests pr " +
+                        "LEFT JOIN rentalcompany rc ON rc." + companyIdCol + " = pr.company_id " +
                         "WHERE pr.provider_id = ? " +
                         "ORDER BY pr.request_id DESC";
 
@@ -539,7 +539,7 @@ public class ProviderRentalRequestsServlet extends HttpServlet {
 
             // Ensure vehicle belongs to provider and is not yet assigned
             String checkVehicle =
-                    "SELECT vehicleid FROM Vehicle WHERE vehicleid=? AND provider_id=? AND (company_id IS NULL OR company_id=0)";
+                    "SELECT vehicleid FROM vehicle WHERE vehicleid=? AND provider_id=? AND (company_id IS NULL OR company_id=0)";
             try (PreparedStatement ps = con.prepareStatement(checkVehicle)) {
                 ps.setInt(1, vehicleId);
                 ps.setInt(2, providerId);
@@ -554,7 +554,7 @@ public class ProviderRentalRequestsServlet extends HttpServlet {
 
             // Prevent duplicate pending request for same vehicle
             String dup =
-                    "SELECT request_id FROM ProviderRentalRequests " +
+                    "SELECT request_id FROM providerrentalrequests " +
                             "WHERE provider_id=? AND vehicle_id=? AND status='pending' LIMIT 1";
             try (PreparedStatement ps = con.prepareStatement(dup)) {
                 ps.setInt(1, providerId);
@@ -569,7 +569,7 @@ public class ProviderRentalRequestsServlet extends HttpServlet {
             }
 
             String insert =
-                    "INSERT INTO ProviderRentalRequests (provider_id, vehicle_id, company_id, status, message) " +
+                    "INSERT INTO providerrentalrequests (provider_id, vehicle_id, company_id, status, message) " +
                             "VALUES (?,?,?,?,?)";
             int newId;
             try (PreparedStatement ps = con.prepareStatement(insert, Statement.RETURN_GENERATED_KEYS)) {

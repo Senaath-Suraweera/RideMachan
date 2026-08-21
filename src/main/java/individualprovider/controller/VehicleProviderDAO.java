@@ -9,7 +9,7 @@ import java.sql.*;
 public class VehicleProviderDAO {
 
     public static boolean insertProvider(VehicleProvider provider) {
-        String sql = "INSERT INTO VehicleProvider " +
+        String sql = "INSERT INTO vehicleprovider " +
                 "(username, email, hashedpassword, salt, company_id, firstname, lastname, phonenumber, housenumber, street, city, zipcode) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
@@ -51,7 +51,7 @@ public class VehicleProviderDAO {
     }
 
     public static VehicleProvider loginProvider(String email, String password) {
-        String sql = "SELECT * FROM VehicleProvider WHERE email = ?";
+        String sql = "SELECT * FROM vehicleprovider WHERE email = ?";
         try (Connection con = DBConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
 
@@ -85,7 +85,7 @@ public class VehicleProviderDAO {
     }
 
     public static boolean updatePassword(int providerId, String newPassword) {
-        String sql = "UPDATE VehicleProvider SET hashedpassword = ?, salt = ? WHERE providerid = ?";
+        String sql = "UPDATE vehicleprovider SET hashedpassword = ?, salt = ? WHERE providerid = ?";
         try (Connection con = DBConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
 

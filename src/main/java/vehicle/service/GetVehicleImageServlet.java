@@ -27,7 +27,7 @@ public class GetVehicleImageServlet extends HttpServlet {
 
             try (Connection con = DBConnection.getConnection();
                  PreparedStatement ps = con.prepareStatement(
-                         "SELECT vehicleimages FROM Vehicle WHERE vehicleid = ?")) {
+                         "SELECT vehicleimages FROM vehicle WHERE vehicleid = ?")) {
 
                 ps.setInt(1, vehicleId);
                 ResultSet rs = ps.executeQuery();

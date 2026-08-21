@@ -1,0 +1,16 @@
+target/
+.git/
+.github/
+.idea/
+.vscode/
+.mvn/
+mvnw
+mvnw.cmd
+db/
+lib/
+**/.DS_Store
+*.sql
+.!*!*
+*.iml
+*.log
+.env

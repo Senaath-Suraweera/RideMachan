@@ -9,7 +9,7 @@ loginForm.addEventListener("submit", async (e) => {
 
   try {
     // ✅ Link to VehicleProviderLoginServlet
-    const response = await fetch("http://localhost:8080/provider/login", {
+    const response = await fetch("/provider/login", {
       method: "POST",
       body: new URLSearchParams({
         email: email,

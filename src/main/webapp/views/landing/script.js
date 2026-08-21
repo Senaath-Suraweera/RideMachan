@@ -256,7 +256,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       try {
         // We use fetch with credentials: 'include' to handle the session/cookie
-        const response = await fetch("http://localhost:8080/customer/login", {
+        const response = await fetch("/customer/login", {
           method: "POST",
           headers: { "Content-Type": "application/x-www-form-urlencoded" },
           body: bodyData,
@@ -278,7 +278,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (response.ok) {
           console.log("✅ Login successful — redirecting manually");
           window.location.href =
-            "http://localhost:8080/views/customer/pages/home.html";
+            "/views/customer/pages/home.html";
           return;
         }
 
@@ -374,7 +374,7 @@ document.addEventListener("DOMContentLoaded", () => {
       responseBox.style.color = "#555";
 
       try {
-        const res = await fetch("http://localhost:8080/provider/signup", {
+        const res = await fetch("/provider/signup", {
           method: "POST",
           body: formData,
         });

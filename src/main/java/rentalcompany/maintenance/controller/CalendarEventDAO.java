@@ -22,7 +22,7 @@ public class CalendarEventDAO {
      * Add new calendar event with all fields
      */
     public boolean addEvent(CalendarEvent event) throws SQLException {
-        String sql = "INSERT INTO CalendarEvents " +
+        String sql = "INSERT INTO calendarevents " +
                 "(vehicle_id, service_type, status, description, maintenance_id, " +
                 "scheduled_date, scheduled_time, service_bay, estimated_duration, assigned_technician) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
@@ -47,7 +47,7 @@ public class CalendarEventDAO {
      * Update existing calendar event
      */
     public boolean updateEvent(CalendarEvent event) throws SQLException {
-        String sql = "UPDATE CalendarEvents SET " +
+        String sql = "UPDATE calendarevents SET " +
                 "vehicle_id=?, service_type=?, status=?, description=?, maintenance_id=?, " +
                 "scheduled_date=?, scheduled_time=?, service_bay=?, estimated_duration=?, " +
                 "assigned_technician=? " +
@@ -74,7 +74,7 @@ public class CalendarEventDAO {
      * Update only the status of an event (for quick status changes)
      */
     public boolean updateEventStatus(int eventId, String status) throws SQLException {
-        String sql = "UPDATE CalendarEvents SET status=? WHERE eventid=?";
+        String sql = "UPDATE calendarevents SET status=? WHERE eventid=?";
 
         try (PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setString(1, status);
@@ -88,7 +88,7 @@ public class CalendarEventDAO {
      * Delete an event
      */
     public boolean deleteEvent(int eventId) throws SQLException {
-        String sql = "DELETE FROM CalendarEvents WHERE eventid=?";
+        String sql = "DELETE FROM calendarevents WHERE eventid=?";
 
         try (PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setInt(1, eventId);
@@ -109,8 +109,8 @@ public class CalendarEventDAO {
                 "ce.service_type, ce.status, ce.description, ce.maintenance_id, " +
                 "ce.scheduled_date, TIME_FORMAT(ce.scheduled_time, '%H:%i') AS scheduled_time, " +
                 "ce.service_bay, ce.estimated_duration, ce.assigned_technician " +
-                "FROM CalendarEvents ce " +
-                "INNER JOIN Vehicle v ON ce.vehicle_id = v.vehicleid " +
+                "FROM calendarevents ce " +
+                "INNER JOIN vehicle v ON ce.vehicle_id = v.vehicleid " +
                 "ORDER BY ce.scheduled_date DESC, ce.scheduled_time ASC";
 
         try (PreparedStatement ps = con.prepareStatement(sql);
@@ -151,8 +151,8 @@ public class CalendarEventDAO {
                 "ce.service_type, ce.status, ce.description, ce.maintenance_id, " +
                 "ce.scheduled_date, TIME_FORMAT(ce.scheduled_time, '%H:%i') AS scheduled_time, " +
                 "ce.service_bay, ce.estimated_duration, ce.assigned_technician " +
-                "FROM CalendarEvents ce " +
-                "INNER JOIN Vehicle v ON ce.vehicle_id = v.vehicleid " +
+                "FROM calendarevents ce " +
+                "INNER JOIN vehicle v ON ce.vehicle_id = v.vehicleid " +
                 "WHERE ce.scheduled_date = ? " +
                 "ORDER BY ce.scheduled_time ASC";
 
@@ -196,8 +196,8 @@ public class CalendarEventDAO {
                 "ce.service_type, ce.status, ce.description, ce.maintenance_id, " +
                 "ce.scheduled_date, TIME_FORMAT(ce.scheduled_time, '%H:%i') AS scheduled_time, " +
                 "ce.service_bay, ce.estimated_duration, ce.assigned_technician " +
-                "FROM CalendarEvents ce " +
-                "INNER JOIN Vehicle v ON ce.vehicle_id = v.vehicleid " +
+                "FROM calendarevents ce " +
+                "INNER JOIN vehicle v ON ce.vehicle_id = v.vehicleid " +
                 "WHERE ce.scheduled_date BETWEEN ? AND ? " +
                 "ORDER BY ce.scheduled_date ASC, ce.scheduled_time ASC";
 
@@ -240,8 +240,8 @@ public class CalendarEventDAO {
                 "ce.service_type, ce.status, ce.description, ce.maintenance_id, " +
                 "ce.scheduled_date, TIME_FORMAT(ce.scheduled_time, '%H:%i') AS scheduled_time, " +
                 "ce.service_bay, ce.estimated_duration, ce.assigned_technician " +
-                "FROM CalendarEvents ce " +
-                "INNER JOIN Vehicle v ON ce.vehicle_id = v.vehicleid " +
+                "FROM calendarevents ce " +
+                "INNER JOIN vehicle v ON ce.vehicle_id = v.vehicleid " +
                 "WHERE ce.eventid = ?";
 
         try (PreparedStatement ps = con.prepareStatement(sql)) {
@@ -284,8 +284,8 @@ public class CalendarEventDAO {
                 "ce.service_type, ce.status, ce.description, ce.maintenance_id, " +
                 "ce.scheduled_date, TIME_FORMAT(ce.scheduled_time, '%H:%i') AS scheduled_time, " +
                 "ce.service_bay, ce.estimated_duration, ce.assigned_technician " +
-                "FROM CalendarEvents ce " +
-                "INNER JOIN Vehicle v ON ce.vehicle_id = v.vehicleid " +
+                "FROM calendarevents ce " +
+                "INNER JOIN vehicle v ON ce.vehicle_id = v.vehicleid " +
                 "WHERE ce.status = ? " +
                 "ORDER BY ce.scheduled_date ASC, ce.scheduled_time ASC";
 
@@ -329,7 +329,7 @@ public class CalendarEventDAO {
         String sql =
                 "SELECT eventid, vehicle_id, service_type, status, " +
                         "scheduled_time, assigned_technician " +
-                        "FROM CalendarEvents " +
+                        "FROM calendarevents " +
                         "WHERE vehicle_id = ? AND scheduled_date = ?";
 
         try (Connection con = DBConnection.getConnection();

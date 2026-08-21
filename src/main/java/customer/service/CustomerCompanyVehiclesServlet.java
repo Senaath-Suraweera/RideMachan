@@ -58,7 +58,7 @@ public class CustomerCompanyVehiclesServlet extends HttpServlet {
     private JsonArray getCompanyVehicles(int companyId) {
         JsonArray vehicles = new JsonArray();
         String sql = "SELECT vehicleid, vehiclebrand, vehiclemodel, numberofpassengers, " +
-                "price_per_day, vehicle_type FROM Vehicle WHERE company_id = ? " +
+                "price_per_day, vehicle_type FROM vehicle WHERE company_id = ? " +
                 "ORDER BY vehicleid DESC LIMIT 8";
 
         try (Connection con = DBConnection.getConnection();

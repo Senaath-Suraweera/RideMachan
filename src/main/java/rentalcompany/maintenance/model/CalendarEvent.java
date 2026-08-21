@@ -7,8 +7,8 @@ package rentalcompany.maintenance.model;
 public class CalendarEvent {
     private int eventId;
     private int vehicleId;
-    private String vehicleNumberPlate;  // From Vehicle table
-    private String vehicleModel;        // From Vehicle table (brand + model)
+    private String vehicleNumberPlate;  // From vehicle table
+    private String vehicleModel;        // From vehicle table (brand + model)
     private String serviceType;
     private String status;
     private String description;

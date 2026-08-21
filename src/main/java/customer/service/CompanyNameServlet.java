@@ -40,7 +40,7 @@ public class CompanyNameServlet extends HttpServlet {
 
     private String getCompanyName(int companyId) {
         String companyName = "N/A";
-        String sql = "SELECT companyname FROM RentalCompany WHERE companyid = ?";
+        String sql = "SELECT companyname FROM rentalcompany WHERE companyid = ?";
 
         try (Connection con = DBConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {

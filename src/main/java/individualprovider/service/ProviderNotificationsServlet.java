@@ -58,8 +58,8 @@ public class ProviderNotificationsServlet extends HttpServlet {
                         "v.vehiclebrand, v.vehiclemodel, v.numberplatenumber, " +
                         "c.firstname AS customer_firstname, c.lastname AS customer_lastname " +
                         "FROM companybookings cb " +
-                        "JOIN Vehicle v ON cb.vehicleid = v.vehicleid " +
-                        "JOIN Customer c ON cb.customerid = c.customerid " +
+                        "JOIN vehicle v ON cb.vehicleid = v.vehicleid " +
+                        "JOIN customer c ON cb.customerid = c.customerid " +
                         "WHERE v.provider_id = ? " +
                         "ORDER BY cb.booking_id DESC " +
                         "LIMIT ?";

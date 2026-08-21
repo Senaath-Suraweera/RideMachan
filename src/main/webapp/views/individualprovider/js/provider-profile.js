@@ -31,7 +31,7 @@ async function ensureProviderId() {
   if (providerId) return providerId;
 
   // Try to fetch from backend session
-  const res = await fetch("http://localhost:8080/api/provider/me");
+  const res = await fetch("/api/provider/me");
   const data = await res.json().catch(() => ({}));
 
   if (!res.ok || !data.providerId) {
@@ -82,7 +82,7 @@ function toast(type, msg, which = "toast") {
 }
 
 async function loadProfile(providerId) {
-  const url = `http://localhost:8080/api/provider/profile?providerId=${encodeURIComponent(
+  const url = `/api/provider/profile?providerId=${encodeURIComponent(
     providerId,
   )}`;
 
@@ -107,7 +107,7 @@ async function loadProfile(providerId) {
 }
 
 async function saveProfile(providerId) {
-  const url = `http://localhost:8080/api/provider/profile?providerId=${encodeURIComponent(
+  const url = `/api/provider/profile?providerId=${encodeURIComponent(
     providerId,
   )}`;
 
@@ -179,7 +179,7 @@ async function changePassword() {
   btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating...';
 
   try {
-    await apiPost("http://localhost:8080/provider/change-password", {
+    await apiPost("/provider/change-password", {
       email,
       currentPassword,
       newPassword,

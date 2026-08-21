@@ -69,9 +69,9 @@ public class AdminRejectRentalCompanyRequestServlet extends HttpServlet {
         String reason = extractReason(readBody(req));
         if (reason != null && reason.length() > 255) reason = reason.substring(0, 255);
 
-        String selectReq = "SELECT companyemail, companyname FROM RentalCompanyRegistrationRequest WHERE request_id=?";
+        String selectReq = "SELECT companyemail, companyname FROM rentalcompanyregistrationrequest WHERE request_id=?";
 
-        String update = "UPDATE RentalCompanyRegistrationRequest " +
+        String update = "UPDATE rentalcompanyregistrationrequest " +
                 "SET status='REJECTED', reviewed_at=NOW(), reviewed_by_adminid=?, reject_reason=? " +
                 "WHERE request_id=? AND status='PENDING'";
 

@@ -15,7 +15,7 @@ import java.util.Map;
 public class DriverDAO {
 
     public static boolean insertDriver(Driver driver) {
-        String sql = "INSERT INTO Driver (username, firstname, lastname, email, mobilenumber, description, " +
+        String sql = "INSERT INTO driver (username, firstname, lastname, email, mobilenumber, description, " +
                 "hashedpassword, salt, nicnumber, nic, driverslicence, company_id, Area, licenceexpirydate, licensenumber) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection con = DBConnection.getConnection();
@@ -124,7 +124,7 @@ public class DriverDAO {
 
     public static Driver loginDriver(String email, String password) {
 
-        String sql = "SELECT * FROM Driver WHERE email = ?";
+        String sql = "SELECT * FROM driver WHERE email = ?";
         try (Connection con = DBConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
 
@@ -451,7 +451,7 @@ public class DriverDAO {
         }
 
 
-        StringBuilder sql = new StringBuilder("UPDATE Driver SET ");
+        StringBuilder sql = new StringBuilder("UPDATE driver SET ");
         boolean first = true;
 
         if (driver.getFirstName() != null) {
@@ -762,7 +762,7 @@ public class DriverDAO {
     // Get notification count for driver
     /*public static int getNotificationCount(int driverId) {
 
-        String sql = "SELECT COUNT(*) as count FROM Notification " +
+        String sql = "SELECT COUNT(*) as count FROM notification " +
                 "WHERE driver_id = ? AND is_read = 0";
 
         try (Connection con = DBConnection.getConnection();
@@ -785,7 +785,7 @@ public class DriverDAO {
     // Get message count for driver
     public static int getMessageCount(int driverId) {
 
-        String sql = "SELECT COUNT(*) as count FROM Message " +
+        String sql = "SELECT COUNT(*) as count FROM message " +
                 "WHERE receiver_id = ? AND receiver_type = 'driver' AND is_read = 0";
 
         try (Connection con = DBConnection.getConnection();
@@ -812,8 +812,8 @@ public class DriverDAO {
     public static Driver getDriverById(int driverId) {
 
         String sql = "SELECT d.*, c.companyname as company_name " +
-                "FROM Driver d " +
-                "LEFT JOIN RentalCompany c ON d.company_id = c.companyid " +
+                "FROM driver d " +
+                "LEFT JOIN rentalcompany c ON d.company_id = c.companyid " +
                 "WHERE d.driverid = ?";
 
         try (Connection con = DBConnection.getConnection();
@@ -870,8 +870,8 @@ public class DriverDAO {
     public static boolean updateDriverAvailability(int driverId, String availability) {
 
         // First check if availability column exists
-        String checkColumnSql = "SHOW COLUMNS FROM Driver LIKE 'status'";
-        String updateSql = "UPDATE Driver SET status = ? WHERE driverid = ?";
+        String checkColumnSql = "SHOW COLUMNS FROM driver LIKE 'status'";
+        String updateSql = "UPDATE driver SET status = ? WHERE driverid = ?";
 
         try (Connection con = DBConnection.getConnection()) {
 
@@ -882,7 +882,7 @@ public class DriverDAO {
                 if (!rs.next()) {
                     // Column doesn't exist, create it
                     try (Statement stmt = con.createStatement()) {
-                        stmt.executeUpdate("ALTER TABLE Driver ADD COLUMN status VARCHAR(20) DEFAULT 'available'");
+                        stmt.executeUpdate("ALTER TABLE driver ADD COLUMN status VARCHAR(20) DEFAULT 'available'");
                         System.out.println("Availability column created successfully");
                     }
 
@@ -1423,7 +1423,7 @@ public class DriverDAO {
 
     public static Map<String, Integer> getIssueCountByStatus(int driverId) {
 
-        String sql = "SELECT status, COUNT(*) count FROM Issue WHERE driver_id = ? GROUP BY status";
+        String sql = "SELECT status, COUNT(*) count FROM issue WHERE driver_id = ? GROUP BY status";
         Map<String, Integer> counts = new HashMap<>();
         counts.put("pending", 0);
         counts.put("resolved", 0);

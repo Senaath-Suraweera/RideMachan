@@ -1,5 +1,5 @@
 (function () {
-  const API_BASE = "http://localhost:8080";
+  const API_BASE = "";
   const API = `${API_BASE}/api/admin/vehicle-providers`;
 
   const $ = (s) => document.querySelector(s);

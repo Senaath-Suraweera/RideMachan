@@ -68,7 +68,7 @@ public class CustomerCompanyDetailsServlet extends HttpServlet {
         JsonObject result = new JsonObject();
         String sql = "SELECT companyid, companyname, companyemail, phone, registrationnumber, " +
                 "taxid, street, city, description " +
-                "FROM RentalCompany WHERE companyid = ?";
+                "FROM rentalcompany WHERE companyid = ?";
 
         try (Connection con = DBConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {

@@ -51,7 +51,7 @@ public class DisplayVehicleMaintenanceLogsServlet extends HttpServlet {
             return;
         }
 
-        // Join CalendarEvents -> Vehicle so we can filter by number plate
+        // Join calendarevents -> Vehicle so we can filter by number plate
         // and also pull plate / brand / model for the response.
         String sql =
                 "SELECT ce.eventid, " +
@@ -66,8 +66,8 @@ public class DisplayVehicleMaintenanceLogsServlet extends HttpServlet {
                         "       v.numberplatenumber, " +
                         "       v.vehiclebrand, " +
                         "       v.vehiclemodel " +
-                        "  FROM CalendarEvents ce " +
-                        "  LEFT JOIN Vehicle v ON v.vehicleid = ce.vehicle_id " +
+                        "  FROM calendarevents ce " +
+                        "  LEFT JOIN vehicle v ON v.vehicleid = ce.vehicle_id " +
                         " WHERE ce.maintenance_id = ? " +
                         "   AND v.numberplatenumber = ? " +
                         "   AND ce.status = 'completed' " +

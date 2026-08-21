@@ -223,7 +223,7 @@ public class AdminVehicleProvidersServlet extends HttpServlet {
     /** Serve a LONGBLOB column as an image response */
     private void serveVehicleBlob(Connection con, HttpServletResponse resp, int vehicleId, String column)
             throws SQLException, IOException {
-        String sql = "SELECT " + column + " FROM Vehicle WHERE vehicleid = ?";
+        String sql = "SELECT " + column + " FROM vehicle WHERE vehicleid = ?";
         try (PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setInt(1, vehicleId);
             try (ResultSet rs = ps.executeQuery()) {
@@ -287,7 +287,7 @@ public class AdminVehicleProvidersServlet extends HttpServlet {
         StringBuilder sql = new StringBuilder(
                 "SELECT providerid, username, email, firstname, lastname, phonenumber, city, " +
                         "COALESCE(status,'pending') AS status, created_at " +
-                        "FROM VehicleProvider WHERE 1=1 "
+                        "FROM vehicleprovider WHERE 1=1 "
         );
 
         List<Object> params = new ArrayList<>();
@@ -409,7 +409,7 @@ public class AdminVehicleProvidersServlet extends HttpServlet {
                 }
 
                 String sql =
-                        "INSERT INTO Vehicle (" +
+                        "INSERT INTO vehicle (" +
                                 "vehiclebrand, vehiclemodel, numberplatenumber, tareweight, color, numberofpassengers, " +
                                 "enginecapacity, enginenumber, chasisnumber, registrationdocumentation, vehicleimages, description, milage, " +
                                 "company_id, provider_id, price_per_day, location, features, manufacture_year, transmission, fuel_type, availability_status" +
@@ -493,7 +493,7 @@ public class AdminVehicleProvidersServlet extends HttpServlet {
                 String newStatus = "ban".equals(parts[2]) ? "suspended" : "active";
 
                 try (PreparedStatement ps =
-                             con.prepareStatement("UPDATE VehicleProvider SET status = ? WHERE providerid = ?")) {
+                             con.prepareStatement("UPDATE vehicleprovider SET status = ? WHERE providerid = ?")) {
                     ps.setString(1, newStatus);
                     ps.setInt(2, providerId);
                     int updated = ps.executeUpdate();
@@ -522,7 +522,7 @@ public class AdminVehicleProvidersServlet extends HttpServlet {
                 String status = getStringOrNull(body, "status");
 
                 String sql =
-                        "UPDATE VehicleProvider SET " +
+                        "UPDATE vehicleprovider SET " +
                                 "firstname = COALESCE(?, firstname), " +
                                 "lastname = COALESCE(?, lastname), " +
                                 "email = COALESCE(?, email), " +
@@ -624,7 +624,7 @@ public class AdminVehicleProvidersServlet extends HttpServlet {
                 boolean updateRegDoc = regDocBytes != null && regDocBytes.length > 0;
                 boolean updateVehicleImg = vehicleImgBytes != null && vehicleImgBytes.length > 0;
 
-                StringBuilder sql = new StringBuilder("UPDATE Vehicle SET ");
+                StringBuilder sql = new StringBuilder("UPDATE vehicle SET ");
                 sql.append("vehiclebrand = COALESCE(?, vehiclebrand), ");
                 sql.append("vehiclemodel = COALESCE(?, vehiclemodel), ");
                 sql.append("numberplatenumber = COALESCE(?, numberplatenumber), ");
@@ -709,7 +709,7 @@ public class AdminVehicleProvidersServlet extends HttpServlet {
                 }
 
                 try (PreparedStatement ps = con.prepareStatement(
-                        "DELETE FROM Vehicle WHERE vehicleid = ? AND provider_id = ?")) {
+                        "DELETE FROM vehicle WHERE vehicleid = ? AND provider_id = ?")) {
                     ps.setInt(1, vehicleId);
                     ps.setInt(2, providerId);
 
@@ -731,7 +731,7 @@ public class AdminVehicleProvidersServlet extends HttpServlet {
         String sql =
                 "SELECT providerid, username, email, firstname, lastname, phonenumber, housenumber, street, city, zipcode, company_id, " +
                         "COALESCE(status,'pending') AS status, created_at " +
-                        "FROM VehicleProvider WHERE providerid = ?";
+                        "FROM vehicleprovider WHERE providerid = ?";
 
         try (PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setInt(1, providerId);
@@ -761,7 +761,7 @@ public class AdminVehicleProvidersServlet extends HttpServlet {
 
     private boolean isProviderSuspended(Connection con, int providerId) throws SQLException {
         try (PreparedStatement ps = con.prepareStatement(
-                "SELECT COALESCE(status,'pending') AS status FROM VehicleProvider WHERE providerid = ?")) {
+                "SELECT COALESCE(status,'pending') AS status FROM vehicleprovider WHERE providerid = ?")) {
             ps.setInt(1, providerId);
             try (ResultSet rs = ps.executeQuery()) {
                 if (!rs.next()) return false;
@@ -779,8 +779,8 @@ public class AdminVehicleProvidersServlet extends HttpServlet {
                         "LENGTH(v.registrationdocumentation) AS regdoc_size, " +
                         "LENGTH(v.vehicleimages) AS images_size, " +
                         "rc.companyname AS rental_company_name " +
-                        "FROM Vehicle v " +
-                        "LEFT JOIN RentalCompany rc ON rc.companyid = v.company_id " +
+                        "FROM vehicle v " +
+                        "LEFT JOIN rentalcompany rc ON rc.companyid = v.company_id " +
                         "WHERE v.provider_id = ? " +
                         "ORDER BY v.vehicleid DESC";
 

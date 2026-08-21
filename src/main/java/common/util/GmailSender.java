@@ -8,12 +8,27 @@ import java.util.Base64;
 
 public class GmailSender {
 
+    /** Gmail account used as the From address. Override with MAIL_USER. */
+    private static String senderEmail() {
+        String value = System.getenv("MAIL_USER");
+        return (value == null || value.isBlank()) ? "ridemachan.help@gmail.com" : value;
+    }
+
+    /** Gmail app password. Must come from MAIL_PASSWORD — never hardcode it. */
+    private static String senderPassword() {
+        String value = System.getenv("MAIL_PASSWORD");
+        if (value == null || value.isBlank()) {
+            throw new IllegalStateException(
+                    "MAIL_PASSWORD environment variable is not set. Cannot send email.");
+        }
+        return value;
+    }
 
     public static void sendEmail(String recipient, String subject, String code) {
         String smtpServer = "smtp.gmail.com";
         int port = 465;
-        String senderEmail = "ridemachan.help@gmail.com";
-        String senderPassword = "kyuinmehbisemimj";
+        String senderEmail = senderEmail();
+        String senderPassword = senderPassword();
 
         String body =
                 "<!DOCTYPE html>" +
@@ -72,8 +87,8 @@ public class GmailSender {
     public static void sendHtmlEmail(String recipient, String subject, String htmlBody) {
         String smtpServer = "smtp.gmail.com";
         int port = 465;
-        String senderEmail = "ridemachan.help@gmail.com";
-        String senderPassword = "kyuinmehbisemimj";
+        String senderEmail = senderEmail();
+        String senderPassword = senderPassword();
 
         sendHtmlEmailInternal(recipient, subject, htmlBody, senderEmail, senderPassword, smtpServer, port);
     }
@@ -91,7 +106,7 @@ public class GmailSender {
                 ? "RideMachan | Rental Company Request Approved"
                 : "RideMachan | Rental Company Request Rejected";
 
-        String statusTitle = approved ? "Approved ✅" : "Rejected ❌";
+        String statusTitle = approved ? "Approved " : "Rejected ";
         String statusColor = approved ? "#16a34a" : "#dc2626";
 
         String reasonBlock = "";

@@ -97,7 +97,7 @@ public class RentalCompanyRequestCreateServlet extends HttpServlet {
         String salt = PasswordServices.generateSalt();
         String hashed = PasswordServices.hashPassword(password, salt);
 
-        String sql = "INSERT INTO RentalCompanyRegistrationRequest " +
+        String sql = "INSERT INTO rentalcompanyregistrationrequest " +
                 "(companyname, companyemail, phone, registrationnumber, taxid, street, city, certificatepath, taxdocumentpath, description, terms, hashedpassword, salt, status) " +
                 "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,'PENDING')";
 

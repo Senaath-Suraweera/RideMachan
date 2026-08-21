@@ -83,8 +83,8 @@
 //            String sql =
 //                    "SELECT pr.request_id, pr.provider_id, pr.vehicle_id, pr.company_id, pr.status, pr.message, pr.requested_at, " +
 //                            "v.vehiclebrand, v.vehiclemodel, v.numberplatenumber, v.location, v.price_per_day " +
-//                            "FROM ProviderRentalRequests pr " +
-//                            "LEFT JOIN Vehicle v ON v.vehicleid = pr.vehicle_id " +
+//                            "FROM providerrentalrequests pr " +
+//                            "LEFT JOIN vehicle v ON v.vehicleid = pr.vehicle_id " +
 //                            "WHERE pr.company_id = ? AND pr.status = ? " +
 //                            "ORDER BY pr.request_id DESC";
 //
@@ -168,7 +168,7 @@
 //            Integer providerId = null;
 //
 //            String getReq =
-//                    "SELECT vehicle_id, provider_id FROM ProviderRentalRequests " +
+//                    "SELECT vehicle_id, provider_id FROM providerrentalrequests " +
 //                            "WHERE request_id=? AND company_id=? AND status='pending' FOR UPDATE";
 //            try (PreparedStatement ps = con.prepareStatement(getReq)) {
 //                ps.setInt(1, requestId);
@@ -187,7 +187,7 @@
 //
 //            if ("reject".equalsIgnoreCase(action)) {
 //                String upd =
-//                        "UPDATE ProviderRentalRequests SET status='rejected', responded_at=NOW() " +
+//                        "UPDATE providerrentalrequests SET status='rejected', responded_at=NOW() " +
 //                                "WHERE request_id=? AND company_id=? AND status='pending'";
 //                try (PreparedStatement ps = con.prepareStatement(upd)) {
 //                    ps.setInt(1, requestId);
@@ -202,7 +202,7 @@
 //            // APPROVE:
 //            // 1) Assign vehicle to company (only if still unassigned)
 //            String assign =
-//                    "UPDATE Vehicle SET company_id=? " +
+//                    "UPDATE vehicle SET company_id=? " +
 //                            "WHERE vehicleid=? AND provider_id=? AND (company_id IS NULL OR company_id=0)";
 //            int assigned;
 //            try (PreparedStatement ps = con.prepareStatement(assign)) {
@@ -221,7 +221,7 @@
 //
 //            // 2) Mark request approved
 //            String upd =
-//                    "UPDATE ProviderRentalRequests SET status='approved', responded_at=NOW() " +
+//                    "UPDATE providerrentalrequests SET status='approved', responded_at=NOW() " +
 //                            "WHERE request_id=? AND company_id=? AND status='pending'";
 //            try (PreparedStatement ps = con.prepareStatement(upd)) {
 //                ps.setInt(1, requestId);

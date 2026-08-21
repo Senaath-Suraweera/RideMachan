@@ -160,7 +160,7 @@ public class AdminRentalCompaniesServlet extends HttpServlet {
                 con.setAutoCommit(false);
 
                 String sql =
-                        "UPDATE RentalCompany SET companyname=?, companyemail=?, phone=?, " +
+                        "UPDATE rentalcompany SET companyname=?, companyemail=?, phone=?, " +
                                 "registrationnumber=?, taxid=?, street=?, city=?, description=?, terms=? " +
                                 "WHERE companyid=?";
 
@@ -190,7 +190,7 @@ public class AdminRentalCompaniesServlet extends HttpServlet {
                     Part certificatePart = getPartSafe(req, "certificate");
                     if (certificatePart != null && certificatePart.getSize() > 0) {
                         String savedPath = saveCompanyFile(certificatePart, companyId, "certificate");
-                        ps = con.prepareStatement("UPDATE RentalCompany SET certificatepath=? WHERE companyid=?");
+                        ps = con.prepareStatement("UPDATE rentalcompany SET certificatepath=? WHERE companyid=?");
                         ps.setString(1, savedPath);
                         ps.setInt(2, companyId);
                         ps.executeUpdate();
@@ -200,7 +200,7 @@ public class AdminRentalCompaniesServlet extends HttpServlet {
                     Part taxDocPart = getPartSafe(req, "taxdocument");
                     if (taxDocPart != null && taxDocPart.getSize() > 0) {
                         String savedPath = saveCompanyFile(taxDocPart, companyId, "taxdocument");
-                        ps = con.prepareStatement("UPDATE RentalCompany SET taxdocumentpath=? WHERE companyid=?");
+                        ps = con.prepareStatement("UPDATE rentalcompany SET taxdocumentpath=? WHERE companyid=?");
                         ps.setString(1, savedPath);
                         ps.setInt(2, companyId);
                         ps.executeUpdate();
@@ -251,7 +251,7 @@ public class AdminRentalCompaniesServlet extends HttpServlet {
             int companyId = Integer.parseInt(idStr);
 
             try (Connection con = DBConnection.getConnection();
-                 PreparedStatement ps = con.prepareStatement("DELETE FROM RentalCompany WHERE companyid=?")) {
+                 PreparedStatement ps = con.prepareStatement("DELETE FROM rentalcompany WHERE companyid=?")) {
                 ps.setInt(1, companyId);
                 int rows = ps.executeUpdate();
 
@@ -284,10 +284,10 @@ public class AdminRentalCompaniesServlet extends HttpServlet {
                         "       CASE WHEN COUNT(DISTINCT d.driverid) > 0 THEN 1 ELSE 0 END AS offersDriver, " +
                         "       IFNULL(AVG(r.rating_value), 0) AS rating, " +
                         "       COUNT(DISTINCT r.rating_id) AS reviews " +
-                        "FROM RentalCompany rc " +
-                        "LEFT JOIN Vehicle v ON v.company_id = rc.companyid " +
-                        "LEFT JOIN Driver d ON d.company_id = rc.companyid " +
-                        "LEFT JOIN MaintenanceStaff ms ON ms.company_id = rc.companyid " +
+                        "FROM rentalcompany rc " +
+                        "LEFT JOIN vehicle v ON v.company_id = rc.companyid " +
+                        "LEFT JOIN driver d ON d.company_id = rc.companyid " +
+                        "LEFT JOIN maintenancestaff ms ON ms.company_id = rc.companyid " +
                         "LEFT JOIN ratings r ON r.companyid = rc.companyid " +
                         "GROUP BY rc.companyid, rc.companyname, rc.city, rc.companyemail, rc.phone, rc.street, rc.description " +
                         "ORDER BY rc.companyname ASC";
@@ -357,9 +357,9 @@ public class AdminRentalCompaniesServlet extends HttpServlet {
                         "           ELSE '' " +
                         "       END AS target_name " +
                         "FROM ratings r " +
-                        "LEFT JOIN Customer c ON c.customerid = r.user_id " +
-                        "LEFT JOIN Vehicle v ON r.actor_type = 'VEHICLE' AND v.vehicleid = r.actor_id " +
-                        "LEFT JOIN Driver d ON r.actor_type = 'DRIVER' AND d.driverid = r.actor_id " +
+                        "LEFT JOIN customer c ON c.customerid = r.user_id " +
+                        "LEFT JOIN vehicle v ON r.actor_type = 'VEHICLE' AND v.vehicleid = r.actor_id " +
+                        "LEFT JOIN driver d ON r.actor_type = 'DRIVER' AND d.driverid = r.actor_id " +
                         "WHERE r.companyid = ? " +
                         "ORDER BY r.created_at DESC";
 
@@ -447,7 +447,7 @@ public class AdminRentalCompaniesServlet extends HttpServlet {
                         "SUM(CASE WHEN availability_status='available' THEN 1 ELSE 0 END) AS availableVehicles, " +
                         "SUM(CASE WHEN availability_status='rented' THEN 1 ELSE 0 END) AS rentedVehicles, " +
                         "SUM(CASE WHEN availability_status='maintenance' THEN 1 ELSE 0 END) AS maintenanceVehicles " +
-                        "FROM Vehicle WHERE company_id = ?")) {
+                        "FROM vehicle WHERE company_id = ?")) {
             ps.setInt(1, companyId);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
@@ -463,7 +463,7 @@ public class AdminRentalCompaniesServlet extends HttpServlet {
                 "SELECT COUNT(*) AS totalDrivers, " +
                         "SUM(CASE WHEN availability='available' THEN 1 ELSE 0 END) AS availableDrivers, " +
                         "SUM(CASE WHEN banned=1 THEN 1 ELSE 0 END) AS bannedDrivers " +
-                        "FROM Driver WHERE company_id = ?")) {
+                        "FROM driver WHERE company_id = ?")) {
             ps.setInt(1, companyId);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
@@ -475,7 +475,7 @@ public class AdminRentalCompaniesServlet extends HttpServlet {
         }
 
         try (PreparedStatement ps = con.prepareStatement(
-                "SELECT COUNT(*) AS totalMaintenanceStaff FROM MaintenanceStaff WHERE company_id = ?")) {
+                "SELECT COUNT(*) AS totalMaintenanceStaff FROM maintenancestaff WHERE company_id = ?")) {
             ps.setInt(1, companyId);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
@@ -501,10 +501,10 @@ public class AdminRentalCompaniesServlet extends HttpServlet {
                         "       CASE WHEN COUNT(DISTINCT d.driverid) > 0 THEN 1 ELSE 0 END AS withDriver, " +
                         "       IFNULL(AVG(r.rating_value), 0) AS rating, " +
                         "       COUNT(DISTINCT r.rating_id) AS reviews " +
-                        "FROM RentalCompany rc " +
-                        "LEFT JOIN Vehicle v ON v.company_id = rc.companyid " +
-                        "LEFT JOIN Driver d ON d.company_id = rc.companyid " +
-                        "LEFT JOIN MaintenanceStaff ms ON ms.company_id = rc.companyid " +
+                        "FROM rentalcompany rc " +
+                        "LEFT JOIN vehicle v ON v.company_id = rc.companyid " +
+                        "LEFT JOIN driver d ON d.company_id = rc.companyid " +
+                        "LEFT JOIN maintenancestaff ms ON ms.company_id = rc.companyid " +
                         "LEFT JOIN ratings r ON r.companyid = rc.companyid " +
                         "WHERE rc.companyid = ? " +
                         "GROUP BY rc.companyid, rc.companyname, rc.companyemail, rc.phone, rc.registrationnumber, rc.taxid, rc.street, rc.city, rc.description, rc.terms, rc.certificatepath, rc.taxdocumentpath";
@@ -552,7 +552,7 @@ public class AdminRentalCompaniesServlet extends HttpServlet {
                         "       v.numberofpassengers, v.transmission, v.manufacture_year, " +
                         "       IFNULL(AVG(r.rating_value), 0) AS vRating, " +
                         "       (CASE WHEN v.vehicleimages IS NOT NULL AND LENGTH(v.vehicleimages) > 1 THEN 1 ELSE 0 END) AS hasImage " +
-                        "FROM Vehicle v " +
+                        "FROM vehicle v " +
                         "LEFT JOIN ratings r ON r.actor_type = 'VEHICLE' AND r.actor_id = v.vehicleid " +
                         "WHERE v.company_id = ? " +
                         "GROUP BY v.vehicleid " +
@@ -600,8 +600,8 @@ public class AdminRentalCompaniesServlet extends HttpServlet {
                         "       d.licensenumber, d.mobilenumber, d.email, " +
                         "       COALESCE(d.totalrides,0) AS totalrides, " +
                         "       IFNULL(AVG(r.rating_value), 0) AS dRating, " +
-                        "       (SELECT COUNT(*) FROM DriverProfileImage pi WHERE pi.driver_id = d.driverid) AS hasProfileImage " +
-                        "FROM Driver d " +
+                        "       (SELECT COUNT(*) FROM driverprofileimage pi WHERE pi.driver_id = d.driverid) AS hasProfileImage " +
+                        "FROM driver d " +
                         "LEFT JOIN ratings r ON r.actor_type = 'DRIVER' AND r.actor_id = d.driverid " +
                         "WHERE d.company_id = ? AND COALESCE(d.banned,0) = 0 " +
                         "GROUP BY d.driverid " +
@@ -637,9 +637,9 @@ public class AdminRentalCompaniesServlet extends HttpServlet {
         String mSql =
                 "SELECT ms.maintenanceid, ms.firstname, ms.lastname, ms.email, ms.mobilenumber, " +
                         "       ms.specialization, ms.status, ms.yearsOfExperience, " +
-                        "       (SELECT COUNT(*) FROM maintenanceJobs mj WHERE mj.assignedStaffId = ms.maintenanceid AND mj.status = 'completed') AS completedJobs, " +
-                        "       (SELECT COUNT(*) FROM maintenanceJobs mj WHERE mj.assignedStaffId = ms.maintenanceid AND mj.status IN ('pending','on Job')) AS activeJobs " +
-                        "FROM MaintenanceStaff ms " +
+                        "       (SELECT COUNT(*) FROM maintenancejobs mj WHERE mj.assignedStaffId = ms.maintenanceid AND mj.status = 'completed') AS completedJobs, " +
+                        "       (SELECT COUNT(*) FROM maintenancejobs mj WHERE mj.assignedStaffId = ms.maintenanceid AND mj.status IN ('pending','on Job')) AS activeJobs " +
+                        "FROM maintenancestaff ms " +
                         "WHERE ms.company_id = ? " +
                         "ORDER BY ms.maintenanceid ASC";
 
@@ -703,7 +703,7 @@ public class AdminRentalCompaniesServlet extends HttpServlet {
 
     /* ======================= DOCUMENT SERVING ======================= */
     private void serveCompanyDocument(Connection con, int companyId, String columnName, HttpServletResponse resp) throws IOException, SQLException {
-        String sql = "SELECT " + columnName + " FROM RentalCompany WHERE companyid=?";
+        String sql = "SELECT " + columnName + " FROM rentalcompany WHERE companyid=?";
         try (PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setInt(1, companyId);
             try (ResultSet rs = ps.executeQuery()) {

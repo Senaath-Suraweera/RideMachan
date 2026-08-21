@@ -1,4 +1,4 @@
-const BASE_URL = "http://localhost:8080";
+const BASE_URL = "";
 
 const VEHICLES_API = `${BASE_URL}/api/vehicles`;
 const PROVIDER_REQ_API = `${BASE_URL}/api/provider/rental-requests`;

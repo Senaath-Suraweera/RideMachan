@@ -65,7 +65,7 @@ function setupEventListeners() {
       this.innerHTML =
         '<i class="fas fa-spinner fa-spin"></i><span>Logging out...</span>';
       setTimeout(() => {
-        window.location.href = "http://localhost:8080/views/landing/index.html";
+        window.location.href = "/views/landing/index.html";
       }, 1000);
     }
   });

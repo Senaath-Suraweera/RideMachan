@@ -56,7 +56,7 @@ public class ProviderSaveToDBServlet extends HttpServlet {
         String salt = PasswordServices.generateSalt();
         String hashedPassword = PasswordServices.hashPassword(password, salt);
 
-        String sql = "INSERT INTO VehicleProvider " +
+        String sql = "INSERT INTO vehicleprovider " +
                 "(username, email, hashedpassword, salt, company_id, firstname, lastname, phonenumber, housenumber, street, city, zipcode) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 

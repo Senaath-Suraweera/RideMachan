@@ -68,8 +68,8 @@ public class AdminVehiclesServlet extends HttpServlet {
                     .append("COUNT(r.rating_id) AS reviews, ")
                     .append("(CASE WHEN v.vehicleimages IS NOT NULL AND LENGTH(v.vehicleimages) > 1 THEN 1 ELSE 0 END) AS hasImage, ")
                     .append("(CASE WHEN v.registrationdocumentation IS NOT NULL AND LENGTH(v.registrationdocumentation) > 1 THEN 1 ELSE 0 END) AS hasRegDoc ")
-                    .append("FROM Vehicle v ")
-                    .append("LEFT JOIN RentalCompany rc ON rc.companyid = v.company_id ")
+                    .append("FROM vehicle v ")
+                    .append("LEFT JOIN rentalcompany rc ON rc.companyid = v.company_id ")
                     .append("LEFT JOIN ratings r ON r.actor_type='VEHICLE' AND r.actor_id = v.vehicleid ")
                     .append("WHERE 1=1 ");
 
@@ -186,8 +186,8 @@ public class AdminVehiclesServlet extends HttpServlet {
                         "COUNT(r.rating_id) AS reviews, " +
                         "(CASE WHEN v.vehicleimages IS NOT NULL AND LENGTH(v.vehicleimages) > 1 THEN 1 ELSE 0 END) AS hasImage, " +
                         "(CASE WHEN v.registrationdocumentation IS NOT NULL AND LENGTH(v.registrationdocumentation) > 1 THEN 1 ELSE 0 END) AS hasRegDoc " +
-                        "FROM Vehicle v " +
-                        "LEFT JOIN RentalCompany rc ON rc.companyid = v.company_id " +
+                        "FROM vehicle v " +
+                        "LEFT JOIN rentalcompany rc ON rc.companyid = v.company_id " +
                         "LEFT JOIN ratings r ON r.actor_type='VEHICLE' AND r.actor_id = v.vehicleid " +
                         "WHERE v.vehicleid = ? " +
                         "GROUP BY v.vehicleid";
@@ -339,7 +339,7 @@ public class AdminVehiclesServlet extends HttpServlet {
             }
 
             String sql =
-                    "INSERT INTO Vehicle (vehiclebrand, vehiclemodel, numberplatenumber, tareweight, color, " +
+                    "INSERT INTO vehicle (vehiclebrand, vehiclemodel, numberplatenumber, tareweight, color, " +
                             "numberofpassengers, enginecapacity, enginenumber, chasisnumber, registrationdocumentation, " +
                             "vehicleimages, description, milage, company_id, provider_id, price_per_day, location, " +
                             "features, vehicle_type, fuel_type, availability_status, manufacture_year, transmission) " +
@@ -453,7 +453,7 @@ public class AdminVehiclesServlet extends HttpServlet {
             con.setAutoCommit(false);
 
             String sql =
-                    "UPDATE Vehicle SET vehiclebrand=?, vehiclemodel=?, numberplatenumber=?, " +
+                    "UPDATE vehicle SET vehiclebrand=?, vehiclemodel=?, numberplatenumber=?, " +
                             "tareweight=?, color=?, numberofpassengers=?, enginecapacity=?, enginenumber=?, " +
                             "chasisnumber=?, description=?, milage=?, price_per_day=?, location=?, " +
                             "features=?, vehicle_type=?, fuel_type=?, availability_status=?, " +
@@ -492,7 +492,7 @@ public class AdminVehiclesServlet extends HttpServlet {
             }
 
             if (imageBytes != null && imageBytes.length > 0) {
-                ps = con.prepareStatement("UPDATE Vehicle SET vehicleimages=? WHERE vehicleid=?");
+                ps = con.prepareStatement("UPDATE vehicle SET vehicleimages=? WHERE vehicleid=?");
                 ps.setBytes(1, imageBytes);
                 ps.setInt(2, id);
                 ps.executeUpdate();
@@ -500,7 +500,7 @@ public class AdminVehiclesServlet extends HttpServlet {
             }
 
             if (regBytes != null && regBytes.length > 0) {
-                ps = con.prepareStatement("UPDATE Vehicle SET registrationdocumentation=? WHERE vehicleid=?");
+                ps = con.prepareStatement("UPDATE vehicle SET registrationdocumentation=? WHERE vehicleid=?");
                 ps.setBytes(1, regBytes);
                 ps.setInt(2, id);
                 ps.executeUpdate();
@@ -543,7 +543,7 @@ public class AdminVehiclesServlet extends HttpServlet {
 
         try {
             con = DBConnection.getConnection();
-            ps = con.prepareStatement("DELETE FROM Vehicle WHERE vehicleid=?");
+            ps = con.prepareStatement("DELETE FROM vehicle WHERE vehicleid=?");
             ps.setInt(1, id);
             int rows = ps.executeUpdate();
 
@@ -585,7 +585,7 @@ public class AdminVehiclesServlet extends HttpServlet {
 
         try {
             con = DBConnection.getConnection();
-            ps = con.prepareStatement("UPDATE Vehicle SET availability_status=? WHERE vehicleid=?");
+            ps = con.prepareStatement("UPDATE vehicle SET availability_status=? WHERE vehicleid=?");
             ps.setString(1, status);
             ps.setInt(2, vehicleId);
             ps.executeUpdate();
@@ -613,7 +613,7 @@ public class AdminVehiclesServlet extends HttpServlet {
 
         try {
             con = DBConnection.getConnection();
-            ps = con.prepareStatement("SELECT vehicleimages FROM Vehicle WHERE vehicleid=?");
+            ps = con.prepareStatement("SELECT vehicleimages FROM vehicle WHERE vehicleid=?");
             ps.setInt(1, vehicleId);
             rs = ps.executeQuery();
 
@@ -658,7 +658,7 @@ public class AdminVehiclesServlet extends HttpServlet {
 
         try {
             con = DBConnection.getConnection();
-            ps = con.prepareStatement("SELECT registrationdocumentation FROM Vehicle WHERE vehicleid=?");
+            ps = con.prepareStatement("SELECT registrationdocumentation FROM vehicle WHERE vehicleid=?");
             ps.setInt(1, vehicleId);
             rs = ps.executeQuery();
 

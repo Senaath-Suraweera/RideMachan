@@ -121,7 +121,7 @@ public class ProviderReportsServlet extends HttpServlet {
         }
 
         String sql = """
-            INSERT INTO Report (
+            INSERT INTO report (
                 category,
                 status,
                 priority,
@@ -196,7 +196,7 @@ public class ProviderReportsServlet extends HttpServlet {
                 reporter_phone,
                 created_at,
                 updated_at
-            FROM Report
+            FROM report
             WHERE reporter_role = 'PROVIDER'
               AND reporter_id = ?
         """);
@@ -282,7 +282,7 @@ public class ProviderReportsServlet extends HttpServlet {
                 reporter_phone,
                 created_at,
                 updated_at
-            FROM Report
+            FROM report
             WHERE report_id = ?
               AND reporter_role = 'PROVIDER'
               AND reporter_id = ?
@@ -337,7 +337,7 @@ public class ProviderReportsServlet extends HttpServlet {
         List<Integer> imageIds = new ArrayList<>();
 
         try (Connection con = DBConnection.getConnection()) {
-            String insertSql = "INSERT INTO ReportImage (report_id, image_data) VALUES (?, ?)";
+            String insertSql = "INSERT INTO reportimage (report_id, image_data) VALUES (?, ?)";
 
             for (Part part : req.getParts()) {
                 if (!"images".equals(part.getName())) continue;
@@ -370,7 +370,7 @@ public class ProviderReportsServlet extends HttpServlet {
     private boolean ownsReport(int providerId, int reportId) throws Exception {
         String sql = """
             SELECT 1
-            FROM Report
+            FROM report
             WHERE report_id = ?
               AND reporter_role = 'PROVIDER'
               AND reporter_id = ?
@@ -389,7 +389,7 @@ public class ProviderReportsServlet extends HttpServlet {
     }
 
     private List<Integer> getImageIds(Connection con, int reportId) throws Exception {
-        String sql = "SELECT image_id FROM ReportImage WHERE report_id = ? ORDER BY created_at DESC";
+        String sql = "SELECT image_id FROM reportimage WHERE report_id = ? ORDER BY created_at DESC";
         List<Integer> ids = new ArrayList<>();
 
         try (PreparedStatement ps = con.prepareStatement(sql)) {
@@ -412,7 +412,7 @@ public class ProviderReportsServlet extends HttpServlet {
                 TRIM(CONCAT(COALESCE(firstname, ''), ' ', COALESCE(lastname, ''))) AS full_name,
                 email,
                 phonenumber
-            FROM VehicleProvider
+            FROM vehicleprovider
             WHERE providerid = ?
         """;
 

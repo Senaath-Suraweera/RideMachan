@@ -39,7 +39,7 @@ public class ResetCompanyPasswordServlet extends HttpServlet {
             String salt = PasswordServices.generateSalt();
             String hashedPassword = PasswordServices.hashPassword(newPassword, salt);
 
-            String sql = "UPDATE RentalCompany SET hashedpassword = ?, salt = ? WHERE companyid = ?";
+            String sql = "UPDATE rentalcompany SET hashedpassword = ?, salt = ? WHERE companyid = ?";
 
             try (Connection conn = DBConnection.getConnection();
                  PreparedStatement stmt = conn.prepareStatement(sql)) {

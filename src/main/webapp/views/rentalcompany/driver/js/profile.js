@@ -486,14 +486,14 @@ async function handleLogout() {
       });
 
       if (response.ok) {
-        window.location.href = "http://localhost:8080/views/landing/index.html";
+        window.location.href = "/views/landing/index.html";
       } else {
         showError("Logout failed. Please try again.");
       }
     } catch (error) {
       console.error("Logout error:", error);
       // Even if logout fails, redirect to login
-      window.location.href = "http://localhost:8080/views/landing/index.html";
+      window.location.href = "/views/landing/index.html";
     }
   }
 }

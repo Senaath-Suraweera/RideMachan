@@ -14,7 +14,7 @@ import java.sql.*;
 
 /**
  * Called after OTP verification.
- * Reads company data from session and inserts into RentalCompanyRegistrationRequest
+ * Reads company data from session and inserts into rentalcompanyregistrationrequest
  * with status = 'PENDING'. Admin must approve before a RentalCompany row is created.
  */
 @WebServlet("/company/save")
@@ -62,8 +62,8 @@ public class SaveRentalCompanyToDBServlet extends HttpServlet {
         String salt = PasswordServices.generateSalt();
         String hashedPassword = PasswordServices.hashPassword(password, salt);
 
-        // ── Insert into RentalCompanyRegistrationRequest ────────────
-        String sql = "INSERT INTO RentalCompanyRegistrationRequest " +
+        // ── Insert into rentalcompanyregistrationrequest ────────────
+        String sql = "INSERT INTO rentalcompanyregistrationrequest " +
                 "(companyname, companyemail, phone, registrationnumber, taxid, street, city, " +
                 " certificatepath, taxdocumentpath, description, terms, hashedpassword, salt, status) " +
                 "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,'PENDING')";

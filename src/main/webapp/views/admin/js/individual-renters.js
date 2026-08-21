@@ -1,6 +1,6 @@
 // Individual Renters (Vehicle Providers) – API-backed list + navigation (FIXED)
 (() => {
-  const API_BASE = "http://localhost:8080";
+  const API_BASE = "";
   const API = `${API_BASE}/api/admin/vehicle-providers`;
 
   const $ = (s) => document.querySelector(s);
@@ -218,8 +218,7 @@
       card.className = "renter-card";
       card.dataset.renterId = id;
 
-      // ✅ HTML matches your individual-renters.css classes:
-      // .renter-avatar, .renter-info, .status-badge.active/.pending, .renter-details
+
       card.innerHTML = `
         <div class="renter-avatar">
           <div class="avatar-text">${esc(initial)}</div>
@@ -422,7 +421,7 @@
     }
 
     try {
-      const res = await fetch("http://localhost:8080/provider/signup", {
+      const res = await fetch("/provider/signup", {
         method: "POST",
         body: fd, // matches @MultipartConfig servlet
       });

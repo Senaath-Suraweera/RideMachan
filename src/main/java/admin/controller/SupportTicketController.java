@@ -89,7 +89,7 @@ public class SupportTicketController {
 
             StringBuilder sql = new StringBuilder(
                     "SELECT ticket_id, actor_type, actor_id, subject, status, priority, booking_id, created_at " +
-                            "FROM SupportTicket WHERE 1=1"
+                            "FROM supportticket WHERE 1=1"
             );
 
             List<Object> params = new ArrayList<>();
@@ -146,7 +146,7 @@ public class SupportTicketController {
         try {
             con = DBConnection.getConnection();
 
-            String sql = "SELECT * FROM SupportTicket WHERE ticket_id=?";
+            String sql = "SELECT * FROM supportticket WHERE ticket_id=?";
             PreparedStatement ps = con.prepareStatement(sql);
             ps.setInt(1, ticketId);
 
@@ -180,7 +180,7 @@ public class SupportTicketController {
         try {
             con = DBConnection.getConnection();
 
-            String sql = "UPDATE SupportTicket SET subject=?, description=?, admin_notes=?, status=?, priority=?, booking_id=? WHERE ticket_id=?";
+            String sql = "UPDATE supportticket SET subject=?, description=?, admin_notes=?, status=?, priority=?, booking_id=? WHERE ticket_id=?";
             PreparedStatement ps = con.prepareStatement(sql);
 
             ps.setString(1, subject);
@@ -204,7 +204,7 @@ public class SupportTicketController {
         try {
             con = DBConnection.getConnection();
 
-            String sql = "INSERT INTO SupportTicketImage(ticket_id, image_data) VALUES(?, ?)";
+            String sql = "INSERT INTO supportticketimage(ticket_id, image_data) VALUES(?, ?)";
             PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             ps.setInt(1, ticketId);
             ps.setBytes(2, imageBytes);
@@ -225,7 +225,7 @@ public class SupportTicketController {
         try {
             con = DBConnection.getConnection();
 
-            String sql = "SELECT image_data FROM SupportTicketImage WHERE image_id=?";
+            String sql = "SELECT image_data FROM supportticketimage WHERE image_id=?";
             PreparedStatement ps = con.prepareStatement(sql);
             ps.setInt(1, imageId);
 
@@ -243,7 +243,7 @@ public class SupportTicketController {
         try {
             con = DBConnection.getConnection();
 
-            String sql = "DELETE FROM SupportTicketImage WHERE image_id=?";
+            String sql = "DELETE FROM supportticketimage WHERE image_id=?";
             PreparedStatement ps = con.prepareStatement(sql);
             ps.setInt(1, imageId);
 
@@ -260,7 +260,7 @@ public class SupportTicketController {
         try {
             con = DBConnection.getConnection();
 
-            String sql = "SELECT image_id FROM SupportTicketImage WHERE ticket_id=? ORDER BY created_at DESC";
+            String sql = "SELECT image_id FROM supportticketimage WHERE ticket_id=? ORDER BY created_at DESC";
             PreparedStatement ps = con.prepareStatement(sql);
             ps.setInt(1, ticketId);
 

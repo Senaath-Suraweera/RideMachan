@@ -35,7 +35,7 @@ public class AdminRentalCompanyRequestsServlet extends HttpServlet {
         // UPDATED: includes description, terms
         String sql = "SELECT request_id, companyname, companyemail, phone, city, registrationnumber, " +
                 "       description, terms, status, submitted_at " +
-                "FROM RentalCompanyRegistrationRequest " +
+                "FROM rentalcompanyregistrationrequest " +
                 "WHERE status = ? ORDER BY submitted_at DESC";
 
         try (Connection con = DBConnection.getConnection();

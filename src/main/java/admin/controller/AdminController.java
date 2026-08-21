@@ -31,7 +31,7 @@ public class AdminController {
             String salt = PasswordServices.generateSalt();
             String hashedPassword = PasswordServices.hashPassword(password, salt);
 
-            String sql = "INSERT INTO Admin (username, email, phonenumber, hashedpassword, salt, nic) VALUES (?, ?, ?, ?, ?, ?)";
+            String sql = "INSERT INTO admin (username, email, phonenumber, hashedpassword, salt, nic) VALUES (?, ?, ?, ?, ?, ?)";
             try (PreparedStatement pstmt = con.prepareStatement(sql)) {
                 pstmt.setString(1, username);
                 pstmt.setString(2, email);
@@ -42,7 +42,7 @@ public class AdminController {
 
                 int rows = pstmt.executeUpdate();
                 if (rows > 0) {
-                    System.out.println("Data inserted into Customer successfully");
+                    System.out.println("Data inserted into customer successfully");
                     isSuccess = true;
                 }
             }
@@ -54,7 +54,7 @@ public class AdminController {
     }
 
     public Admin getAdminByEmail(String email) {
-        String sql = "SELECT * FROM Admin WHERE email = ?";
+        String sql = "SELECT * FROM admin WHERE email = ?";
         try (Connection con = DBConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setString(1, email);
@@ -78,7 +78,7 @@ public class AdminController {
 
     public static List<Admin> getAllAdmins() {
         List<Admin> admins = new ArrayList<>();
-        String sql = "SELECT adminid, username, email, phonenumber, nic FROM Admin";
+        String sql = "SELECT adminid, username, email, phonenumber, nic FROM admin";
 
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
@@ -101,7 +101,7 @@ public class AdminController {
 
 
     public static boolean deleteAdmin(int adminId) {
-        String sql = "DELETE FROM Admin WHERE adminId = ?";
+        String sql = "DELETE FROM admin WHERE adminId = ?";
         try (Connection con = DBConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setInt(1, adminId);
@@ -119,7 +119,7 @@ public class AdminController {
 
     public boolean updateAdmin(int adminId, String username, String email, String phoneNumber) {
         try (Connection conn = DBConnection.getConnection()) {
-            String sql = "UPDATE Admin SET username=?, email=?, phoneNumber=? WHERE adminId=?";
+            String sql = "UPDATE admin SET username=?, email=?, phoneNumber=? WHERE adminId=?";
             PreparedStatement ps = conn.prepareStatement(sql);
             ps.setString(1, username);
             ps.setString(2, email);
@@ -141,7 +141,7 @@ public class AdminController {
     public boolean makeActive(String email)
     {
         try (Connection conn = DBConnection.getConnection()) {
-            String sql = "UPDATE Admin SET active=? WHERE email=?";
+            String sql = "UPDATE admin SET active=? WHERE email=?";
             PreparedStatement ps = conn.prepareStatement(sql);
             ps.setString(1, "1");
             ps.setString(2, email);
@@ -156,7 +156,7 @@ public class AdminController {
     public boolean makeInactive(String email)
     {
         try (Connection conn = DBConnection.getConnection()) {
-            String sql = "UPDATE Admin SET active=? WHERE email=?";
+            String sql = "UPDATE admin SET active=? WHERE email=?";
             PreparedStatement ps = conn.prepareStatement(sql);
             ps.setString(1, "0");
             ps.setString(2, email);
@@ -169,7 +169,7 @@ public class AdminController {
     }
 
     public static boolean emailExists(String email) {
-        String sql = "SELECT COUNT(*) FROM Admin WHERE email = ?";
+        String sql = "SELECT COUNT(*) FROM admin WHERE email = ?";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, email);
@@ -186,7 +186,7 @@ public class AdminController {
     public static boolean setVerified(String email)
     {
         try (Connection conn = DBConnection.getConnection()) {
-            String sql = "UPDATE Admin SET verified=? WHERE email=?";
+            String sql = "UPDATE admin SET verified=? WHERE email=?";
             PreparedStatement ps = conn.prepareStatement(sql);
             ps.setString(1, "1");
             ps.setString(2, email);
@@ -199,7 +199,7 @@ public class AdminController {
     }
 
     public static boolean updatePassword(int adminId, String newPassword) {
-        String sql = "UPDATE Admin SET hashedpassword = ?, salt = ? WHERE adminid = ?";
+        String sql = "UPDATE admin SET hashedpassword = ?, salt = ? WHERE adminid = ?";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 

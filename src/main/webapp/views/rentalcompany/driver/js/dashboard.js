@@ -402,11 +402,11 @@ async function handleLogout() {
     });
 
     // Redirect to login regardless of response
-    window.location.href = "http://localhost:8080/views/landing/index.html";
+    window.location.href = "/views/landing/index.html";
   } catch (error) {
     console.error("Logout error:", error);
     // Redirect anyway
-    window.location.href = "http://localhost:8080/views/landing/index.html";
+    window.location.href = "/views/landing/index.html";
   }
 }
 

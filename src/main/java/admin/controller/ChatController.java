@@ -20,7 +20,7 @@ public class ChatController {
         try {
             con = DBConnection.getConnection();
             PreparedStatement ps = con.prepareStatement(
-                    "SELECT 1 FROM MessagingPermission WHERE from_actor_type=? AND to_actor_type=? LIMIT 1"
+                    "SELECT 1 FROM messagingpermission WHERE from_actor_type=? AND to_actor_type=? LIMIT 1"
             );
             ps.setString(1, fromType.toUpperCase());
             ps.setString(2, toType.toUpperCase());
@@ -36,7 +36,7 @@ public class ChatController {
         try {
             con = DBConnection.getConnection();
             PreparedStatement ps = con.prepareStatement(
-                    "SELECT to_actor_type FROM MessagingPermission WHERE from_actor_type=?"
+                    "SELECT to_actor_type FROM messagingpermission WHERE from_actor_type=?"
             );
             ps.setString(1, actorType.toUpperCase());
             ResultSet rs = ps.executeQuery();
@@ -54,22 +54,22 @@ public class ChatController {
             String sql;
             switch (actorType.toUpperCase()) {
                 case "ADMIN":
-                    sql = "SELECT username AS name FROM Admin WHERE adminid=?";
+                    sql = "SELECT username AS name FROM admin WHERE adminid=?";
                     break;
                 case "CUSTOMER":
-                    sql = "SELECT CONCAT(firstname,' ',lastname) AS name FROM Customer WHERE customerid=?";
+                    sql = "SELECT CONCAT(firstname,' ',lastname) AS name FROM customer WHERE customerid=?";
                     break;
                 case "DRIVER":
-                    sql = "SELECT CONCAT(firstname,' ',lastname) AS name FROM Driver WHERE driverid=?";
+                    sql = "SELECT CONCAT(firstname,' ',lastname) AS name FROM driver WHERE driverid=?";
                     break;
                 case "COMPANY":
-                    sql = "SELECT companyname AS name FROM RentalCompany WHERE companyid=?";
+                    sql = "SELECT companyname AS name FROM rentalcompany WHERE companyid=?";
                     break;
                 case "MAINTENANCE":
-                    sql = "SELECT CONCAT(firstname,' ',lastname) AS name FROM MaintenanceStaff WHERE maintenanceid=?";
+                    sql = "SELECT CONCAT(firstname,' ',lastname) AS name FROM maintenancestaff WHERE maintenanceid=?";
                     break;
                 case "PROVIDER":
-                    sql = "SELECT CONCAT(firstname,' ',lastname) AS name FROM VehicleProvider WHERE providerid=?";
+                    sql = "SELECT CONCAT(firstname,' ',lastname) AS name FROM vehicleprovider WHERE providerid=?";
                     break;
                 default:
                     return actorType + " #" + actorId;
@@ -94,22 +94,22 @@ public class ChatController {
             String sql;
             switch (actorType.toUpperCase()) {
                 case "ADMIN":
-                    sql = "SELECT adminid AS id, username AS name FROM Admin WHERE active=1";
+                    sql = "SELECT adminid AS id, username AS name FROM admin WHERE active=1";
                     break;
                 case "CUSTOMER":
-                    sql = "SELECT customerid AS id, CONCAT(firstname,' ',lastname) AS name FROM Customer WHERE active=1";
+                    sql = "SELECT customerid AS id, CONCAT(firstname,' ',lastname) AS name FROM customer WHERE active=1";
                     break;
                 case "DRIVER":
-                    sql = "SELECT driverid AS id, CONCAT(firstname,' ',lastname) AS name FROM Driver WHERE active=1";
+                    sql = "SELECT driverid AS id, CONCAT(firstname,' ',lastname) AS name FROM driver WHERE active=1";
                     break;
                 case "COMPANY":
-                    sql = "SELECT companyid AS id, companyname AS name FROM RentalCompany";
+                    sql = "SELECT companyid AS id, companyname AS name FROM rentalcompany";
                     break;
                 case "MAINTENANCE":
-                    sql = "SELECT maintenanceid AS id, CONCAT(firstname,' ',lastname) AS name FROM MaintenanceStaff";
+                    sql = "SELECT maintenanceid AS id, CONCAT(firstname,' ',lastname) AS name FROM maintenancestaff";
                     break;
                 case "PROVIDER":
-                    sql = "SELECT providerid AS id, CONCAT(firstname,' ',lastname) AS name FROM VehicleProvider WHERE status='active'";
+                    sql = "SELECT providerid AS id, CONCAT(firstname,' ',lastname) AS name FROM vehicleprovider WHERE status='active'";
                     break;
                 default:
                     return list;
@@ -139,7 +139,7 @@ public class ChatController {
             if (existing != null) return existing;
 
             PreparedStatement ps = con.prepareStatement(
-                    "INSERT INTO Conversation(type) VALUES('DIRECT')",
+                    "INSERT INTO conversation(type) VALUES('DIRECT')",
                     Statement.RETURN_GENERATED_KEYS
             );
             ps.executeUpdate();
@@ -162,9 +162,9 @@ public class ChatController {
             con = DBConnection.getConnection();
             String sql =
                     "SELECT c.conversation_id " +
-                            "FROM Conversation c " +
-                            "JOIN ConversationParticipant p1 ON c.conversation_id=p1.conversation_id " +
-                            "JOIN ConversationParticipant p2 ON c.conversation_id=p2.conversation_id " +
+                            "FROM conversation c " +
+                            "JOIN conversationparticipant p1 ON c.conversation_id=p1.conversation_id " +
+                            "JOIN conversationparticipant p2 ON c.conversation_id=p2.conversation_id " +
                             "WHERE c.type='DIRECT' " +
                             "AND p1.actor_type=? AND p1.actor_id=? " +
                             "AND p2.actor_type=? AND p2.actor_id=? " +
@@ -184,7 +184,7 @@ public class ChatController {
         try {
             con = DBConnection.getConnection();
             PreparedStatement ps = con.prepareStatement(
-                    "INSERT IGNORE INTO ConversationParticipant(conversation_id, actor_type, actor_id) VALUES(?,?,?)"
+                    "INSERT IGNORE INTO conversationparticipant(conversation_id, actor_type, actor_id) VALUES(?,?,?)"
             );
             ps.setInt(1, convId);
             ps.setString(2, type);
@@ -203,13 +203,13 @@ public class ChatController {
             con = DBConnection.getConnection();
             String sql =
                     "SELECT c.conversation_id, c.type, c.title, c.created_at, " +
-                            "  (SELECT m.content FROM Message m WHERE m.conversation_id=c.conversation_id ORDER BY m.sent_at DESC LIMIT 1) AS last_message, " +
-                            "  (SELECT m.sent_at  FROM Message m WHERE m.conversation_id=c.conversation_id ORDER BY m.sent_at DESC LIMIT 1) AS last_time, " +
-                            "  (SELECT COUNT(*) FROM Message m2 " +
+                            "  (SELECT m.content FROM message m WHERE m.conversation_id=c.conversation_id ORDER BY m.sent_at DESC LIMIT 1) AS last_message, " +
+                            "  (SELECT m.sent_at  FROM message m WHERE m.conversation_id=c.conversation_id ORDER BY m.sent_at DESC LIMIT 1) AS last_time, " +
+                            "  (SELECT COUNT(*) FROM message m2 " +
                             "     WHERE m2.conversation_id=c.conversation_id " +
                             "       AND m2.message_id > COALESCE(p.last_read_message_id,0)) AS unread_count " +
-                            "FROM Conversation c " +
-                            "JOIN ConversationParticipant p ON c.conversation_id=p.conversation_id " +
+                            "FROM conversation c " +
+                            "JOIN conversationparticipant p ON c.conversation_id=p.conversation_id " +
                             "WHERE p.actor_type=? AND p.actor_id=? " +
                             "ORDER BY COALESCE(last_time, c.created_at) DESC";
             PreparedStatement ps = con.prepareStatement(sql);
@@ -258,7 +258,7 @@ public class ChatController {
         try {
             con = DBConnection.getConnection();
             PreparedStatement ps = con.prepareStatement(
-                    "SELECT actor_type, actor_id FROM ConversationParticipant " +
+                    "SELECT actor_type, actor_id FROM conversationparticipant " +
                             "WHERE conversation_id=? AND NOT (actor_type=? AND actor_id=?) LIMIT 1"
             );
             ps.setInt(1, convId);
@@ -282,7 +282,7 @@ public class ChatController {
         try {
             con = DBConnection.getConnection();
             PreparedStatement ps = con.prepareStatement(
-                    "INSERT INTO Message(conversation_id, sender_type, sender_id, content) VALUES(?,?,?,?)",
+                    "INSERT INTO message(conversation_id, sender_type, sender_id, content) VALUES(?,?,?,?)",
                     Statement.RETURN_GENERATED_KEYS
             );
             ps.setInt(1, convId);
@@ -295,7 +295,7 @@ public class ChatController {
             if (!keys.next()) return null;
             int msgId = keys.getInt(1);
 
-            PreparedStatement ps2 = con.prepareStatement("SELECT sent_at FROM Message WHERE message_id=?");
+            PreparedStatement ps2 = con.prepareStatement("SELECT sent_at FROM message WHERE message_id=?");
             ps2.setInt(1, msgId);
             ResultSet rs = ps2.executeQuery();
             String sentAt = null;
@@ -336,7 +336,7 @@ public class ChatController {
             con = DBConnection.getConnection();
             PreparedStatement ps = con.prepareStatement(
                     "SELECT message_id, conversation_id, sender_type, sender_id, content, sent_at " +
-                            "FROM Message WHERE conversation_id=? ORDER BY sent_at DESC LIMIT ? OFFSET ?"
+                            "FROM message WHERE conversation_id=? ORDER BY sent_at DESC LIMIT ? OFFSET ?"
             );
             ps.setInt(1, convId);
             ps.setInt(2, limit);
@@ -365,7 +365,7 @@ public class ChatController {
 
             // Mark conversation read
             PreparedStatement ps = con.prepareStatement(
-                    "UPDATE ConversationParticipant SET last_read_message_id=? " +
+                    "UPDATE conversationparticipant SET last_read_message_id=? " +
                             "WHERE conversation_id=? AND actor_type=? AND actor_id=?"
             );
             ps.setInt(1, lastMessageId);
@@ -376,7 +376,7 @@ public class ChatController {
 
             // Also mark related notifications as read
             PreparedStatement ps2 = con.prepareStatement(
-                    "UPDATE Notification SET is_read=TRUE " +
+                    "UPDATE notification SET is_read=TRUE " +
                             "WHERE recipient_type=? AND recipient_id=? AND reference_type='CONVERSATION' AND reference_id=?"
             );
             ps2.setString(1, actorType);
@@ -395,7 +395,7 @@ public class ChatController {
         try {
             con = DBConnection.getConnection();
             PreparedStatement ps = con.prepareStatement(
-                    "SELECT 1 FROM ConversationParticipant WHERE conversation_id=? AND actor_type=? AND actor_id=? LIMIT 1"
+                    "SELECT 1 FROM conversationparticipant WHERE conversation_id=? AND actor_type=? AND actor_id=? LIMIT 1"
             );
             ps.setInt(1, convId);
             ps.setString(2, actorType);
@@ -412,7 +412,7 @@ public class ChatController {
         try {
             con = DBConnection.getConnection();
             PreparedStatement ps = con.prepareStatement(
-                    "SELECT actor_type, actor_id FROM ConversationParticipant WHERE conversation_id=?"
+                    "SELECT actor_type, actor_id FROM conversationparticipant WHERE conversation_id=?"
             );
             ps.setInt(1, convId);
             ResultSet rs = ps.executeQuery();
@@ -438,7 +438,7 @@ public class ChatController {
         try {
             con = DBConnection.getConnection();
             PreparedStatement ps = con.prepareStatement(
-                    "INSERT INTO Notification(recipient_type, recipient_id, type, title, body, reference_type, reference_id) " +
+                    "INSERT INTO notification(recipient_type, recipient_id, type, title, body, reference_type, reference_id) " +
                             "VALUES(?,?,?,?,?,?,?)"
             );
             ps.setString(1, recipientType);
@@ -459,7 +459,7 @@ public class ChatController {
         try {
             con = DBConnection.getConnection();
             PreparedStatement ps = con.prepareStatement(
-                    "SELECT * FROM Notification WHERE recipient_type=? AND recipient_id=? " +
+                    "SELECT * FROM notification WHERE recipient_type=? AND recipient_id=? " +
                             "ORDER BY created_at DESC LIMIT ? OFFSET ?"
             );
             ps.setString(1, actorType);
@@ -491,7 +491,7 @@ public class ChatController {
         try {
             con = DBConnection.getConnection();
             PreparedStatement ps = con.prepareStatement(
-                    "SELECT COUNT(*) FROM Notification WHERE recipient_type=? AND recipient_id=? AND is_read=FALSE"
+                    "SELECT COUNT(*) FROM notification WHERE recipient_type=? AND recipient_id=? AND is_read=FALSE"
             );
             ps.setString(1, actorType);
             ps.setInt(2, actorId);
@@ -507,7 +507,7 @@ public class ChatController {
         try {
             con = DBConnection.getConnection();
             PreparedStatement ps = con.prepareStatement(
-                    "UPDATE Notification SET is_read=TRUE WHERE notification_id=? AND recipient_type=? AND recipient_id=?"
+                    "UPDATE notification SET is_read=TRUE WHERE notification_id=? AND recipient_type=? AND recipient_id=?"
             );
             ps.setInt(1, notificationId);
             ps.setString(2, actorType);
@@ -523,7 +523,7 @@ public class ChatController {
         try {
             con = DBConnection.getConnection();
             PreparedStatement ps = con.prepareStatement(
-                    "UPDATE Notification SET is_read=TRUE WHERE recipient_type=? AND recipient_id=? AND is_read=FALSE"
+                    "UPDATE notification SET is_read=TRUE WHERE recipient_type=? AND recipient_id=? AND is_read=FALSE"
             );
             ps.setString(1, actorType);
             ps.setInt(2, actorId);
